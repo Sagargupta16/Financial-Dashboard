@@ -2,52 +2,32 @@
 import React from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
+import {
+  formatCurrency,
+  formatCurrencyDetailed,
+  getCommonChartOptions,
+  exportChartAsPNG,
+  colorPalettes,
+  monthNames,
+  shortMonthNames,
+} from "../../utils/chartUtils";
+import {
+  ChartContainer,
+  ExportButton,
+  DropdownSelect,
+  TimeNavigationControls,
+  ChartWrapper,
+  FilterControls,
+  InfoCard,
+} from "../UI/ChartUIComponents";
+import {
+  useTimeNavigation,
+  useChartDataProcessor,
+  useMultipleFilters,
+} from "../../hooks/useChartHooks";
 
-// Chart Options Configuration
-export const commonChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { labels: { color: "#9ca3af" } },
-    tooltip: {
-      callbacks: {
-        label: (c) => {
-          const formatCurrency = (value) => {
-            return new Intl.NumberFormat("en-IN", {
-              style: "currency",
-              currency: "INR",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(value);
-          };
-          return `${c.dataset.label || ""}: ${formatCurrency(
-            c.parsed.y || c.parsed
-          )}`;
-        },
-      },
-    },
-  },
-  scales: {
-    x: { ticks: { color: "#9ca3af" }, grid: { color: "#374151" } },
-    y: {
-      ticks: {
-        color: "#9ca3af",
-        callback: (v) => {
-          const formatCurrency = (value) => {
-            return new Intl.NumberFormat("en-IN", {
-              style: "currency",
-              currency: "INR",
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(value);
-          };
-          return formatCurrency(v);
-        },
-      },
-      grid: { color: "#374151" },
-    },
-  },
-};
+// Legacy chart options for backward compatibility
+export const commonChartOptions = getCommonChartOptions();
 
 export const doughnutOptions = {
   ...commonChartOptions,
@@ -79,62 +59,24 @@ export const EnhancedTopExpenseCategoriesChart = ({
   filteredData,
   chartRef,
 }) => {
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
-  const [viewMode, setViewMode] = React.useState("year"); // 'month', 'year', 'all-time'
+  const {
+    currentYear,
+    currentMonth,
+    viewMode,
+    setViewMode,
+    handlePrevious,
+    handleNext,
+    canGoPrevious,
+    canGoNext,
+    availableYears,
+    getCurrentPeriodLabel,
+    getFilteredData,
+  } = useTimeNavigation(filteredData);
 
-  const monthNames = React.useMemo(
-    () => [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ],
-    []
-  );
-
-  // Get available years from data
-  const availableYears = React.useMemo(() => {
-    const years = new Set();
-    filteredData.forEach((item) => {
-      if (item.date) {
-        years.add(new Date(item.date).getFullYear());
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  }, [filteredData]);
-
-  // Filter data based on selected time period
+  // Filter data based on selected time period using the hook
   const timeFilteredData = React.useMemo(() => {
-    return filteredData.filter((item) => {
-      if (!item.date || item.type !== "Expense") return false;
-      const date = new Date(item.date);
-
-      if (viewMode === "all-time") {
-        return true;
-      } else if (viewMode === "year") {
-        return date.getFullYear() === currentYear;
-      } else if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
-      }
-      return false;
-    });
-  }, [filteredData, currentYear, currentMonth, viewMode]);
+    return getFilteredData().filter((item) => item.type === "Expense");
+  }, [getFilteredData]);
 
   // Generate chart data
   const chartData = React.useMemo(() => {
@@ -160,163 +102,39 @@ export const EnhancedTopExpenseCategoriesChart = ({
     };
   }, [timeFilteredData]);
 
-  // Navigation handlers
-  const handlePrevious = () => {
-    if (viewMode === "month") {
-      if (currentMonth > 1) {
-        setCurrentMonth(currentMonth - 1);
-      } else if (currentYear > Math.min(...availableYears)) {
-        setCurrentYear(currentYear - 1);
-        setCurrentMonth(12);
-      }
-    } else if (viewMode === "year") {
-      if (currentYear > Math.min(...availableYears)) {
-        setCurrentYear(currentYear - 1);
-      }
-    }
-  };
-
-  const handleNext = () => {
-    if (viewMode === "month") {
-      if (currentMonth < 12) {
-        setCurrentMonth(currentMonth + 1);
-      } else if (currentYear < Math.max(...availableYears)) {
-        setCurrentYear(currentYear + 1);
-        setCurrentMonth(1);
-      }
-    } else if (viewMode === "year") {
-      if (currentYear < Math.max(...availableYears)) {
-        setCurrentYear(currentYear + 1);
-      }
-    }
-  };
-
-  const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear > Math.min(...availableYears) || currentMonth > 1;
-    } else if (viewMode === "year") {
-      return currentYear > Math.min(...availableYears);
-    }
-    return false;
-  };
-
-  const canGoNext = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear < Math.max(...availableYears) || currentMonth < 12;
-    } else if (viewMode === "year") {
-      return currentYear < Math.max(...availableYears);
-    }
-    return false;
-  };
-
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Top Expense Categories
-        </h3>
-        <button
-          onClick={() => {
-            if (chartRef?.current) {
-              const canvas = chartRef.current.canvas;
-              const url = canvas.toDataURL("image/png");
-              const link = document.createElement("a");
-              const fileName = `top-expenses-${viewMode}-${currentYear}${
-                viewMode === "month" ? `-${currentMonth}` : ""
-              }.png`;
-              link.download = fileName;
-              link.href = url;
-              link.click();
-            }
-          }}
-          className="text-gray-400 hover:text-white"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7,10 12,15 17,10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-        </button>
-      </div>
+    <ChartContainer title="Top Expense Categories">
+      <TimeNavigationControls
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        currentPeriod={`${
+          viewMode === "all-time"
+            ? "All Time"
+            : viewMode === "year"
+            ? `Year ${currentYear}`
+            : `${monthNames[currentMonth - 1]} ${currentYear}`
+        }`}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        canGoPrevious={canGoPrevious}
+        canGoNext={canGoNext}
+      />
 
-      {/* Time Navigation Controls */}
-      <div className="flex justify-between items-center mb-4 bg-gray-700/50 rounded-lg p-3">
-        <div className="flex items-center gap-2">
-          <select
-            value={viewMode}
-            onChange={(e) => setViewMode(e.target.value)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="month">Monthly View</option>
-            <option value="year">Yearly View</option>
-            <option value="all-time">All Time</option>
-          </select>
-        </div>
+      <ExportButton
+        chartRef={chartRef}
+        filename={`top-expenses-${viewMode}-${currentYear}${
+          viewMode === "month" ? `-${currentMonth}` : ""
+        }.png`}
+      />
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handlePrevious}
-            disabled={!canGoPrevious()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="15,18 9,12 15,6"></polyline>
-            </svg>
-          </button>
-
-          <div className="text-white font-semibold min-w-[150px] text-center">
-            {viewMode === "all-time"
-              ? "All Time"
-              : viewMode === "year"
-              ? `Year ${currentYear}`
-              : `${monthNames[currentMonth - 1]} ${currentYear}`}
-          </div>
-
-          <button
-            onClick={handleNext}
-            disabled={!canGoNext()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="9,18 15,12 9,6"></polyline>
-            </svg>
-          </button>
-        </div>
-
-        <div className="text-sm text-gray-400">
-          {timeFilteredData.length} expenses
-        </div>
+      <div className="text-sm text-gray-400 mb-4">
+        {timeFilteredData.length} expenses
       </div>
 
       <div className="flex-grow">
         <Bar ref={chartRef} data={chartData} options={commonChartOptions} />
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 
@@ -331,63 +149,24 @@ export const TopIncomeSourcesChart = ({ data, chartRef }) => (
 );
 
 export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
-  const [viewMode, setViewMode] = React.useState("year"); // 'month', 'year', 'all-time'
+  const {
+    currentYear,
+    currentMonth,
+    viewMode,
+    setViewMode,
+    handlePrevious,
+    handleNext,
+    canGoPrevious,
+    canGoNext,
+    getFilteredData,
+  } = useTimeNavigation(filteredData, "year");
 
-  const monthNames = React.useMemo(
-    () => [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ],
-    []
-  );
-
-  // Get available years from data
-  const availableYears = React.useMemo(() => {
-    const years = new Set();
-    filteredData.forEach((item) => {
-      if (item.date) {
-        years.add(new Date(item.date).getFullYear());
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  }, [filteredData]);
-
-  // Filter data based on selected time period
+  // Filter data based on selected time period using the hook
   const timeFilteredData = React.useMemo(() => {
-    return filteredData.filter((item) => {
-      if (!item.date || item.type !== "Income" || item.category === "In-pocket")
-        return false;
-      const date = new Date(item.date);
-
-      if (viewMode === "all-time") {
-        return true;
-      } else if (viewMode === "year") {
-        return date.getFullYear() === currentYear;
-      } else if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
-      }
-      return false;
-    });
-  }, [filteredData, currentYear, currentMonth, viewMode]);
+    return getFilteredData().filter(
+      (item) => item.type === "Income" && item.category !== "In-pocket"
+    );
+  }, [getFilteredData]);
 
   // Generate chart data
   const chartData = React.useMemo(() => {
@@ -411,59 +190,8 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
     };
   }, [timeFilteredData]);
 
-  // Navigation handlers
-  const handlePrevious = () => {
-    if (viewMode === "month") {
-      if (currentMonth > 1) {
-        setCurrentMonth(currentMonth - 1);
-      } else if (currentYear > Math.min(...availableYears)) {
-        setCurrentYear(currentYear - 1);
-        setCurrentMonth(12);
-      }
-    } else if (viewMode === "year") {
-      if (currentYear > Math.min(...availableYears)) {
-        setCurrentYear(currentYear - 1);
-      }
-    }
-  };
-
-  const handleNext = () => {
-    if (viewMode === "month") {
-      if (currentMonth < 12) {
-        setCurrentMonth(currentMonth + 1);
-      } else if (currentYear < Math.max(...availableYears)) {
-        setCurrentYear(currentYear + 1);
-        setCurrentMonth(1);
-      }
-    } else if (viewMode === "year") {
-      if (currentYear < Math.max(...availableYears)) {
-        setCurrentYear(currentYear + 1);
-      }
-    }
-  };
-
-  const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear > Math.min(...availableYears) || currentMonth > 1;
-    } else if (viewMode === "year") {
-      return currentYear > Math.min(...availableYears);
-    }
-    return false;
-  };
-
-  const canGoNext = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear < Math.max(...availableYears) || currentMonth < 12;
-    } else if (viewMode === "year") {
-      return currentYear < Math.max(...availableYears);
-    }
-    return false;
-  };
-
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
+    <ChartContainer title="Top Income Sources">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-white">Top Income Sources</h3>
         <button
@@ -565,7 +293,7 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
       <div className="flex-grow">
         <Bar ref={chartRef} data={chartData} options={commonChartOptions} />
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 
@@ -580,24 +308,17 @@ export const SpendingByAccountChart = ({ data, chartRef }) => (
 );
 
 export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
-  const [viewMode, setViewMode] = React.useState("all-time"); // 'month', 'year', 'all-time'
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
-
-  // Get available years from data
-  const availableYears = React.useMemo(() => {
-    const years = new Set();
-    filteredData.forEach((item) => {
-      if (item.date) {
-        years.add(new Date(item.date).getFullYear());
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  }, [filteredData]);
+  const {
+    currentYear,
+    currentMonth,
+    viewMode,
+    setViewMode,
+    handlePrevious,
+    handleNext,
+    canGoPrevious,
+    canGoNext,
+    getFilteredData,
+  } = useTimeNavigation(filteredData, "all-time");
 
   // Filter data based on selected time period
   const timeFilteredData = React.useMemo(() => {
@@ -746,14 +467,6 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
                 0
               );
               const percentage = ((value / total) * 100).toFixed(1);
-              const formatCurrency = (val) => {
-                return new Intl.NumberFormat("en-IN", {
-                  style: "currency",
-                  currency: "INR",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(val);
-              };
               return [
                 `Amount: ${formatCurrency(value)}`,
                 `Percentage: ${percentage}%`,
@@ -772,53 +485,6 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
     }),
     []
   );
-
-  // Navigation functions
-  const handlePrevious = () => {
-    if (viewMode === "month") {
-      if (currentMonth === 1) {
-        setCurrentMonth(12);
-        setCurrentYear(currentYear - 1);
-      } else {
-        setCurrentMonth(currentMonth - 1);
-      }
-    } else if (viewMode === "year") {
-      setCurrentYear(currentYear - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (viewMode === "month") {
-      if (currentMonth === 12) {
-        setCurrentMonth(1);
-        setCurrentYear(currentYear + 1);
-      } else {
-        setCurrentMonth(currentMonth + 1);
-      }
-    } else if (viewMode === "year") {
-      setCurrentYear(currentYear + 1);
-    }
-  };
-
-  const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear > Math.min(...availableYears) || currentMonth > 1;
-    } else if (viewMode === "year") {
-      return currentYear > Math.min(...availableYears);
-    }
-    return false;
-  };
-
-  const canGoNext = () => {
-    if (viewMode === "all-time") return false;
-    if (viewMode === "month") {
-      return currentYear < Math.max(...availableYears) || currentMonth < 12;
-    } else if (viewMode === "year") {
-      return currentYear < Math.max(...availableYears);
-    }
-    return false;
-  };
 
   const formatMonthLabel = (monthString) => {
     const monthNames = [
@@ -854,15 +520,6 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   const totalSpending = React.useMemo(() => {
     return timeFilteredData.reduce((sum, item) => sum + item.amount, 0);
   }, [timeFilteredData]);
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
 
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
@@ -1017,7 +674,12 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
     const years = new Set();
     filteredData.forEach((item) => {
       if (item.date) {
-        years.add(new Date(item.date).getFullYear());
+        // Ensure date is properly converted to Date object
+        const date = new Date(item.date);
+        if (!isNaN(date.getTime())) {
+          // Only add valid dates
+          years.add(date.getFullYear());
+        }
       }
     });
     return Array.from(years).sort((a, b) => b - a);
@@ -1028,7 +690,10 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
     const now = new Date();
     return filteredData.filter((item) => {
       if (!item.date || item.category === "In-pocket") return false;
+
+      // Ensure date is properly converted to Date object
       const date = new Date(item.date);
+      if (isNaN(date.getTime())) return false; // Skip invalid dates
 
       if (viewMode === "all-time") {
         return true;
@@ -1049,10 +714,20 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   // Generate chart data
   const chartData = React.useMemo(() => {
     const monthly = timeFilteredData.reduce((acc, item) => {
-      const month = item.date.toISOString().slice(0, 7);
+      if (!item.date) return acc;
+
+      // Ensure date is properly converted to Date object
+      const date = new Date(item.date);
+      if (isNaN(date.getTime())) return acc; // Skip invalid dates
+
+      const month = date.toISOString().slice(0, 7); // YYYY-MM format
       if (!acc[month]) acc[month] = { income: 0, expense: 0 };
-      if (item.type === "Income") acc[month].income += item.amount;
-      else if (item.type === "Expense") acc[month].expense += item.amount;
+
+      if (item.type === "Income") {
+        acc[month].income += item.amount || 0;
+      } else if (item.type === "Expense") {
+        acc[month].expense += item.amount || 0;
+      }
       return acc;
     }, {});
 
@@ -1241,7 +916,17 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       </div>
 
       <div className="flex-grow">
-        <Line ref={chartRef} data={chartData} options={commonChartOptions} />
+        {chartData.labels && chartData.labels.length > 0 ? (
+          <Line ref={chartRef} data={chartData} options={commonChartOptions} />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📊</div>
+              <div>No data available</div>
+              <div className="text-sm">for the selected time period</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2562,15 +2247,6 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
     return data[data.length - 1] - data[0];
   }, [chartData]);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
@@ -3420,15 +3096,6 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     };
   }, [filteredData, selectedCategory]);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[400px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
@@ -3631,15 +3298,6 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
       newSelected.add(year);
     }
     setSelectedYears(newSelected);
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
   };
 
   return (
@@ -3937,15 +3595,6 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
     };
   }, [filteredData, forecastMonths, forecastType]);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
@@ -4198,30 +3847,21 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
     }
   }, [filteredData, selectedAccount, viewMode]);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(Math.abs(value));
-  };
-
   const accounts = [
     ...new Set(filteredData.map((item) => item.account)),
   ].sort();
 
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">
+      <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-white">
           Account Balance Progression
         </h3>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <select
             value={selectedAccount}
             onChange={(e) => setSelectedAccount(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+            className="bg-gray-700 border border-gray-600 text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Accounts</option>
             {accounts.map((account) => (
@@ -4233,7 +3873,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+            className="bg-gray-700 border border-gray-600 text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="cumulative">Cumulative</option>
             <option value="monthly">Monthly</option>
@@ -4249,11 +3889,11 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
                 link.click();
               }
             }}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded-lg"
           >
             <svg
-              width="18"
-              height="18"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -4483,18 +4123,6 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
     }
   }, [filteredData, patternType, metricType]);
 
-  const formatCurrency = (value) => {
-    if (metricType === "count") {
-      return value.toString();
-    }
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
@@ -4590,6 +4218,483 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
           }}
         />
       </div>
+    </div>
+  );
+};
+
+// 6. Sankey Diagram for Money Flow
+export const SankeyFlowChart = ({ filteredData, chartRef }) => {
+  const [timeRange, setTimeRange] = React.useState("all");
+  const [minFlowAmount, setMinFlowAmount] = React.useState(100);
+
+  // Process data for Sankey diagram
+  const sankeyData = React.useMemo(() => {
+    if (!filteredData || filteredData.length === 0)
+      return { nodes: [], links: [] };
+
+    // Debug: Log first few items to understand data structure
+    console.log("Sankey Data Sample:", filteredData.slice(0, 3));
+
+    // Filter data by time range
+    let timeFilteredData = filteredData;
+    if (timeRange !== "all") {
+      const now = new Date();
+      const cutoffDate = new Date();
+
+      switch (timeRange) {
+        case "1month":
+          cutoffDate.setMonth(now.getMonth() - 1);
+          break;
+        case "3months":
+          cutoffDate.setMonth(now.getMonth() - 3);
+          break;
+        case "6months":
+          cutoffDate.setMonth(now.getMonth() - 6);
+          break;
+        case "1year":
+          cutoffDate.setFullYear(now.getFullYear() - 1);
+          break;
+        default:
+          // Keep original cutoffDate for "all" case
+          break;
+      }
+
+      timeFilteredData = filteredData.filter((transaction) => {
+        const transactionDate = new Date(transaction.Date);
+        return transactionDate >= cutoffDate;
+      });
+    }
+
+    // Separate income and expenses based on the Income/Expense column
+    const incomeData = timeFilteredData.filter((t) => {
+      const incomeExpenseType = t["Income/Expense"] || t.Type || "";
+      const amount = parseFloat(
+        (t.INR || t.Amount || "0").replace(/[₹,$,]/g, "")
+      );
+
+      return (
+        incomeExpenseType.toLowerCase() === "income" ||
+        incomeExpenseType.toLowerCase().includes("income") ||
+        amount > 0
+      );
+    });
+
+    const expenseData = timeFilteredData.filter((t) => {
+      const incomeExpenseType = t["Income/Expense"] || t.Type || "";
+      const amount = parseFloat(
+        (t.INR || t.Amount || "0").replace(/[₹,$,]/g, "")
+      );
+
+      return (
+        incomeExpenseType.toLowerCase() === "expense" ||
+        incomeExpenseType.toLowerCase().includes("expense") ||
+        amount < 0
+      );
+    });
+
+    console.log(
+      "Income Data:",
+      incomeData.length,
+      "Expense Data:",
+      expenseData.length
+    );
+
+    // Group income by account
+    const incomeByAccount = incomeData.reduce((acc, transaction) => {
+      const account =
+        transaction.Accounts || transaction.Account || "Other Income";
+      const amount = Math.abs(
+        parseFloat(
+          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
+        )
+      );
+      if (amount > 0) {
+        acc[account] = (acc[account] || 0) + amount;
+      }
+      return acc;
+    }, {});
+
+    // Group expenses by category
+    const expensesByCategory = expenseData.reduce((acc, transaction) => {
+      const category = transaction.Category || "Other Expenses";
+      const amount = Math.abs(
+        parseFloat(
+          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
+        )
+      );
+      if (amount > 0) {
+        acc[category] = (acc[category] || 0) + amount;
+      }
+      return acc;
+    }, {});
+
+    console.log("Income by Account:", incomeByAccount);
+    console.log("Expenses by Category:", expensesByCategory);
+
+    // Create nodes and links
+    const nodes = [];
+    const links = [];
+    let nodeIndex = 0;
+
+    // Income nodes (left side)
+    const incomeNodes = Object.entries(incomeByAccount)
+      .filter(([_, amount]) => amount >= minFlowAmount)
+      .map(([account, amount]) => ({
+        id: nodeIndex++,
+        name: account,
+        value: amount,
+        type: "income",
+        color: "#10b981", // Green for income
+      }));
+
+    // Expense nodes (right side)
+    const expenseNodes = Object.entries(expensesByCategory)
+      .filter(([_, amount]) => amount >= minFlowAmount)
+      .map(([category, amount]) => ({
+        id: nodeIndex++,
+        name: category,
+        value: amount,
+        type: "expense",
+        color: "#ef4444", // Red for expenses
+      }));
+
+    nodes.push(...incomeNodes, ...expenseNodes);
+
+    // Create flow links
+    const totalIncome = incomeNodes.reduce((sum, node) => sum + node.value, 0);
+    const totalExpenses = expenseNodes.reduce(
+      (sum, node) => sum + node.value,
+      0
+    );
+
+    // Create proportional flows from income to expenses
+    incomeNodes.forEach((incomeNode) => {
+      expenseNodes.forEach((expenseNode) => {
+        const flowRatio =
+          (incomeNode.value / totalIncome) *
+          (expenseNode.value / totalExpenses);
+        const flowValue =
+          Math.min(incomeNode.value, expenseNode.value) * flowRatio;
+
+        if (flowValue >= minFlowAmount / 10) {
+          // Smaller threshold for links
+          links.push({
+            source: incomeNode.id,
+            target: expenseNode.id,
+            value: flowValue,
+          });
+        }
+      });
+    });
+
+    return { nodes, links };
+  }, [filteredData, timeRange, minFlowAmount]);
+
+  // Calculate layout positions
+  const calculateLayout = () => {
+    const { nodes } = sankeyData;
+    const width = 800;
+    const height = 500;
+    const margin = { top: 20, right: 120, bottom: 20, left: 120 };
+
+    const incomeNodes = nodes.filter((n) => n.type === "income");
+    const expenseNodes = nodes.filter((n) => n.type === "expense");
+
+    // Position income nodes on the left
+    const incomeHeight = Math.max(incomeNodes.length * 60, height * 0.8);
+    incomeNodes.forEach((node, i) => {
+      node.x = margin.left;
+      node.y = margin.top + i * (incomeHeight / incomeNodes.length) + 30;
+      node.width = 140;
+      node.height = Math.max(
+        40,
+        (node.value / Math.max(...incomeNodes.map((n) => n.value))) * 80
+      );
+    });
+
+    // Position expense nodes on the right
+    const expenseHeight = Math.max(expenseNodes.length * 60, height * 0.8);
+    expenseNodes.forEach((node, i) => {
+      node.x = width - margin.right - 140;
+      node.y = margin.top + i * (expenseHeight / expenseNodes.length) + 30;
+      node.width = 140;
+      node.height = Math.max(
+        40,
+        (node.value / Math.max(...expenseNodes.map((n) => n.value))) * 80
+      );
+    });
+
+    return { width, height, margin };
+  };
+
+  const { width, height } = calculateLayout();
+
+  // Generate curved path for links
+  const generatePath = (link) => {
+    const { nodes } = sankeyData;
+    const sourceNode = nodes.find((n) => n.id === link.source);
+    const targetNode = nodes.find((n) => n.id === link.target);
+
+    if (!sourceNode || !targetNode) return "";
+
+    const x1 = sourceNode.x + sourceNode.width;
+    const y1 = sourceNode.y + sourceNode.height / 2;
+    const x2 = targetNode.x;
+    const y2 = targetNode.y + targetNode.height / 2;
+
+    const cx1 = x1 + (x2 - x1) * 0.5;
+    const cx2 = x2 - (x2 - x1) * 0.5;
+
+    return `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`;
+  };
+
+  const exportToCSV = (data, filename) => {
+    const csvContent = data
+      .map((row) => Object.values(row).join(","))
+      .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+  };
+
+  return (
+    <div className="lg:col-span-2 bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 h-[600px] flex flex-col">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-2">
+            ₹ Money Flow Analysis
+          </h3>
+          <p className="text-gray-400 text-sm">
+            Visualize how money flows from income sources to expense categories
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="bg-gray-700 text-white border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">All Time</option>
+            <option value="1month">Last Month</option>
+            <option value="3months">Last 3 Months</option>
+            <option value="6months">Last 6 Months</option>
+            <option value="1year">Last Year</option>
+          </select>
+
+          <select
+            value={minFlowAmount}
+            onChange={(e) => setMinFlowAmount(Number(e.target.value))}
+            className="bg-gray-700 text-white border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value={50}>Min: ₹50</option>
+            <option value={100}>Min: ₹100</option>
+            <option value={500}>Min: ₹500</option>
+            <option value={1000}>Min: ₹1000</option>
+          </select>
+
+          <button
+            onClick={() => exportToCSV(filteredData, "money_flow_analysis.csv")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm"
+          >
+            📊 Export
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden">
+        {sankeyData.nodes.length > 0 ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <svg
+              ref={chartRef}
+              width={Math.min(width, window.innerWidth * 0.9)}
+              height={height}
+              className="border border-gray-600 rounded-lg bg-gray-750"
+            >
+              {/* Background */}
+              <rect width="100%" height="100%" fill="#1f2937" />
+
+              {/* Title sections */}
+              <text
+                x={120}
+                y={35}
+                fill="#10b981"
+                fontSize="16"
+                fontWeight="bold"
+                textAnchor="middle"
+              >
+                ₹ Income Sources
+              </text>
+              <text
+                x={width - 120}
+                y={35}
+                fill="#ef4444"
+                fontSize="16"
+                fontWeight="bold"
+                textAnchor="middle"
+              >
+                ₹ Expense Categories
+              </text>
+
+              {/* Links (flows) */}
+              {sankeyData.links.map((link, i) => (
+                <path
+                  key={i}
+                  d={generatePath(link)}
+                  stroke="#60a5fa"
+                  strokeWidth={Math.max(
+                    2,
+                    (link.value /
+                      Math.max(...sankeyData.links.map((l) => l.value))) *
+                      20
+                  )}
+                  fill="none"
+                  opacity={0.6}
+                  className="hover:opacity-80 transition-opacity"
+                />
+              ))}
+
+              {/* Nodes */}
+              {sankeyData.nodes.map((node) => (
+                <g key={node.id}>
+                  <rect
+                    x={node.x}
+                    y={node.y}
+                    width={node.width}
+                    height={node.height}
+                    fill={node.color}
+                    rx={8}
+                    className="hover:opacity-80 transition-opacity cursor-pointer"
+                    stroke="#374151"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={node.x + node.width / 2}
+                    y={node.y + node.height / 2 - 8}
+                    fill="white"
+                    fontSize="12"
+                    fontWeight="bold"
+                    textAnchor="middle"
+                    className="pointer-events-none"
+                  >
+                    {node.name.length > 15
+                      ? `${node.name.substring(0, 12)}...`
+                      : node.name}
+                  </text>
+                  <text
+                    x={node.x + node.width / 2}
+                    y={node.y + node.height / 2 + 8}
+                    fill="white"
+                    fontSize="11"
+                    textAnchor="middle"
+                    className="pointer-events-none"
+                  >
+                    {formatCurrency(node.value)}
+                  </text>
+                </g>
+              ))}
+
+              {/* Legend */}
+              <g transform={`translate(20, ${height - 60})`}>
+                <rect
+                  x={0}
+                  y={0}
+                  width={15}
+                  height={15}
+                  fill="#10b981"
+                  rx={3}
+                />
+                <text x={20} y={12} fill="#9ca3af" fontSize="12">
+                  Income Sources
+                </text>
+
+                <rect
+                  x={130}
+                  y={0}
+                  width={15}
+                  height={15}
+                  fill="#ef4444"
+                  rx={3}
+                />
+                <text x={150} y={12} fill="#9ca3af" fontSize="12">
+                  Expense Categories
+                </text>
+
+                <rect
+                  x={280}
+                  y={0}
+                  width={15}
+                  height={3}
+                  fill="#60a5fa"
+                  rx={1}
+                />
+                <text x={300} y={12} fill="#9ca3af" fontSize="12">
+                  Money Flow
+                </text>
+              </g>
+            </svg>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="text-center">
+              <div className="text-4xl mb-3">🔄</div>
+              <div className="text-lg mb-2">No flow data available</div>
+              <div className="text-sm">
+                {filteredData.length === 0
+                  ? "Upload transaction data to see money flow analysis"
+                  : `Found ${filteredData.length} transactions, but no qualifying flows with current filters`}
+              </div>
+              {filteredData.length > 0 && (
+                <div className="text-xs text-gray-500 mt-2">
+                  Try reducing the minimum amount filter or changing the time
+                  range
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Summary stats */}
+      {sankeyData.nodes.length > 0 && (
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="bg-gray-700 rounded-lg p-3">
+            <div className="text-gray-400">Income Sources</div>
+            <div className="text-green-400 font-bold">
+              {sankeyData.nodes.filter((n) => n.type === "income").length}
+            </div>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-3">
+            <div className="text-gray-400">Expense Categories</div>
+            <div className="text-red-400 font-bold">
+              {sankeyData.nodes.filter((n) => n.type === "expense").length}
+            </div>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-3">
+            <div className="text-gray-400">Total Income</div>
+            <div className="text-green-400 font-bold">
+              {formatCurrency(
+                sankeyData.nodes
+                  .filter((n) => n.type === "income")
+                  .reduce((sum, n) => sum + n.value, 0)
+              )}
+            </div>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-3">
+            <div className="text-gray-400">Total Expenses</div>
+            <div className="text-red-400 font-bold">
+              {formatCurrency(
+                sankeyData.nodes
+                  .filter((n) => n.type === "expense")
+                  .reduce((sum, n) => sum + n.value, 0)
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

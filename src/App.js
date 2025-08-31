@@ -43,6 +43,11 @@ import {
   MultiCategoryTimeAnalysisChart,
   NetWorthTrendChart,
   CumulativeCategoryTrendChart,
+  SeasonalSpendingHeatmap,
+  YearOverYearComparisonChart,
+  SpendingForecastChart,
+  AccountBalanceProgressionChart,
+  DayWeekSpendingPatternsChart,
 } from "./components/Charts/ChartComponents";
 
 // Hooks
@@ -99,6 +104,11 @@ const App = () => {
     multiCategoryTimeAnalysis: useRef(null),
     netWorth: useRef(null),
     cumulativeCategoryTrend: useRef(null),
+    seasonalSpendingHeatmap: useRef(null),
+    yearOverYearComparison: useRef(null),
+    spendingForecast: useRef(null),
+    accountBalanceProgression: useRef(null),
+    dayWeekSpendingPatterns: useRef(null),
   };
 
   // Custom hooks
@@ -347,6 +357,35 @@ const App = () => {
             <CumulativeCategoryTrendChart
               filteredData={filteredData}
               chartRef={chartRefs.cumulativeCategoryTrend}
+            />
+          </div>
+        </div>
+
+        {/* Advanced Analytics Section */}
+        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">
+            Advanced Financial Analytics
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SeasonalSpendingHeatmap
+              filteredData={filteredData}
+              chartRef={chartRefs.seasonalSpendingHeatmap}
+            />
+            <YearOverYearComparisonChart
+              filteredData={filteredData}
+              chartRef={chartRefs.yearOverYearComparison}
+            />
+            <SpendingForecastChart
+              filteredData={filteredData}
+              chartRef={chartRefs.spendingForecast}
+            />
+            <AccountBalanceProgressionChart
+              filteredData={filteredData}
+              chartRef={chartRefs.accountBalanceProgression}
+            />
+            <DayWeekSpendingPatternsChart
+              filteredData={filteredData}
+              chartRef={chartRefs.dayWeekSpendingPatterns}
             />
           </div>
         </div>

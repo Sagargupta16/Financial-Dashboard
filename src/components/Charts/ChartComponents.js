@@ -3341,3 +3341,1255 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
     </div>
   );
 };
+
+// 1. Seasonal Spending Heatmap
+export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+
+  // Get available categories
+  const availableCategories = React.useMemo(() => {
+    const categories = new Set(["All"]);
+    filteredData.forEach((item) => {
+      if (
+        item.type === "Expense" &&
+        item.category &&
+        item.category !== "In-pocket"
+      ) {
+        categories.add(item.category);
+      }
+    });
+    return Array.from(categories).sort();
+  }, [filteredData]);
+
+  // Calculate spending intensity by month and year
+  const heatmapData = React.useMemo(() => {
+    const data = filteredData.filter(
+      (item) =>
+        item.type === "Expense" &&
+        item.category !== "In-pocket" &&
+        (selectedCategory === "All" || item.category === selectedCategory)
+    );
+
+    const monthlyData = {};
+    data.forEach((item) => {
+      const date = new Date(item.date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+
+      if (!monthlyData[year]) monthlyData[year] = {};
+      if (!monthlyData[year][month]) monthlyData[year][month] = 0;
+
+      monthlyData[year][month] += item.amount;
+    });
+
+    // Convert to chart format
+    const years = Object.keys(monthlyData).sort();
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+    const datasets = years.map((year) => ({
+      label: year,
+      data: months.map((month) => monthlyData[year]?.[month] || 0),
+      backgroundColor: months.map((month) => {
+        const value = monthlyData[year]?.[month] || 0;
+        const maxValue = Math.max(
+          ...Object.values(monthlyData).flatMap((y) => Object.values(y))
+        );
+        const intensity = value / (maxValue || 1);
+        return `rgba(59, 130, 246, ${Math.max(0.1, intensity)})`;
+      }),
+      borderColor: "#1f2937",
+      borderWidth: 1,
+    }));
+
+    return {
+      labels: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+      datasets,
+    };
+  }, [filteredData, selectedCategory]);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[400px] flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white">
+          Seasonal Spending Heatmap
+        </h3>
+        <div className="flex items-center space-x-4">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            {availableCategories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => {
+              if (chartRef?.current) {
+                const canvas = chartRef.current.canvas;
+                const url = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `seasonal-heatmap-${selectedCategory}.png`;
+                link.href = url;
+                link.click();
+              }
+            }}
+            className="text-gray-400 hover:text-white"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 relative">
+        <Bar
+          ref={chartRef}
+          data={heatmapData}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "#9ca3af" } },
+              tooltip: {
+                backgroundColor: "#111827",
+                titleColor: "#ffffff",
+                bodyColor: "#e5e7eb",
+                callbacks: {
+                  label: (context) =>
+                    `${context.dataset.label}: ${formatCurrency(
+                      context.parsed.y
+                    )}`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#9ca3af" },
+                grid: { color: "#374151" },
+                stacked: false,
+              },
+              y: {
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) => formatCurrency(v),
+                },
+                grid: { color: "#374151" },
+                stacked: false,
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// 2. Year-over-Year Comparison Chart
+export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
+  const [comparisonType, setComparisonType] = React.useState("monthly"); // 'monthly', 'quarterly'
+  const [selectedYears, setSelectedYears] = React.useState(new Set());
+
+  // Get available years
+  const availableYears = React.useMemo(() => {
+    const years = new Set();
+    filteredData.forEach((item) => {
+      if (item.date) {
+        years.add(new Date(item.date).getFullYear());
+      }
+    });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [filteredData]);
+
+  // Initialize with last 3 years
+  React.useEffect(() => {
+    if (availableYears.length > 0 && selectedYears.size === 0) {
+      const recentYears = availableYears.slice(0, 3);
+      setSelectedYears(new Set(recentYears));
+    }
+  }, [availableYears, selectedYears.size]);
+
+  const chartData = React.useMemo(() => {
+    if (selectedYears.size === 0) return { labels: [], datasets: [] };
+
+    const groupedData = {};
+
+    filteredData.forEach((item) => {
+      if (item.category === "In-pocket") return;
+
+      const date = new Date(item.date);
+      const year = date.getFullYear();
+
+      if (!selectedYears.has(year)) return;
+
+      let periodKey;
+      if (comparisonType === "monthly") {
+        periodKey = date.getMonth() + 1; // 1-12
+      } else {
+        periodKey = Math.floor(date.getMonth() / 3) + 1; // 1-4 for quarters
+      }
+
+      if (!groupedData[year]) groupedData[year] = {};
+      if (!groupedData[year][periodKey]) {
+        groupedData[year][periodKey] = { income: 0, expense: 0 };
+      }
+
+      if (item.type === "Income") {
+        groupedData[year][periodKey].income += item.amount;
+      } else if (item.type === "Expense") {
+        groupedData[year][periodKey].expense += item.amount;
+      }
+    });
+
+    const labels =
+      comparisonType === "monthly"
+        ? [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ]
+        : ["Q1", "Q2", "Q3", "Q4"];
+
+    const colors = [
+      "#3b82f6",
+      "#8b5cf6",
+      "#ec4899",
+      "#f97316",
+      "#eab308",
+      "#10b981",
+    ];
+
+    const datasets = [];
+    Array.from(selectedYears)
+      .sort()
+      .forEach((year, yearIndex) => {
+        // Net income datasets
+        datasets.push({
+          label: `${year} Net`,
+          data: labels.map((_, index) => {
+            const periodData = groupedData[year]?.[index + 1];
+            return periodData ? periodData.income - periodData.expense : 0;
+          }),
+          borderColor: colors[yearIndex % colors.length],
+          backgroundColor: `${colors[yearIndex % colors.length]}20`,
+          borderWidth: 3,
+          fill: false,
+          tension: 0.3,
+        });
+      });
+
+    return { labels, datasets };
+  }, [filteredData, selectedYears, comparisonType]);
+
+  const toggleYear = (year) => {
+    const newSelected = new Set(selectedYears);
+    if (newSelected.has(year)) {
+      newSelected.delete(year);
+    } else {
+      newSelected.add(year);
+    }
+    setSelectedYears(newSelected);
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white">
+          Year-over-Year Comparison
+        </h3>
+        <div className="flex items-center space-x-4">
+          <select
+            value={comparisonType}
+            onChange={(e) => setComparisonType(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+          </select>
+          <button
+            onClick={() => {
+              if (chartRef?.current) {
+                const canvas = chartRef.current.canvas;
+                const url = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `year-over-year-${comparisonType}.png`;
+                link.href = url;
+                link.click();
+              }
+            }}
+            className="text-gray-400 hover:text-white"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Year Selection */}
+      <div className="mb-4">
+        <div className="text-sm text-gray-400 mb-2">
+          Select Years to Compare:
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {availableYears.map((year) => (
+            <button
+              key={year}
+              onClick={() => toggleYear(year)}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                selectedYears.has(year)
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {year}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 relative">
+        <Line
+          ref={chartRef}
+          data={chartData}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "#9ca3af" } },
+              tooltip: {
+                backgroundColor: "#111827",
+                titleColor: "#ffffff",
+                bodyColor: "#e5e7eb",
+                callbacks: {
+                  label: (context) =>
+                    `${context.dataset.label}: ${formatCurrency(
+                      context.parsed.y
+                    )}`,
+                },
+              },
+            },
+            scales: {
+              x: { ticks: { color: "#9ca3af" }, grid: { color: "#374151" } },
+              y: {
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) => formatCurrency(v),
+                },
+                grid: { color: "#374151" },
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// 3. Spending Forecast Chart
+export const SpendingForecastChart = ({ filteredData, chartRef }) => {
+  const [forecastMonths, setForecastMonths] = React.useState(6);
+  const [forecastType, setForecastType] = React.useState("linear"); // 'linear', 'trend'
+
+  const chartData = React.useMemo(() => {
+    // Group historical data by month
+    const monthlyData = {};
+    filteredData.forEach((item) => {
+      if (item.category === "In-pocket") return;
+
+      const date = new Date(item.date);
+      const monthKey = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { income: 0, expense: 0, net: 0 };
+      }
+
+      if (item.type === "Income") {
+        monthlyData[monthKey].income += item.amount;
+      } else if (item.type === "Expense") {
+        monthlyData[monthKey].expense += item.amount;
+      }
+
+      monthlyData[monthKey].net =
+        monthlyData[monthKey].income - monthlyData[monthKey].expense;
+    });
+
+    // Get sorted historical months
+    const historicalMonths = Object.keys(monthlyData).sort();
+    const lastMonth = historicalMonths[historicalMonths.length - 1];
+
+    // Calculate forecast based on selected method
+    let forecastData = [];
+    if (forecastType === "linear") {
+      // Simple average of last 6 months
+      const recentMonths = historicalMonths.slice(-6);
+      const avgIncome =
+        recentMonths.reduce(
+          (sum, month) => sum + monthlyData[month].income,
+          0
+        ) / recentMonths.length;
+      const avgExpense =
+        recentMonths.reduce(
+          (sum, month) => sum + monthlyData[month].expense,
+          0
+        ) / recentMonths.length;
+      const avgNet = avgIncome - avgExpense;
+
+      forecastData = Array.from({ length: forecastMonths }, () => ({
+        income: avgIncome,
+        expense: avgExpense,
+        net: avgNet,
+      }));
+    } else {
+      // Trend-based forecast (simple linear regression)
+      const recentMonths = historicalMonths.slice(-12); // Use last 12 months for trend
+      const trendData = recentMonths.map((month, index) => ({
+        x: index,
+        income: monthlyData[month].income,
+        expense: monthlyData[month].expense,
+        net: monthlyData[month].net,
+      }));
+
+      // Calculate linear trend for each metric
+      const calculateTrend = (data, key) => {
+        const n = data.length;
+        const sumX = data.reduce((sum, item) => sum + item.x, 0);
+        const sumY = data.reduce((sum, item) => sum + item[key], 0);
+        const sumXY = data.reduce((sum, item) => sum + item.x * item[key], 0);
+        const sumXX = data.reduce((sum, item) => sum + item.x * item.x, 0);
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        return { slope, intercept };
+      };
+
+      const incomeTrend = calculateTrend(trendData, "income");
+      const expenseTrend = calculateTrend(trendData, "expense");
+
+      forecastData = Array.from({ length: forecastMonths }, (_, index) => {
+        const futureX = trendData.length + index;
+        const income = Math.max(
+          0,
+          incomeTrend.slope * futureX + incomeTrend.intercept
+        );
+        const expense = Math.max(
+          0,
+          expenseTrend.slope * futureX + expenseTrend.intercept
+        );
+        return {
+          income,
+          expense,
+          net: income - expense,
+        };
+      });
+    }
+
+    // Generate future month labels
+    const futureMonths = [];
+    let currentDate = new Date(lastMonth + "-01");
+    for (let i = 0; i < forecastMonths; i++) {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      const monthKey = `${currentDate.getFullYear()}-${String(
+        currentDate.getMonth() + 1
+      ).padStart(2, "0")}`;
+      futureMonths.push(monthKey);
+    }
+
+    // Combine historical and forecast data
+    const allMonths = [...historicalMonths.slice(-12), ...futureMonths]; // Show last 12 months + forecast
+    const labels = allMonths.map((month) => {
+      const [year, monthNum] = month.split("-");
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${monthNames[parseInt(monthNum) - 1]} ${year}`;
+    });
+
+    const historicalIncome = historicalMonths
+      .slice(-12)
+      .map((month) => monthlyData[month]?.income || 0);
+    const historicalNet = historicalMonths
+      .slice(-12)
+      .map((month) => monthlyData[month]?.net || 0);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Historical Net",
+          data: [...historicalNet, ...Array(forecastMonths).fill(null)],
+          borderColor: "#10b981",
+          backgroundColor: "rgba(16, 185, 129, 0.1)",
+          borderWidth: 3,
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: "Forecast Net",
+          data: [
+            ...Array(historicalNet.length).fill(null),
+            ...forecastData.map((d) => d.net),
+          ],
+          borderColor: "#f59e0b",
+          backgroundColor: "rgba(245, 158, 11, 0.1)",
+          borderWidth: 3,
+          borderDash: [5, 5],
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: "Historical Income",
+          data: [...historicalIncome, ...Array(forecastMonths).fill(null)],
+          borderColor: "#3b82f6",
+          backgroundColor: "rgba(59, 130, 246, 0.05)",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: "Forecast Income",
+          data: [
+            ...Array(historicalIncome.length).fill(null),
+            ...forecastData.map((d) => d.income),
+          ],
+          borderColor: "#60a5fa",
+          backgroundColor: "rgba(96, 165, 250, 0.05)",
+          borderWidth: 2,
+          borderDash: [3, 3],
+          fill: false,
+          tension: 0.3,
+        },
+      ],
+    };
+  }, [filteredData, forecastMonths, forecastType]);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white">Spending Forecast</h3>
+        <div className="flex items-center space-x-4">
+          <select
+            value={forecastMonths}
+            onChange={(e) => setForecastMonths(parseInt(e.target.value))}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value={3}>3 Months</option>
+            <option value={6}>6 Months</option>
+            <option value={12}>12 Months</option>
+          </select>
+          <select
+            value={forecastType}
+            onChange={(e) => setForecastType(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="linear">Average</option>
+            <option value="trend">Trend</option>
+          </select>
+          <button
+            onClick={() => {
+              if (chartRef?.current) {
+                const canvas = chartRef.current.canvas;
+                const url = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `spending-forecast-${forecastMonths}m.png`;
+                link.href = url;
+                link.click();
+              }
+            }}
+            className="text-gray-400 hover:text-white"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 relative">
+        <Line
+          ref={chartRef}
+          data={chartData}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "#9ca3af", font: { size: 11 } } },
+              tooltip: {
+                backgroundColor: "#111827",
+                titleColor: "#ffffff",
+                bodyColor: "#e5e7eb",
+                callbacks: {
+                  label: (context) =>
+                    `${context.dataset.label}: ${formatCurrency(
+                      context.parsed.y
+                    )}`,
+                },
+              },
+            },
+            scales: {
+              x: { ticks: { color: "#9ca3af" }, grid: { color: "#374151" } },
+              y: {
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) => formatCurrency(v),
+                },
+                grid: { color: "#374151" },
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// 4. Account Balance Progression Chart
+export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
+  const [selectedAccount, setSelectedAccount] = React.useState("all");
+  const [viewMode, setViewMode] = React.useState("cumulative"); // 'cumulative', 'monthly'
+
+  const chartData = React.useMemo(() => {
+    // Get unique accounts
+    const accounts = [
+      ...new Set(filteredData.map((item) => item.account)),
+    ].sort();
+
+    // Group data by account and date
+    const accountData = {};
+    accounts.forEach((account) => {
+      accountData[account] = {};
+    });
+
+    filteredData.forEach((item) => {
+      if (item.category === "In-pocket") return;
+
+      const date = new Date(item.date);
+      const monthKey = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      if (!accountData[item.account][monthKey]) {
+        accountData[item.account][monthKey] = {
+          income: 0,
+          expense: 0,
+          balance: 0,
+        };
+      }
+
+      if (item.type === "Income") {
+        accountData[item.account][monthKey].income += item.amount;
+      } else if (item.type === "Expense") {
+        accountData[item.account][monthKey].expense += item.amount;
+      }
+    });
+
+    // Calculate balances
+    const allMonths = [
+      ...new Set(Object.values(accountData).flatMap((acc) => Object.keys(acc))),
+    ].sort();
+
+    // Calculate running balances for each account
+    accounts.forEach((account) => {
+      let runningBalance = 0;
+      allMonths.forEach((month) => {
+        if (!accountData[account][month]) {
+          accountData[account][month] = {
+            income: 0,
+            expense: 0,
+            balance: runningBalance,
+          };
+        } else {
+          runningBalance +=
+            accountData[account][month].income -
+            accountData[account][month].expense;
+          accountData[account][month].balance = runningBalance;
+        }
+      });
+    });
+
+    const labels = allMonths.map((month) => {
+      const [year, monthNum] = month.split("-");
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${monthNames[parseInt(monthNum) - 1]} ${year}`;
+    });
+
+    const colors = [
+      "#3b82f6",
+      "#ef4444",
+      "#10b981",
+      "#f59e0b",
+      "#8b5cf6",
+      "#06b6d4",
+      "#f97316",
+      "#84cc16",
+    ];
+
+    if (selectedAccount === "all") {
+      // Show all accounts
+      const datasets = accounts.map((account, index) => ({
+        label: account,
+        data: allMonths.map((month) => {
+          const data = accountData[account][month];
+          return viewMode === "cumulative"
+            ? data.balance
+            : data.income - data.expense;
+        }),
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + "20",
+        borderWidth: 2,
+        fill: false,
+        tension: 0.3,
+      }));
+
+      return { labels, datasets };
+    } else {
+      // Show single account with income/expense breakdown
+      const account = selectedAccount;
+      return {
+        labels,
+        datasets: [
+          {
+            label: viewMode === "cumulative" ? "Balance" : "Net Income",
+            data: allMonths.map((month) => {
+              const data = accountData[account][month];
+              return viewMode === "cumulative"
+                ? data.balance
+                : data.income - data.expense;
+            }),
+            borderColor: "#10b981",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3,
+          },
+          ...(viewMode === "monthly"
+            ? [
+                {
+                  label: "Income",
+                  data: allMonths.map(
+                    (month) => accountData[account][month].income
+                  ),
+                  borderColor: "#3b82f6",
+                  backgroundColor: "rgba(59, 130, 246, 0.1)",
+                  borderWidth: 2,
+                  fill: false,
+                  tension: 0.3,
+                },
+                {
+                  label: "Expense",
+                  data: allMonths.map(
+                    (month) => -accountData[account][month].expense
+                  ),
+                  borderColor: "#ef4444",
+                  backgroundColor: "rgba(239, 68, 68, 0.1)",
+                  borderWidth: 2,
+                  fill: false,
+                  tension: 0.3,
+                },
+              ]
+            : []),
+        ],
+      };
+    }
+  }, [filteredData, selectedAccount, viewMode]);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Math.abs(value));
+  };
+
+  const accounts = [
+    ...new Set(filteredData.map((item) => item.account)),
+  ].sort();
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white">
+          Account Balance Progression
+        </h3>
+        <div className="flex items-center space-x-4">
+          <select
+            value={selectedAccount}
+            onChange={(e) => setSelectedAccount(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="all">All Accounts</option>
+            {accounts.map((account) => (
+              <option key={account} value={account}>
+                {account}
+              </option>
+            ))}
+          </select>
+          <select
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="cumulative">Cumulative</option>
+            <option value="monthly">Monthly</option>
+          </select>
+          <button
+            onClick={() => {
+              if (chartRef?.current) {
+                const canvas = chartRef.current.canvas;
+                const url = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `account-balance-progression-${selectedAccount}.png`;
+                link.href = url;
+                link.click();
+              }
+            }}
+            className="text-gray-400 hover:text-white"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 relative">
+        <Line
+          ref={chartRef}
+          data={chartData}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "#9ca3af", font: { size: 11 } } },
+              tooltip: {
+                backgroundColor: "#111827",
+                titleColor: "#ffffff",
+                bodyColor: "#e5e7eb",
+                callbacks: {
+                  label: (context) =>
+                    `${context.dataset.label}: ${formatCurrency(
+                      context.parsed.y
+                    )}`,
+                },
+              },
+            },
+            scales: {
+              x: { ticks: { color: "#9ca3af" }, grid: { color: "#374151" } },
+              y: {
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) => formatCurrency(v),
+                },
+                grid: { color: "#374151" },
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// 5. Day of Week/Month Spending Patterns Chart
+export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
+  const [patternType, setPatternType] = React.useState("dayOfWeek"); // 'dayOfWeek', 'dayOfMonth'
+  const [metricType, setMetricType] = React.useState("expense"); // 'expense', 'income', 'count'
+
+  const chartData = React.useMemo(() => {
+    const expenseData = filteredData.filter(
+      (item) => item.type === "Expense" && item.category !== "In-pocket"
+    );
+    const incomeData = filteredData.filter((item) => item.type === "Income");
+
+    if (patternType === "dayOfWeek") {
+      // Day of week analysis
+      const dayNames = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const weekData = Array(7)
+        .fill(0)
+        .map(() => ({ expense: 0, income: 0, count: 0 }));
+
+      expenseData.forEach((item) => {
+        const dayOfWeek = new Date(item.date).getDay();
+        weekData[dayOfWeek].expense += item.amount;
+        weekData[dayOfWeek].count += 1;
+      });
+
+      incomeData.forEach((item) => {
+        const dayOfWeek = new Date(item.date).getDay();
+        weekData[dayOfWeek].income += item.amount;
+      });
+
+      const labels = dayNames;
+      let data, backgroundColors;
+
+      if (metricType === "expense") {
+        data = weekData.map((d) => d.expense);
+        backgroundColors = dayNames.map((_, index) => {
+          const intensity = Math.max(
+            0.3,
+            Math.min(1, data[index] / Math.max(...data))
+          );
+          return `rgba(239, 68, 68, ${intensity})`;
+        });
+      } else if (metricType === "income") {
+        data = weekData.map((d) => d.income);
+        backgroundColors = dayNames.map((_, index) => {
+          const intensity = Math.max(
+            0.3,
+            Math.min(1, data[index] / Math.max(...data))
+          );
+          return `rgba(16, 185, 129, ${intensity})`;
+        });
+      } else {
+        data = weekData.map((d) => d.count);
+        backgroundColors = dayNames.map((_, index) => {
+          const intensity = Math.max(
+            0.3,
+            Math.min(1, data[index] / Math.max(...data))
+          );
+          return `rgba(59, 130, 246, ${intensity})`;
+        });
+      }
+
+      return {
+        labels,
+        datasets: [
+          {
+            label:
+              metricType === "expense"
+                ? "Total Expenses"
+                : metricType === "income"
+                ? "Total Income"
+                : "Transaction Count",
+            data,
+            backgroundColor: backgroundColors,
+            borderColor:
+              metricType === "expense"
+                ? "#ef4444"
+                : metricType === "income"
+                ? "#10b981"
+                : "#3b82f6",
+            borderWidth: 2,
+          },
+        ],
+      };
+    } else {
+      // Day of month analysis
+      const monthData = Array(31)
+        .fill(0)
+        .map(() => ({ expense: 0, income: 0, count: 0 }));
+
+      expenseData.forEach((item) => {
+        const dayOfMonth = new Date(item.date).getDate() - 1;
+        if (dayOfMonth >= 0 && dayOfMonth < 31) {
+          monthData[dayOfMonth].expense += item.amount;
+          monthData[dayOfMonth].count += 1;
+        }
+      });
+
+      incomeData.forEach((item) => {
+        const dayOfMonth = new Date(item.date).getDate() - 1;
+        if (dayOfMonth >= 0 && dayOfMonth < 31) {
+          monthData[dayOfMonth].income += item.amount;
+        }
+      });
+
+      const labels = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+      let data, backgroundColors;
+
+      if (metricType === "expense") {
+        data = monthData.map((d) => d.expense);
+        backgroundColors = Array(31)
+          .fill(0)
+          .map((_, index) => {
+            const maxValue = Math.max(...data.filter((v) => v > 0));
+            const intensity =
+              data[index] > 0
+                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+                : 0.1;
+            return `rgba(239, 68, 68, ${intensity})`;
+          });
+      } else if (metricType === "income") {
+        data = monthData.map((d) => d.income);
+        backgroundColors = Array(31)
+          .fill(0)
+          .map((_, index) => {
+            const maxValue = Math.max(...data.filter((v) => v > 0));
+            const intensity =
+              data[index] > 0
+                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+                : 0.1;
+            return `rgba(16, 185, 129, ${intensity})`;
+          });
+      } else {
+        data = monthData.map((d) => d.count);
+        backgroundColors = Array(31)
+          .fill(0)
+          .map((_, index) => {
+            const maxValue = Math.max(...data.filter((v) => v > 0));
+            const intensity =
+              data[index] > 0
+                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+                : 0.1;
+            return `rgba(59, 130, 246, ${intensity})`;
+          });
+      }
+
+      return {
+        labels,
+        datasets: [
+          {
+            label:
+              metricType === "expense"
+                ? "Total Expenses"
+                : metricType === "income"
+                ? "Total Income"
+                : "Transaction Count",
+            data,
+            backgroundColor: backgroundColors,
+            borderColor:
+              metricType === "expense"
+                ? "#ef4444"
+                : metricType === "income"
+                ? "#10b981"
+                : "#3b82f6",
+            borderWidth: 1,
+          },
+        ],
+      };
+    }
+  }, [filteredData, patternType, metricType]);
+
+  const formatCurrency = (value) => {
+    if (metricType === "count") {
+      return value.toString();
+    }
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white">Spending Patterns</h3>
+        <div className="flex items-center space-x-4">
+          <select
+            value={patternType}
+            onChange={(e) => setPatternType(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="dayOfWeek">Day of Week</option>
+            <option value="dayOfMonth">Day of Month</option>
+          </select>
+          <select
+            value={metricType}
+            onChange={(e) => setMetricType(e.target.value)}
+            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            <option value="expense">Expenses</option>
+            <option value="income">Income</option>
+            <option value="count">Transaction Count</option>
+          </select>
+          <button
+            onClick={() => {
+              if (chartRef?.current) {
+                const canvas = chartRef.current.canvas;
+                const url = canvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.download = `spending-patterns-${patternType}-${metricType}.png`;
+                link.href = url;
+                link.click();
+              }
+            }}
+            className="text-gray-400 hover:text-white"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 relative">
+        <Bar
+          ref={chartRef}
+          data={chartData}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "#111827",
+                titleColor: "#ffffff",
+                bodyColor: "#e5e7eb",
+                callbacks: {
+                  label: (context) => {
+                    const value = context.parsed.y;
+                    return `${context.dataset.label}: ${formatCurrency(value)}`;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: "#9ca3af",
+                  maxRotation: patternType === "dayOfMonth" ? 45 : 0,
+                  font: { size: patternType === "dayOfMonth" ? 10 : 12 },
+                },
+                grid: { color: "#374151" },
+              },
+              y: {
+                ticks: {
+                  color: "#9ca3af",
+                  callback: (v) =>
+                    metricType === "count" ? v : formatCurrency(v),
+                },
+                grid: { color: "#374151" },
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { parseCurrency, parseDate } from "../utils/dataUtils";
+import * as XLSX from "xlsx";
 
 export const useDataProcessor = (initialCsvData) => {
   const [data, setData] = useState([]);
@@ -73,8 +74,67 @@ export const useDataProcessor = (initialCsvData) => {
     } catch (e) {
       console.error("Failed to parse data:", e);
       setError(
-        "Could not parse the financial data. Please check the CSV format."
+        "Could not parse the financial data. Please check the file format."
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const parseExcelData = (arrayBuffer) => {
+    try {
+      // Read the workbook from array buffer
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+      // Get the first worksheet
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      // Convert to JSON array
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      // Skip the header row and process data
+      const rows = jsonData.slice(1);
+
+      const parsedData = rows
+        .map((row, index) => {
+          // Skip rows with insufficient columns
+          if (!row || row.length < 8) {
+            return null;
+          }
+
+          // Clean and normalize the data
+          const cleanColumn = (col) => col?.toString().trim() || "";
+
+          const item = {
+            id: index,
+            date: parseDate(cleanColumn(row[0]), cleanColumn(row[1])),
+            time: cleanColumn(row[1]),
+            account: cleanColumn(row[2]),
+            category: cleanColumn(row[3]),
+            subcategory: cleanColumn(row[4]),
+            note: cleanColumn(row[5]),
+            amount: parseCurrency(cleanColumn(row[6])),
+            type: cleanColumn(row[7]),
+          };
+
+          return item;
+        })
+        .filter((item) => {
+          // Keep all valid items with dates and types
+          const isValid =
+            item?.date &&
+            item?.type &&
+            (item.type.includes("Transfer") || item.amount > 0);
+
+          return isValid;
+        });
+
+      setData(parsedData);
+      setError(null);
+    } catch (e) {
+      console.error("Failed to parse Excel data:", e);
+      setError("Could not parse the Excel file. Please check the file format.");
     } finally {
       setLoading(false);
     }
@@ -90,16 +150,37 @@ export const useDataProcessor = (initialCsvData) => {
 
     setLoading(true);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      parseData(e.target.result);
-    };
-    reader.onerror = (e) => {
-      console.error("File reading error:", e);
-      setError("Failed to read the uploaded file.");
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (fileExtension === "csv") {
+      // Handle CSV files
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        parseData(e.target.result);
+      };
+      reader.onerror = (e) => {
+        console.error("File reading error:", e);
+        setError("Failed to read the uploaded CSV file.");
+        setLoading(false);
+      };
+      reader.readAsText(file);
+    } else if (fileExtension === "xlsx" || fileExtension === "xls") {
+      // Handle Excel files
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const arrayBuffer = e.target.result;
+        parseExcelData(arrayBuffer);
+      };
+      reader.onerror = (e) => {
+        console.error("File reading error:", e);
+        setError("Failed to read the uploaded Excel file.");
+        setLoading(false);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      setError("Unsupported file format. Please upload a CSV or Excel file.");
       setLoading(false);
-    };
-    reader.readAsText(file);
+    }
   };
 
   return { data, loading, error, handleFileUpload };

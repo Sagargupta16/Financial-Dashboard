@@ -14,22 +14,24 @@ A comprehensive, modern financial dashboard built with React that provides power
 
 ### 📈 **Rich Visualizations**
 - **Income vs Expense Breakdown** (Doughnut Chart)
-- **Top Expense Categories** (Bar Chart)
-- **Income Sources Analysis** (Bar Chart)
+- **Top Expense Categories** (Bar Chart) - *with time filtering*
+- **Income Sources Analysis** (Bar Chart) - *with time filtering*
 - **Spending by Account** (Doughnut Chart)
-- **Monthly Trends** (Line Chart)
+- **Monthly Trends** (Line Chart) - *with time filtering*
 - **Daily Spending Patterns** (Bar Chart)
 - **Subcategory Analysis** with drill-down capabilities
 
 ### 🕒 **Time-Based Analysis**
+- **Enhanced Top Categories**: Monthly, yearly, and all-time views for expenses and income
+- **Enhanced Monthly Trends**: Yearly, last 12 months, and all-time views
 - **Enhanced Subcategory Breakdown**: Monthly, yearly, and decade views
 - **Multi-Category Time Analysis**: Compare spending across categories over time
 - **Interactive Navigation**: Navigate through different time periods
 - **Trend Identification**: Spot patterns and seasonal variations
 
 ### 🔍 **Data Management**
-- **CSV Upload**: Easy data import functionality
-- **Smart Parsing**: Handles quoted fields and various CSV formats
+- **CSV & Excel Upload**: Easy data import functionality for both CSV and Excel files (.xlsx, .xls)
+- **Smart Parsing**: Handles quoted fields and various file formats
 - **Data Filtering**: Search and filter transactions
 - **Sorting & Pagination**: Organized transaction table with sorting capabilities
 - **Export Charts**: Download visualizations as PNG images
@@ -67,15 +69,20 @@ A comprehensive, modern financial dashboard built with React that provides power
 4. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 📋 CSV Data Format
+## 📋 Data Format (CSV & Excel)
 
-Your CSV file should follow this format:
+Your CSV or Excel file should follow this format:
 
 ```csv
 Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 01/01/2024,10:30:00,Bank Account,Food,Groceries,Weekly shopping,2500,Expense
 01/01/2024,14:15:00,Savings Account,Salary,Basic Salary,Monthly salary,50000,Income
 ```
+
+**Supported File Types:**
+- **.csv** - Comma-separated values
+- **.xlsx** - Excel workbook format
+- **.xls** - Legacy Excel format
 
 ### Required Columns:
 - **Date**: DD/MM/YYYY format
@@ -95,6 +102,7 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 - **react-chartjs-2**: React wrapper for Chart.js
 - **TailwindCSS 3.4.17**: Utility-first CSS framework
 - **Lucide React**: Beautiful icon library
+- **xlsx 0.18.5**: Excel file parsing and processing
 
 ### Build Tools
 - **Create React App 5.0.1**: Zero-configuration setup
@@ -190,15 +198,16 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 
 ### Common Issues
 
-**CSV Upload Not Working**
-- Ensure CSV follows the exact format specified
+**CSV/Excel Upload Not Working**
+- Ensure file follows the exact format specified
 - Check that all required columns are present
 - Verify date format is DD/MM/YYYY
+- For Excel files, ensure data is in the first worksheet
 
 **Charts Not Displaying**
 - Check browser console for JavaScript errors
 - Ensure all dependencies are installed correctly
-- Verify CSV data is properly formatted
+- Verify file data is properly formatted
 
 **Build Failures**
 - Run `npm install` to ensure all dependencies are installed

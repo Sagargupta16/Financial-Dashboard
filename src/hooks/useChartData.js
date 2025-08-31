@@ -99,8 +99,29 @@ export const useChartData = (filteredData, kpiData, drilldownCategory) => {
       return acc;
     }, {});
     const sortedMonths = Object.keys(monthly).sort();
+
+    // Convert YYYY-MM format to readable month labels
+    const formatMonthLabel = (monthString) => {
+      const [year, month] = monthString.split("-");
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${monthNames[parseInt(month) - 1]} ${year}`;
+    };
+
     return {
-      labels: sortedMonths,
+      labels: sortedMonths.map(formatMonthLabel),
       datasets: [
         {
           label: "Income",

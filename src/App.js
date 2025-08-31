@@ -33,14 +33,16 @@ import { TransactionTable } from "./components/UI/TransactionTable";
 import { Footer } from "./components/UI/Footer";
 import {
   IncomeVsExpenseChart,
-  TopExpenseCategoriesChart,
-  TopIncomeSourcesChart,
-  SpendingByAccountChart,
-  MonthlyTrendsChart,
+  EnhancedTopExpenseCategoriesChart,
+  EnhancedTopIncomeSourcesChart,
+  EnhancedSpendingByAccountChart,
+  EnhancedMonthlyTrendsChart,
   SpendingByDayChart,
   SubcategoryBreakdownChart,
   EnhancedSubcategoryBreakdownChart,
   MultiCategoryTimeAnalysisChart,
+  NetWorthTrendChart,
+  CumulativeCategoryTrendChart,
 } from "./components/Charts/ChartComponents";
 
 // Hooks
@@ -95,6 +97,8 @@ const App = () => {
     subcategoryBreakdown: useRef(null),
     enhancedSubcategoryBreakdown: useRef(null),
     multiCategoryTimeAnalysis: useRef(null),
+    netWorth: useRef(null),
+    cumulativeCategoryTrend: useRef(null),
   };
 
   // Custom hooks
@@ -254,21 +258,25 @@ const App = () => {
             chartRef={chartRefs.doughnut}
           />
           <AccountBalancesCard balances={accountBalances} />
-          <TopExpenseCategoriesChart
-            data={chartData.barChartData}
+          <EnhancedTopExpenseCategoriesChart
+            filteredData={filteredData}
             chartRef={chartRefs.bar}
           />
-          <TopIncomeSourcesChart
-            data={chartData.incomeSourcesChartData}
+          <EnhancedTopIncomeSourcesChart
+            filteredData={filteredData}
             chartRef={chartRefs.incomeSources}
           />
-          <SpendingByAccountChart
-            data={chartData.spendingByAccountChartData}
+          <EnhancedSpendingByAccountChart
+            filteredData={filteredData}
             chartRef={chartRefs.spendingByAccount}
           />
-          <MonthlyTrendsChart
-            data={chartData.lineChartData}
+          <EnhancedMonthlyTrendsChart
+            filteredData={filteredData}
             chartRef={chartRefs.line}
+          />
+          <NetWorthTrendChart
+            filteredData={filteredData}
+            chartRef={chartRefs.netWorth}
           />
         </div>
 
@@ -326,6 +334,19 @@ const App = () => {
               filteredData={filteredData}
               chartRef={chartRefs.multiCategoryTimeAnalysis}
               categories={uniqueValues.expenseCategories}
+            />
+          </div>
+        </div>
+
+        {/* Cumulative Trends Section */}
+        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">
+            Cumulative Spending Analysis
+          </h2>
+          <div className="grid grid-cols-1 gap-6">
+            <CumulativeCategoryTrendChart
+              filteredData={filteredData}
+              chartRef={chartRefs.cumulativeCategoryTrend}
             />
           </div>
         </div>

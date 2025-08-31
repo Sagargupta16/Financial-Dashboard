@@ -10,7 +10,7 @@ export const parseDate = (dateString, timeString) => {
   const dateParts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4})/);
   const timeParts = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
   if (!dateParts || !timeParts) return null;
-  return new Date(
+  const date = new Date(
     dateParts[3],
     dateParts[2] - 1,
     dateParts[1],
@@ -18,6 +18,11 @@ export const parseDate = (dateString, timeString) => {
     timeParts[2],
     timeParts[3]
   );
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return null;
+  }
+  return date;
 };
 
 export const formatCurrency = (value) => {

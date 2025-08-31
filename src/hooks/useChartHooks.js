@@ -222,7 +222,7 @@ export const useTrendAnalysis = (data, period = "month") => {
       latest: latest.net,
       previous: previous.net,
     };
-  }, [data, period]);
+  }, [data]);
 };
 
 // Custom hook for forecasting

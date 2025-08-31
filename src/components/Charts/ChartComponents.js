@@ -4,27 +4,15 @@ import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
 import {
   formatCurrency,
-  formatCurrencyDetailed,
   getCommonChartOptions,
-  exportChartAsPNG,
-  colorPalettes,
   monthNames,
-  shortMonthNames,
 } from "../../utils/chartUtils";
 import {
   ChartContainer,
   ExportButton,
-  DropdownSelect,
   TimeNavigationControls,
-  ChartWrapper,
-  FilterControls,
-  InfoCard,
 } from "../UI/ChartUIComponents";
-import {
-  useTimeNavigation,
-  useChartDataProcessor,
-  useMultipleFilters,
-} from "../../hooks/useChartHooks";
+import { useTimeNavigation } from "../../hooks/useChartHooks";
 
 // Legacy chart options for backward compatibility
 export const commonChartOptions = getCommonChartOptions();
@@ -68,8 +56,6 @@ export const EnhancedTopExpenseCategoriesChart = ({
     handleNext,
     canGoPrevious,
     canGoNext,
-    availableYears,
-    getCurrentPeriodLabel,
     getFilteredData,
   } = useTimeNavigation(filteredData);
 
@@ -317,7 +303,6 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
     handleNext,
     canGoPrevious,
     canGoNext,
-    getFilteredData,
   } = useTimeNavigation(filteredData, "all-time");
 
   // Filter data based on selected time period

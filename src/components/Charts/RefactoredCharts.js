@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import {
   formatCurrency,
@@ -18,14 +18,14 @@ import {
   useMultipleFilters,
 } from "../../hooks/useChartHooks";
 
-// Reusable Enhanced Chart Component
+
 const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
   return ({
     filteredData,
     chartRef,
     title,
-    dataType = "expense", // 'expense', 'income', 'both'
-    chartType = "bar", // 'bar', 'line', 'doughnut'
+    dataType = "expense",
+    chartType = "bar",
     limit = 10,
     colSpan = "",
     ...customOptions
@@ -38,11 +38,11 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
       account: "all",
     });
 
-    // Process chart data
+
     const chartData = React.useMemo(() => {
       let data = getFilteredData();
 
-      // Apply data type filter
+
       if (dataType === "expense") {
         data = data.filter(
           (item) => item.type === "Expense" && item.category !== "In-pocket"
@@ -51,7 +51,7 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
         data = data.filter((item) => item.type === "Income");
       }
 
-      // Apply additional filters
+
       if (filters.category !== "all") {
         data = data.filter((item) => item.category === filters.category);
       }
@@ -59,9 +59,9 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
         data = data.filter((item) => item.account === filters.account);
       }
 
-      // Group and sort data
+
       const grouped = data.reduce((acc, item) => {
-        const key = item.category; // or item.account based on chart type
+        const key = item.category;
         acc[key] = (acc[key] || 0) + item.amount;
         return acc;
       }, {});
@@ -70,7 +70,7 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
         .sort(([, a], [, b]) => b - a)
         .slice(0, limit);
 
-      // Generate colors
+
       const colors =
         chartType === "doughnut"
           ? colorPalettes.primary.slice(0, sorted.length)
@@ -93,7 +93,7 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
       };
     }, [getFilteredData, dataType, filters, limit, chartType]);
 
-    // Get unique categories and accounts for filters
+
     const categories = React.useMemo(
       () => [...new Set(filteredData.map((item) => item.category))].sort(),
       [filteredData]
@@ -190,9 +190,16 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
   };
 };
 
-// Export specific chart types
+
 export const EnhancedBarChart = createEnhancedChart(Bar, {
   scales: {
+    x: {
+      ticks: {
+        font: { size: 10 },
+        maxRotation: 45,
+        maxTicksLimit: 15,
+      },
+    },
     y: {
       beginAtZero: true,
     },
@@ -201,6 +208,13 @@ export const EnhancedBarChart = createEnhancedChart(Bar, {
 
 export const EnhancedLineChart = createEnhancedChart(Line, {
   scales: {
+    x: {
+      ticks: {
+        font: { size: 10 },
+        maxRotation: 45,
+        maxTicksLimit: 15,
+      },
+    },
     y: {
       beginAtZero: true,
     },
@@ -216,7 +230,7 @@ export const EnhancedDoughnutChart = createEnhancedChart(Doughnut, {
   },
 });
 
-// Specific chart implementations using the enhanced components
+
 export const RefactoredTopExpenseCategoriesChart = (props) => (
   <EnhancedBarChart
     {...props}
@@ -247,17 +261,17 @@ export const RefactoredExpenseDistributionChart = (props) => (
   />
 );
 
-// Trend Chart Component
+
 export const RefactoredTrendChart = ({
   filteredData,
   chartRef,
   title = "Financial Trends",
   colSpan = "lg:col-span-2",
 }) => {
-  const [metricType, setMetricType] = React.useState("net"); // 'income', 'expense', 'net'
+  const [metricType, setMetricType] = React.useState("net");
 
   const chartData = React.useMemo(() => {
-    // Group data by month
+
     const monthlyData = filteredData.reduce((acc, item) => {
       if (!item.date) return acc;
 
@@ -279,7 +293,7 @@ export const RefactoredTrendChart = ({
       return acc;
     }, {});
 
-    // Convert to arrays
+
     const sortedMonths = Object.keys(monthlyData).sort();
     const labels = sortedMonths.map((month) => {
       const [year, monthNum] = month.split("-");
@@ -345,6 +359,13 @@ export const RefactoredTrendChart = ({
           data={chartData}
           options={getCommonChartOptions({
             scales: {
+              x: {
+                ticks: {
+                  font: { size: 10 },
+                  maxRotation: 45,
+                  maxTicksLimit: 15,
+                },
+              },
               y: { beginAtZero: true },
             },
           })}

@@ -49,7 +49,7 @@ import {
   AccountBalanceProgressionChart,
   DayWeekSpendingPatternsChart,
   TreemapChart,
-} from "./components/Charts/ChartComponents";
+} from "./components/Charts";
 
 // Hooks
 import {

@@ -4,8 +4,22 @@ import {
   filterDataByTimeRange,
   groupDataByCategory,
   groupDataByMonth,
-  monthNames,
 } from "../utils/chartUtils";
+
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 // Custom hook for time navigation logic
 export const useTimeNavigation = (data, initialViewMode = "month") => {

@@ -1,6 +1,3 @@
-// Chart utility functions and constants
-
-// Currency formatting utility
 export const formatCurrency = (value) => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -10,33 +7,13 @@ export const formatCurrency = (value) => {
   }).format(value);
 };
 
-// Enhanced currency formatting with decimals
-export const formatCurrencyDetailed = (value) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
+export const truncateLabel = (label, maxLength = 12) => {
+  if (typeof label !== "string") return label;
+  return label.length > maxLength
+    ? `${label.substring(0, maxLength)}...`
+    : label;
 };
 
-// Month names array
-export const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-// Short month names array
 export const shortMonthNames = [
   "Jan",
   "Feb",
@@ -52,7 +29,6 @@ export const shortMonthNames = [
   "Dec",
 ];
 
-// Color palettes for charts
 export const colorPalettes = {
   primary: [
     "#3b82f6",
@@ -96,7 +72,6 @@ export const colorPalettes = {
   ],
 };
 
-// Common chart configuration
 export const getCommonChartOptions = (customOptions = {}) => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -123,7 +98,18 @@ export const getCommonChartOptions = (customOptions = {}) => ({
   },
   scales: {
     x: {
-      ticks: { color: "#9ca3af" },
+      ticks: {
+        color: "#9ca3af",
+        font: { size: 10 },
+        maxRotation: 45,
+        maxTicksLimit: 15,
+        callback: function (value, index) {
+          const label = this.getLabelForValue
+            ? this.getLabelForValue(value)
+            : value;
+          return truncateLabel(label, 12);
+        },
+      },
       grid: { color: "#374151" },
       ...customOptions.scales?.x,
     },
@@ -140,7 +126,6 @@ export const getCommonChartOptions = (customOptions = {}) => ({
   ...customOptions,
 });
 
-// Export chart as image utility
 export const exportChartAsPNG = (chartRef, filename) => {
   if (chartRef?.current) {
     const canvas = chartRef.current.canvas;
@@ -152,7 +137,6 @@ export const exportChartAsPNG = (chartRef, filename) => {
   }
 };
 
-// Data filtering utilities
 export const filterDataByTimeRange = (data, timeRange) => {
   return data.filter((item) => {
     if (!item.date) return false;
@@ -174,7 +158,6 @@ export const filterDataByTimeRange = (data, timeRange) => {
   });
 };
 
-// Group data by category
 export const groupDataByCategory = (data, filterOptions = {}) => {
   const { excludeInPocket = true, type = null } = filterOptions;
 
@@ -226,37 +209,7 @@ export const getAvailableYears = (data) => {
   return Array.from(years).sort((a, b) => a - b);
 };
 
-// Format month key to readable label
 export const formatMonthLabel = (monthKey) => {
   const [year, monthNum] = monthKey.split("-");
   return `${shortMonthNames[parseInt(monthNum) - 1]} ${year}`;
-};
-
-// Generate color with opacity
-export const generateColorWithOpacity = (color, opacity) => {
-  // Convert hex to rgba
-  const hex = color.replace("#", "");
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-};
-
-// Calculate percentage change
-export const calculatePercentageChange = (oldValue, newValue) => {
-  if (oldValue === 0) return newValue > 0 ? 100 : 0;
-  return ((newValue - oldValue) / oldValue) * 100;
-};
-
-// Debounce utility for performance
-export const debounce = (func, wait) => {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 };

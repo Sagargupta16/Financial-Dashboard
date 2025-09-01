@@ -163,8 +163,8 @@ const App = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 font-sans p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black text-gray-300 font-sans p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+      <div className="relative z-10 max-w-7xl mx-auto">
         <Header onFileUpload={handleFileUpload} />
 
         {/* Main KPI Cards */}
@@ -287,102 +287,107 @@ const App = () => {
         </div>
 
         {/* Deeper Analysis Section */}
-        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Deeper Analysis
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <SmallKPICard
-              title="Busiest Spending Day"
-              value={keyInsights.busiestDay}
-              icon={<CalendarDays size={22} />}
-            />
-            <SmallKPICard
-              title="Most Frequent Category"
-              value={keyInsights.mostFrequentCategory}
-              icon={<LayoutGrid size={22} />}
-            />
-            <SmallKPICard
-              title="Avg. Transaction Value"
-              value={keyInsights.avgTransactionValue}
-              icon={<Calculator size={22} />}
-            />
+        <div className="relative bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-700/50 overflow-hidden">
+          <div className="relative z-10">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+              <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl mr-3 shadow-lg">
+                <LayoutGrid size={24} className="text-white" />
+              </div>
+              Deeper Analysis
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <SmallKPICard
+                title="Busiest Spending Day"
+                value={keyInsights.busiestDay}
+                icon={<CalendarDays size={22} />}
+              />
+              <SmallKPICard
+                title="Most Frequent Category"
+                value={keyInsights.mostFrequentCategory}
+                icon={<LayoutGrid size={22} />}
+              />
+              <SmallKPICard
+                title="Avg. Transaction Value"
+                value={keyInsights.avgTransactionValue}
+                icon={<Calculator size={22} />}
+              />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SpendingByDayChart
+                data={chartData.spendingByDayData}
+                chartRef={chartRefs.spendingByDay}
+              />
+              <SubcategoryBreakdownChart
+                data={chartData.subcategoryBreakdownData}
+                chartRef={chartRefs.subcategoryBreakdown}
+                categories={uniqueValues.expenseCategories}
+                selectedCategory={drilldownCategory}
+                onCategoryChange={setDrilldownCategory}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SpendingByDayChart
-              data={chartData.spendingByDayData}
-              chartRef={chartRefs.spendingByDay}
-            />
-            <SubcategoryBreakdownChart
-              data={chartData.subcategoryBreakdownData}
-              chartRef={chartRefs.subcategoryBreakdown}
-              categories={uniqueValues.expenseCategories}
-              selectedCategory={drilldownCategory}
-              onCategoryChange={setDrilldownCategory}
-            />
-          </div>
-        </div>
 
-        {/* Enhanced Time-based Analysis */}
-        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Time-based Category Analysis
-          </h2>
-          <div className="grid grid-cols-1 gap-6">
-            <EnhancedSubcategoryBreakdownChart
-              filteredData={filteredData}
-              chartRef={chartRefs.enhancedSubcategoryBreakdown}
-              categories={uniqueValues.expenseCategories}
-              selectedCategory={drilldownCategory}
-              onCategoryChange={setDrilldownCategory}
-            />
-            <MultiCategoryTimeAnalysisChart
-              filteredData={filteredData}
-              chartRef={chartRefs.multiCategoryTimeAnalysis}
-              categories={uniqueValues.expenseCategories}
-            />
+          {/* Enhanced Time-based Analysis */}
+          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Time-based Category Analysis
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              <EnhancedSubcategoryBreakdownChart
+                filteredData={filteredData}
+                chartRef={chartRefs.enhancedSubcategoryBreakdown}
+                categories={uniqueValues.expenseCategories}
+                selectedCategory={drilldownCategory}
+                onCategoryChange={setDrilldownCategory}
+              />
+              <MultiCategoryTimeAnalysisChart
+                filteredData={filteredData}
+                chartRef={chartRefs.multiCategoryTimeAnalysis}
+                categories={uniqueValues.expenseCategories}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Cumulative Trends Section */}
-        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Cumulative Spending Analysis
-          </h2>
-          <div className="grid grid-cols-1 gap-6">
-            <CumulativeCategoryTrendChart
-              filteredData={filteredData}
-              chartRef={chartRefs.cumulativeCategoryTrend}
-            />
+          {/* Cumulative Trends Section */}
+          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Cumulative Spending Analysis
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              <CumulativeCategoryTrendChart
+                filteredData={filteredData}
+                chartRef={chartRefs.cumulativeCategoryTrend}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Advanced Analytics Section */}
-        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Advanced Financial Analytics
-          </h2>
-          <div className="grid grid-cols-1 gap-6">
-            <SeasonalSpendingHeatmap
-              filteredData={filteredData}
-              chartRef={chartRefs.seasonalSpendingHeatmap}
-            />
-            <YearOverYearComparisonChart
-              filteredData={filteredData}
-              chartRef={chartRefs.yearOverYearComparison}
-            />
-            <SpendingForecastChart
-              filteredData={filteredData}
-              chartRef={chartRefs.spendingForecast}
-            />
-            <AccountBalanceProgressionChart
-              filteredData={filteredData}
-              chartRef={chartRefs.accountBalanceProgression}
-            />
-            <DayWeekSpendingPatternsChart
-              filteredData={filteredData}
-              chartRef={chartRefs.dayWeekSpendingPatterns}
-            />
+          {/* Advanced Analytics Section */}
+          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Advanced Financial Analytics
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              <SeasonalSpendingHeatmap
+                filteredData={filteredData}
+                chartRef={chartRefs.seasonalSpendingHeatmap}
+              />
+              <YearOverYearComparisonChart
+                filteredData={filteredData}
+                chartRef={chartRefs.yearOverYearComparison}
+              />
+              <SpendingForecastChart
+                filteredData={filteredData}
+                chartRef={chartRefs.spendingForecast}
+              />
+              <AccountBalanceProgressionChart
+                filteredData={filteredData}
+                chartRef={chartRefs.accountBalanceProgression}
+              />
+              <DayWeekSpendingPatternsChart
+                filteredData={filteredData}
+                chartRef={chartRefs.dayWeekSpendingPatterns}
+              />
+            </div>
           </div>
         </div>
 

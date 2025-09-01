@@ -225,9 +225,16 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   }, [timeFilteredData]);
 
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
+    <div className="group relative bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-gray-700 hover:border-gray-600 transition-all duration-500 h-[450px] flex flex-col overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+      {/* Floating orbs */}
+      <div className="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+      <div className="absolute -bottom-10 -left-10 w-16 h-16 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-300"></div>
+
+      <div className="relative z-10 flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-white group-hover:text-gray-100 transition-colors duration-300">
           {getDisplayTitle()}
         </h3>
         <button
@@ -244,7 +251,7 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
               link.click();
             }
           }}
-          className="text-gray-400 hover:text-white"
+          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform"
         >
           <svg
             width="18"
@@ -264,15 +271,15 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
       </div>
 
       {/* View Mode Selector */}
-      <div className="flex space-x-2 mb-4">
+      <div className="relative z-10 flex space-x-2 mb-4">
         {["month", "year", "all-time"].map((mode) => (
           <button
             key={mode}
             onClick={() => setViewMode(mode)}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
               viewMode === mode
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25"
+                : "bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300 hover:from-gray-600 hover:to-gray-700 border border-gray-600"
             }`}
           >
             {mode === "all-time"
@@ -284,11 +291,11 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
 
       {/* Navigation Controls */}
       {viewMode !== "all-time" && (
-        <div className="flex items-center justify-between mb-4">
+        <div className="relative z-10 flex items-center justify-between mb-4">
           <button
             onClick={handlePrevious}
             disabled={!canGoPrevious()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform disabled:transform-none"
           >
             <svg
               width="24"
@@ -301,7 +308,7 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
               <polyline points="15,18 9,12 15,6"></polyline>
             </svg>
           </button>
-          <span className="text-gray-300 font-medium">
+          <span className="text-gray-300 font-medium px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
             {viewMode === "month" &&
               `${formatMonthLabel(currentMonth)} ${currentYear}`}
             {viewMode === "year" && currentYear}
@@ -309,7 +316,7 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
           <button
             onClick={handleNext}
             disabled={!canGoNext()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform disabled:transform-none"
           >
             <svg
               width="24"
@@ -326,15 +333,17 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
       )}
 
       {/* Total Spending Display */}
-      <div className="text-center mb-4">
-        <div className="text-sm text-gray-400">Total Spending</div>
-        <div className="text-2xl font-bold text-white">
+      <div className="relative z-10 text-center mb-4 p-4 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-xl border border-gray-700/50">
+        <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+          Total Spending
+        </div>
+        <div className="text-2xl font-bold text-white group-hover:text-gray-100 transition-colors duration-300">
           {formatCurrency(totalSpending)}
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="flex-1 relative">
+      <div className="relative z-10 flex-1 relative bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl p-4 border border-gray-700/50">
         {chartData.labels.length > 0 ? (
           <Doughnut
             ref={chartRef}
@@ -351,6 +360,9 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
           </div>
         )}
       </div>
+
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
     </div>
   );
 };

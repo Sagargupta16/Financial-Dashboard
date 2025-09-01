@@ -207,7 +207,10 @@ export const EnhancedTransactionTable = ({
   };
 
   return (
-    <div className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+    <div className="group relative bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 rounded-2xl shadow-xl hover:shadow-2xl border border-gray-700 hover:border-gray-600 transition-all duration-500 overflow-hidden">
+      {/* Floating orbs */}
+      <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-purple-600/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+      <div className="absolute -bottom-20 -left-20 w-32 h-32 bg-gradient-to-br from-purple-500/5 to-pink-600/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-300"></div>
       {/* Header with Search and Filter Controls */}
       <div className="p-6 border-b border-gray-700">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
@@ -575,13 +578,32 @@ export const EnhancedTransactionTable = ({
             {paginatedData.map((item) => (
               <tr
                 key={item.id}
-                className="hover:bg-gray-700/50 transition-colors"
+                style={{
+                  transition: "background-color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#374151";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "";
+                }}
               >
-                <td className="p-4 whitespace-nowrap text-sm">
+                <td
+                  className="p-4 whitespace-nowrap text-sm"
+                  style={{ color: "#f3f4f6" }}
+                >
                   {item.date?.toLocaleDateString()}
                 </td>
-                <td className="p-4 whitespace-nowrap text-sm">{item.time}</td>
-                <td className="p-4 whitespace-nowrap text-sm">
+                <td
+                  className="p-4 whitespace-nowrap text-sm"
+                  style={{ color: "#f3f4f6" }}
+                >
+                  {item.time}
+                </td>
+                <td
+                  className="p-4 whitespace-nowrap text-sm"
+                  style={{ color: "#f3f4f6" }}
+                >
                   {item.account}
                 </td>
                 <td className="p-4 whitespace-nowrap">
@@ -593,8 +615,14 @@ export const EnhancedTransactionTable = ({
                     {item.category}
                   </span>
                 </td>
-                <td className="p-4 text-sm">{item.subcategory || "-"}</td>
-                <td className="p-4 text-sm max-w-xs truncate" title={item.note}>
+                <td className="p-4 text-sm" style={{ color: "#f3f4f6" }}>
+                  {item.subcategory || "-"}
+                </td>
+                <td
+                  className="p-4 text-sm max-w-xs truncate"
+                  style={{ color: "#f3f4f6" }}
+                  title={item.note}
+                >
                   {item.note || "-"}
                 </td>
                 <td

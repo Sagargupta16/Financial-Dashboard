@@ -191,9 +191,23 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   };
 
   return (
-    <div className="lg:col-span-2 bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">Monthly Trends</h3>
+    <div className="group lg:col-span-2 relative bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-gray-700 hover:border-gray-600 transition-all duration-500 h-[450px] flex flex-col overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 via-blue-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+      {/* Floating orbs */}
+      <div className="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-blue-600/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+      <div className="absolute -bottom-16 -left-16 w-24 h-24 bg-gradient-to-br from-blue-500/10 to-pink-600/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-300"></div>
+
+      <div className="relative z-10 flex justify-between items-center mb-4">
+        <div>
+          <h3 className="text-2xl font-bold text-white group-hover:text-gray-100 transition-colors duration-300">
+            Monthly Trends
+          </h3>
+          <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300 text-sm">
+            Track your income and expense patterns over time
+          </p>
+        </div>
         <button
           onClick={() => {
             if (chartRef?.current) {
@@ -208,7 +222,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
               link.click();
             }
           }}
-          className="text-gray-400 hover:text-white"
+          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform"
         >
           <svg
             width="18"
@@ -228,12 +242,12 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       </div>
 
       {/* Time Navigation Controls */}
-      <div className="flex justify-between items-center mb-4 bg-gray-700/50 rounded-lg p-3">
-        <div className="flex items-center gap-2">
+      <div className="relative z-10 flex justify-between items-center mb-4 bg-gradient-to-r from-gray-800/80 to-gray-900/80 rounded-xl p-4 border border-gray-600/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
           >
             <option value="year">Yearly View</option>
             <option value="last-12-months">Last 12 Months</option>
@@ -242,7 +256,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           <select
             value={dataMode}
             onChange={(e) => setDataMode(e.target.value)}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg"
           >
             <option value="regular">Regular</option>
             <option value="cumulative">Cumulative</option>
@@ -253,7 +267,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           <button
             onClick={handlePrevious}
             disabled={!canGoPrevious()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform disabled:transform-none"
           >
             <svg
               width="20"
@@ -267,7 +281,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
             </svg>
           </button>
 
-          <div className="text-white font-semibold min-w-[150px] text-center">
+          <div className="text-white font-semibold min-w-[150px] text-center px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
             {viewMode === "all-time"
               ? "All Time"
               : viewMode === "last-12-months"
@@ -278,7 +292,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           <button
             onClick={handleNext}
             disabled={!canGoNext()}
-            className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 rounded-xl transition-all duration-300 hover:scale-110 transform disabled:transform-none"
           >
             <svg
               width="20"
@@ -293,7 +307,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           </button>
         </div>
 
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300 px-3 py-1 bg-gradient-to-r from-gray-700/50 to-gray-800/50 rounded-lg">
           {
             timeFilteredData.filter(
               (i) => i.type === "Income" || i.type === "Expense"
@@ -303,7 +317,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
         </div>
       </div>
 
-      <div className="flex-grow">
+      <div className="relative z-10 flex-grow bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl p-4 border border-gray-700/50">
         {chartData.labels && chartData.labels.length > 0 ? (
           <Line ref={chartRef} data={chartData} options={commonChartOptions} />
         ) : (
@@ -316,6 +330,9 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           </div>
         )}
       </div>
+
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
     </div>
   );
 };

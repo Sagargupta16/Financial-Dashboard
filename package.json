@@ -5,6 +5,9 @@
   "homepage": "https://sagargupta16.github.io/Financial-Dashboard",
   "dependencies": {
     "chart.js": "^4.5.0",
+    "d3-hierarchy": "^3.1.2",
+    "d3-scale": "^4.0.2",
+    "d3-selection": "^3.0.0",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.0",

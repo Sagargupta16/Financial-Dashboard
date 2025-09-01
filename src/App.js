@@ -48,6 +48,7 @@ import {
   SpendingForecastChart,
   AccountBalanceProgressionChart,
   DayWeekSpendingPatternsChart,
+  TreemapChart,
 } from "./components/Charts/ChartComponents";
 
 // Hooks
@@ -109,6 +110,7 @@ const App = () => {
     spendingForecast: useRef(null),
     accountBalanceProgression: useRef(null),
     dayWeekSpendingPatterns: useRef(null),
+    treemap: useRef(null),
   };
 
   // Custom hooks
@@ -287,6 +289,10 @@ const App = () => {
           <NetWorthTrendChart
             filteredData={filteredData}
             chartRef={chartRefs.netWorth}
+          />
+          <TreemapChart
+            filteredData={filteredData}
+            chartRef={chartRefs.treemap}
           />
         </div>
 

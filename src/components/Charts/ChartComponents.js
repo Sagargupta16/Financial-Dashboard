@@ -2,6 +2,7 @@
 import React from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
+import TreemapChart from "./TreemapChart";
 import {
   formatCurrency,
   getCommonChartOptions,
@@ -4683,3 +4684,6 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     </div>
   );
 };
+
+// Treemap Chart Export
+export { TreemapChart };

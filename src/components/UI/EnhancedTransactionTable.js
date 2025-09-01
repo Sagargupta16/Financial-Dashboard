@@ -1,18 +1,18 @@
 import React, { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
-import { 
-  ArrowUpDown, 
-  ChevronLeft, 
-  ChevronRight, 
-  Search, 
-  Filter, 
-  X, 
+import {
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Filter,
+  X,
   Calendar,
   DollarSign,
   Tag,
   FileText,
   CreditCard,
-  Settings
+  Settings,
 } from "lucide-react";
 import { formatCurrency } from "../../utils/dataUtils";
 
@@ -44,7 +44,7 @@ export const EnhancedTransactionTable = ({
   onSort,
   currentPage: initialPage = 1,
   transactionsPerPage = 25,
-  initialFilters = {}
+  initialFilters = {},
 }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,7 +59,7 @@ export const EnhancedTransactionTable = ({
     subcategory: "",
     type: "",
     note: "",
-    ...initialFilters
+    ...initialFilters,
   });
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
@@ -67,10 +67,16 @@ export const EnhancedTransactionTable = ({
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
     return {
-      accounts: [...new Set(data.map(item => item.account).filter(Boolean))].sort(),
-      categories: [...new Set(data.map(item => item.category).filter(Boolean))].sort(),
-      subcategories: [...new Set(data.map(item => item.subcategory).filter(Boolean))].sort(),
-      types: [...new Set(data.map(item => item.type).filter(Boolean))].sort()
+      accounts: [
+        ...new Set(data.map((item) => item.account).filter(Boolean)),
+      ].sort(),
+      categories: [
+        ...new Set(data.map((item) => item.category).filter(Boolean)),
+      ].sort(),
+      subcategories: [
+        ...new Set(data.map((item) => item.subcategory).filter(Boolean)),
+      ].sort(),
+      types: [...new Set(data.map((item) => item.type).filter(Boolean))].sort(),
     };
   }, [data]);
 
@@ -81,21 +87,23 @@ export const EnhancedTransactionTable = ({
     // Apply search term across multiple fields
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(item =>
-        (item.account || "").toLowerCase().includes(searchLower) ||
-        (item.category || "").toLowerCase().includes(searchLower) ||
-        (item.subcategory || "").toLowerCase().includes(searchLower) ||
-        (item.note || "").toLowerCase().includes(searchLower) ||
-        (item.type || "").toLowerCase().includes(searchLower) ||
-        formatCurrency(item.amount).toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (item) =>
+          (item.account || "").toLowerCase().includes(searchLower) ||
+          (item.category || "").toLowerCase().includes(searchLower) ||
+          (item.subcategory || "").toLowerCase().includes(searchLower) ||
+          (item.note || "").toLowerCase().includes(searchLower) ||
+          (item.type || "").toLowerCase().includes(searchLower) ||
+          formatCurrency(item.amount).toLowerCase().includes(searchLower)
       );
     }
 
     // Apply individual filters
     if (filters.dateFrom) {
       const fromDate = new Date(filters.dateFrom);
-      filtered = filtered.filter(item => {
-        const itemDate = item.date instanceof Date ? item.date : new Date(item.date);
+      filtered = filtered.filter((item) => {
+        const itemDate =
+          item.date instanceof Date ? item.date : new Date(item.date);
         return itemDate >= fromDate;
       });
     }
@@ -103,8 +111,9 @@ export const EnhancedTransactionTable = ({
     if (filters.dateTo) {
       const toDate = new Date(filters.dateTo);
       toDate.setHours(23, 59, 59, 999); // End of day
-      filtered = filtered.filter(item => {
-        const itemDate = item.date instanceof Date ? item.date : new Date(item.date);
+      filtered = filtered.filter((item) => {
+        const itemDate =
+          item.date instanceof Date ? item.date : new Date(item.date);
         return itemDate <= toDate;
       });
     }
@@ -112,36 +121,38 @@ export const EnhancedTransactionTable = ({
     if (filters.amountMin !== "") {
       const minAmount = parseFloat(filters.amountMin);
       if (!isNaN(minAmount)) {
-        filtered = filtered.filter(item => item.amount >= minAmount);
+        filtered = filtered.filter((item) => item.amount >= minAmount);
       }
     }
 
     if (filters.amountMax !== "") {
       const maxAmount = parseFloat(filters.amountMax);
       if (!isNaN(maxAmount)) {
-        filtered = filtered.filter(item => item.amount <= maxAmount);
+        filtered = filtered.filter((item) => item.amount <= maxAmount);
       }
     }
 
     if (filters.account) {
-      filtered = filtered.filter(item => item.account === filters.account);
+      filtered = filtered.filter((item) => item.account === filters.account);
     }
 
     if (filters.category) {
-      filtered = filtered.filter(item => item.category === filters.category);
+      filtered = filtered.filter((item) => item.category === filters.category);
     }
 
     if (filters.subcategory) {
-      filtered = filtered.filter(item => item.subcategory === filters.subcategory);
+      filtered = filtered.filter(
+        (item) => item.subcategory === filters.subcategory
+      );
     }
 
     if (filters.type) {
-      filtered = filtered.filter(item => item.type === filters.type);
+      filtered = filtered.filter((item) => item.type === filters.type);
     }
 
     if (filters.note) {
       const noteLower = filters.note.toLowerCase();
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter((item) =>
         (item.note || "").toLowerCase().includes(noteLower)
       );
     }
@@ -162,14 +173,14 @@ export const EnhancedTransactionTable = ({
 
   // Count active filters
   useEffect(() => {
-    const count = Object.values(filters).filter(value => value !== "").length;
+    const count = Object.values(filters).filter((value) => value !== "").length;
     setActiveFiltersCount(count);
   }, [filters]);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -183,15 +194,15 @@ export const EnhancedTransactionTable = ({
       category: "",
       subcategory: "",
       type: "",
-      note: ""
+      note: "",
     });
     setSearchTerm("");
   };
 
   const clearFilter = (key) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [key]: ""
+      [key]: "",
     }));
   };
 
@@ -201,11 +212,14 @@ export const EnhancedTransactionTable = ({
       <div className="p-6 border-b border-gray-700">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <h3 className="text-xl font-semibold text-white">Transactions</h3>
-          
+
           <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             {/* Global Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={16}
+              />
               <input
                 type="text"
                 placeholder="Search transactions..."
@@ -227,8 +241,8 @@ export const EnhancedTransactionTable = ({
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                showFilters 
-                  ? "bg-blue-600 text-white" 
+                showFilters
+                  ? "bg-blue-600 text-white"
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
@@ -268,7 +282,9 @@ export const EnhancedTransactionTable = ({
                   <input
                     type="date"
                     value={filters.dateFrom}
-                    onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("dateFrom", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {filters.dateFrom && (
@@ -291,7 +307,9 @@ export const EnhancedTransactionTable = ({
                   <input
                     type="date"
                     value={filters.dateTo}
-                    onChange={(e) => handleFilterChange("dateTo", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("dateTo", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {filters.dateTo && (
@@ -317,7 +335,9 @@ export const EnhancedTransactionTable = ({
                     step="0.01"
                     placeholder="0.00"
                     value={filters.amountMin}
-                    onChange={(e) => handleFilterChange("amountMin", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("amountMin", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {filters.amountMin && (
@@ -342,7 +362,9 @@ export const EnhancedTransactionTable = ({
                     step="0.01"
                     placeholder="0.00"
                     value={filters.amountMax}
-                    onChange={(e) => handleFilterChange("amountMax", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("amountMax", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {filters.amountMax && (
@@ -365,12 +387,16 @@ export const EnhancedTransactionTable = ({
                 <div className="relative">
                   <select
                     value={filters.account}
-                    onChange={(e) => handleFilterChange("account", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("account", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">All Accounts</option>
-                    {uniqueValues.accounts.map(account => (
-                      <option key={account} value={account}>{account}</option>
+                    {uniqueValues.accounts.map((account) => (
+                      <option key={account} value={account}>
+                        {account}
+                      </option>
                     ))}
                   </select>
                   {filters.account && (
@@ -393,12 +419,16 @@ export const EnhancedTransactionTable = ({
                 <div className="relative">
                   <select
                     value={filters.category}
-                    onChange={(e) => handleFilterChange("category", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("category", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">All Categories</option>
-                    {uniqueValues.categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {uniqueValues.categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                   {filters.category && (
@@ -421,12 +451,16 @@ export const EnhancedTransactionTable = ({
                 <div className="relative">
                   <select
                     value={filters.subcategory}
-                    onChange={(e) => handleFilterChange("subcategory", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("subcategory", e.target.value)
+                    }
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">All Subcategories</option>
-                    {uniqueValues.subcategories.map(subcategory => (
-                      <option key={subcategory} value={subcategory}>{subcategory}</option>
+                    {uniqueValues.subcategories.map((subcategory) => (
+                      <option key={subcategory} value={subcategory}>
+                        {subcategory}
+                      </option>
                     ))}
                   </select>
                   {filters.subcategory && (
@@ -453,8 +487,10 @@ export const EnhancedTransactionTable = ({
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">All Types</option>
-                    {uniqueValues.types.map(type => (
-                      <option key={type} value={type}>{type}</option>
+                    {uniqueValues.types.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
                     ))}
                   </select>
                   {filters.type && (
@@ -497,8 +533,10 @@ export const EnhancedTransactionTable = ({
             {/* Filter Summary */}
             {activeFiltersCount > 0 && (
               <div className="mt-4 text-sm text-gray-300">
-                <span className="font-medium">Active filters:</span> {activeFiltersCount} | 
-                <span className="font-medium"> Showing:</span> {filteredData.length} of {data.length} transactions
+                <span className="font-medium">Active filters:</span>{" "}
+                {activeFiltersCount} |
+                <span className="font-medium"> Showing:</span>{" "}
+                {filteredData.length} of {data.length} transactions
               </div>
             )}
           </div>
@@ -512,7 +550,7 @@ export const EnhancedTransactionTable = ({
             <tr>
               {[
                 "date",
-                "time", 
+                "time",
                 "account",
                 "category",
                 "subcategory",
@@ -543,7 +581,9 @@ export const EnhancedTransactionTable = ({
                   {item.date?.toLocaleDateString()}
                 </td>
                 <td className="p-4 whitespace-nowrap text-sm">{item.time}</td>
-                <td className="p-4 whitespace-nowrap text-sm">{item.account}</td>
+                <td className="p-4 whitespace-nowrap text-sm">
+                  {item.account}
+                </td>
                 <td className="p-4 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${getTypeStyles(
@@ -580,10 +620,9 @@ export const EnhancedTransactionTable = ({
         {paginatedData.length === 0 && (
           <div className="text-center py-16">
             <p className="text-gray-400">
-              {searchTerm || activeFiltersCount > 0 
-                ? "No transactions match your search criteria." 
-                : "No transactions found."
-              }
+              {searchTerm || activeFiltersCount > 0
+                ? "No transactions match your search criteria."
+                : "No transactions found."}
             </p>
             {(searchTerm || activeFiltersCount > 0) && (
               <button
@@ -601,11 +640,13 @@ export const EnhancedTransactionTable = ({
       {totalPages > 1 && (
         <div className="flex justify-between items-center p-4 bg-gray-800 border-t border-gray-700">
           <p className="text-sm text-gray-400">
-            Showing {startIndex + 1}-
-            {Math.min(endIndex, filteredData.length)} of{" "}
-            {filteredData.length}
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)}{" "}
+            of {filteredData.length}
             {(searchTerm || activeFiltersCount > 0) && (
-              <span className="text-gray-500"> (filtered from {data.length})</span>
+              <span className="text-gray-500">
+                {" "}
+                (filtered from {data.length})
+              </span>
             )}
           </p>
           <div className="flex items-center gap-2">
@@ -620,7 +661,9 @@ export const EnhancedTransactionTable = ({
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage(Math.min(currentPage + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
             >
@@ -638,7 +681,7 @@ EnhancedTransactionTable.propTypes = {
   onSort: PropTypes.func.isRequired,
   currentPage: PropTypes.number,
   transactionsPerPage: PropTypes.number,
-  initialFilters: PropTypes.object
+  initialFilters: PropTypes.object,
 };
 
 export default EnhancedTransactionTable;

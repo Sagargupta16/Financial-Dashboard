@@ -13,10 +13,8 @@ This file tracks proposed features, new chart types, and technical improvements 
 
 - [ ] **Sankey Diagram**: Create a flow diagram to visualize money moving from income to expenses.
 - [ ] **Calendar Heatmap**: Implement a calendar view with days colored by spending amount.
-- [ ] **Treemap for Expense Breakdown**: Add a treemap as an alternative way to visualize expense categories.
 
 ## 🛠️ Technical and UI/UX Enhancements
 
-- [ ] **Advanced Filtering and Search**: Enhance the transaction table with multi-column filtering and improved search.
 - [ ] **"What If" Scenarios**: Add a feature to simulate the financial impact of different financial decisions.
 - [ ] **Migration to TypeScript**: Convert the project from JavaScript to TypeScript for improved type safety and maintainability.

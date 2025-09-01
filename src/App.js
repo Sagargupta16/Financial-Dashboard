@@ -29,7 +29,7 @@ import {
 import { Header } from "./components/UI/Header";
 import { KPICard, SmallKPICard } from "./components/UI/KPICards";
 import { AccountBalancesCard } from "./components/UI/AccountBalancesCard";
-import { TransactionTable } from "./components/UI/TransactionTable";
+import EnhancedTransactionTable from "./components/UI/EnhancedTransactionTable";
 import { Footer } from "./components/UI/Footer";
 import {
   IncomeVsExpenseChart,
@@ -147,16 +147,6 @@ const App = () => {
     }));
     setCurrentPage(1); // Reset to first page when sorting
   };
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredData.length / transactionsPerPage);
-  const startIndex = (currentPage - 1) * transactionsPerPage;
-  const endIndex = startIndex + transactionsPerPage;
-  const paginatedData = filteredData.slice(startIndex, endIndex);
 
   // Loading and error states
   if (loading)
@@ -397,14 +387,11 @@ const App = () => {
         </div>
 
         {/* Data Table */}
-        <TransactionTable
-          data={paginatedData}
+        <EnhancedTransactionTable
+          data={filteredData}
           onSort={handleSort}
           currentPage={currentPage}
-          totalPages={totalPages}
           transactionsPerPage={transactionsPerPage}
-          totalTransactions={filteredData.length}
-          onPageChange={handlePageChange}
         />
 
         <Footer />

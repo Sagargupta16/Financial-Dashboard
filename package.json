@@ -1,6 +1,7 @@
 {
   "name": "financial-dashboard",
   "version": "0.1.0",
+  "description": "A comprehensive React-based financial dashboard with advanced analytics, interactive charts, and CSV/Excel import capabilities for personal finance management",
   "private": true,
   "homepage": "https://sagargupta16.github.io/Financial-Dashboard",
   "dependencies": {

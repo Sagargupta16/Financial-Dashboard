@@ -1,8 +1,10 @@
 # 💰 Financial Dashboard
 
-A comprehensive, modern financial dashboard built with React that provides powerful analytics and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, and financial trends.
+A comprehensive, modern financial dashboard built with React that provides powerful analytics and visualizations for personal finance management. Transform your financial data into actionable insights with advanced charts, KPI tracking, spending forecasts, and seasonal analysis. Simply upload your CSV or Excel files and unlock deep insights into your spending patterns, income sources, and financial trends.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.1.0-brightgreen)
+> **🚀 Built with React 19.1.1, Chart.js 4.5.0, and TailwindCSS 3.4.17**
+
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.1.0-brightgreen) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow)
 
 ## 🎯 Demo
 
@@ -11,6 +13,8 @@ A comprehensive, modern financial dashboard built with React that provides power
 💡 **Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get some great stats instantly!
 
 ## 📸 Screenshots
+
+![Financial Dashboard Screenshot](https://github.com/user-attachments/assets/264e2490-ea24-4ba7-bfa6-d2f5ff579dac)
 
 _Upload your financial data and watch your dashboard come to life with interactive charts and comprehensive analytics._
 

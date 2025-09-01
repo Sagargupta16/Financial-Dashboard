@@ -369,6 +369,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
     new Date().getMonth() + 1
   );
   const [viewMode, setViewMode] = React.useState("month");
+  const [dataMode, setDataMode] = React.useState("regular"); // Add this line
 
   const monthNames = React.useMemo(
     () => [
@@ -438,6 +439,39 @@ export const EnhancedSubcategoryBreakdownChart = ({
   const chartData = React.useMemo(() => {
     if (!selectedCategory) return { labels: [], datasets: [] };
 
+    const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+
+    // Helper function to create cumulative data
+    const createDatasets = (subcategories, getData, labels) => {
+      if (dataMode === "cumulative") {
+        const cumulativeData = {};
+        subcategories.forEach((sub) => {
+          cumulativeData[sub] = 0;
+        });
+
+        return subcategories.map((sub, index) => ({
+          label: truncateLabel(sub, 15),
+          data: labels.map((_, labelIndex) => {
+            cumulativeData[sub] += getData(labelIndex, sub);
+            return cumulativeData[sub];
+          }),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          tension: 0.4,
+          fill: false,
+        }));
+      } else {
+        return subcategories.map((sub, index) => ({
+          label: truncateLabel(sub, 15),
+          data: labels.map((_, labelIndex) => getData(labelIndex, sub)),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          tension: 0.4,
+          fill: false,
+        }));
+      }
+    };
+
     if (viewMode === "decade") {
       const decade = Math.floor(currentYear / 10) * 10;
       const yearlyData = {};
@@ -471,21 +505,44 @@ export const EnhancedSubcategoryBreakdownChart = ({
         .slice(0, 5)
         .map(([sub]) => sub);
 
-      const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+      // Helper function to create cumulative data
+      const createDatasets = (subcategories, getData, labels) => {
+        if (dataMode === "cumulative") {
+          const cumulativeData = {};
+          subcategories.forEach((sub) => {
+            cumulativeData[sub] = 0;
+          });
+
+          return subcategories.map((sub, index) => ({
+            label: truncateLabel(sub, 15),
+            data: labels.map((_, labelIndex) => {
+              cumulativeData[sub] += getData(labelIndex, sub);
+              return cumulativeData[sub];
+            }),
+            borderColor: colors[index % colors.length],
+            backgroundColor: colors[index % colors.length] + "20",
+            tension: 0.4,
+            fill: false,
+          }));
+        } else {
+          return subcategories.map((sub, index) => ({
+            label: truncateLabel(sub, 15),
+            data: labels.map((_, labelIndex) => getData(labelIndex, sub)),
+            borderColor: colors[index % colors.length],
+            backgroundColor: colors[index % colors.length] + "20",
+            tension: 0.4,
+            fill: false,
+          }));
+        }
+      };
 
       return {
         labels: Array.from({ length: 10 }, (_, i) => `${decade + i}`),
-        datasets: topSubcategories.map((sub, index) => ({
-          label: truncateLabel(sub, 15),
-          data: Array.from(
-            { length: 10 },
-            (_, yearIndex) => yearlyData[decade + yearIndex][sub] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topSubcategories,
+          (yearIndex, sub) => yearlyData[decade + yearIndex][sub] || 0,
+          Array.from({ length: 10 }, (_, i) => `${decade + i}`)
+        ),
       };
     } else if (viewMode === "year") {
       const monthlyData = {};
@@ -519,20 +576,13 @@ export const EnhancedSubcategoryBreakdownChart = ({
         .slice(0, 5)
         .map(([sub]) => sub);
 
-      const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
-
       return {
         labels: shortMonthNames,
-        datasets: topSubcategories.map((sub, index) => ({
-          label: truncateLabel(sub, 15),
-          data: shortMonthNames.map(
-            (_, monthIndex) => monthlyData[monthIndex + 1][sub] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topSubcategories,
+          (monthIndex, sub) => monthlyData[monthIndex + 1][sub] || 0,
+          shortMonthNames
+        ),
       };
     } else {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -570,21 +620,13 @@ export const EnhancedSubcategoryBreakdownChart = ({
         .slice(0, 5)
         .map(([sub]) => sub);
 
-      const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
-
       return {
         labels: Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
-        datasets: topSubcategories.map((sub, index) => ({
-          label: truncateLabel(sub, 15),
-          data: Array.from(
-            { length: daysInMonth },
-            (_, dayIndex) => dailyData[dayIndex + 1][sub] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topSubcategories,
+          (dayIndex, sub) => dailyData[dayIndex + 1][sub] || 0,
+          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)
+        ),
       };
     }
   }, [
@@ -593,6 +635,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
     currentYear,
     currentMonth,
     viewMode,
+    dataMode,
     monthNames,
     shortMonthNames,
   ]);
@@ -725,6 +768,14 @@ export const EnhancedSubcategoryBreakdownChart = ({
             <option value="year">Yearly View</option>
             <option value="decade">Decade View</option>
           </select>
+          <select
+            value={dataMode}
+            onChange={(e) => setDataMode(e.target.value)}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="regular">Regular</option>
+            <option value="cumulative">Cumulative</option>
+          </select>
         </div>
 
         <div className="flex items-center gap-4">
@@ -800,6 +851,7 @@ export const MultiCategoryTimeAnalysisChart = ({
     new Date().getMonth() + 1
   );
   const [viewMode, setViewMode] = React.useState("month");
+  const [dataMode, setDataMode] = React.useState("regular");
 
   const monthNames = React.useMemo(
     () => [
@@ -867,6 +919,46 @@ export const MultiCategoryTimeAnalysisChart = ({
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
   const chartData = React.useMemo(() => {
+    const colors = [
+      "#ef4444",
+      "#f97316",
+      "#f59e0b",
+      "#22c55e",
+      "#3b82f6",
+      "#8b5cf6",
+    ];
+
+    // Helper function to create cumulative data
+    const createDatasets = (categories, getData, labels) => {
+      if (dataMode === "cumulative") {
+        const cumulativeData = {};
+        categories.forEach((category) => {
+          cumulativeData[category] = 0;
+        });
+
+        return categories.map((category, index) => ({
+          label: category,
+          data: labels.map((_, labelIndex) => {
+            cumulativeData[category] += getData(labelIndex, category);
+            return cumulativeData[category];
+          }),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          tension: 0.4,
+          fill: false,
+        }));
+      } else {
+        return categories.map((category, index) => ({
+          label: category,
+          data: labels.map((_, labelIndex) => getData(labelIndex, category)),
+          borderColor: colors[index % colors.length],
+          backgroundColor: colors[index % colors.length] + "20",
+          tension: 0.4,
+          fill: false,
+        }));
+      }
+    };
+
     if (viewMode === "decade") {
       const decade = Math.floor(currentYear / 10) * 10;
       const yearlyData = {};
@@ -900,28 +992,14 @@ export const MultiCategoryTimeAnalysisChart = ({
         .slice(0, 6)
         .map(([category]) => category);
 
-      const colors = [
-        "#ef4444",
-        "#f97316",
-        "#f59e0b",
-        "#22c55e",
-        "#3b82f6",
-        "#8b5cf6",
-      ];
-
       return {
         labels: Array.from({ length: 10 }, (_, i) => `${decade + i}`),
-        datasets: topCategories.map((category, index) => ({
-          label: category,
-          data: Array.from(
-            { length: 10 },
-            (_, yearIndex) => yearlyData[decade + yearIndex][category] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topCategories,
+          (yearIndex, category) =>
+            yearlyData[decade + yearIndex][category] || 0,
+          Array.from({ length: 10 }, (_, i) => `${decade + i}`)
+        ),
       };
     } else if (viewMode === "year") {
       const monthlyData = {};
@@ -955,27 +1033,13 @@ export const MultiCategoryTimeAnalysisChart = ({
         .slice(0, 6)
         .map(([category]) => category);
 
-      const colors = [
-        "#ef4444",
-        "#f97316",
-        "#f59e0b",
-        "#22c55e",
-        "#3b82f6",
-        "#8b5cf6",
-      ];
-
       return {
         labels: shortMonthNames,
-        datasets: topCategories.map((category, index) => ({
-          label: category,
-          data: shortMonthNames.map(
-            (_, monthIndex) => monthlyData[monthIndex + 1][category] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topCategories,
+          (monthIndex, category) => monthlyData[monthIndex + 1][category] || 0,
+          shortMonthNames
+        ),
       };
     } else {
       const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -1013,28 +1077,13 @@ export const MultiCategoryTimeAnalysisChart = ({
         .slice(0, 6)
         .map(([category]) => category);
 
-      const colors = [
-        "#ef4444",
-        "#f97316",
-        "#f59e0b",
-        "#22c55e",
-        "#3b82f6",
-        "#8b5cf6",
-      ];
-
       return {
         labels: Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
-        datasets: topCategories.map((category, index) => ({
-          label: category,
-          data: Array.from(
-            { length: daysInMonth },
-            (_, dayIndex) => dailyData[dayIndex + 1][category] || 0
-          ),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        })),
+        datasets: createDatasets(
+          topCategories,
+          (dayIndex, category) => dailyData[dayIndex + 1][category] || 0,
+          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)
+        ),
       };
     }
   }, [
@@ -1042,6 +1091,7 @@ export const MultiCategoryTimeAnalysisChart = ({
     currentYear,
     currentMonth,
     viewMode,
+    dataMode,
     monthNames,
     shortMonthNames,
   ]);
@@ -1136,6 +1186,14 @@ export const MultiCategoryTimeAnalysisChart = ({
             <option value="month">Monthly View</option>
             <option value="year">Yearly View</option>
             <option value="decade">Decade View</option>
+          </select>
+          <select
+            value={dataMode}
+            onChange={(e) => setDataMode(e.target.value)}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="regular">Regular</option>
+            <option value="cumulative">Cumulative</option>
           </select>
         </div>
 
@@ -3013,9 +3071,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         };
       }
 
-      if (item.type === "Income") {
+      if (item.type === "Income" || item.type === "Transfer-In") {
         accountData[item.account][monthKey].income += item.amount;
-      } else if (item.type === "Expense") {
+      } else if (item.type === "Expense" || item.type === "Transfer-Out") {
         accountData[item.account][monthKey].expense += item.amount;
       }
     });
@@ -3596,10 +3654,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
         transaction.Accounts || transaction.Account || "Other Income";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(
-            /[₹,$,]/g,
-            ""
-          )
+          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
         )
       );
       if (amount > 0) {
@@ -3612,10 +3667,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       const category = transaction.Category || "Other Expenses";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(
-            /[₹,$,]/g,
-            ""
-          )
+          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
         )
       );
       if (amount > 0) {

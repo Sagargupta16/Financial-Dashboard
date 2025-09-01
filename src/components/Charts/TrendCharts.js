@@ -8,6 +8,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
     new Date().getFullYear()
   );
   const [viewMode, setViewMode] = React.useState("year");
+  const [dataMode, setDataMode] = React.useState("regular");
 
   const availableYears = React.useMemo(() => {
     const years = new Set();
@@ -90,28 +91,78 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       }
     };
 
-    return {
-      labels: sortedMonths.map(formatMonthLabel),
-      datasets: [
-        {
-          label: "Income",
-          data: sortedMonths.map((m) => monthly[m].income),
-          borderColor: "#22c55e",
-          backgroundColor: "#22c55e",
-          tension: 0.3,
-          fill: false,
-        },
-        {
-          label: "Expense",
-          data: sortedMonths.map((m) => monthly[m].expense),
-          borderColor: "#ef4444",
-          backgroundColor: "#ef4444",
-          tension: 0.3,
-          fill: false,
-        },
-      ],
-    };
-  }, [timeFilteredData, viewMode]);
+    if (dataMode === "cumulative") {
+      let cumulativeIncome = 0;
+      let cumulativeExpense = 0;
+
+      return {
+        labels: sortedMonths.map(formatMonthLabel),
+        datasets: [
+          {
+            label: "Cumulative Income",
+            data: sortedMonths.map((m) => {
+              cumulativeIncome += monthly[m].income;
+              return cumulativeIncome;
+            }),
+            borderColor: "#22c55e",
+            backgroundColor: "rgba(34, 197, 94, 0.1)",
+            tension: 0.3,
+            fill: "+1",
+          },
+          {
+            label: "Cumulative Expense",
+            data: sortedMonths.map((m) => {
+              cumulativeExpense += monthly[m].expense;
+              return cumulativeExpense;
+            }),
+            borderColor: "#ef4444",
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            tension: 0.3,
+            fill: true,
+          },
+          {
+            label: "Cumulative Net",
+            data: sortedMonths.map((m, index) => {
+              const totalIncome = sortedMonths
+                .slice(0, index + 1)
+                .reduce((sum, month) => sum + monthly[month].income, 0);
+              const totalExpense = sortedMonths
+                .slice(0, index + 1)
+                .reduce((sum, month) => sum + monthly[month].expense, 0);
+              return totalIncome - totalExpense;
+            }),
+            borderColor: "#9333ea",
+            backgroundColor: "rgba(147, 51, 234, 0.1)",
+            tension: 0.3,
+            fill: false,
+            borderWidth: 3,
+          },
+        ],
+      };
+    } else {
+      return {
+        labels: sortedMonths.map(formatMonthLabel),
+        datasets: [
+          {
+            label: "Income",
+            data: sortedMonths.map((m) => monthly[m].income),
+            borderColor: "#22c55e",
+            backgroundColor: "#22c55e",
+            tension: 0.3,
+            fill: false,
+          },
+          {
+            label: "Expense",
+            data: sortedMonths.map((m) => monthly[m].expense),
+            borderColor: "#ef4444",
+            backgroundColor: "#ef4444",
+            tension: 0.3,
+            fill: false,
+          },
+        ],
+      };
+    }
+  }, [timeFilteredData, viewMode, dataMode]);
 
   const handlePrevious = () => {
     if (viewMode === "year") {
@@ -187,6 +238,14 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
             <option value="year">Yearly View</option>
             <option value="last-12-months">Last 12 Months</option>
             <option value="all-time">All Time</option>
+          </select>
+          <select
+            value={dataMode}
+            onChange={(e) => setDataMode(e.target.value)}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors border-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="regular">Regular</option>
+            <option value="cumulative">Cumulative</option>
           </select>
         </div>
 

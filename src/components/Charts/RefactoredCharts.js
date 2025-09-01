@@ -18,7 +18,6 @@ import {
   useMultipleFilters,
 } from "../../hooks/useChartHooks";
 
-
 const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
   return ({
     filteredData,
@@ -38,10 +37,8 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
       account: "all",
     });
 
-
     const chartData = React.useMemo(() => {
       let data = getFilteredData();
-
 
       if (dataType === "expense") {
         data = data.filter(
@@ -51,14 +48,12 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
         data = data.filter((item) => item.type === "Income");
       }
 
-
       if (filters.category !== "all") {
         data = data.filter((item) => item.category === filters.category);
       }
       if (filters.account !== "all") {
         data = data.filter((item) => item.account === filters.account);
       }
-
 
       const grouped = data.reduce((acc, item) => {
         const key = item.category;
@@ -69,7 +64,6 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
       const sorted = Object.entries(grouped)
         .sort(([, a], [, b]) => b - a)
         .slice(0, limit);
-
 
       const colors =
         chartType === "doughnut"
@@ -92,7 +86,6 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
         ],
       };
     }, [getFilteredData, dataType, filters, limit, chartType]);
-
 
     const categories = React.useMemo(
       () => [...new Set(filteredData.map((item) => item.category))].sort(),
@@ -190,7 +183,6 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
   };
 };
 
-
 export const EnhancedBarChart = createEnhancedChart(Bar, {
   scales: {
     x: {
@@ -230,7 +222,6 @@ export const EnhancedDoughnutChart = createEnhancedChart(Doughnut, {
   },
 });
 
-
 export const RefactoredTopExpenseCategoriesChart = (props) => (
   <EnhancedBarChart
     {...props}
@@ -261,7 +252,6 @@ export const RefactoredExpenseDistributionChart = (props) => (
   />
 );
 
-
 export const RefactoredTrendChart = ({
   filteredData,
   chartRef,
@@ -271,7 +261,6 @@ export const RefactoredTrendChart = ({
   const [metricType, setMetricType] = React.useState("net");
 
   const chartData = React.useMemo(() => {
-
     const monthlyData = filteredData.reduce((acc, item) => {
       if (!item.date) return acc;
 
@@ -292,7 +281,6 @@ export const RefactoredTrendChart = ({
 
       return acc;
     }, {});
-
 
     const sortedMonths = Object.keys(monthlyData).sort();
     const labels = sortedMonths.map((month) => {

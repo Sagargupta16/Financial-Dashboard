@@ -2,26 +2,39 @@
 
 A comprehensive, modern financial dashboard built with React that provides powerful analytics and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, and financial trends.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange)
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.1.0-brightgreen)
+
+## 🎯 Demo
+
+🔗 **[Live Demo](https://sagargupta16.github.io/Financial-Dashboard)**
+
+💡 **Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get some great stats instantly!
+
+## 📸 Screenshots
+
+_Upload your financial data and watch your dashboard come to life with interactive charts and comprehensive analytics._
 
 ## ✨ Features
 
 ### 📊 **Comprehensive Analytics**
+
 - **KPI Overview**: Total income, expenses, net balance, and transaction counts
 - **Account Balances**: Real-time view of all account balances
 - **Transfer Tracking**: Monitor internal money movements between accounts
 - **Advanced Metrics**: Highest expenses, average spending, and transaction insights
 
 ### 📈 **Rich Visualizations**
+
 - **Income vs Expense Breakdown** (Doughnut Chart)
-- **Top Expense Categories** (Bar Chart) - *with time filtering*
-- **Income Sources Analysis** (Bar Chart) - *with time filtering*
+- **Top Expense Categories** (Bar Chart) - _with time filtering_
+- **Income Sources Analysis** (Bar Chart) - _with time filtering_
 - **Spending by Account** (Doughnut Chart)
-- **Monthly Trends** (Line Chart) - *with time filtering*
+- **Monthly Trends** (Line Chart) - _with time filtering_
 - **Daily Spending Patterns** (Bar Chart)
 - **Subcategory Analysis** with drill-down capabilities
 
 ### 🕒 **Time-Based Analysis**
+
 - **Enhanced Top Categories**: Monthly, yearly, and all-time views for expenses and income
 - **Enhanced Monthly Trends**: Yearly, last 12 months, and all-time views
 - **Enhanced Subcategory Breakdown**: Monthly, yearly, and decade views
@@ -30,6 +43,7 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Trend Identification**: Spot patterns and seasonal variations
 
 ### 🔍 **Data Management**
+
 - **CSV & Excel Upload**: Easy data import functionality for both CSV and Excel files (.xlsx, .xls)
 - **Smart Parsing**: Handles quoted fields and various file formats
 - **Data Filtering**: Search and filter transactions
@@ -37,6 +51,7 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Export Charts**: Download visualizations as PNG images
 
 ### 💼 **Transaction Types Support**
+
 - **Income**: Track all income sources
 - **Expenses**: Monitor spending across categories
 - **Transfers**: Handle internal account transfers
@@ -45,28 +60,33 @@ A comprehensive, modern financial dashboard built with React that provides power
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Sagargupta16/Financial-Dashboard.git
    cd Financial-Dashboard
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start the development server**
+
    ```bash
    npm start
    ```
 
 4. **Open your browser**
+
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📋 Data Format (CSV & Excel)
@@ -80,11 +100,13 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 ```
 
 **Supported File Types:**
+
 - **.csv** - Comma-separated values
 - **.xlsx** - Excel workbook format
 - **.xls** - Legacy Excel format
 
-### Required Columns:
+### Required Columns
+
 - **Date**: DD/MM/YYYY format
 - **Time**: HH:MM:SS format
 - **Accounts**: Account name (e.g., "Bank Account", "Credit Card")
@@ -97,6 +119,7 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 ## 🛠️ Technology Stack
 
 ### Core Technologies
+
 - **React 19.1.1**: Modern UI framework with latest features
 - **Chart.js 4.5.0**: Powerful charting library
 - **react-chartjs-2**: React wrapper for Chart.js
@@ -105,6 +128,7 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 - **xlsx 0.18.5**: Excel file parsing and processing
 
 ### Build Tools
+
 - **Create React App 5.0.1**: Zero-configuration setup
 - **PostCSS & Autoprefixer**: CSS processing
 - **React Scripts**: Build and development tools
@@ -138,6 +162,7 @@ src/
 ## 🎯 Available Scripts
 
 ### Development
+
 ```bash
 npm start          # Start development server
 npm test           # Run test suite
@@ -146,6 +171,7 @@ npm run eject      # Eject from Create React App (one-way operation)
 ```
 
 ### Production Deployment
+
 ```bash
 npm run build      # Creates optimized production build in /build folder
 ```
@@ -153,11 +179,13 @@ npm run build      # Creates optimized production build in /build folder
 ## 🔧 Customization
 
 ### Adding New Chart Types
+
 1. Create new chart component in `src/components/Charts/ChartComponents.js`
 2. Add chart data processing logic in `src/hooks/useChartData.js`
 3. Import and use in `src/App.js`
 
 ### Modifying Currency Format
+
 Update the `formatCurrency` function in `src/utils/dataUtils.js`:
 
 ```javascript
@@ -172,6 +200,7 @@ export const formatCurrency = (value) => {
 ```
 
 ### Custom Themes
+
 Modify the color scheme in `tailwind.config.js` or update the CSS classes in components.
 
 ## 📊 Features Overview
@@ -187,6 +216,7 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 7. **Transaction Table**: Detailed, sortable transaction list
 
 ### Key Insights Generated
+
 - Busiest spending day of the week
 - Most frequent expense category
 - Average transaction value
@@ -199,17 +229,20 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 ### Common Issues
 
 **CSV/Excel Upload Not Working**
+
 - Ensure file follows the exact format specified
 - Check that all required columns are present
 - Verify date format is DD/MM/YYYY
 - For Excel files, ensure data is in the first worksheet
 
 **Charts Not Displaying**
+
 - Check browser console for JavaScript errors
 - Ensure all dependencies are installed correctly
 - Verify file data is properly formatted
 
 **Build Failures**
+
 - Run `npm install` to ensure all dependencies are installed
 - Check Node.js version compatibility
 - Clear npm cache: `npm cache clean --force`
@@ -229,6 +262,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 👤 Author
 
 **Sagar Gupta**
+
 - GitHub: [@Sagargupta16](https://github.com/Sagargupta16)
 
 ## 🙏 Acknowledgments
@@ -241,5 +275,3 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 ⭐ **Star this repository if you find it helpful!**
-#   F i n a n c i a l   D a s h b o a r d  
- 

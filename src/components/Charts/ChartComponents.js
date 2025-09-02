@@ -3056,6 +3056,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
 export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const [selectedAccount, setSelectedAccount] = React.useState("all");
   const [viewMode, setViewMode] = React.useState("cumulative");
+  const [showAverage, setShowAverage] = React.useState(true);
 
   const chartData = React.useMemo(() => {
     const accounts = [
@@ -3158,6 +3159,76 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         tension: 0.3,
       }));
 
+      // Calculate total portfolio value (sum of all accounts)
+      const totalPortfolioData = allMonths.map((month) => {
+        const accountValues = accounts
+          .map((account) => {
+            const data = accountData[account][month];
+            return viewMode === "cumulative"
+              ? data.balance
+              : data.income - data.expense;
+          })
+          .filter(
+            (value) => value !== undefined && value !== null && !isNaN(value)
+          );
+
+        return accountValues.reduce((sum, value) => sum + value, 0);
+      });
+
+      // Calculate average of all accounts
+      const averageData = allMonths.map((month) => {
+        const accountValues = accounts
+          .map((account) => {
+            const data = accountData[account][month];
+            return viewMode === "cumulative"
+              ? data.balance
+              : data.income - data.expense;
+          })
+          .filter(
+            (value) => value !== undefined && value !== null && !isNaN(value)
+          );
+
+        if (accountValues.length === 0) return 0;
+        return (
+          accountValues.reduce((sum, value) => sum + value, 0) /
+          accountValues.length
+        );
+      });
+
+      // Add total portfolio line dataset
+      if (showAverage) {
+        datasets.push({
+          label: "Total Portfolio Value",
+          data: totalPortfolioData,
+          borderColor: "#fbbf24",
+          backgroundColor: "rgba(251, 191, 36, 0.1)",
+          borderWidth: 3,
+          borderDash: [8, 4],
+          fill: false,
+          tension: 0.3,
+          pointBackgroundColor: "#fbbf24",
+          pointBorderColor: "#fbbf24",
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        });
+
+        // Add average line dataset
+        datasets.push({
+          label: "Average Account Balance",
+          data: averageData,
+          borderColor: "#ffffff",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          borderWidth: 3,
+          borderDash: [12, 6],
+          fill: false,
+          tension: 0.3,
+          pointBackgroundColor: "#ffffff",
+          pointBorderColor: "#ffffff",
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        });
+      }
+
       return { labels, datasets };
     } else {
       const account = selectedAccount;
@@ -3207,7 +3278,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         ],
       };
     }
-  }, [filteredData, selectedAccount, viewMode]);
+  }, [filteredData, selectedAccount, viewMode, showAverage]);
 
   const accounts = [
     ...new Set(filteredData.map((item) => item.account)),
@@ -3240,6 +3311,17 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
             <option value="cumulative">Cumulative</option>
             <option value="monthly">Monthly</option>
           </select>
+          {selectedAccount === "all" && (
+            <label className="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showAverage}
+                onChange={(e) => setShowAverage(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <span>Show Average</span>
+            </label>
+          )}
           <button
             onClick={() => {
               if (chartRef?.current) {

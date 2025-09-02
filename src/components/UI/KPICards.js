@@ -34,7 +34,7 @@ export const KPICard = ({ title, value, icon, color }) => (
   </div>
 );
 
-export const SmallKPICard = ({ title, value, icon, unit }) => (
+export const SmallKPICard = ({ title, value, icon, unit, isCount = false }) => (
   <div className="group bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center border border-gray-700 hover:border-gray-600 relative overflow-hidden">
     {/* Hover background effect */}
     <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -47,7 +47,11 @@ export const SmallKPICard = ({ title, value, icon, unit }) => (
         {title}
       </span>
       <p className="text-xl font-bold text-white group-hover:text-gray-100 transition-colors duration-300">
-        {typeof value === "number" && !unit ? formatCurrency(value) : value}
+        {typeof value === "number" && !unit && !isCount
+          ? formatCurrency(value)
+          : isCount
+          ? value.toLocaleString()
+          : value}
         {unit && (
           <span className="text-base font-normal text-gray-400"> {unit}</span>
         )}

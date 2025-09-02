@@ -247,19 +247,29 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-lg [&>option]:bg-gray-800 [&>option]:text-white"
           >
-            <option value="year">Yearly View</option>
-            <option value="last-12-months">Last 12 Months</option>
-            <option value="all-time">All Time</option>
+            <option value="year" className="bg-gray-800 text-white">
+              Yearly View
+            </option>
+            <option value="last-12-months" className="bg-gray-800 text-white">
+              Last 12 Months
+            </option>
+            <option value="all-time" className="bg-gray-800 text-white">
+              All Time
+            </option>
           </select>
           <select
             value={dataMode}
             onChange={(e) => setDataMode(e.target.value)}
-            className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg"
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg [&>option]:bg-gray-800 [&>option]:text-white"
           >
-            <option value="regular">Regular</option>
-            <option value="cumulative">Cumulative</option>
+            <option value="regular" className="bg-gray-800 text-white">
+              Regular
+            </option>
+            <option value="cumulative" className="bg-gray-800 text-white">
+              Cumulative
+            </option>
           </select>
         </div>
 

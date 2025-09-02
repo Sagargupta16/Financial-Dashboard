@@ -195,6 +195,7 @@ const App = () => {
             title="Total Transactions"
             value={additionalKpiData.totalTransactions}
             icon={<Hash size={22} />}
+            isCount={true}
           />
           <SmallKPICard
             title="Highest Expense"

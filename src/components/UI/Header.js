@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Upload, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
 
 export const Header = ({ onFileUpload }) => (
@@ -64,3 +65,7 @@ export const Header = ({ onFileUpload }) => (
     </div>
   </header>
 );
+
+Header.propTypes = {
+  onFileUpload: PropTypes.func.isRequired,
+};

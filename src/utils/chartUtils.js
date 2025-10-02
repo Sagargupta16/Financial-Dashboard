@@ -8,7 +8,9 @@ export const formatCurrency = (value) => {
 };
 
 export const truncateLabel = (label, maxLength = 12) => {
-  if (typeof label !== "string") return label;
+  if (typeof label !== "string") {
+    return label;
+  }
   return label.length > maxLength
     ? `${label.substring(0, maxLength)}...`
     : label;
@@ -103,7 +105,7 @@ export const getCommonChartOptions = (customOptions = {}) => ({
         font: { size: 10 },
         maxRotation: 45,
         maxTicksLimit: 15,
-        callback: function (value, index) {
+        callback: function (value, _index) {
           const label = this.getLabelForValue
             ? this.getLabelForValue(value)
             : value;
@@ -139,7 +141,9 @@ export const exportChartAsPNG = (chartRef, filename) => {
 
 export const filterDataByTimeRange = (data, timeRange) => {
   return data.filter((item) => {
-    if (!item.date) return false;
+    if (!item.date) {
+      return false;
+    }
     const date = new Date(item.date);
     const now = new Date();
 
@@ -162,8 +166,12 @@ export const groupDataByCategory = (data, filterOptions = {}) => {
   const { excludeInPocket = true, type = null } = filterOptions;
 
   return data.reduce((acc, item) => {
-    if (excludeInPocket && item.category === "In-pocket") return acc;
-    if (type && item.type !== type) return acc;
+    if (excludeInPocket && item.category === "In-pocket") {
+      return acc;
+    }
+    if (type && item.type !== type) {
+      return acc;
+    }
 
     if (!acc[item.category]) {
       acc[item.category] = 0;
@@ -176,11 +184,13 @@ export const groupDataByCategory = (data, filterOptions = {}) => {
 // Group data by month
 export const groupDataByMonth = (data) => {
   return data.reduce((acc, item) => {
-    if (!item.date) return acc;
+    if (!item.date) {
+      return acc;
+    }
 
     const date = new Date(item.date);
     const monthKey = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
+      date.getMonth() + 1,
     ).padStart(2, "0")}`;
 
     if (!acc[monthKey]) {

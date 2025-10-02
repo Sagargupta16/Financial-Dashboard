@@ -82,6 +82,7 @@ ChartJS.register(
   TimeScale
 );
 
+// eslint-disable-next-line max-lines-per-function
 const App = () => {
   // State
   const [sortConfig, setSortConfig] = useState({
@@ -150,17 +151,17 @@ const App = () => {
 
   // Loading and error states
   if (loading)
-    return (
+    {return (
       <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
         <p>Loading...</p>
       </div>
-    );
+    );}
   if (error)
-    return (
+    {return (
       <div className="flex items-center justify-center h-screen bg-gray-900 text-red-400">
         <p>{error}</p>
       </div>
-    );
+    );}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black text-gray-300 font-sans p-4 sm:p-6 lg:p-8 relative overflow-hidden">

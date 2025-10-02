@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Bar } from "react-chartjs-2";
 import { truncateLabel } from "../../utils/chartUtils";
 import { commonChartOptions } from "./ChartConfig";
@@ -10,8 +11,18 @@ import {
 import { useTimeNavigation } from "../../hooks/useChartHooks";
 
 const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 export const EnhancedTopExpenseCategoriesChart = ({
@@ -62,13 +73,15 @@ export const EnhancedTopExpenseCategoriesChart = ({
       <TimeNavigationControls
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        currentPeriod={`${
-          viewMode === "all-time"
-            ? "All Time"
-            : viewMode === "year"
-            ? `Year ${currentYear}`
-            : `${monthNames[currentMonth - 1]} ${currentYear}`
-        }`}
+        currentPeriod={(() => {
+          if (viewMode === "all-time") {
+            return "All Time";
+          }
+          if (viewMode === "year") {
+            return `Year ${currentYear}`;
+          }
+          return `${monthNames[currentMonth - 1]} ${currentYear}`;
+        })()}
         onPrevious={handlePrevious}
         onNext={handleNext}
         canGoPrevious={canGoPrevious}
@@ -93,6 +106,11 @@ export const EnhancedTopExpenseCategoriesChart = ({
   );
 };
 
+EnhancedTopExpenseCategoriesChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
+
 // Enhanced Top Income Sources Chart with time navigation
 export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
   const {
@@ -109,7 +127,7 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
 
   const timeFilteredData = React.useMemo(() => {
     return getFilteredData().filter(
-      (item) => item.type === "Income" && item.category !== "In-pocket"
+      (item) => item.type === "Income" && item.category !== "In-pocket",
     );
   }, [getFilteredData]);
 
@@ -141,13 +159,15 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
       <TimeNavigationControls
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        currentPeriod={`${
-          viewMode === "all-time"
-            ? "All Time"
-            : viewMode === "year"
-            ? `Year ${currentYear}`
-            : `${monthNames[currentMonth - 1]} ${currentYear}`
-        }`}
+        currentPeriod={(() => {
+          if (viewMode === "all-time") {
+            return "All Time";
+          }
+          if (viewMode === "year") {
+            return `Year ${currentYear}`;
+          }
+          return `${monthNames[currentMonth - 1]} ${currentYear}`;
+        })()}
         onPrevious={handlePrevious}
         onNext={handleNext}
         canGoPrevious={canGoPrevious}
@@ -170,4 +190,9 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
       </div>
     </ChartContainer>
   );
+};
+
+EnhancedTopIncomeSourcesChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
 };

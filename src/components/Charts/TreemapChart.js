@@ -5,6 +5,7 @@ import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
 import { formatCurrency } from "../../utils/chartUtils";
 
+// eslint-disable-next-line max-lines-per-function
 export const TreemapChart = ({ filteredData, chartRef }) => {
   const svgRef = useRef(null);
   const [viewMode, setViewMode] = useState("all-time");
@@ -26,7 +27,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   // Filter data based on selected time period
   const timeFilteredData = useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date || item.type !== "Expense") return false;
+      if (!item.date || item.type !== "Expense") {return false;}
       const date = new Date(item.date);
 
       if (viewMode === "all-time") {
@@ -144,7 +145,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {return false;}
     if (viewMode === "month") {
       return currentYear > Math.min(...availableYears) || currentMonth > 1;
     } else if (viewMode === "year") {
@@ -154,7 +155,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoNext = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {return false;}
     const currentDate = new Date();
     if (viewMode === "month") {
       return currentYear < currentDate.getFullYear() || 
@@ -166,7 +167,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   useEffect(() => {
-    if (!svgRef.current || !treemapData.children || treemapData.children.length === 0) return;
+    if (!svgRef.current || !treemapData.children || treemapData.children.length === 0) {return;}
 
     const renderTreemap = () => {
       const svg = d3.select(svgRef.current);
@@ -266,9 +267,9 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
         const rectWidth = d.x1 - d.x0;
         const rectHeight = d.y1 - d.y0;
         const area = rectWidth * rectHeight;
-        if (area < 1000) return "0px"; // Hide text for very small rectangles
-        if (area < 3000) return "10px";
-        if (area < 6000) return "11px";
+        if (area < 1000) {return "0px";} // Hide text for very small rectangles
+        if (area < 3000) {return "10px";}
+        if (area < 6000) {return "11px";}
         return "12px";
       })
       .attr("font-weight", "bold")
@@ -424,8 +425,8 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
 
           <div className="text-white font-semibold min-w-[120px] text-center text-sm">
             {(() => {
-              if (viewMode === "all-time") return "All Time";
-              if (viewMode === "year") return `${currentYear}`;
+              if (viewMode === "all-time") {return "All Time";}
+              if (viewMode === "year") {return `${currentYear}`;}
               return `${monthNames[currentMonth - 1].substring(0, 3)} ${currentYear}`;
             })()}
           </div>

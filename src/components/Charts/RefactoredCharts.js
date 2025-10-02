@@ -1,4 +1,5 @@
-﻿import React from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import {
   formatCurrency,
@@ -14,12 +15,11 @@ import {
 } from "../UI/ChartUIComponents";
 import {
   useTimeNavigation,
-  useChartDataProcessor,
   useMultipleFilters,
 } from "../../hooks/useChartHooks";
 
 const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
-  return ({
+  const Component = ({
     filteredData,
     chartRef,
     title,
@@ -29,8 +29,10 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
     colSpan = "",
     ...customOptions
   }) => {
-    const { viewMode, setViewMode, getCurrentPeriodLabel, getFilteredData } =
-      useTimeNavigation(filteredData, "year");
+    const { viewMode, setViewMode, getFilteredData } = useTimeNavigation(
+      filteredData,
+      "year"
+    );
 
     const { filters, updateFilter } = useMultipleFilters({
       category: "all",
@@ -181,6 +183,18 @@ const createEnhancedChart = (ChartComponent, defaultOptions = {}) => {
       </ChartContainer>
     );
   };
+
+  Component.propTypes = {
+    filteredData: PropTypes.array.isRequired,
+    chartRef: PropTypes.object,
+    title: PropTypes.string.isRequired,
+    dataType: PropTypes.oneOf(["expense", "income"]),
+    chartType: PropTypes.oneOf(["bar", "line", "doughnut"]),
+    limit: PropTypes.number,
+    colSpan: PropTypes.string,
+  };
+
+  return Component;
 };
 
 export const EnhancedBarChart = createEnhancedChart(Bar, {
@@ -232,6 +246,11 @@ export const RefactoredTopExpenseCategoriesChart = (props) => (
   />
 );
 
+RefactoredTopExpenseCategoriesChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const RefactoredTopIncomeSourcesChart = (props) => (
   <EnhancedBarChart
     {...props}
@@ -241,6 +260,11 @@ export const RefactoredTopIncomeSourcesChart = (props) => (
     limit={10}
   />
 );
+
+RefactoredTopIncomeSourcesChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
 
 export const RefactoredExpenseDistributionChart = (props) => (
   <EnhancedDoughnutChart
@@ -252,6 +276,11 @@ export const RefactoredExpenseDistributionChart = (props) => (
   />
 );
 
+RefactoredExpenseDistributionChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const RefactoredTrendChart = ({
   filteredData,
   chartRef,
@@ -262,7 +291,9 @@ export const RefactoredTrendChart = ({
 
   const chartData = React.useMemo(() => {
     const monthlyData = filteredData.reduce((acc, item) => {
-      if (!item.date) return acc;
+      if (!item.date) {
+        return acc;
+      }
 
       const date = new Date(item.date);
       const monthKey = `${date.getFullYear()}-${String(
@@ -361,4 +392,11 @@ export const RefactoredTrendChart = ({
       </ChartWrapper>
     </ChartContainer>
   );
+};
+
+RefactoredTrendChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+  title: PropTypes.string,
+  colSpan: PropTypes.string,
 };

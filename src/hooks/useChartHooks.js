@@ -78,18 +78,28 @@ export const useTimeNavigation = (data, initialViewMode = "month") => {
   };
 
   const getCurrentPeriodLabel = () => {
-    if (viewMode === "all-time") return "All Time";
-    if (viewMode === "year") return `Year ${currentYear}`;
+    if (viewMode === "all-time") {
+      return "All Time";
+    }
+    if (viewMode === "year") {
+      return `Year ${currentYear}`;
+    }
     return `${monthNames[currentMonth - 1]} ${currentYear}`;
   };
 
   const getFilteredData = () => {
     return data.filter((item) => {
-      if (!item.date) return false;
+      if (!item.date) {
+        return false;
+      }
       const date = new Date(item.date);
 
-      if (viewMode === "all-time") return true;
-      if (viewMode === "year") return date.getFullYear() === currentYear;
+      if (viewMode === "all-time") {
+        return true;
+      }
+      if (viewMode === "year") {
+        return date.getFullYear() === currentYear;
+      }
       if (viewMode === "month") {
         return (
           date.getFullYear() === currentYear &&
@@ -131,7 +141,7 @@ export const useChartDataProcessor = (data, options = {}) => {
     // Filter out in-pocket if needed
     if (excludeInPocket) {
       processedData = processedData.filter(
-        (item) => item.category !== "In-pocket"
+        (item) => item.category !== "In-pocket",
       );
     }
 
@@ -143,7 +153,9 @@ export const useChartDataProcessor = (data, options = {}) => {
       groupedData = groupDataByMonth(processedData);
     } else if (groupBy === "account") {
       groupedData = processedData.reduce((acc, item) => {
-        if (!acc[item.account]) acc[item.account] = 0;
+        if (!acc[item.account]) {
+          acc[item.account] = 0;
+        }
         acc[item.account] += item.amount;
         return acc;
       }, {});
@@ -156,7 +168,7 @@ export const useChartDataProcessor = (data, options = {}) => {
       sortedData.sort(([, a], [, b]) => (sortOrder === "desc" ? b - a : a - b));
     } else if (sortBy === "name") {
       sortedData.sort(([a], [b]) =>
-        sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b)
+        sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b),
       );
     }
 
@@ -187,7 +199,9 @@ export const useMultipleFilters = (initialFilters = {}) => {
   const applyFilters = (data) => {
     return data.filter((item) => {
       return Object.entries(filters).every(([key, value]) => {
-        if (!value || value === "all" || value === "All") return true;
+        if (!value || value === "all" || value === "All") {
+          return true;
+        }
 
         // Handle different filter types
         switch (key) {
@@ -215,7 +229,7 @@ export const useMultipleFilters = (initialFilters = {}) => {
 };
 
 // Custom hook for trend analysis
-export const useTrendAnalysis = (data, period = "month") => {
+export const useTrendAnalysis = (data, _period = "month") => {
   return useMemo(() => {
     const groupedData = groupDataByMonth(data);
     const sortedMonths = Object.keys(groupedData).sort();
@@ -229,10 +243,30 @@ export const useTrendAnalysis = (data, period = "month") => {
 
     const change = ((latest.net - previous.net) / Math.abs(previous.net)) * 100;
 
+    // Determine trend based on change percentage
+    let trendStatus;
+    if (change > 5) {
+      trendStatus = "improving";
+    } else if (change < -5) {
+      trendStatus = "declining";
+    } else {
+      trendStatus = "stable";
+    }
+
+    // Determine direction based on change
+    let direction;
+    if (change > 0) {
+      direction = "up";
+    } else if (change < 0) {
+      direction = "down";
+    } else {
+      direction = "stable";
+    }
+
     return {
-      trend: change > 5 ? "improving" : change < -5 ? "declining" : "stable",
+      trend: trendStatus,
       change: Math.abs(change),
-      direction: change > 0 ? "up" : change < 0 ? "down" : "stable",
+      direction,
       latest: latest.net,
       previous: previous.net,
     };
@@ -243,7 +277,7 @@ export const useTrendAnalysis = (data, period = "month") => {
 export const useForecastData = (
   historicalData,
   forecastPeriods = 6,
-  method = "linear"
+  method = "linear",
 ) => {
   return useMemo(() => {
     const monthlyData = groupDataByMonth(historicalData);
@@ -270,11 +304,11 @@ export const useForecastData = (
       const sumY = recentData.reduce((sum, val) => sum + val, 0);
       const sumXY = recentData.reduce(
         (sum, val, index) => sum + index * val,
-        0
+        0,
       );
       const sumXX = recentData.reduce(
         (sum, _, index) => sum + index * index,
-        0
+        0,
       );
 
       const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
@@ -285,12 +319,15 @@ export const useForecastData = (
       });
     }
 
-    const confidence =
-      recentData.length >= 6
-        ? "high"
-        : recentData.length >= 3
-        ? "medium"
-        : "low";
+    // Determine confidence level based on data points
+    let confidence;
+    if (recentData.length >= 6) {
+      confidence = "high";
+    } else if (recentData.length >= 3) {
+      confidence = "medium";
+    } else {
+      confidence = "low";
+    }
 
     return {
       forecast,

@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
+import PropTypes from "prop-types";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import TreemapChart from "./TreemapChart";
 import {
@@ -7,6 +8,7 @@ import {
   getCommonChartOptions,
   truncateLabel,
 } from "../../utils/chartUtils";
+import logger from "../../utils/logger";
 import { useTimeNavigation } from "../../hooks/useChartHooks";
 
 export const commonChartOptions = getCommonChartOptions();
@@ -16,6 +18,7 @@ export const doughnutOptions = {
   scales: {},
 };
 
+// eslint-disable-next-line max-lines-per-function
 export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   const {
     currentYear,
@@ -30,7 +33,9 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
 
   const timeFilteredData = React.useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date || item.type !== "Expense") return false;
+      if (!item.date || item.type !== "Expense") {
+        return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "all-time") {
@@ -353,7 +358,7 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
-              <div className="text-4xl mb-2">📊</div>
+              <div className="text-4xl mb-2">ðŸ“Š</div>
               <div>No spending data available</div>
               <div className="text-sm">for the selected period</div>
             </div>
@@ -367,6 +372,13 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   );
 };
 
+EnhancedSpendingByAccountChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
+// eslint-disable-next-line max-lines-per-function
+
+// eslint-disable-next-line max-lines-per-function
 export const EnhancedSubcategoryBreakdownChart = ({
   filteredData,
   chartRef,
@@ -431,7 +443,9 @@ export const EnhancedSubcategoryBreakdownChart = ({
 
   const timeFilteredData = React.useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date) return false;
+      if (!item.date) {
+        return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "decade") {
@@ -446,10 +460,14 @@ export const EnhancedSubcategoryBreakdownChart = ({
         );
       }
     });
+// eslint-disable-next-line max-lines-per-function
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
+  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
-    if (!selectedCategory) return { labels: [], datasets: [] };
+    if (!selectedCategory) {
+      return { labels: [], datasets: [] };
+    }
 
     const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
@@ -495,12 +513,16 @@ export const EnhancedSubcategoryBreakdownChart = ({
       filteredData
         .filter((i) => i.type === "Expense" && i.category === selectedCategory)
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           const year = date.getFullYear();
           if (year >= decade && year < decade + 10) {
             const sub = item.subcategory || "Uncategorized";
-            if (!yearlyData[year][sub]) yearlyData[year][sub] = 0;
+            if (!yearlyData[year][sub]) {
+              yearlyData[year][sub] = 0;
+            }
             yearlyData[year][sub] += item.amount;
           }
         });
@@ -566,12 +588,16 @@ export const EnhancedSubcategoryBreakdownChart = ({
       filteredData
         .filter((i) => i.type === "Expense" && i.category === selectedCategory)
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           if (date.getFullYear() === currentYear) {
             const month = date.getMonth() + 1;
             const sub = item.subcategory || "Uncategorized";
-            if (!monthlyData[month][sub]) monthlyData[month][sub] = 0;
+            if (!monthlyData[month][sub]) {
+              monthlyData[month][sub] = 0;
+            }
             monthlyData[month][sub] += item.amount;
           }
         });
@@ -607,7 +633,9 @@ export const EnhancedSubcategoryBreakdownChart = ({
       filteredData
         .filter((i) => i.type === "Expense" && i.category === selectedCategory)
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           if (
             date.getFullYear() === currentYear &&
@@ -615,7 +643,9 @@ export const EnhancedSubcategoryBreakdownChart = ({
           ) {
             const day = date.getDate();
             const sub = item.subcategory || "Uncategorized";
-            if (!dailyData[day][sub]) dailyData[day][sub] = 0;
+            if (!dailyData[day][sub]) {
+              dailyData[day][sub] = 0;
+            }
             dailyData[day][sub] += item.amount;
           }
         });
@@ -809,11 +839,16 @@ export const EnhancedSubcategoryBreakdownChart = ({
           </button>
 
           <div className="text-white font-semibold min-w-[150px] text-center">
-            {viewMode === "decade"
-              ? `${Math.floor(currentYear / 10) * 10}s`
-              : viewMode === "year"
-              ? `Year ${currentYear}`
-              : `${monthNames[currentMonth - 1]} ${currentYear}`}
+            {(() => {
+              if (viewMode === "decade") {
+                return `${Math.floor(currentYear / 10) * 10}s`;
+              }
+              if (viewMode === "year") {
+                return `Year ${currentYear}`;
+              }
+              return `${monthNames[currentMonth - 1]} ${currentYear}`;
+            })()}
+            : `${monthNames[currentMonth - 1]} ${currentYear}`}
           </div>
 
           <button
@@ -851,10 +886,20 @@ export const EnhancedSubcategoryBreakdownChart = ({
   );
 };
 
+EnhancedSubcategoryBreakdownChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+  categories: PropTypes.array,
+  selectedCategory: PropTypes.string,
+// eslint-disable-next-line max-lines-per-function
+  onCategoryChange: PropTypes.func,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const MultiCategoryTimeAnalysisChart = ({
   filteredData,
   chartRef,
-  categories,
+  categories: _categories,
 }) => {
   const [currentYear, setCurrentYear] = React.useState(
     new Date().getFullYear()
@@ -913,7 +958,9 @@ export const MultiCategoryTimeAnalysisChart = ({
 
   const timeFilteredData = React.useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date) return false;
+      if (!item.date) {
+        return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "decade") {
@@ -927,9 +974,11 @@ export const MultiCategoryTimeAnalysisChart = ({
           date.getMonth() + 1 === currentMonth
         );
       }
+// eslint-disable-next-line max-lines-per-function
     });
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
+  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const colors = [
       "#ef4444",
@@ -982,12 +1031,16 @@ export const MultiCategoryTimeAnalysisChart = ({
       filteredData
         .filter((i) => i.type === "Expense")
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           const year = date.getFullYear();
           if (year >= decade && year < decade + 10) {
             const category = item.category;
-            if (!yearlyData[year][category]) yearlyData[year][category] = 0;
+            if (!yearlyData[year][category]) {
+              yearlyData[year][category] = 0;
+            }
             yearlyData[year][category] += item.amount;
           }
         });
@@ -1023,12 +1076,16 @@ export const MultiCategoryTimeAnalysisChart = ({
       filteredData
         .filter((i) => i.type === "Expense")
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           if (date.getFullYear() === currentYear) {
             const month = date.getMonth() + 1;
             const category = item.category;
-            if (!monthlyData[month][category]) monthlyData[month][category] = 0;
+            if (!monthlyData[month][category]) {
+              monthlyData[month][category] = 0;
+            }
             monthlyData[month][category] += item.amount;
           }
         });
@@ -1064,7 +1121,9 @@ export const MultiCategoryTimeAnalysisChart = ({
       filteredData
         .filter((i) => i.type === "Expense")
         .forEach((item) => {
-          if (!item.date) return;
+          if (!item.date) {
+            return;
+          }
           const date = new Date(item.date);
           if (
             date.getFullYear() === currentYear &&
@@ -1072,7 +1131,9 @@ export const MultiCategoryTimeAnalysisChart = ({
           ) {
             const day = date.getDate();
             const category = item.category;
-            if (!dailyData[day][category]) dailyData[day][category] = 0;
+            if (!dailyData[day][category]) {
+              dailyData[day][category] = 0;
+            }
             dailyData[day][category] += item.amount;
           }
         });
@@ -1228,11 +1289,15 @@ export const MultiCategoryTimeAnalysisChart = ({
           </button>
 
           <div className="text-white font-semibold min-w-[150px] text-center">
-            {viewMode === "decade"
-              ? `${Math.floor(currentYear / 10) * 10}s`
-              : viewMode === "year"
-              ? `Year ${currentYear}`
-              : `${monthNames[currentMonth - 1]} ${currentYear}`}
+            {(() => {
+              if (viewMode === "decade") {
+                return `${Math.floor(currentYear / 10) * 10}s`;
+              }
+              if (viewMode === "year") {
+                return `Year ${currentYear}`;
+              }
+              return `${monthNames[currentMonth - 1]} ${currentYear}`;
+            })()}
           </div>
 
           <button
@@ -1266,6 +1331,14 @@ export const MultiCategoryTimeAnalysisChart = ({
   );
 };
 
+MultiCategoryTimeAnalysisChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+// eslint-disable-next-line max-lines-per-function
+  categories: PropTypes.array,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   const [viewMode, setViewMode] = React.useState("all-time");
   const [currentYear, setCurrentYear] = React.useState(
@@ -1287,7 +1360,9 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
 
   const timeFilteredData = React.useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date || item.category === "In-pocket") return false;
+      if (!item.date || item.category === "In-pocket") {
+        return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "all-time") {
@@ -1504,9 +1579,16 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
             color: "#9ca3af",
             font: { size: 10 },
             maxRotation: 45,
-            maxTicksLimit:
-              viewMode === "month" ? 31 : viewMode === "year" ? 12 : 10,
-            callback: function (value, index) {
+            maxTicksLimit: (() => {
+              if (viewMode === "month") {
+                return 31;
+              }
+              if (viewMode === "year") {
+                return 12;
+              }
+              return 10;
+            })(),
+            callback: function (value, _index) {
               const label = this.getLabelForValue(value);
               return truncateLabel(label, 12);
             },
@@ -1522,11 +1604,11 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
             callback: (value) => {
               const formatCurrency = (val) => {
                 if (Math.abs(val) >= 1000000) {
-                  return `₹${(val / 1000000).toFixed(1)}M`;
+                  return `â‚¹${(val / 1000000).toFixed(1)}M`;
                 } else if (Math.abs(val) >= 1000) {
-                  return `₹${(val / 1000).toFixed(0)}K`;
+                  return `â‚¹${(val / 1000).toFixed(0)}K`;
                 }
-                return `₹${val.toFixed(0)}`;
+                return `â‚¹${val.toFixed(0)}`;
               };
               return formatCurrency(value);
             },
@@ -1586,7 +1668,9 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {
+      return false;
+    }
     if (viewMode === "month") {
       return currentYear > Math.min(...availableYears) || currentMonth > 1;
     } else if (viewMode === "year") {
@@ -1596,7 +1680,9 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoNext = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {
+      return false;
+    }
     if (viewMode === "month") {
       return currentYear < Math.max(...availableYears) || currentMonth < 12;
     } else if (viewMode === "year") {
@@ -1619,13 +1705,17 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   };
 
   const currentNetWorth = React.useMemo(() => {
-    if (chartData.datasets[0].data.length === 0) return 0;
+    if (chartData.datasets[0].data.length === 0) {
+      return 0;
+    }
     return chartData.datasets[0].data[chartData.datasets[0].data.length - 1];
   }, [chartData]);
 
   const netWorthChange = React.useMemo(() => {
     const data = chartData.datasets[0].data;
-    if (data.length < 2) return 0;
+    if (data.length < 2) {
+      return 0;
+    }
     return data[data.length - 1] - data[0];
   }, [chartData]);
 
@@ -1794,7 +1884,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
-              <div className="text-4xl mb-2">📈</div>
+              <div className="text-4xl mb-2">ðŸ“ˆ</div>
               <div>No financial data available</div>
               <div className="text-sm">for the selected period</div>
             </div>
@@ -1805,6 +1895,13 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   );
 };
 
+NetWorthTrendChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   const [viewMode, setViewMode] = React.useState("yearly");
   const [currentYear, setCurrentYear] = React.useState(
@@ -1865,8 +1962,9 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         !item.date ||
         item.type !== "Expense" ||
         item.category === "In-pocket"
-      )
+      ) {
         return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "all-time") {
@@ -2111,9 +2209,16 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
             color: "#9ca3af",
             font: { size: 10 },
             maxRotation: 45,
-            maxTicksLimit:
-              viewMode === "monthly" ? 31 : viewMode === "yearly" ? 12 : 10,
-            callback: function (value, index) {
+            maxTicksLimit: (() => {
+              if (viewMode === "monthly") {
+                return 31;
+              }
+              if (viewMode === "yearly") {
+                return 12;
+              }
+              return 10;
+            })(),
+            callback: function (value, _index) {
               const label = this.getLabelForValue(value);
               return truncateLabel(label, 12);
             },
@@ -2129,11 +2234,11 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
             callback: (value) => {
               const formatCurrency = (val) => {
                 if (Math.abs(val) >= 1000000) {
-                  return `₹${(val / 1000000).toFixed(1)}M`;
+                  return `â‚¹${(val / 1000000).toFixed(1)}M`;
                 } else if (Math.abs(val) >= 1000) {
-                  return `₹${(val / 1000).toFixed(0)}K`;
+                  return `â‚¹${(val / 1000).toFixed(0)}K`;
                 }
-                return `₹${val.toFixed(0)}`;
+                return `â‚¹${val.toFixed(0)}`;
               };
               return formatCurrency(value);
             },
@@ -2193,7 +2298,9 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoPrevious = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {
+      return false;
+    }
     if (viewMode === "monthly") {
       return currentYear > Math.min(...availableYears) || currentMonth > 1;
     } else if (viewMode === "yearly") {
@@ -2203,7 +2310,9 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoNext = () => {
-    if (viewMode === "all-time") return false;
+    if (viewMode === "all-time") {
+      return false;
+    }
     if (viewMode === "monthly") {
       return currentYear < Math.max(...availableYears) || currentMonth < 12;
     } else if (viewMode === "yearly") {
@@ -2369,7 +2478,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
-              <div className="text-4xl mb-2">📊</div>
+              <div className="text-4xl mb-2">ðŸ“Š</div>
               <div>
                 {selectedCategories.size === 0
                   ? "Select categories to display"
@@ -2388,6 +2497,13 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   );
 };
 
+CumulativeCategoryTrendChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("All");
 
@@ -2419,8 +2535,12 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
 
-      if (!monthlyData[year]) monthlyData[year] = {};
-      if (!monthlyData[year][month]) monthlyData[year][month] = 0;
+      if (!monthlyData[year]) {
+        monthlyData[year] = {};
+      }
+      if (!monthlyData[year][month]) {
+        monthlyData[year][month] = 0;
+      }
 
       monthlyData[year][month] += item.amount;
     });
@@ -2551,6 +2671,13 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   );
 };
 
+SeasonalSpendingHeatmap.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   const [comparisonType, setComparisonType] = React.useState("monthly");
   const [selectedYears, setSelectedYears] = React.useState(new Set());
@@ -2573,17 +2700,23 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   }, [availableYears, selectedYears.size]);
 
   const chartData = React.useMemo(() => {
-    if (selectedYears.size === 0) return { labels: [], datasets: [] };
+    if (selectedYears.size === 0) {
+      return { labels: [], datasets: [] };
+    }
 
     const groupedData = {};
 
     filteredData.forEach((item) => {
-      if (item.category === "In-pocket") return;
+      if (item.category === "In-pocket") {
+        return;
+      }
 
       const date = new Date(item.date);
       const year = date.getFullYear();
 
-      if (!selectedYears.has(year)) return;
+      if (!selectedYears.has(year)) {
+        return;
+      }
 
       let periodKey;
       if (comparisonType === "monthly") {
@@ -2592,7 +2725,9 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
         periodKey = Math.floor(date.getMonth() / 3) + 1;
       }
 
-      if (!groupedData[year]) groupedData[year] = {};
+      if (!groupedData[year]) {
+        groupedData[year] = {};
+      }
       if (!groupedData[year][periodKey]) {
         groupedData[year][periodKey] = { income: 0, expense: 0 };
       }
@@ -2774,14 +2909,25 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   );
 };
 
+YearOverYearComparisonChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const SpendingForecastChart = ({ filteredData, chartRef }) => {
+// eslint-disable-next-line max-lines-per-function
   const [forecastMonths, setForecastMonths] = React.useState(6);
   const [forecastType, setForecastType] = React.useState("linear");
 
+  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const monthlyData = {};
     filteredData.forEach((item) => {
-      if (item.category === "In-pocket") return;
+      if (item.category === "In-pocket") {
+        return;
+      }
 
       const date = new Date(item.date);
       const monthKey = `${date.getFullYear()}-${String(
@@ -2869,7 +3015,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
     }
 
     const futureMonths = [];
-    let currentDate = new Date(lastMonth + "-01");
+    const currentDate = new Date(lastMonth + "-01");
     for (let i = 0; i < forecastMonths; i++) {
       currentDate.setMonth(currentDate.getMonth() + 1);
       const monthKey = `${currentDate.getFullYear()}-${String(
@@ -3053,11 +3199,20 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
   );
 };
 
+SpendingForecastChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const [selectedAccount, setSelectedAccount] = React.useState("all");
+// eslint-disable-next-line max-lines-per-function
   const [viewMode, setViewMode] = React.useState("cumulative");
   const [showAverage, setShowAverage] = React.useState(true);
 
+  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const accounts = [
       ...new Set(filteredData.map((item) => item.account)),
@@ -3069,7 +3224,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
     });
 
     filteredData.forEach((item) => {
-      if (item.category === "In-pocket") return;
+      if (item.category === "In-pocket") {
+        return;
+      }
 
       const date = new Date(item.date);
       const monthKey = `${date.getFullYear()}-${String(
@@ -3188,7 +3345,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
             (value) => value !== undefined && value !== null && !isNaN(value)
           );
 
-        if (accountValues.length === 0) return 0;
+        if (accountValues.length === 0) {
+          return 0;
+        }
         return (
           accountValues.reduce((sum, value) => sum + value, 0) /
           accountValues.length
@@ -3397,10 +3556,19 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   );
 };
 
+AccountBalanceProgressionChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
+// eslint-disable-next-line max-lines-per-function
   const [patternType, setPatternType] = React.useState("dayOfWeek");
   const [metricType, setMetricType] = React.useState("expense");
 
+  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const expenseData = filteredData.filter(
       (item) => item.type === "Expense" && item.category !== "In-pocket"
@@ -3468,20 +3636,26 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         labels,
         datasets: [
           {
-            label:
-              metricType === "expense"
-                ? "Total Expenses"
-                : metricType === "income"
-                ? "Total Income"
-                : "Transaction Count",
+            label: (() => {
+              if (metricType === "expense") {
+                return "Total Expenses";
+              }
+              if (metricType === "income") {
+                return "Total Income";
+              }
+              return "Transaction Count";
+            })(),
             data,
             backgroundColor: backgroundColors,
-            borderColor:
-              metricType === "expense"
-                ? "#ef4444"
-                : metricType === "income"
-                ? "#10b981"
-                : "#3b82f6",
+            borderColor: (() => {
+              if (metricType === "expense") {
+                return "#ef4444";
+              }
+              if (metricType === "income") {
+                return "#10b981";
+              }
+              return "#3b82f6";
+            })(),
             borderWidth: 2,
           },
         ],
@@ -3551,20 +3725,26 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         labels,
         datasets: [
           {
-            label:
-              metricType === "expense"
-                ? "Total Expenses"
-                : metricType === "income"
-                ? "Total Income"
-                : "Transaction Count",
+            label: (() => {
+              if (metricType === "expense") {
+                return "Total Expenses";
+              }
+              if (metricType === "income") {
+                return "Total Income";
+              }
+              return "Transaction Count";
+            })(),
             data,
             backgroundColor: backgroundColors,
-            borderColor:
-              metricType === "expense"
-                ? "#ef4444"
-                : metricType === "income"
-                ? "#10b981"
-                : "#3b82f6",
+            borderColor: (() => {
+              if (metricType === "expense") {
+                return "#ef4444";
+              }
+              if (metricType === "income") {
+                return "#10b981";
+              }
+              return "#3b82f6";
+            })(),
             borderWidth: 1,
           },
         ],
@@ -3672,15 +3852,23 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
   );
 };
 
+DayWeekSpendingPatternsChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+// eslint-disable-next-line max-lines-per-function
+  chartRef: PropTypes.object,
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const SankeyFlowChart = ({ filteredData, chartRef }) => {
   const [timeRange, setTimeRange] = React.useState("all");
   const [minFlowAmount, setMinFlowAmount] = React.useState(100);
 
   const sankeyData = React.useMemo(() => {
-    if (!filteredData || filteredData.length === 0)
+    if (!filteredData || filteredData.length === 0) {
       return { nodes: [], links: [] };
+    }
 
-    console.log("Sankey Data Sample:", filteredData.slice(0, 3));
+    logger.debug("Sankey Data Sample:", filteredData.slice(0, 3));
 
     let timeFilteredData = filteredData;
     if (timeRange !== "all") {
@@ -3713,7 +3901,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     const incomeData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
       const amount = parseFloat(
-        (t.INR || t.Amount || "0").replace(/[₹,$,]/g, "")
+        (t.INR || t.Amount || "0").replace(/[â‚¹,$,]/g, "")
       );
 
       return (
@@ -3726,7 +3914,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     const expenseData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
       const amount = parseFloat(
-        (t.INR || t.Amount || "0").replace(/[₹,$,]/g, "")
+        (t.INR || t.Amount || "0").replace(/[â‚¹,$,]/g, "")
       );
 
       return (
@@ -3736,7 +3924,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       );
     });
 
-    console.log(
+    logger.debug(
       "Income Data:",
       incomeData.length,
       "Expense Data:",
@@ -3748,7 +3936,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
         transaction.Accounts || transaction.Account || "Other Income";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
+          (transaction.INR || transaction.Amount || "0").replace(/[â‚¹,$,]/g, "")
         )
       );
       if (amount > 0) {
@@ -3761,7 +3949,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       const category = transaction.Category || "Other Expenses";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(/[₹,$,]/g, "")
+          (transaction.INR || transaction.Amount || "0").replace(/[â‚¹,$,]/g, "")
         )
       );
       if (amount > 0) {
@@ -3770,8 +3958,8 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       return acc;
     }, {});
 
-    console.log("Income by Account:", incomeByAccount);
-    console.log("Expenses by Category:", expensesByCategory);
+    logger.debug("Income by Account:", incomeByAccount);
+    logger.debug("Expenses by Category:", expensesByCategory);
 
     const nodes = [];
     const links = [];
@@ -3867,7 +4055,9 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     const sourceNode = nodes.find((n) => n.id === link.source);
     const targetNode = nodes.find((n) => n.id === link.target);
 
-    if (!sourceNode || !targetNode) return "";
+    if (!sourceNode || !targetNode) {
+      return "";
+    }
 
     const x1 = sourceNode.x + sourceNode.width;
     const y1 = sourceNode.y + sourceNode.height / 2;
@@ -3897,7 +4087,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h3 className="text-xl font-bold text-white mb-2">
-            ₹ Money Flow Analysis
+            â‚¹ Money Flow Analysis
           </h3>
           <p className="text-gray-400 text-sm">
             Visualize how money flows from income sources to expense categories
@@ -3922,17 +4112,17 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
             onChange={(e) => setMinFlowAmount(Number(e.target.value))}
             className="bg-gray-700 text-white border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value={50}>Min: ₹50</option>
-            <option value={100}>Min: ₹100</option>
-            <option value={500}>Min: ₹500</option>
-            <option value={1000}>Min: ₹1000</option>
+            <option value={50}>Min: â‚¹50</option>
+            <option value={100}>Min: â‚¹100</option>
+            <option value={500}>Min: â‚¹500</option>
+            <option value={1000}>Min: â‚¹1000</option>
           </select>
 
           <button
             onClick={() => exportToCSV(filteredData, "money_flow_analysis.csv")}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm"
           >
-            📊 Export
+            ðŸ“Š Export
           </button>
         </div>
       </div>
@@ -3958,7 +4148,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
                 fontWeight="bold"
                 textAnchor="middle"
               >
-                ₹ Income Sources
+                â‚¹ Income Sources
               </text>
               <text
                 x={width - 120}
@@ -3968,7 +4158,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
                 fontWeight="bold"
                 textAnchor="middle"
               >
-                ₹ Expense Categories
+                â‚¹ Expense Categories
               </text>
 
               {/* Links (flows) */}
@@ -4072,7 +4262,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
-              <div className="text-4xl mb-3">🔄</div>
+              <div className="text-4xl mb-3">ðŸ”„</div>
               <div className="text-lg mb-2">No flow data available</div>
               <div className="text-sm">
                 {filteredData.length === 0
@@ -4131,4 +4321,11 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
   );
 };
 
+SankeyFlowChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export { TreemapChart };
+
+

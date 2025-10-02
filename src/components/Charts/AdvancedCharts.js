@@ -1,29 +1,67 @@
-import React from "react";
-import { Bar } from "react-chartjs-2";
-import { commonChartOptions } from "./ChartConfig";
+import PropTypes from "prop-types";
 
 // Advanced analysis charts
-export const SpendingForecastChart = ({ filteredData, chartRef }) => {
+export const SpendingForecastChart = ({
+  filteredData: _filteredData,
+  chartRef: _chartRef,
+}) => {
   // This will be moved from ChartComponents.js
   return null;
 };
 
-export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
+SpendingForecastChart.propTypes = {
+  filteredData: PropTypes.array,
+  chartRef: PropTypes.object,
+};
+
+export const SeasonalSpendingHeatmap = ({
+  filteredData: _filteredData,
+  chartRef: _chartRef,
+}) => {
   // This will be moved from ChartComponents.js
   return null;
 };
 
-export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
+SeasonalSpendingHeatmap.propTypes = {
+  filteredData: PropTypes.array,
+  chartRef: PropTypes.object,
+};
+
+export const AccountBalanceProgressionChart = ({
+  filteredData: _filteredData,
+  chartRef: _chartRef,
+}) => {
   // This will be moved from ChartComponents.js
   return null;
 };
 
-export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
+AccountBalanceProgressionChart.propTypes = {
+  filteredData: PropTypes.array,
+  chartRef: PropTypes.object,
+};
+
+export const DayWeekSpendingPatternsChart = ({
+  filteredData: _filteredData,
+  chartRef: _chartRef,
+}) => {
   // This will be moved from ChartComponents.js
   return null;
 };
 
-export const SankeyFlowChart = ({ filteredData, chartRef }) => {
+DayWeekSpendingPatternsChart.propTypes = {
+  filteredData: PropTypes.array,
+  chartRef: PropTypes.object,
+};
+
+export const SankeyFlowChart = ({
+  filteredData: _filteredData,
+  chartRef: _chartRef,
+}) => {
   // This will be moved from ChartComponents.js
   return null;
+};
+
+SankeyFlowChart.propTypes = {
+  filteredData: PropTypes.array,
+  chartRef: PropTypes.object,
 };

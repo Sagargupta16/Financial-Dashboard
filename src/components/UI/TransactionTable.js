@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatCurrency } from "../../utils/dataUtils";
 
@@ -19,9 +20,15 @@ const getTypeStyles = (type) => {
 };
 
 const getAmountTextColor = (type) => {
-  if (type === "Income") return "text-green-400";
-  if (type === "Transfer-In") return "text-blue-400";
-  if (type === "Transfer-Out") return "text-orange-400";
+  if (type === "Income") {
+    return "text-green-400";
+  }
+  if (type === "Transfer-In") {
+    return "text-blue-400";
+  }
+  if (type === "Transfer-Out") {
+    return "text-orange-400";
+  }
   return "text-red-400";
 };
 
@@ -79,7 +86,7 @@ export const TransactionTable = ({
               <td className="p-4 whitespace-nowrap">
                 <span
                   className={`px-2 py-1 text-xs rounded-full ${getTypeStyles(
-                    item.type
+                    item.type,
                   )}`}
                 >
                   {item.category}
@@ -91,7 +98,7 @@ export const TransactionTable = ({
               </td>
               <td
                 className={`p-4 whitespace-nowrap font-medium text-sm ${getAmountTextColor(
-                  item.type
+                  item.type,
                 )}`}
               >
                 {formatCurrency(item.amount)}
@@ -99,7 +106,7 @@ export const TransactionTable = ({
               <td className="p-4 whitespace-nowrap text-sm">
                 <span
                   className={`px-2 py-1 text-xs rounded-full ${getTypeStyles(
-                    item.type
+                    item.type,
                   )}`}
                 >
                   {item.type}
@@ -145,3 +152,13 @@ export const TransactionTable = ({
     )}
   </div>
 );
+
+TransactionTable.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onSort: PropTypes.func.isRequired,
+  currentPage: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  transactionsPerPage: PropTypes.number.isRequired,
+  totalTransactions: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+};

@@ -1,0 +1,20 @@
+{
+  "extends": ["react-app", "react-app/jest"],
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "react/prop-types": "warn",
+    "react/jsx-no-target-blank": "error",
+    "max-depth": ["warn", 4],
+    "complexity": ["warn", 20],
+    "max-lines-per-function": [
+      "warn",
+      { "max": 150, "skipBlankLines": true, "skipComments": true }
+    ],
+    "no-nested-ternary": "warn",
+    "prefer-const": "error",
+    "no-var": "error",
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"]
+  }
+}

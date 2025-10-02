@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { formatCurrency } from "../../utils/dataUtils";
 
 export const AccountBalancesCard = ({ balances }) => (
@@ -26,3 +27,12 @@ export const AccountBalancesCard = ({ balances }) => (
     </div>
   </div>
 );
+
+AccountBalancesCard.propTypes = {
+  balances: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      balance: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
+};

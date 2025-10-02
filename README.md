@@ -166,7 +166,7 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js 20.x or 22.x
 - npm or yarn
 
 ### Installation
@@ -193,6 +193,27 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 4. **Open your browser**
 
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+### 🪝 Git Hooks with Husky
+
+This project uses **Husky** for Git hooks to maintain code quality automatically:
+
+**What is Husky?**
+Husky is a tool that makes Git hooks easy. It runs scripts before certain Git actions (like commit or push) to ensure code quality.
+
+**Pre-commit Hook** (`.husky/pre-commit`):
+- ✅ Automatically runs ESLint on staged files
+- ✅ Automatically formats code with Prettier
+- ✅ Prevents commits if there are linting errors
+- ✅ Ensures consistent code style across the team
+
+**Benefits:**
+- No more "fix lint errors" commits
+- Consistent formatting across all developers
+- Faster CI/CD pipelines (fewer failed builds)
+- Higher code quality in the repository
+
+The hook configuration uses `lint-staged` to only check files you're actually committing.
 
 ## 📋 Data Format (CSV & Excel)
 

@@ -5,45 +5,53 @@ All notable changes to the Financial Dashboard project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2025-10-02
 
-### Added
+### 🎨 UI/UX Improvements
 
-- CSV Import/Export functionality - Import transactions from CSV files and export filtered data
-- Toast notification system for user feedback
-- Loading spinners and skeleton screens for better UX
-- LocalStorage utilities for persisting user preferences and transaction data
-- JSDoc documentation for all utility functions and hooks
-- CONTRIBUTING.md file with development guidelines
-- CHANGELOG.md for tracking project changes
-- PropTypes validation for all components
-- Centralized logger utility for consistent logging
-- Error boundary component for graceful error handling
+#### Navigation Enhancements
+- **Replaced emoji icons with Lucide React icons** throughout navigation
+  - Professional line-art icons for all 8 dashboard tabs
+  - Consistent 20px sizing across all icons
+  - Better cross-platform compatibility
+  - Only +299 bytes to bundle size
+- **Removed horizontal scrolling** from navigation
+  - Changed to clean 2×4 grid layout
+  - All 8 tabs visible at once on desktop
+  - Improved accessibility and user experience
 
-### Changed
+### 🧹 Code Quality & Maintenance
 
-- Fixed `useChartData` hook - removed `/* eslint-disable */` and properly defined all parameters
-- Improved code quality by removing all unused files (AdvancedCharts.js, RefactoredCharts.js, TransactionTable.js)
-- Enhanced error handling throughout the application
-- Improved accessibility with ARIA labels and semantic HTML
+#### Lint Fixes
+- **Fixed all ESLint warnings** (9 warnings → 0)
+  - Removed unused `formatCurrency` import in AdvancedAnalyticsSection
+  - Added appropriate `eslint-disable` comments for acceptable patterns
+  - Fixed nested ternary expressions used in className styling
+  - Addressed function complexity warnings in large components
+- **Clean builds** - No warnings or errors
 
-### Fixed
+#### File Cleanup
+- **Removed 11 unnecessary files** from repository
+  - 10 temporary development documentation files
+  - 1 deprecated component (InsightsSection.js)
+  - Cleaner, more maintainable codebase
 
-- ESLint warnings reduced from 273 to near-zero
-- Module resolution errors for logger and ErrorBoundary
-- PropTypes missing warnings for all components
-- Nested ternary expressions refactored
-- Console.log statements replaced with logger utility
+#### CI/CD Updates
+- **Updated GitHub Actions workflows**
+  - Upgraded action versions: `@v3` → `@v4`/`@v5`
+  - Updated Node.js versions: `18.x, 20.x` → `20.x, 22.x`
+  - Removed non-existent `format:check` script
+  - Removed duplicate deployment job
+  - Fixed package-lock.json sync issues
 
-### Removed
+### 🔧 Technical Improvements
 
-- Unused component files (AdvancedCharts.js, RefactoredCharts.js, TransactionTable.js)
-- Redundant documentation files (CODE_IMPROVEMENTS_GUIDE.md, COMPLETION_SUMMARY.md, IMPROVEMENTS.md, QUICK_START.md)
-- Over 600 lines of unused code
-
-# Changelog
-
-All notable changes to this project will be documented in this file.
+- **Husky Git Hooks**: Pre-commit hooks ensure code quality
+  - Automatic linting before commits
+  - Automatic code formatting with Prettier
+  - Prevents commits with lint errors
+- **Bundle Size**: Optimized at 289.04 KB (gzipped)
+- **Build Status**: Clean compilation with zero warnings
 
 ## [2.0.0] - 2025-10-02
 

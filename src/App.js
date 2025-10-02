@@ -14,9 +14,9 @@ import {
 } from "chart.js";
 
 // Components
-import { Header } from "./components/UI/Header";
-import { Footer } from "./components/UI/Footer";
-import { Tabs, TabContent } from "./components/UI/Tabs";
+import { Header } from "./shared/components/layout/Header";
+import { Footer } from "./shared/components/layout/Footer";
+import { Tabs, TabContent } from "./shared/components/ui/Tabs";
 
 // Section Components
 import {
@@ -24,26 +24,26 @@ import {
   IncomeExpenseSection,
   CategoryAnalysisSection,
   TrendsForecastsSection,
-  TransactionsSection,
-  BudgetGoalsSection,
-} from "./components/sections";
-import { InsightsSection } from "./components/sections/InsightsSection";
+} from "./shared/components/sections";
+import { InsightsSection } from "./shared/components/sections/InsightsSection";
+import { TransactionsSection } from "./features/transactions/components/TransactionsSection";
+import { BudgetGoalsSection } from "./features/budget/components/BudgetGoalsSection";
 
 // Hooks
 import {
   useDataProcessor,
   useUniqueValues,
   useFilteredData,
-} from "./hooks/useDataProcessor";
+} from "./shared/hooks/useDataProcessor";
 import {
   useKPIData,
   useKeyInsights,
   useAccountBalances,
-} from "./hooks/useCalculations";
-import { useChartData } from "./hooks/useChartData";
+} from "./shared/hooks/useCalculations";
+import { useChartData } from "./shared/hooks/useChartData";
 
 // Utils
-import { initialCsvData } from "./utils/constants";
+import { initialCsvData } from "./shared/utils/constants";
 
 // Register Chart.js components
 ChartJS.register(
@@ -204,6 +204,7 @@ const App = () => {
             additionalKpiData={additionalKpiData}
             accountBalances={accountBalances}
             keyInsights={keyInsights}
+            filteredData={filteredData}
           />
         </TabContent>
 

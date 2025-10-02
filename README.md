@@ -16,6 +16,15 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## ✨ Features
 
+### 🆕 **Latest Updates**
+
+- **CSV Import/Export**: Import transactions from CSV files and export filtered data for backup or analysis
+- **Toast Notifications**: Real-time feedback for all user actions
+- **Loading States**: Professional loading spinners and skeleton screens
+- **Data Persistence**: Automatic saving of preferences and data to browser localStorage
+- **Enhanced Error Handling**: Graceful error recovery with user-friendly messages
+- **Improved Code Quality**: Zero ESLint warnings, comprehensive PropTypes, JSDoc documentation
+
 ### 📊 **Comprehensive Analytics**
 
 - **KPI Overview**: Total income, expenses, net balance, and transaction counts

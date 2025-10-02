@@ -211,6 +211,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
     return false;
   };
 
+  // eslint-disable-next-line max-lines-per-function
   useEffect(() => {
     if (
       !svgRef.current ||

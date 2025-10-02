@@ -1,8 +1,13 @@
-/* eslint-disable */
 import { useMemo } from "react";
 
-import { truncateLabel } from "../utils/chartUtils";
-
+/**
+ * Custom hook to generate chart data from filtered transaction data
+ * @param {Array} filteredData - Array of filtered transaction objects
+ * @param {Object} kpiData - Object containing income and expense totals
+ * @param {string} drilldownCategory - Selected category for subcategory breakdown
+ * @returns {Object} Object containing all chart data configurations
+ */
+// eslint-disable-next-line max-lines-per-function
 export const useChartData = (filteredData, kpiData, drilldownCategory) => {
   const doughnutChartData = useMemo(
     () => ({
@@ -108,7 +113,9 @@ export const useChartData = (filteredData, kpiData, drilldownCategory) => {
       }
       return acc;
     }, {});
-    const sortedMonths = Object.keys(monthly).sort();
+    const sortedMonths = Object.keys(monthly).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     // Convert YYYY-MM format to readable month labels
     const formatMonthLabel = (monthString) => {

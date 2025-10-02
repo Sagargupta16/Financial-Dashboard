@@ -5,46 +5,56 @@ import { CommuteOptimizer } from "../../../features/analytics/components/Commute
 import { AccountDashboard } from "../../../features/analytics/components/AccountDashboard";
 
 /**
- * Insights Section
- * Combines all data-driven analytics in one place
+ * Category Insights Section
+ * Specialized analytics for specific spending categories
  */
-export const InsightsSection = ({ filteredData }) => {
+export const CategoryInsightsSection = ({ filteredData }) => {
   return (
     <div className="space-y-8">
       {/* Section Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-white mb-2">
-          🔍 Smart Insights
+          🧠 Category Insights
         </h1>
         <p className="text-gray-400">
-          Personalized analytics based on your actual spending patterns
+          Deep dive into specific spending categories with AI-powered insights
         </p>
       </div>
 
       {/* Food Analytics */}
-      <div id="food-analytics">
-        <FoodAnalyticsDashboard filteredData={filteredData} />
+      <div>
+        <div id="food-analytics">
+          <FoodAnalyticsDashboard filteredData={filteredData} />
+        </div>
       </div>
 
       {/* Divider */}
       <div className="border-t border-gray-700"></div>
 
       {/* Commute Optimizer */}
-      <div id="commute-optimizer">
-        <CommuteOptimizer filteredData={filteredData} />
+      <div>
+        <div id="commute-optimizer">
+          <CommuteOptimizer filteredData={filteredData} />
+        </div>
       </div>
 
       {/* Divider */}
       <div className="border-t border-gray-700"></div>
 
-      {/* Account Dashboard */}
-      <div id="account-dashboard">
-        <AccountDashboard filteredData={filteredData} />
+      {/* Account Analytics */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+          <span className="mr-3">🏦</span>
+          Account Analytics
+        </h2>
+        <div id="account-dashboard">
+          <AccountDashboard filteredData={filteredData} />
+        </div>
       </div>
     </div>
   );
 };
 
-InsightsSection.propTypes = {
+CategoryInsightsSection.propTypes = {
   filteredData: PropTypes.array.isRequired,
 };

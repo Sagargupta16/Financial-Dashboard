@@ -23,23 +23,60 @@ export const SpendingCalendar = ({ filteredData }) => {
 
     // Calculate spending per day
     filteredData.forEach((transaction) => {
-      const dateStr = transaction.Date;
-      const amount = Math.abs(parseFloat(transaction.INR) || 0);
-      const type = transaction["Income/Expense"];
+      if (!transaction || !transaction.date) {
+        return;
+      }
 
-      if (type === "Expense" && dailySpending[dateStr]) {
+      // Normalize the date to YYYY-MM-DD format
+      let dateStr;
+      try {
+        const transDate = new Date(transaction.date);
+        if (isNaN(transDate.getTime())) {
+          return; // Skip invalid dates
+        }
+        dateStr = transDate.toISOString().split("T")[0];
+      } catch (e) {
+        return; // Skip if date parsing fails
+      }
+
+      const amount = Math.abs(parseFloat(transaction.amount) || 0);
+      const type = transaction.type;
+
+      if (type === "Expense") {
+        // Initialize the date if it doesn't exist (for dates outside 30-day window)
+        if (!dailySpending[dateStr]) {
+          dailySpending[dateStr] = { total: 0, transactions: [] };
+        }
         dailySpending[dateStr].total += amount;
         dailySpending[dateStr].transactions.push(transaction);
       }
     });
 
-    // Calculate stats
-    const amounts = Object.values(dailySpending).map((d) => d.total);
-    const maxSpending = Math.max(...amounts);
-    const avgSpending =
-      amounts.reduce((sum, val) => sum + val, 0) / amounts.length;
+    // Calculate stats - reuse existing today variable
+    const thirtyDaysAgoDate = new Date(today);
+    thirtyDaysAgoDate.setDate(today.getDate() - 29);
 
-    return { dailySpending, maxSpending, avgSpending };
+    // Filter to only last 30 days
+    const last30DaysData = Object.entries(dailySpending).filter(([dateStr]) => {
+      const date = new Date(dateStr);
+      return date >= thirtyDaysAgoDate && date <= today;
+    });
+
+    const amounts = last30DaysData.map(([, d]) => d.total);
+    const maxSpending = Math.max(...amounts, 0);
+    const avgSpending =
+      amounts.length > 0
+        ? amounts.reduce((sum, val) => sum + val, 0) / amounts.length
+        : 0;
+
+    // Return only last 30 days
+    const filteredDailySpending = Object.fromEntries(last30DaysData);
+
+    return {
+      dailySpending: filteredDailySpending,
+      maxSpending,
+      avgSpending,
+    };
   }, [filteredData]);
 
   const { dailySpending, maxSpending, avgSpending } = calendarData;
@@ -85,7 +122,7 @@ export const SpendingCalendar = ({ filteredData }) => {
         <div className="text-right">
           <p className="text-gray-400 text-sm">Daily Average</p>
           <p className="text-xl font-bold text-white">
-            ₹{avgSpending.toLocaleString()}
+            ₹{(avgSpending || 0).toFixed(0).toLocaleString()}
           </p>
         </div>
       </div>
@@ -145,8 +182,8 @@ export const SpendingCalendar = ({ filteredData }) => {
                       <div className="max-h-24 overflow-y-auto space-y-1">
                         {data.transactions.slice(0, 3).map((t, i) => (
                           <p key={i} className="text-gray-300 text-xs truncate">
-                            {t.Category}: ₹
-                            {Math.abs(parseFloat(t.INR)).toFixed(0)}
+                            {t.category}: ₹
+                            {Math.abs(parseFloat(t.amount)).toFixed(0)}
                           </p>
                         ))}
                         {data.transactions.length > 3 && (
@@ -169,7 +206,10 @@ export const SpendingCalendar = ({ filteredData }) => {
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => {
           const daySpending = dates
             .filter((dateStr) => getDayName(dateStr) === day)
-            .reduce((sum, dateStr) => sum + dailySpending[dateStr].total, 0);
+            .reduce(
+              (sum, dateStr) => sum + (dailySpending[dateStr]?.total || 0),
+              0
+            );
           const avgDaySpending = daySpending / 4; // Approx 4 weeks
 
           return (
@@ -179,7 +219,7 @@ export const SpendingCalendar = ({ filteredData }) => {
             >
               <p className="text-gray-400 text-xs mb-1">{day}</p>
               <p className="text-white font-medium text-sm">
-                ₹{avgDaySpending.toLocaleString()}
+                ₹{(avgDaySpending || 0).toFixed(0).toLocaleString()}
               </p>
             </div>
           );

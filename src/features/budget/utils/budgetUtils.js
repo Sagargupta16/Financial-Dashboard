@@ -396,33 +396,43 @@ const calculateCategoryBalanceScore = (maxCategoryPercent) => {
 export const calculateHealthScore = (data) => {
   const { income, expenses, savings, accountBalances } = data;
 
+  // Ensure we have valid numbers
+  const validIncome = parseFloat(income) || 0;
+  const validExpenses = parseFloat(expenses) || 0;
+  const validSavings = parseFloat(savings) || 0;
+
   const metrics = {};
 
   // 1. Savings Rate (0-30 points)
-  const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+  const savingsRate = validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
   metrics.savingsRate = calculateSavingsRateScore(savingsRate);
 
   // 2. Spending Consistency (0-20 points)
-  const variance = calculateSpendingVariance(expenses);
+  const variance = calculateSpendingVariance(validExpenses);
   metrics.consistency = calculateConsistencyScore(variance);
 
   // 3. Emergency Fund (0-25 points)
-  const totalBalance = Object.values(accountBalances).reduce(
-    (sum, val) => sum + val,
-    0
-  );
-  const monthlyExpenses = expenses;
+  // Handle accountBalances which can be an object with account names as keys
+  let totalBalance = 0;
+  if (accountBalances && typeof accountBalances === "object") {
+    totalBalance = Object.values(accountBalances).reduce(
+      (sum, val) => sum + (parseFloat(val) || 0),
+      0
+    );
+  }
+  const monthlyExpenses = validExpenses;
   const monthsCovered =
     monthlyExpenses > 0 ? totalBalance / monthlyExpenses : 0;
   metrics.emergencyFund = calculateEmergencyFundScore(monthsCovered);
 
   // 4. Income/Expense Ratio (0-15 points)
-  const ratio = expenses > 0 ? income / expenses : 1;
+  const ratio = validExpenses > 0 ? validIncome / validExpenses : 1;
   metrics.ratio = calculateRatioScore(ratio);
 
   // 5. Category Balance (0-10 points)
-  const categoryPercentages = Object.values(data.categorySpending || {}).map(
-    (amount) => (amount / expenses) * 100
+  const categorySpending = data.categorySpending || {};
+  const categoryPercentages = Object.values(categorySpending).map((amount) =>
+    validExpenses > 0 ? (amount / validExpenses) * 100 : 0
   );
   const maxCategoryPercent = Math.max(...categoryPercentages, 0);
   metrics.categoryBalance = calculateCategoryBalanceScore(maxCategoryPercent);
@@ -487,33 +497,73 @@ export const generateRecommendations = (budgetComparison, healthScore) => {
   const recommendations = [];
 
   // Budget-based recommendations
-  Object.entries(budgetComparison).forEach(([category, data]) => {
-    if (data.status === "over") {
-      recommendations.push({
-        type: "warning",
-        category,
-        message: `${category} is over budget by ₹${Math.abs(data.remaining).toFixed(0)}`,
-        action: `Reduce ${category} spending by ${(data.percentage - 100).toFixed(0)}%`,
-      });
-    }
-  });
-
-  // Health score recommendations
-  if (healthScore.savingsRate < 10) {
-    recommendations.push({
-      type: "tip",
-      category: "Savings",
-      message: "Savings rate is below 10%",
-      action: "Try to save at least 10-20% of your income",
+  if (budgetComparison && Object.keys(budgetComparison).length > 0) {
+    Object.entries(budgetComparison).forEach(([category, data]) => {
+      if (data.status === "over") {
+        recommendations.push({
+          type: "warning",
+          category,
+          message: `${category} is over budget by ₹${Math.abs(data.remaining).toFixed(0)}`,
+          action: `Reduce ${category} spending by ${(data.percentage - 100).toFixed(0)}%`,
+        });
+      }
     });
   }
 
-  if (healthScore.monthsCovered < 3) {
+  // Health score recommendations
+  if (!healthScore) {
+    return recommendations;
+  }
+
+  const savingsRate = parseFloat(healthScore.savingsRate) || 0;
+  const monthsCovered = parseFloat(healthScore.monthsCovered) || 0;
+  const score = healthScore.score || 0;
+
+  if (savingsRate < 10) {
+    recommendations.push({
+      type: "alert",
+      category: "Savings",
+      message: `Savings rate is ${savingsRate.toFixed(1)}% (Target: 20%+)`,
+      action: "Try to save at least 10-20% of your income",
+    });
+  } else if (savingsRate < 15) {
+    recommendations.push({
+      type: "tip",
+      category: "Savings",
+      message: `Savings rate is ${savingsRate.toFixed(1)}% (Good, but aim higher)`,
+      action: "Increase savings rate to 20% for excellent financial health",
+    });
+  }
+
+  if (monthsCovered < 3) {
     recommendations.push({
       type: "alert",
       category: "Emergency Fund",
-      message: "Emergency fund covers less than 3 months",
+      message: `Emergency fund covers ${monthsCovered.toFixed(1)} months (Target: 6 months)`,
       action: "Build emergency fund to cover 3-6 months of expenses",
+    });
+  } else if (monthsCovered < 6) {
+    recommendations.push({
+      type: "tip",
+      category: "Emergency Fund",
+      message: `Emergency fund covers ${monthsCovered.toFixed(1)} months (On track!)`,
+      action: "Continue building to reach 6-month target",
+    });
+  }
+
+  if (score >= 80) {
+    recommendations.push({
+      type: "success",
+      category: "Overall",
+      message: "Excellent financial health! 🎉",
+      action: "Keep up the great work with your current financial habits",
+    });
+  } else if (score < 60) {
+    recommendations.push({
+      type: "warning",
+      category: "Overall",
+      message: "Financial health needs attention",
+      action: "Focus on increasing savings rate and building emergency fund",
     });
   }
 

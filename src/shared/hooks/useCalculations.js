@@ -3,13 +3,29 @@ import { calculateDateRange } from "../utils/calculations";
 
 export const useKPIData = (filteredData) => {
   return useMemo(() => {
+    // Validate input
+    if (!filteredData || filteredData.length === 0) {
+      return {
+        kpiData: { income: 0, expense: 0 },
+        additionalKpiData: {
+          highestExpense: 0,
+          averageExpense: 0,
+          totalTransactions: 0,
+          transferData: { transferIn: 0, transferOut: 0 },
+        },
+      };
+    }
+
     const kpiData = filteredData.reduce(
       (acc, item) => {
+        // Validate amount is a number
+        const amount = Number(item.amount) || 0;
+
         // Only count actual income and expenses, not transfers between accounts
         if (item.type === "Income") {
-          acc.income += item.amount;
+          acc.income += Math.abs(amount);
         } else if (item.type === "Expense") {
-          acc.expense += item.amount;
+          acc.expense += Math.abs(amount);
         }
         // Note: Transfer-In and Transfer-Out are excluded from income/expense totals
         // as they represent money movement, not wealth creation/destruction
@@ -26,10 +42,12 @@ export const useKPIData = (filteredData) => {
     // Calculate transfer metrics separately
     const transferData = filteredData.reduce(
       (acc, item) => {
+        const amount = Math.abs(Number(item.amount) || 0);
+
         if (item.type === "Transfer-In") {
-          acc.transferIn += item.amount;
+          acc.transferIn += amount;
         } else if (item.type === "Transfer-Out") {
-          acc.transferOut += item.amount;
+          acc.transferOut += amount;
         }
         return acc;
       },
@@ -39,7 +57,7 @@ export const useKPIData = (filteredData) => {
     const additionalKpiData = {
       highestExpense: Math.max(
         0,
-        ...expenseTransactions.map((item) => item.amount)
+        ...expenseTransactions.map((item) => Math.abs(Number(item.amount) || 0))
       ),
       averageExpense:
         expenseTransactions.length > 0
@@ -55,6 +73,15 @@ export const useKPIData = (filteredData) => {
 
 export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
   return useMemo(() => {
+    // Validate input
+    if (!filteredData || filteredData.length === 0) {
+      return {
+        busiestDay: "N/A",
+        mostFrequentCategory: "N/A",
+        avgTransactionValue: 0,
+      };
+    }
+
     const days = [
       "Sunday",
       "Monday",
@@ -69,30 +96,47 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
 
     filteredData.forEach((item) => {
       if (item.type === "Expense") {
+        const amount = Math.abs(Number(item.amount) || 0);
+
         if (item.date) {
-          daySpending[item.date.getDay()] += item.amount;
+          const dayIndex = item.date.getDay();
+          if (dayIndex >= 0 && dayIndex < 7) {
+            daySpending[dayIndex] += amount;
+          }
         }
         categoryCounts[item.category] =
           (categoryCounts[item.category] || 0) + 1;
       }
     });
 
-    const busiestDay = days[daySpending.indexOf(Math.max(...daySpending))];
+    const maxSpending = Math.max(...daySpending);
+    const busiestDay =
+      maxSpending > 0 ? days[daySpending.indexOf(maxSpending)] : "N/A";
     const mostFrequentCategory =
       Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
       "N/A";
-    const totalValue = kpiData.income + kpiData.expense;
+
+    // Calculate more meaningful averages - absolute value of all transactions
+    const totalAbsoluteValue = filteredData.reduce(
+      (sum, t) => sum + Math.abs(t.amount || 0),
+      0
+    );
     const avgTransactionValue =
       additionalKpiData.totalTransactions > 0
-        ? totalValue / additionalKpiData.totalTransactions
+        ? totalAbsoluteValue / additionalKpiData.totalTransactions
         : 0;
 
     return { busiestDay, mostFrequentCategory, avgTransactionValue };
-  }, [filteredData, kpiData, additionalKpiData]);
+  }, [filteredData, additionalKpiData]);
 };
 
 export const useAccountBalances = (data) => {
   return useMemo(() => {
+    // Validate input
+    if (!data || data.length === 0) {
+      return [];
+    }
+
     const balances = data.reduce((acc, { account, type, amount }) => {
       if (!account) {
         return acc;
@@ -101,12 +145,14 @@ export const useAccountBalances = (data) => {
         acc[account] = 0;
       }
 
+      const validAmount = Math.abs(Number(amount) || 0);
+
       // Handle all transaction types - transfers show movement between accounts
       // This gives a clear picture of where money is currently located
       if (type === "Income" || type === "Transfer-In") {
-        acc[account] += amount;
+        acc[account] += validAmount;
       } else if (type === "Expense" || type === "Transfer-Out") {
-        acc[account] -= amount;
+        acc[account] -= validAmount;
       }
 
       return acc;
@@ -120,6 +166,20 @@ export const useAccountBalances = (data) => {
 
 export const useEnhancedKPIData = (filteredData, kpiData) => {
   return useMemo(() => {
+    // Validate input
+    if (!filteredData || filteredData.length === 0 || !kpiData) {
+      return {
+        savingsRate: 0,
+        dailySpendingRate: 0,
+        monthlyBurnRate: 0,
+        netWorth: 0,
+        netWorthPerMonth: 0,
+        spendingVelocity: 100,
+        categoryConcentration: null,
+        dateRange: { days: 0, months: 0, years: 0 },
+      };
+    }
+
     const dateRange = calculateDateRange(filteredData);
     const { income, expense } = kpiData;
 
@@ -149,7 +209,11 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
       (sum, t) => sum + t.amount,
       0
     );
-    const spendingPerDay30d = spending30d / 30;
+
+    // Calculate actual days in the last period (not always 30)
+    const actualDaysInPeriod = Math.min(30, dateRange.days);
+    const spendingPerDay30d =
+      actualDaysInPeriod > 0 ? spending30d / actualDaysInPeriod : 0;
     const spendingVelocity =
       dailySpendingRate > 0
         ? (spendingPerDay30d / dailySpendingRate) * 100
@@ -159,8 +223,9 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
     const categoryTotals = {};
     filteredData.forEach((t) => {
       if (t.type === "Expense") {
-        categoryTotals[t.category] =
-          (categoryTotals[t.category] || 0) + t.amount;
+        const amount = Math.abs(Number(t.amount) || 0);
+        const category = t.category || "Uncategorized";
+        categoryTotals[category] = (categoryTotals[category] || 0) + amount;
       }
     });
 

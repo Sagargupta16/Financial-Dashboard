@@ -45,7 +45,7 @@ const convertExcelSerialDate = (excelDate, index) => {
   const timeFraction = excelDate - days;
 
   const date = new Date(
-    excelEpoch.getTime() + (days - 2) * 24 * 60 * 60 * 1000,
+    excelEpoch.getTime() + (days - 2) * 24 * 60 * 60 * 1000
   );
 
   const hours = Math.floor(timeFraction * 24);
@@ -188,7 +188,7 @@ const isValidItem = (item) => {
 // Helper function: Detect Excel data format
 const detectExcelFormat = (header) => {
   const hasPeriod = header.some(
-    (h) => h?.includes("period") || h?.includes("date"),
+    (h) => h?.includes("period") || h?.includes("date")
   );
   const hasTime = header.some((h) => h?.includes("time"));
   const hasAccounts = header.some((h) => h?.includes("account"));
@@ -214,7 +214,7 @@ const processExcelRow = (row, index, isNewFormat) => {
   if (!row || row.length < 7) {
     logger.debug(
       `Skipping row ${index} due to insufficient columns:`,
-      row?.length,
+      row?.length
     );
     return null;
   }
@@ -266,7 +266,7 @@ export const useDataProcessor = (initialCsvData) => {
     } catch (e) {
       logger.error("Failed to parse CSV data:", e);
       setError(
-        "Could not parse the financial data. Please check the file format.",
+        "Could not parse the financial data. Please check the file format."
       );
     } finally {
       setLoading(false);
@@ -295,7 +295,7 @@ export const useDataProcessor = (initialCsvData) => {
       if (!jsonData || jsonData.length === 0) {
         logger.error("No data found in Excel file");
         setError(
-          "No data found in the Excel file. Please check the file format.",
+          "No data found in the Excel file. Please check the file format."
         );
         return;
       }

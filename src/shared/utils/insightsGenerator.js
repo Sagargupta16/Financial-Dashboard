@@ -9,6 +9,7 @@ import {
   calculateSavingsPotential,
 } from "./calculations";
 
+// eslint-disable-next-line max-lines-per-function, complexity
 export const generateSmartInsights = (transactions) => {
   const insights = [];
   const dateRange = calculateDateRange(transactions);

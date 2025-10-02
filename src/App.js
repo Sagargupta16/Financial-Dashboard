@@ -12,6 +12,16 @@ import {
   LineElement,
   TimeScale,
 } from "chart.js";
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Tags,
+  LineChart,
+  Target,
+  Repeat,
+  Lightbulb,
+  Receipt,
+} from "lucide-react";
 
 // Components
 import { Header } from "./shared/components/layout/Header";
@@ -24,8 +34,9 @@ import {
   IncomeExpenseSection,
   CategoryAnalysisSection,
   TrendsForecastsSection,
+  PatternsSection,
+  CategoryInsightsSection,
 } from "./shared/components/sections";
-import { InsightsSection } from "./shared/components/sections/InsightsSection";
 import { TransactionsSection } from "./features/transactions/components/TransactionsSection";
 import { BudgetGoalsSection } from "./features/budget/components/BudgetGoalsSection";
 
@@ -148,43 +159,49 @@ const App = () => {
     {
       id: "overview",
       label: "Overview",
-      icon: "📊",
+      icon: LayoutDashboard,
       description: "Quick snapshot of your financial health",
     },
     {
       id: "income-expense",
       label: "Income & Expenses",
-      icon: "💰",
+      icon: TrendingUp,
       description: "Detailed income and spending analysis",
     },
     {
       id: "categories",
       label: "Categories",
-      icon: "🏷️",
+      icon: Tags,
       description: "Deep dive into spending categories",
     },
     {
       id: "trends",
       label: "Trends & Forecasts",
-      icon: "📈",
+      icon: LineChart,
       description: "Advanced analytics and predictions",
     },
     {
       id: "budget-goals",
-      label: "Budget & Goals",
-      icon: "🎯",
-      description: "Budget simulator, goals, and insights",
+      label: "Budget & Planning",
+      icon: Target,
+      description: "Financial health, budgets, and planning tools",
     },
     {
-      id: "insights",
-      label: "Insights",
-      icon: "🔍",
-      description: "Smart analytics from your spending patterns",
+      id: "patterns",
+      label: "Subscriptions & Patterns",
+      icon: Repeat,
+      description: "Recurring payments and spending patterns",
+    },
+    {
+      id: "category-insights",
+      label: "Category Insights",
+      icon: Lightbulb,
+      description: "Specialized analytics for specific categories",
     },
     {
       id: "transactions",
       label: "Transactions",
-      icon: "📝",
+      icon: Receipt,
       description: "Detailed transaction list with filters",
     },
   ];
@@ -244,8 +261,12 @@ const App = () => {
           />
         </TabContent>
 
-        <TabContent isActive={activeTab === "insights"}>
-          <InsightsSection filteredData={filteredData} />
+        <TabContent isActive={activeTab === "patterns"}>
+          <PatternsSection filteredData={filteredData} />
+        </TabContent>
+
+        <TabContent isActive={activeTab === "category-insights"}>
+          <CategoryInsightsSection filteredData={filteredData} />
         </TabContent>
 
         <TabContent isActive={activeTab === "transactions"}>

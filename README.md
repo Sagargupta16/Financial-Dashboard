@@ -19,11 +19,13 @@ _Upload your financial data and watch your dashboard come to life with interacti
 ### 🆕 **Latest Updates (October 2025)**
 
 #### **Financial Health Dashboard**
+
 - **6 Advanced KPI Cards**: Savings rate, daily burn rate, monthly spending, net worth change, spending velocity (30-day), and category concentration
 - **Smart Color Coding**: Green (excellent), Yellow (good), Red (needs attention)
 - **Real-time Calculations**: All metrics update automatically with your data
 
 #### **AI-Style Smart Insights & Recommendations**
+
 - **💰 Savings Opportunities**: Identifies potential savings from delivery apps, cafeteria spending, etc.
 - **📊 Pattern Detection**: Weekend vs weekday spending, high-frequency categories, large transactions
 - **🎉 Achievements**: Celebrates good financial behaviors
@@ -32,12 +34,14 @@ _Upload your financial data and watch your dashboard come to life with interacti
 - **Priority-Based Display**: High priority alerts shown first
 
 #### **Running Balance Tracking**
+
 - **Cumulative Balance Column**: See your balance after each transaction
 - **Visual Flow**: Color-coded positive (green) and negative (red) balances
 - **Historical View**: Track exactly when you went positive or negative
 - **All Transaction Types**: Handles income, expenses, and transfers
 
 #### **Enhanced Data Management**
+
 - **CSV Import/Export**: Import transactions and export filtered data
 - **Toast Notifications**: Real-time feedback for all actions
 - **Data Persistence**: Automatic saving to browser localStorage
@@ -133,6 +137,7 @@ _Upload your financial data and watch your dashboard come to life with interacti
 - **🎯 Priority System**: High-priority insights shown first for immediate action
 
 **Example Insights:**
+
 - "You order food 4.2x/week (avg ₹350/order). Reducing by 30% could save ₹52,416/year"
 - "You spend 68% more on weekends vs weekdays - consider planning weekend activities better"
 - "You're saving 28.5% of your income - that's excellent! Keep it up!"
@@ -148,6 +153,7 @@ _Upload your financial data and watch your dashboard come to life with interacti
 - **Visual Impact**: See the immediate effect of large expenses
 
 **Example:**
+
 ```
 Date    | Amount     | Type    | Running Balance
 --------|------------|---------|------------------
@@ -336,13 +342,11 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
    - 6 Financial Health Metrics (Savings Rate, Burn Rate, Velocity, etc.)
    - Smart Insights & Recommendations with time filtering
    - Account balances and transfer tracking
-   
 2. **Income & Expense Tab** - Detailed breakdowns
    - Income vs Expense comparison charts
    - Top expense categories with time filtering
    - Income sources analysis
    - Spending by account visualization
-   
 3. **Trends & Forecasts Tab** - Temporal analysis
    - Monthly trends with time filtering
    - Daily spending patterns
@@ -376,6 +380,7 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 ### Key Metrics & Insights
 
 **Automatically calculated for your data:**
+
 - Savings rate and financial health score
 - Daily and monthly burn rates
 - Spending velocity (are you spending more than usual?)

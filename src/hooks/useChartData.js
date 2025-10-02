@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { truncateLabel } from "../utils/chartUtils";
 
-export const useChartData = (filteredData) => {
+export const useChartData = (filteredData, kpiData, drilldownCategory) => {
   const doughnutChartData = useMemo(
     () => ({
       labels: ["Income", "Expense"],

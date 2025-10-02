@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 import { commonChartOptions } from "./ChartConfig";
 
@@ -26,10 +27,14 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   const timeFilteredData = React.useMemo(() => {
     const now = new Date();
     return filteredData.filter((item) => {
-      if (!item.date || item.category === "In-pocket") return false;
+      if (!item.date || item.category === "In-pocket") {
+        return false;
+      }
 
       const date = new Date(item.date);
-      if (isNaN(date.getTime())) return false;
+      if (isNaN(date.getTime())) {
+        return false;
+      }
 
       if (viewMode === "all-time") {
         return true;
@@ -49,13 +54,19 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
 
   const chartData = React.useMemo(() => {
     const monthly = timeFilteredData.reduce((acc, item) => {
-      if (!item.date) return acc;
+      if (!item.date) {
+        return acc;
+      }
 
       const date = new Date(item.date);
-      if (isNaN(date.getTime())) return acc;
+      if (isNaN(date.getTime())) {
+        return acc;
+      }
 
       const month = date.toISOString().slice(0, 7);
-      if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+      if (!acc[month]) {
+        acc[month] = { income: 0, expense: 0 };
+      }
 
       if (item.type === "Income") {
         acc[month].income += item.amount || 0;
@@ -181,12 +192,16 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoPrevious = () => {
-    if (viewMode === "all-time" || viewMode === "last-12-months") return false;
+    if (viewMode === "all-time" || viewMode === "last-12-months") {
+      return false;
+    }
     return currentYear > Math.min(...availableYears);
   };
 
   const canGoNext = () => {
-    if (viewMode === "all-time" || viewMode === "last-12-months") return false;
+    if (viewMode === "all-time" || viewMode === "last-12-months") {
+      return false;
+    }
     return currentYear < Math.max(...availableYears);
   };
 
@@ -295,8 +310,8 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
             {viewMode === "all-time"
               ? "All Time"
               : viewMode === "last-12-months"
-              ? "Last 12 Months"
-              : `Year ${currentYear}`}
+                ? "Last 12 Months"
+                : `Year ${currentYear}`}
           </div>
 
           <button
@@ -345,4 +360,9 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
     </div>
   );
+};
+
+EnhancedMonthlyTrendsChart.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  chartRef: PropTypes.object,
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { exportChartAsPNG } from "../../utils/chartUtils";
 
 // Common chart container component
@@ -207,3 +208,73 @@ export const InfoCard = ({
     )}
   </div>
 );
+
+// PropTypes validations
+ChartContainer.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  height: PropTypes.string,
+  colSpan: PropTypes.string,
+  chartRef: PropTypes.object,
+  filename: PropTypes.string,
+  actions: PropTypes.node,
+};
+
+ExportButton.propTypes = {
+  chartRef: PropTypes.object.isRequired,
+  filename: PropTypes.string.isRequired,
+};
+
+DropdownSelect.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  className: PropTypes.string,
+};
+
+NavigationButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+  direction: PropTypes.oneOf(["left", "right"]),
+  className: PropTypes.string,
+};
+
+TimeNavigationControls.propTypes = {
+  viewMode: PropTypes.string.isRequired,
+  onViewModeChange: PropTypes.func.isRequired,
+  currentPeriod: PropTypes.string.isRequired,
+  onPrevious: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
+  canGoPrevious: PropTypes.bool.isRequired,
+  canGoNext: PropTypes.bool.isRequired,
+  viewModeOptions: PropTypes.arrayOf(PropTypes.string),
+};
+
+ChartWrapper.propTypes = {
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+};
+
+FilterControls.propTypes = {
+  filters: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+      onChange: PropTypes.func.isRequired,
+      options: PropTypes.arrayOf(PropTypes.string).isRequired,
+    })
+  ).isRequired,
+  onFilterChange: PropTypes.func,
+  className: PropTypes.string,
+};
+
+InfoCard.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  change: PropTypes.number,
+  icon: PropTypes.node,
+  className: PropTypes.string,
+};

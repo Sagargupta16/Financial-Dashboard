@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Download } from "lucide-react";
 import { downloadChart } from "../../utils/dataUtils";
 
@@ -24,3 +25,11 @@ export const ChartCard = ({
     <div className="flex-grow">{children}</div>
   </div>
 );
+
+ChartCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  chartRef: PropTypes.object,
+  fileName: PropTypes.string,
+  className: PropTypes.string,
+};

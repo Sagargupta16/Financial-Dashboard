@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
 import { commonChartOptions, doughnutOptions } from "./ChartConfig";
@@ -13,6 +14,11 @@ export const IncomeVsExpenseChart = ({ data, chartRef }) => (
   </ChartCard>
 );
 
+IncomeVsExpenseChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const TopExpenseCategoriesChart = ({ data, chartRef }) => (
   <ChartCard
     title="Top Expense Categories"
@@ -22,6 +28,11 @@ export const TopExpenseCategoriesChart = ({ data, chartRef }) => (
     <Bar ref={chartRef} data={data} options={commonChartOptions} />
   </ChartCard>
 );
+
+TopExpenseCategoriesChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
 
 export const TopIncomeSourcesChart = ({ data, chartRef }) => (
   <ChartCard
@@ -33,6 +44,11 @@ export const TopIncomeSourcesChart = ({ data, chartRef }) => (
   </ChartCard>
 );
 
+TopIncomeSourcesChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const SpendingByAccountChart = ({ data, chartRef }) => (
   <ChartCard
     title="Spending by Account"
@@ -42,6 +58,11 @@ export const SpendingByAccountChart = ({ data, chartRef }) => (
     <Doughnut ref={chartRef} data={data} options={doughnutOptions} />
   </ChartCard>
 );
+
+SpendingByAccountChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
 
 export const MonthlyTrendsChart = ({ data, chartRef }) => (
   <ChartCard
@@ -53,6 +74,11 @@ export const MonthlyTrendsChart = ({ data, chartRef }) => (
   </ChartCard>
 );
 
+MonthlyTrendsChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const SpendingByDayChart = ({ data, chartRef }) => (
   <ChartCard
     title="Spending by Day of Week"
@@ -63,11 +89,16 @@ export const SpendingByDayChart = ({ data, chartRef }) => (
   </ChartCard>
 );
 
+SpendingByDayChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  chartRef: PropTypes.object,
+};
+
 export const SubcategoryBreakdownChart = ({
   data,
-  categories,
-  selectedCategory,
-  onCategoryChange,
+  _categories,
+  _selectedCategory,
+  _onCategoryChange,
   chartRef,
 }) => (
   <ChartCard
@@ -78,3 +109,11 @@ export const SubcategoryBreakdownChart = ({
     <Bar ref={chartRef} data={data} options={commonChartOptions} />
   </ChartCard>
 );
+
+SubcategoryBreakdownChart.propTypes = {
+  data: PropTypes.object.isRequired,
+  _categories: PropTypes.array,
+  _selectedCategory: PropTypes.string,
+  _onCategoryChange: PropTypes.func,
+  chartRef: PropTypes.object,
+};

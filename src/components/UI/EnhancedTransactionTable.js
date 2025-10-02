@@ -33,9 +33,9 @@ const getTypeStyles = (type) => {
 };
 
 const getAmountTextColor = (type) => {
-  if (type === "Income") return "text-green-400";
-  if (type === "Transfer-In") return "text-blue-400";
-  if (type === "Transfer-Out") return "text-orange-400";
+  if (type === "Income") {return "text-green-400";}
+  if (type === "Transfer-In") {return "text-blue-400";}
+  if (type === "Transfer-Out") {return "text-orange-400";}
   return "text-red-400";
 };
 

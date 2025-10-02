@@ -5,8 +5,8 @@ export const useKPIData = (filteredData) => {
     const kpiData = filteredData.reduce(
       (acc, item) => {
         // Only count actual income and expenses, not transfers between accounts
-        if (item.type === "Income") acc.income += item.amount;
-        else if (item.type === "Expense") acc.expense += item.amount;
+        if (item.type === "Income") {acc.income += item.amount;}
+        else if (item.type === "Expense") {acc.expense += item.amount;}
         // Note: Transfer-In and Transfer-Out are excluded from income/expense totals
         // as they represent money movement, not wealth creation/destruction
 
@@ -65,7 +65,7 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
 
     filteredData.forEach((item) => {
       if (item.type === "Expense") {
-        if (item.date) daySpending[item.date.getDay()] += item.amount;
+        if (item.date) {daySpending[item.date.getDay()] += item.amount;}
         categoryCounts[item.category] =
           (categoryCounts[item.category] || 0) + 1;
       }
@@ -88,8 +88,8 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
 export const useAccountBalances = (data) => {
   return useMemo(() => {
     const balances = data.reduce((acc, { account, type, amount }) => {
-      if (!account) return acc;
-      if (!acc[account]) acc[account] = 0;
+      if (!account) {return acc;}
+      if (!acc[account]) {acc[account] = 0;}
 
       // Handle all transaction types - transfers show movement between accounts
       // This gives a clear picture of where money is currently located

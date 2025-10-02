@@ -12,44 +12,20 @@ import {
   LineElement,
   TimeScale,
 } from "chart.js";
-import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  Hash,
-  Target,
-  Sigma,
-  CalendarDays,
-  LayoutGrid,
-  Calculator,
-  ArrowLeftRight,
-} from "lucide-react";
 
 // Components
 import { Header } from "./components/UI/Header";
-import { KPICard, SmallKPICard } from "./components/UI/KPICards";
-import { AccountBalancesCard } from "./components/UI/AccountBalancesCard";
-import EnhancedTransactionTable from "./components/UI/EnhancedTransactionTable";
 import { Footer } from "./components/UI/Footer";
+import { Tabs, TabContent } from "./components/UI/Tabs";
+
+// Section Components
 import {
-  IncomeVsExpenseChart,
-  EnhancedTopExpenseCategoriesChart,
-  EnhancedTopIncomeSourcesChart,
-  EnhancedSpendingByAccountChart,
-  EnhancedMonthlyTrendsChart,
-  SpendingByDayChart,
-  SubcategoryBreakdownChart,
-  EnhancedSubcategoryBreakdownChart,
-  MultiCategoryTimeAnalysisChart,
-  NetWorthTrendChart,
-  CumulativeCategoryTrendChart,
-  SeasonalSpendingHeatmap,
-  YearOverYearComparisonChart,
-  SpendingForecastChart,
-  AccountBalanceProgressionChart,
-  DayWeekSpendingPatternsChart,
-  TreemapChart,
-} from "./components/Charts";
+  OverviewSection,
+  IncomeExpenseSection,
+  CategoryAnalysisSection,
+  TrendsForecastsSection,
+  TransactionsSection,
+} from "./components/sections";
 
 // Hooks
 import {
@@ -66,7 +42,6 @@ import { useChartData } from "./hooks/useChartData";
 
 // Utils
 import { initialCsvData } from "./utils/constants";
-import { formatCurrency } from "./utils/dataUtils";
 
 // Register Chart.js components
 ChartJS.register(
@@ -85,6 +60,7 @@ ChartJS.register(
 // eslint-disable-next-line max-lines-per-function
 const App = () => {
   // State
+  const [activeTab, setActiveTab] = useState("overview");
   const [sortConfig, setSortConfig] = useState({
     key: "date",
     direction: "desc",
@@ -165,243 +141,94 @@ const App = () => {
     );
   }
 
+  // Tab configuration
+  const tabs = [
+    {
+      id: "overview",
+      label: "Overview",
+      icon: "📊",
+      description: "Quick snapshot of your financial health",
+    },
+    {
+      id: "income-expense",
+      label: "Income & Expenses",
+      icon: "💰",
+      description: "Detailed income and spending analysis",
+    },
+    {
+      id: "categories",
+      label: "Categories",
+      icon: "🏷️",
+      description: "Deep dive into spending categories",
+    },
+    {
+      id: "trends",
+      label: "Trends & Forecasts",
+      icon: "📈",
+      description: "Advanced analytics and predictions",
+    },
+    {
+      id: "transactions",
+      label: "Transactions",
+      icon: "📝",
+      description: "Detailed transaction list with filters",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black text-gray-300 font-sans p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto">
         <Header onFileUpload={handleFileUpload} />
 
-        {/* Main KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <KPICard
-            title="Total Income"
-            value={kpiData.income}
-            icon={<TrendingUp size={24} />}
-            color="green"
-          />
-          <KPICard
-            title="Total Expense"
-            value={kpiData.expense}
-            icon={<TrendingDown size={24} />}
-            color="red"
-          />
-          <KPICard
-            title="Net Balance"
-            value={kpiData.income - kpiData.expense}
-            icon={<Wallet size={24} />}
-            color="blue"
-          />
-        </div>
+        {/* Tab Navigation */}
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-        {/* Secondary KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-          <SmallKPICard
-            title="Total Transactions"
-            value={additionalKpiData.totalTransactions}
-            icon={<Hash size={22} />}
-            isCount={true}
+        {/* Tab Content */}
+        <TabContent isActive={activeTab === "overview"}>
+          <OverviewSection
+            kpiData={kpiData}
+            additionalKpiData={additionalKpiData}
+            accountBalances={accountBalances}
+            keyInsights={keyInsights}
           />
-          <SmallKPICard
-            title="Highest Expense"
-            value={additionalKpiData.highestExpense}
-            icon={<Target size={22} />}
-          />
-          <SmallKPICard
-            title="Average Expense"
-            value={additionalKpiData.averageExpense}
-            icon={<Sigma size={22} />}
-          />
-        </div>
+        </TabContent>
 
-        {/* Transfer Information Cards */}
-        {(additionalKpiData.transferData?.transferIn > 0 ||
-          additionalKpiData.transferData?.transferOut > 0) && (
-          <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-6 mb-8">
-            <h3 className="text-xl font-semibold text-purple-300 mb-4 flex items-center">
-              <div className="p-2 rounded-lg bg-purple-900/50 text-purple-400 mr-3">
-                <ArrowLeftRight size={20} />
-              </div>
-              Account Transfers (Internal Money Movement)
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-purple-900/30 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-purple-300">
-                    Money Transferred In
-                  </span>
-                  <span className="text-lg font-bold text-purple-400">
-                    ←{" "}
-                    {formatCurrency(
-                      additionalKpiData.transferData?.transferIn || 0
-                    )}
-                  </span>
-                </div>
-              </div>
-              <div className="bg-purple-900/30 p-4 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-purple-300">
-                    Money Transferred Out
-                  </span>
-                  <span className="text-lg font-bold text-purple-400">
-                    →{" "}
-                    {formatCurrency(
-                      additionalKpiData.transferData?.transferOut || 0
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-purple-300/70 mt-3">
-              * Transfers represent internal money movement between your
-              accounts and do not affect your total income or expenses.
-            </p>
-          </div>
-        )}
-
-        {/* Visualizations Grid */}
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <IncomeVsExpenseChart
-            data={chartData.doughnutChartData}
-            chartRef={chartRefs.doughnut}
-          />
-          <AccountBalancesCard balances={accountBalances} />
-          <EnhancedTopExpenseCategoriesChart
+        <TabContent isActive={activeTab === "income-expense"}>
+          <IncomeExpenseSection
+            chartData={chartData}
+            chartRefs={chartRefs}
             filteredData={filteredData}
-            chartRef={chartRefs.bar}
+            uniqueValues={uniqueValues}
+            drilldownCategory={drilldownCategory}
+            setDrilldownCategory={setDrilldownCategory}
           />
-          <EnhancedTopIncomeSourcesChart
-            filteredData={filteredData}
-            chartRef={chartRefs.incomeSources}
-          />
-          <EnhancedSpendingByAccountChart
-            filteredData={filteredData}
-            chartRef={chartRefs.spendingByAccount}
-          />
-          <EnhancedMonthlyTrendsChart
-            filteredData={filteredData}
-            chartRef={chartRefs.line}
-          />
-          <NetWorthTrendChart
-            filteredData={filteredData}
-            chartRef={chartRefs.netWorth}
-          />
-          <TreemapChart
-            filteredData={filteredData}
-            chartRef={chartRefs.treemap}
-          />
-        </div>
+        </TabContent>
 
-        {/* Deeper Analysis Section */}
-        <div className="relative bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-700/50 overflow-hidden">
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-              <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl mr-3 shadow-lg">
-                <LayoutGrid size={24} className="text-white" />
-              </div>
-              Deeper Analysis
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <SmallKPICard
-                title="Busiest Spending Day"
-                value={keyInsights.busiestDay}
-                icon={<CalendarDays size={22} />}
-              />
-              <SmallKPICard
-                title="Most Frequent Category"
-                value={keyInsights.mostFrequentCategory}
-                icon={<LayoutGrid size={22} />}
-              />
-              <SmallKPICard
-                title="Avg. Transaction Value"
-                value={keyInsights.avgTransactionValue}
-                icon={<Calculator size={22} />}
-              />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SpendingByDayChart
-                data={chartData.spendingByDayData}
-                chartRef={chartRefs.spendingByDay}
-              />
-              <SubcategoryBreakdownChart
-                data={chartData.subcategoryBreakdownData}
-                chartRef={chartRefs.subcategoryBreakdown}
-                categories={uniqueValues.expenseCategories}
-                selectedCategory={drilldownCategory}
-                onCategoryChange={setDrilldownCategory}
-              />
-            </div>
-          </div>
+        <TabContent isActive={activeTab === "categories"}>
+          <CategoryAnalysisSection
+            chartRefs={chartRefs}
+            filteredData={filteredData}
+            uniqueValues={uniqueValues}
+            drilldownCategory={drilldownCategory}
+            setDrilldownCategory={setDrilldownCategory}
+          />
+        </TabContent>
 
-          {/* Enhanced Time-based Analysis */}
-          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Time-based Category Analysis
-            </h2>
-            <div className="grid grid-cols-1 gap-6">
-              <EnhancedSubcategoryBreakdownChart
-                filteredData={filteredData}
-                chartRef={chartRefs.enhancedSubcategoryBreakdown}
-                categories={uniqueValues.expenseCategories}
-                selectedCategory={drilldownCategory}
-                onCategoryChange={setDrilldownCategory}
-              />
-              <MultiCategoryTimeAnalysisChart
-                filteredData={filteredData}
-                chartRef={chartRefs.multiCategoryTimeAnalysis}
-                categories={uniqueValues.expenseCategories}
-              />
-            </div>
-          </div>
+        <TabContent isActive={activeTab === "trends"}>
+          <TrendsForecastsSection
+            chartRefs={chartRefs}
+            filteredData={filteredData}
+          />
+        </TabContent>
 
-          {/* Cumulative Trends Section */}
-          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Cumulative Spending Analysis
-            </h2>
-            <div className="grid grid-cols-1 gap-6">
-              <CumulativeCategoryTrendChart
-                filteredData={filteredData}
-                chartRef={chartRefs.cumulativeCategoryTrend}
-              />
-            </div>
-          </div>
-
-          {/* Advanced Analytics Section */}
-          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Advanced Financial Analytics
-            </h2>
-            <div className="grid grid-cols-1 gap-6">
-              <SeasonalSpendingHeatmap
-                filteredData={filteredData}
-                chartRef={chartRefs.seasonalSpendingHeatmap}
-              />
-              <YearOverYearComparisonChart
-                filteredData={filteredData}
-                chartRef={chartRefs.yearOverYearComparison}
-              />
-              <SpendingForecastChart
-                filteredData={filteredData}
-                chartRef={chartRefs.spendingForecast}
-              />
-              <AccountBalanceProgressionChart
-                filteredData={filteredData}
-                chartRef={chartRefs.accountBalanceProgression}
-              />
-              <DayWeekSpendingPatternsChart
-                filteredData={filteredData}
-                chartRef={chartRefs.dayWeekSpendingPatterns}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Data Table */}
-        <EnhancedTransactionTable
-          data={filteredData}
-          onSort={handleSort}
-          currentPage={currentPage}
-          transactionsPerPage={transactionsPerPage}
-        />
+        <TabContent isActive={activeTab === "transactions"}>
+          <TransactionsSection
+            filteredData={filteredData}
+            handleSort={handleSort}
+            currentPage={currentPage}
+            transactionsPerPage={transactionsPerPage}
+          />
+        </TabContent>
 
         <Footer />
       </div>

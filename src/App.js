@@ -25,7 +25,9 @@ import {
   CategoryAnalysisSection,
   TrendsForecastsSection,
   TransactionsSection,
+  BudgetGoalsSection,
 } from "./components/sections";
+import { InsightsSection } from "./components/sections/InsightsSection";
 
 // Hooks
 import {
@@ -168,6 +170,18 @@ const App = () => {
       description: "Advanced analytics and predictions",
     },
     {
+      id: "budget-goals",
+      label: "Budget & Goals",
+      icon: "🎯",
+      description: "Budget simulator, goals, and insights",
+    },
+    {
+      id: "insights",
+      label: "Insights",
+      icon: "🔍",
+      description: "Smart analytics from your spending patterns",
+    },
+    {
       id: "transactions",
       label: "Transactions",
       icon: "📝",
@@ -219,6 +233,18 @@ const App = () => {
             chartRefs={chartRefs}
             filteredData={filteredData}
           />
+        </TabContent>
+
+        <TabContent isActive={activeTab === "budget-goals"}>
+          <BudgetGoalsSection
+            filteredData={filteredData}
+            kpiData={kpiData}
+            accountBalances={accountBalances}
+          />
+        </TabContent>
+
+        <TabContent isActive={activeTab === "insights"}>
+          <InsightsSection filteredData={filteredData} />
         </TabContent>
 
         <TabContent isActive={activeTab === "transactions"}>

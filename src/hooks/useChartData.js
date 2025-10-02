@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { truncateLabel } from "../utils/chartUtils";
 
-const useChartData = (filteredData) => {
+export const useChartData = (filteredData) => {
   const doughnutChartData = useMemo(
     () => ({
       labels: ["Income", "Expense"],
@@ -94,11 +94,18 @@ const useChartData = (filteredData) => {
 
   const lineChartData = useMemo(() => {
     const monthly = filteredData.reduce((acc, item) => {
-      if (item.category === "In-pocket") {return acc;}
+      if (item.category === "In-pocket") {
+        return acc;
+      }
       const month = item.date.toISOString().slice(0, 7);
-      if (!acc[month]) {acc[month] = { income: 0, expense: 0 };}
-      if (item.type === "Income") {acc[month].income += item.amount;}
-      else if (item.type === "Expense") {acc[month].expense += item.amount;}
+      if (!acc[month]) {
+        acc[month] = { income: 0, expense: 0 };
+      }
+      if (item.type === "Income") {
+        acc[month].income += item.amount;
+      } else if (item.type === "Expense") {
+        acc[month].expense += item.amount;
+      }
       return acc;
     }, {});
     const sortedMonths = Object.keys(monthly).sort();
@@ -150,8 +157,9 @@ const useChartData = (filteredData) => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const spending = Array(7).fill(0);
     filteredData.forEach((item) => {
-      if (item.type === "Expense" && item.date)
-        {spending[item.date.getDay()] += item.amount;}
+      if (item.type === "Expense" && item.date) {
+        spending[item.date.getDay()] += item.amount;
+      }
     });
     return {
       labels: days,
@@ -167,7 +175,9 @@ const useChartData = (filteredData) => {
   }, [filteredData]);
 
   const subcategoryBreakdownData = useMemo(() => {
-    if (!drilldownCategory) {return { labels: [], datasets: [] };}
+    if (!drilldownCategory) {
+      return { labels: [], datasets: [] };
+    }
     const spending = filteredData
       .filter((i) => i.type === "Expense" && i.category === drilldownCategory)
       .reduce((acc, i) => {

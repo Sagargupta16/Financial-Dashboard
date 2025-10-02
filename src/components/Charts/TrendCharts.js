@@ -7,7 +7,7 @@ import { commonChartOptions } from "./ChartConfig";
 // eslint-disable-next-line max-lines-per-function
 export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear(),
+    new Date().getFullYear()
   );
   const [viewMode, setViewMode] = React.useState("year");
   const [dataMode, setDataMode] = React.useState("regular");
@@ -45,7 +45,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
         const twelveMonthsAgo = new Date(
           now.getFullYear(),
           now.getMonth() - 12,
-          1,
+          1
         );
         return date >= twelveMonthsAgo;
       }
@@ -308,7 +308,15 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           </button>
 
           <div className="text-white font-semibold min-w-[150px] text-center px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
-            {(() => { if (viewMode === "all-time") { return "All Time"; } if (viewMode === "last-12-months") { return "Last 12 Months"; } return `Year ${currentYear}`; })()}
+            {(() => {
+              if (viewMode === "all-time") {
+                return "All Time";
+              }
+              if (viewMode === "last-12-months") {
+                return "Last 12 Months";
+              }
+              return `Year ${currentYear}`;
+            })()}
           </div>
 
           <button
@@ -332,7 +340,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
         <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300 px-3 py-1 bg-gradient-to-r from-gray-700/50 to-gray-800/50 rounded-lg">
           {
             timeFilteredData.filter(
-              (i) => i.type === "Income" || i.type === "Expense",
+              (i) => i.type === "Income" || i.type === "Expense"
             ).length
           }{" "}
           transactions
@@ -363,4 +371,3 @@ EnhancedMonthlyTrendsChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
   chartRef: PropTypes.object,
 };
-

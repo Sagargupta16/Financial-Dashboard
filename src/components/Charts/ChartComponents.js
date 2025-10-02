@@ -460,7 +460,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
         );
       }
     });
-// eslint-disable-next-line max-lines-per-function
+    // eslint-disable-next-line max-lines-per-function
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
   // eslint-disable-next-line max-lines-per-function
@@ -891,7 +891,7 @@ EnhancedSubcategoryBreakdownChart.propTypes = {
   chartRef: PropTypes.object,
   categories: PropTypes.array,
   selectedCategory: PropTypes.string,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   onCategoryChange: PropTypes.func,
 };
 
@@ -974,7 +974,7 @@ export const MultiCategoryTimeAnalysisChart = ({
           date.getMonth() + 1 === currentMonth
         );
       }
-// eslint-disable-next-line max-lines-per-function
+      // eslint-disable-next-line max-lines-per-function
     });
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
@@ -1334,7 +1334,7 @@ export const MultiCategoryTimeAnalysisChart = ({
 MultiCategoryTimeAnalysisChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
   chartRef: PropTypes.object,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   categories: PropTypes.array,
 };
 
@@ -1897,7 +1897,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
 
 NetWorthTrendChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
@@ -2499,7 +2499,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
 
 CumulativeCategoryTrendChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
@@ -2673,7 +2673,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
 
 SeasonalSpendingHeatmap.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
@@ -2911,13 +2911,13 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
 
 YearOverYearComparisonChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const SpendingForecastChart = ({ filteredData, chartRef }) => {
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   const [forecastMonths, setForecastMonths] = React.useState(6);
   const [forecastType, setForecastType] = React.useState("linear");
 
@@ -3201,14 +3201,14 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
 
 SpendingForecastChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const [selectedAccount, setSelectedAccount] = React.useState("all");
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   const [viewMode, setViewMode] = React.useState("cumulative");
   const [showAverage, setShowAverage] = React.useState(true);
 
@@ -3558,13 +3558,13 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
 
 AccountBalanceProgressionChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   const [patternType, setPatternType] = React.useState("dayOfWeek");
   const [metricType, setMetricType] = React.useState("expense");
 
@@ -3854,7 +3854,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
 
 DayWeekSpendingPatternsChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-// eslint-disable-next-line max-lines-per-function
+  // eslint-disable-next-line max-lines-per-function
   chartRef: PropTypes.object,
 };
 
@@ -3936,7 +3936,10 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
         transaction.Accounts || transaction.Account || "Other Income";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(/[â‚¹,$,]/g, "")
+          (transaction.INR || transaction.Amount || "0").replace(
+            /[â‚¹,$,]/g,
+            ""
+          )
         )
       );
       if (amount > 0) {
@@ -3949,7 +3952,10 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       const category = transaction.Category || "Other Expenses";
       const amount = Math.abs(
         parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(/[â‚¹,$,]/g, "")
+          (transaction.INR || transaction.Amount || "0").replace(
+            /[â‚¹,$,]/g,
+            ""
+          )
         )
       );
       if (amount > 0) {
@@ -4327,5 +4333,3 @@ SankeyFlowChart.propTypes = {
 };
 
 export { TreemapChart };
-
-

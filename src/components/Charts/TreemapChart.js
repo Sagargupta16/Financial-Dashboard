@@ -27,7 +27,9 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   // Filter data based on selected time period
   const timeFilteredData = useMemo(() => {
     return filteredData.filter((item) => {
-      if (!item.date || item.type !== "Expense") {return false;}
+      if (!item.date || item.type !== "Expense") {
+        return false;
+      }
       const date = new Date(item.date);
 
       if (viewMode === "all-time") {
@@ -53,48 +55,55 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
     if (showSubcategories) {
       // Group by category and subcategory
       const categoryData = {};
-      
+
       timeFilteredData.forEach((item) => {
         const category = item.category || "Other";
         const subcategory = item.subcategory || "Uncategorized";
-        
+
         if (!categoryData[category]) {
           categoryData[category] = {};
         }
-        
+
         if (!categoryData[category][subcategory]) {
           categoryData[category][subcategory] = 0;
         }
-        
+
         categoryData[category][subcategory] += item.amount;
       });
 
       // Convert to hierarchical structure
-      const children = Object.entries(categoryData).map(([category, subcategories]) => ({
-        name: category,
-        children: Object.entries(subcategories).map(([subcategory, amount]) => ({
-          name: subcategory,
-          value: amount,
-          category: category,
-          fullName: `${category} - ${subcategory}`
-        }))
-      }));
+      const children = Object.entries(categoryData).map(
+        ([category, subcategories]) => ({
+          name: category,
+          children: Object.entries(subcategories).map(
+            ([subcategory, amount]) => ({
+              name: subcategory,
+              value: amount,
+              category: category,
+              fullName: `${category} - ${subcategory}`,
+            })
+          ),
+        })
+      );
 
       return { name: "root", children };
     } else {
       // Group by category only
       const categoryTotals = {};
-      
+
       timeFilteredData.forEach((item) => {
         const category = item.category || "Other";
-        categoryTotals[category] = (categoryTotals[category] || 0) + item.amount;
+        categoryTotals[category] =
+          (categoryTotals[category] || 0) + item.amount;
       });
 
-      const children = Object.entries(categoryTotals).map(([category, amount]) => ({
-        name: category,
-        value: amount,
-        category: category
-      }));
+      const children = Object.entries(categoryTotals).map(
+        ([category, amount]) => ({
+          name: category,
+          value: amount,
+          category: category,
+        })
+      );
 
       return { name: "root", children };
     }
@@ -103,19 +112,48 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   // Color scale
   const colorScale = scaleOrdinal()
     .domain([
-      "Food & Dining", "Shopping", "Transportation", "Bills & Utilities",
-      "Entertainment", "Health & Fitness", "Travel", "Education",
-      "Gifts & Donations", "Business Services", "Personal Care", "Other"
+      "Food & Dining",
+      "Shopping",
+      "Transportation",
+      "Bills & Utilities",
+      "Entertainment",
+      "Health & Fitness",
+      "Travel",
+      "Education",
+      "Gifts & Donations",
+      "Business Services",
+      "Personal Care",
+      "Other",
     ])
     .range([
-      "#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#10b981",
-      "#ef4444", "#06b6d4", "#84cc16", "#f59e0b", "#8b5a2b", "#6b7280"
+      "#3b82f6",
+      "#8b5cf6",
+      "#ec4899",
+      "#f97316",
+      "#eab308",
+      "#10b981",
+      "#ef4444",
+      "#06b6d4",
+      "#84cc16",
+      "#f59e0b",
+      "#8b5a2b",
+      "#6b7280",
     ]);
 
   // Navigation functions
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const handlePrevious = () => {
@@ -145,7 +183,9 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoPrevious = () => {
-    if (viewMode === "all-time") {return false;}
+    if (viewMode === "all-time") {
+      return false;
+    }
     if (viewMode === "month") {
       return currentYear > Math.min(...availableYears) || currentMonth > 1;
     } else if (viewMode === "year") {
@@ -155,11 +195,16 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   const canGoNext = () => {
-    if (viewMode === "all-time") {return false;}
+    if (viewMode === "all-time") {
+      return false;
+    }
     const currentDate = new Date();
     if (viewMode === "month") {
-      return currentYear < currentDate.getFullYear() || 
-        (currentYear === currentDate.getFullYear() && currentMonth < currentDate.getMonth() + 1);
+      return (
+        currentYear < currentDate.getFullYear() ||
+        (currentYear === currentDate.getFullYear() &&
+          currentMonth < currentDate.getMonth() + 1)
+      );
     } else if (viewMode === "year") {
       return currentYear < currentDate.getFullYear();
     }
@@ -167,7 +212,13 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   };
 
   useEffect(() => {
-    if (!svgRef.current || !treemapData.children || treemapData.children.length === 0) {return;}
+    if (
+      !svgRef.current ||
+      !treemapData.children ||
+      treemapData.children.length === 0
+    ) {
+      return;
+    }
 
     const renderTreemap = () => {
       const svg = d3.select(svgRef.current);
@@ -178,142 +229,160 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
       const containerRect = container.getBoundingClientRect();
       const containerWidth = Math.max(containerRect.width || 800, 400);
       const containerHeight = Math.max(containerRect.height || 500, 300);
-      
+
       const margin = { top: 5, right: 5, bottom: 5, left: 5 };
       const width = containerWidth - margin.left - margin.right;
       const height = containerHeight - margin.top - margin.bottom;
 
-    // Create hierarchy and treemap layout
-    const root = hierarchy(treemapData)
-      .sum(d => d.value || 0)
-      .sort((a, b) => b.value - a.value);
+      // Create hierarchy and treemap layout
+      const root = hierarchy(treemapData)
+        .sum((d) => d.value || 0)
+        .sort((a, b) => b.value - a.value);
 
-    const treemapLayout = treemap()
-      .tile(treemapBinary)
-      .size([width, height])
-      .padding(2)
-      .round(true);
+      const treemapLayout = treemap()
+        .tile(treemapBinary)
+        .size([width, height])
+        .padding(2)
+        .round(true);
 
-    treemapLayout(root);
+      treemapLayout(root);
 
-    svg
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
-      .style("width", "100%")
-      .style("height", "100%")
-      .style("max-width", "100%")
-      .style("max-height", "100%");
+      svg
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+        .style("width", "100%")
+        .style("height", "100%")
+        .style("max-width", "100%")
+        .style("max-height", "100%");
 
-    const g = svg
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create tooltip
-    const tooltip = d3.select("body").append("div")
-      .attr("class", "treemap-tooltip")
-      .style("position", "absolute")
-      .style("visibility", "hidden")
-      .style("background", "rgba(0, 0, 0, 0.9)")
-      .style("color", "white")
-      .style("padding", "8px")
-      .style("border-radius", "4px")
-      .style("font-size", "12px")
-      .style("z-index", "1000");
+      // Create tooltip
+      const tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "treemap-tooltip")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("background", "rgba(0, 0, 0, 0.9)")
+        .style("color", "white")
+        .style("padding", "8px")
+        .style("border-radius", "4px")
+        .style("font-size", "12px")
+        .style("z-index", "1000");
 
-    // Create leaves (rectangles)
-    const leaves = g.selectAll("g")
-      .data(root.leaves())
-      .join("g")
-      .attr("transform", d => `translate(${d.x0},${d.y0})`);
+      // Create leaves (rectangles)
+      const leaves = g
+        .selectAll("g")
+        .data(root.leaves())
+        .join("g")
+        .attr("transform", (d) => `translate(${d.x0},${d.y0})`);
 
-    // Add rectangles
-    leaves.append("rect")
-      .attr("width", d => d.x1 - d.x0)
-      .attr("height", d => d.y1 - d.y0)
-      .attr("fill", d => {
-        const category = showSubcategories ? d.data.category : d.data.name;
-        return colorScale(category);
-      })
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1)
-      .attr("opacity", 0.8)
-      .style("cursor", "pointer")
-      .on("mouseover", function(event, d) {
-        d3.select(this).attr("opacity", 1);
-        const displayName = showSubcategories ? d.data.fullName : d.data.name;
-        tooltip.style("visibility", "visible")
-          .html(`
+      // Add rectangles
+      leaves
+        .append("rect")
+        .attr("width", (d) => d.x1 - d.x0)
+        .attr("height", (d) => d.y1 - d.y0)
+        .attr("fill", (d) => {
+          const category = showSubcategories ? d.data.category : d.data.name;
+          return colorScale(category);
+        })
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1)
+        .attr("opacity", 0.8)
+        .style("cursor", "pointer")
+        .on("mouseover", function (event, d) {
+          d3.select(this).attr("opacity", 1);
+          const displayName = showSubcategories ? d.data.fullName : d.data.name;
+          tooltip.style("visibility", "visible").html(`
             <strong>${displayName}</strong><br/>
             Amount: ${formatCurrency(d.data.value)}<br/>
             ${((d.data.value / root.value) * 100).toFixed(1)}% of total
           `);
-      })
-      .on("mousemove", function(event) {
-        tooltip.style("top", (event.pageY - 10) + "px")
-          .style("left", (event.pageX + 10) + "px");
-      })
-      .on("mouseout", function() {
-        d3.select(this).attr("opacity", 0.8);
-        tooltip.style("visibility", "hidden");
-      });
-
-    // Add text labels
-    leaves.append("text")
-      .attr("x", 4)
-      .attr("y", 14)
-      .attr("font-family", "Arial, sans-serif")
-      .attr("font-size", d => {
-        const rectWidth = d.x1 - d.x0;
-        const rectHeight = d.y1 - d.y0;
-        const area = rectWidth * rectHeight;
-        if (area < 1000) {return "0px";} // Hide text for very small rectangles
-        if (area < 3000) {return "10px";}
-        if (area < 6000) {return "11px";}
-        return "12px";
-      })
-      .attr("font-weight", "bold")
-      .attr("fill", "white")
-      .attr("text-shadow", "1px 1px 2px rgba(0,0,0,0.7)")
-      .style("pointer-events", "none")
-      .each(function(d) {
-        const text = d3.select(this);
-        const rectWidth = d.x1 - d.x0;
-        const rectHeight = d.y1 - d.y0;
-        
-        if (rectWidth < 50 || rectHeight < 30) {
-          return; // Don't add text for very small rectangles
-        }
-
-        const lines = [];
-        
-        let displayName;
-        if (showSubcategories) {
-          displayName = d.data.name.length > 15 ? `${d.data.name.substring(0, 12)}...` : d.data.name;
-        } else {
-          displayName = d.data.name.length > 20 ? `${d.data.name.substring(0, 17)}...` : d.data.name;
-        }
-        
-        lines.push(displayName);
-        
-        if (rectHeight > 50) {
-          lines.push(formatCurrency(d.data.value));
-        }
-
-        lines.forEach((line, i) => {
-          text.append("tspan")
-            .attr("x", 4)
-            .attr("dy", i === 0 ? 0 : "1.2em")
-            .attr("font-size", i === 0 ? "12px" : "10px")
-            .attr("font-weight", i === 0 ? "bold" : "normal")
-            .text(line);
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .style("top", event.pageY - 10 + "px")
+            .style("left", event.pageX + 10 + "px");
+        })
+        .on("mouseout", function () {
+          d3.select(this).attr("opacity", 0.8);
+          tooltip.style("visibility", "hidden");
         });
-      });
 
-    // Cleanup tooltip on component unmount
-    return () => {
-      tooltip.remove();
-    };
+      // Add text labels
+      leaves
+        .append("text")
+        .attr("x", 4)
+        .attr("y", 14)
+        .attr("font-family", "Arial, sans-serif")
+        .attr("font-size", (d) => {
+          const rectWidth = d.x1 - d.x0;
+          const rectHeight = d.y1 - d.y0;
+          const area = rectWidth * rectHeight;
+          if (area < 1000) {
+            return "0px";
+          } // Hide text for very small rectangles
+          if (area < 3000) {
+            return "10px";
+          }
+          if (area < 6000) {
+            return "11px";
+          }
+          return "12px";
+        })
+        .attr("font-weight", "bold")
+        .attr("fill", "white")
+        .attr("text-shadow", "1px 1px 2px rgba(0,0,0,0.7)")
+        .style("pointer-events", "none")
+        .each(function (d) {
+          const text = d3.select(this);
+          const rectWidth = d.x1 - d.x0;
+          const rectHeight = d.y1 - d.y0;
+
+          if (rectWidth < 50 || rectHeight < 30) {
+            return; // Don't add text for very small rectangles
+          }
+
+          const lines = [];
+
+          let displayName;
+          if (showSubcategories) {
+            displayName =
+              d.data.name.length > 15
+                ? `${d.data.name.substring(0, 12)}...`
+                : d.data.name;
+          } else {
+            displayName =
+              d.data.name.length > 20
+                ? `${d.data.name.substring(0, 17)}...`
+                : d.data.name;
+          }
+
+          lines.push(displayName);
+
+          if (rectHeight > 50) {
+            lines.push(formatCurrency(d.data.value));
+          }
+
+          lines.forEach((line, i) => {
+            text
+              .append("tspan")
+              .attr("x", 4)
+              .attr("dy", i === 0 ? 0 : "1.2em")
+              .attr("font-size", i === 0 ? "12px" : "10px")
+              .attr("font-weight", i === 0 ? "bold" : "normal")
+              .text(line);
+          });
+        });
+
+      // Cleanup tooltip on component unmount
+      return () => {
+        tooltip.remove();
+      };
     };
 
     // Initial render
@@ -331,7 +400,6 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
     return () => {
       resizeObserver.disconnect();
     };
-
   }, [treemapData, colorScale, showSubcategories]);
 
   // Sync external ref
@@ -344,18 +412,21 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
   return (
     <div className="lg:col-span-2 bg-gray-800 p-6 rounded-2xl shadow-lg h-[600px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">Expense Breakdown Treemap</h3>
+        <h3 className="text-xl font-semibold text-white">
+          Expense Breakdown Treemap
+        </h3>
         <button
           onClick={() => {
             if (chartRef?.current) {
               const svgElement = chartRef.current;
               const serializer = new XMLSerializer();
               const svgString = serializer.serializeToString(svgElement);
-              const blob = new Blob([svgString], { type: 'image/svg+xml' });
+              const blob = new Blob([svgString], { type: "image/svg+xml" });
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
               const fileName = `expense-treemap-${viewMode}-${currentYear}`;
-              const monthSuffix = viewMode === "month" ? `-${currentMonth}` : "";
+              const monthSuffix =
+                viewMode === "month" ? `-${currentMonth}` : "";
               link.download = fileName + monthSuffix + ".svg";
               link.href = url;
               link.click();
@@ -393,7 +464,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
             <option value="year">Yearly View</option>
             <option value="all-time">All Time</option>
           </select>
-          
+
           <label className="flex items-center text-white text-sm">
             <input
               type="checkbox"
@@ -425,8 +496,12 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
 
           <div className="text-white font-semibold min-w-[120px] text-center text-sm">
             {(() => {
-              if (viewMode === "all-time") {return "All Time";}
-              if (viewMode === "year") {return `${currentYear}`;}
+              if (viewMode === "all-time") {
+                return "All Time";
+              }
+              if (viewMode === "year") {
+                return `${currentYear}`;
+              }
               return `${monthNames[currentMonth - 1].substring(0, 3)} ${currentYear}`;
             })()}
           </div>
@@ -470,14 +545,15 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
           </div>
         )}
       </div>
-      
+
       <div className="mt-2 text-xs text-gray-600">
-        <p className="mb-1">Rectangle size = expense amount. Hover for details.</p>
+        <p className="mb-1">
+          Rectangle size = expense amount. Hover for details.
+        </p>
         <div className="text-xs text-gray-500">
-          {showSubcategories ? 
-            "Showing subcategories within main categories" : 
-            "Showing main expense categories only"
-          }
+          {showSubcategories
+            ? "Showing subcategories within main categories"
+            : "Showing main expense categories only"}
         </div>
       </div>
     </div>
@@ -486,7 +562,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
 
 TreemapChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object
+  chartRef: PropTypes.object,
 };
 
 export default TreemapChart;

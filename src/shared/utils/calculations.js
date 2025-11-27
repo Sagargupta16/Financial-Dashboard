@@ -814,3 +814,267 @@ export const calculateGoalProgress = (
     monthlyRequired: remaining / 12, // Amount needed per month to reach in 1 year
   };
 };
+
+// ============================================================================
+// FINANCIAL HEALTH SCORE CALCULATIONS
+// ============================================================================
+
+/**
+ * Calculate total from object or array
+ */
+export const calculateTotal = (data) => {
+  if (!data) {
+    return 0;
+  }
+
+  if (Array.isArray(data)) {
+    return data.reduce((sum, item) => {
+      const value =
+        typeof item === "object" ? item.balance || item.amount || 0 : item;
+      return sum + (parseFloat(value) || 0);
+    }, 0);
+  }
+
+  if (typeof data === "object") {
+    return Object.values(data).reduce(
+      (sum, val) => sum + (parseFloat(val) || 0),
+      0
+    );
+  }
+
+  return 0;
+};
+
+/**
+ * Calculate total liquid assets (bank balances only)
+ */
+export const calculateTotalLiquidAssets = (accountBalances) => {
+  let totalBalance = 0;
+
+  if (accountBalances && typeof accountBalances === "object") {
+    if (Array.isArray(accountBalances)) {
+      totalBalance = accountBalances.reduce(
+        (sum, acc) => sum + (parseFloat(acc.balance) || 0),
+        0
+      );
+    } else {
+      totalBalance = Object.values(accountBalances).reduce(
+        (sum, val) => sum + (parseFloat(val) || 0),
+        0
+      );
+    }
+  }
+
+  return totalBalance;
+};
+
+/**
+ * Calculate total investments
+ */
+export const calculateTotalInvestments = (investments = {}) => {
+  return calculateTotal(investments);
+};
+
+/**
+ * Calculate total deposits
+ */
+export const calculateTotalDeposits = (deposits = {}) => {
+  return calculateTotal(deposits);
+};
+
+/**
+ * Calculate total debt from account balances
+ */
+export const calculateTotalDebt = (accountBalances) => {
+  let totalDebt = 0;
+
+  if (accountBalances && typeof accountBalances === "object") {
+    const balances = Array.isArray(accountBalances)
+      ? accountBalances
+      : Object.entries(accountBalances).map(([name, balance]) => ({
+          name,
+          balance,
+        }));
+
+    balances.forEach(({ name, balance }) => {
+      const nameLower = (name || "").toLowerCase();
+      const balanceNum = parseFloat(balance) || 0;
+
+      // Negative balances = debt
+      if (balanceNum < 0) {
+        totalDebt += Math.abs(balanceNum);
+      }
+      // Positive credit card balances = debt owed
+      else if (balanceNum > 0 && nameLower.includes("credit card")) {
+        totalDebt += balanceNum;
+      }
+    });
+  }
+
+  return totalDebt;
+};
+
+/**
+ * Calculate savings rate percentage
+ */
+export const calculateSavingsRate = (savings, income) => {
+  const validIncome = parseFloat(income) || 0;
+  const validSavings = parseFloat(savings) || 0;
+  return validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
+};
+
+/**
+ * Calculate debt to income ratio
+ */
+export const calculateDebtToIncomeRatio = (debt, income) => {
+  const validIncome = parseFloat(income) || 0;
+  const validDebt = parseFloat(debt) || 0;
+  return validIncome > 0 ? (validDebt / validIncome) * 100 : 0;
+};
+
+/**
+ * Calculate emergency fund months covered
+ */
+export const calculateEmergencyFundMonths = (liquidAssets, monthlyExpenses) => {
+  const validLiquid = parseFloat(liquidAssets) || 0;
+  const validExpenses = parseFloat(monthlyExpenses) || 0;
+  return validExpenses > 0 ? validLiquid / validExpenses : 0;
+};
+
+/**
+ * Calculate income to expense ratio
+ */
+export const calculateIncomeExpenseRatio = (income, expenses) => {
+  const validIncome = parseFloat(income) || 0;
+  const validExpenses = parseFloat(expenses) || 0;
+  return validExpenses > 0 ? validIncome / validExpenses : 1;
+};
+
+// ============================================================================
+// FINANCIAL HEALTH SCORING FUNCTIONS
+// ============================================================================
+
+/**
+ * Score: Spending Consistency (0-15 points)
+ */
+export const scoreConsistency = (variance) => {
+  if (variance <= 15) {
+    return 15;
+  }
+  if (variance <= 25) {
+    return 12;
+  }
+  if (variance <= 35) {
+    return 8;
+  }
+  return 5;
+};
+
+/**
+ * Score: Emergency Fund (0-25 points)
+ */
+export const scoreEmergencyFund = (monthsCovered) => {
+  if (monthsCovered >= 6) {
+    return 25;
+  }
+  if (monthsCovered >= 3) {
+    return 20;
+  }
+  if (monthsCovered >= 1) {
+    return 10;
+  }
+  return 5;
+};
+
+/**
+ * Score: Income/Expense Ratio (0-15 points)
+ */
+export const scoreIncomeExpenseRatio = (ratio) => {
+  if (ratio >= 1.5) {
+    return 15;
+  }
+  if (ratio >= 1.2) {
+    return 12;
+  }
+  if (ratio >= 1.0) {
+    return 8;
+  }
+  return 3;
+};
+
+/**
+ * Score: Category Balance (0-10 points)
+ */
+export const scoreCategoryBalance = (maxCategoryPercent) => {
+  if (maxCategoryPercent <= 30) {
+    return 10;
+  }
+  if (maxCategoryPercent <= 40) {
+    return 7;
+  }
+  if (maxCategoryPercent <= 50) {
+    return 4;
+  }
+  return 2;
+};
+
+/**
+ * Score: Debt Management (0-10 points)
+ */
+export const scoreDebtManagement = (debtToIncomeRatio) => {
+  if (debtToIncomeRatio === 0) {
+    return 10;
+  }
+  if (debtToIncomeRatio <= 20) {
+    return 8;
+  }
+  if (debtToIncomeRatio <= 36) {
+    return 6;
+  }
+  if (debtToIncomeRatio <= 50) {
+    return 3;
+  }
+  return 0;
+};
+
+/**
+ * Score: Savings Rate (0-25 points)
+ * Dynamic calculation: 20% savings = full points
+ */
+export const scoreSavingsRate = (savingsRatePercent) => {
+  return Math.min(25, Math.round((savingsRatePercent / 20) * 25));
+};
+
+/**
+ * Get letter grade from score (0-100)
+ */
+export const getFinancialGrade = (score) => {
+  if (score >= 90) {
+    return "A+";
+  }
+  if (score >= 85) {
+    return "A";
+  }
+  if (score >= 80) {
+    return "A-";
+  }
+  if (score >= 75) {
+    return "B+";
+  }
+  if (score >= 70) {
+    return "B";
+  }
+  if (score >= 65) {
+    return "B-";
+  }
+  if (score >= 60) {
+    return "C+";
+  }
+  if (score >= 55) {
+    return "C";
+  }
+  if (score >= 50) {
+    return "C-";
+  }
+  return "D";
+};

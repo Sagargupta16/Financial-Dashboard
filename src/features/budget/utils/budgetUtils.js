@@ -3,6 +3,20 @@
  * Handles budget calculations, goal tracking, and localStorage persistence
  */
 
+// Import centralized calculation formulas
+import {
+  calculateTotalLiquidAssets,
+  calculateTotalInvestments,
+  calculateTotalDeposits,
+  calculateTotalDebt,
+  scoreConsistency,
+  scoreEmergencyFund,
+  scoreIncomeExpenseRatio,
+  scoreCategoryBalance,
+  scoreDebtManagement,
+  getFinancialGrade,
+} from "../../../shared/utils/calculations";
+
 // Storage keys for budget data
 const BUDGET_KEY = "financial_dashboard_budgets";
 const GOALS_KEY = "financial_dashboard_goals";
@@ -308,145 +322,28 @@ export const detectRecurringPayments = (transactions) => {
 };
 
 /**
- * Calculate savings rate score
+ * Calculate savings rate score (legacy - kept for reference)
+ * Now using dynamic calculation in calculateHealthScore
  */
-const calculateSavingsRateScore = (savingsRate) => {
-  if (savingsRate >= 20) {
-    return 30;
-  }
-  if (savingsRate >= 15) {
-    return 25;
-  }
-  if (savingsRate >= 10) {
-    return 20;
-  }
-  if (savingsRate >= 5) {
-    return 10;
-  }
-  return 5;
-};
+// const calculateSavingsRateScore = (savingsRate) => {
+//   if (savingsRate >= 20) return 30;
+//   if (savingsRate >= 15) return 25;
+//   if (savingsRate >= 10) return 20;
+//   if (savingsRate >= 5) return 10;
+//   return 5;
+// };
 
 /**
  * Calculate consistency score
  */
-const calculateConsistencyScore = (variance) => {
-  if (variance <= 15) {
-    return 20;
-  }
-  if (variance <= 25) {
-    return 15;
-  }
-  if (variance <= 35) {
-    return 10;
-  }
-  return 5;
-};
+// Note: All calculation and scoring functions now imported from shared/utils/calculations.js
+// Using imported functions directly with aliases for compatibility
 
-/**
- * Calculate emergency fund score
- */
-const calculateEmergencyFundScore = (monthsCovered) => {
-  if (monthsCovered >= 6) {
-    return 25;
-  }
-  if (monthsCovered >= 3) {
-    return 20;
-  }
-  if (monthsCovered >= 1) {
-    return 10;
-  }
-  return 5;
-};
-
-/**
- * Calculate ratio score
- */
-const calculateRatioScore = (ratio) => {
-  if (ratio >= 1.5) {
-    return 15;
-  }
-  if (ratio >= 1.2) {
-    return 12;
-  }
-  if (ratio >= 1.0) {
-    return 8;
-  }
-  return 3;
-};
-
-/**
- * Calculate category balance score
- */
-const calculateCategoryBalanceScore = (maxCategoryPercent) => {
-  if (maxCategoryPercent <= 30) {
-    return 10;
-  }
-  if (maxCategoryPercent <= 40) {
-    return 7;
-  }
-  if (maxCategoryPercent <= 50) {
-    return 4;
-  }
-  return 2;
-};
-
-/**
- * Calculate financial health score (0-100)
- */
-export const calculateHealthScore = (data) => {
-  const { income, expenses, savings, accountBalances } = data;
-
-  // Ensure we have valid numbers
-  const validIncome = parseFloat(income) || 0;
-  const validExpenses = parseFloat(expenses) || 0;
-  const validSavings = parseFloat(savings) || 0;
-
-  const metrics = {};
-
-  // 1. Savings Rate (0-30 points)
-  const savingsRate = validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
-  metrics.savingsRate = calculateSavingsRateScore(savingsRate);
-
-  // 2. Spending Consistency (0-20 points)
-  const variance = calculateSpendingVariance(validExpenses);
-  metrics.consistency = calculateConsistencyScore(variance);
-
-  // 3. Emergency Fund (0-25 points)
-  // Handle accountBalances which can be an object with account names as keys
-  let totalBalance = 0;
-  if (accountBalances && typeof accountBalances === "object") {
-    totalBalance = Object.values(accountBalances).reduce(
-      (sum, val) => sum + (parseFloat(val) || 0),
-      0
-    );
-  }
-  const monthlyExpenses = validExpenses;
-  const monthsCovered =
-    monthlyExpenses > 0 ? totalBalance / monthlyExpenses : 0;
-  metrics.emergencyFund = calculateEmergencyFundScore(monthsCovered);
-
-  // 4. Income/Expense Ratio (0-15 points)
-  const ratio = validExpenses > 0 ? validIncome / validExpenses : 1;
-  metrics.ratio = calculateRatioScore(ratio);
-
-  // 5. Category Balance (0-10 points)
-  const categorySpending = data.categorySpending || {};
-  const categoryPercentages = Object.values(categorySpending).map((amount) =>
-    validExpenses > 0 ? (amount / validExpenses) * 100 : 0
-  );
-  const maxCategoryPercent = Math.max(...categoryPercentages, 0);
-  metrics.categoryBalance = calculateCategoryBalanceScore(maxCategoryPercent);
-
-  const score = Object.values(metrics).reduce((sum, val) => sum + val, 0);
-
-  return {
-    score: Math.min(100, Math.round(score)),
-    metrics,
-    grade: getGrade(score),
-    savingsRate: savingsRate.toFixed(1),
-    monthsCovered: monthsCovered.toFixed(1),
-  };
-};
+const calculateConsistencyScore = scoreConsistency;
+const calculateEmergencyFundScore = scoreEmergencyFund;
+const calculateRatioScore = scoreIncomeExpenseRatio;
+const calculateCategoryBalanceScore = scoreCategoryBalance;
+const calculateDebtScore = scoreDebtManagement;
 
 /**
  * Calculate spending variance (coefficient of variation)
@@ -457,37 +354,116 @@ const calculateSpendingVariance = (_expenses) => {
 };
 
 /**
- * Get letter grade from score
+ * Calculate financial health score (0-100)
  */
-const getGrade = (score) => {
-  if (score >= 90) {
-    return "A+";
-  }
-  if (score >= 85) {
-    return "A";
-  }
-  if (score >= 80) {
-    return "A-";
-  }
-  if (score >= 75) {
-    return "B+";
-  }
-  if (score >= 70) {
-    return "B";
-  }
-  if (score >= 65) {
-    return "B-";
-  }
-  if (score >= 60) {
-    return "C+";
-  }
-  if (score >= 55) {
-    return "C";
-  }
-  if (score >= 50) {
-    return "C-";
-  }
-  return "D";
+export const calculateHealthScore = (data) => {
+  const {
+    income,
+    expenses,
+    savings,
+    accountBalances,
+    investments,
+    deposits,
+    // eslint-disable-next-line no-unused-vars
+    filteredData, // Kept for future use, not needed in current calculation
+  } = data;
+
+  // Debug logging
+  // eslint-disable-next-line no-console
+  console.log("calculateHealthScore - Input:", {
+    income,
+    expenses,
+    savings,
+    accountBalances,
+    investments,
+    deposits,
+  });
+
+  // Ensure we have valid numbers
+  const validIncome = parseFloat(income) || 0;
+  const validExpenses = parseFloat(expenses) || 0;
+  const validSavings = parseFloat(savings) || 0;
+
+  const metrics = {};
+  const details = {}; // Store calculation details for visualization
+
+  // Calculate total wealth for reference
+  const totalInvestments = calculateTotalInvestments(investments);
+  const totalDeposits = calculateTotalDeposits(deposits);
+  const totalLiquidAssets = calculateTotalLiquidAssets(accountBalances);
+
+  // Calculate debt (only current balances, not historical transactions)
+  const totalDebt = calculateTotalDebt(accountBalances);
+  const debtToIncomeRatio =
+    validIncome > 0 ? (totalDebt / validIncome) * 100 : 0;
+
+  // 1. Savings Rate (0-25 points) - Reduced from 30 to make room for debt
+  const savingsRate = validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
+  const savingsScore = Math.min(25, Math.round((savingsRate / 20) * 25)); // 20% savings = full points
+  metrics.savingsRate = savingsScore;
+  details.savingsRate = savingsRate;
+
+  // 2. Spending Consistency (0-15 points) - Reduced from 20
+  const variance = calculateSpendingVariance(validExpenses);
+  metrics.consistency = calculateConsistencyScore(variance);
+  details.consistency = variance;
+
+  // 3. Emergency Fund (0-25 points)
+  // Emergency fund should cover 6 months of expenses with liquid bank assets
+  const monthlyExpenses = validExpenses;
+  const monthsCovered =
+    monthlyExpenses > 0 ? totalLiquidAssets / monthlyExpenses : 0;
+  metrics.emergencyFund = calculateEmergencyFundScore(monthsCovered);
+  details.monthsCovered = monthsCovered;
+
+  // Debug emergency fund calculation
+  // eslint-disable-next-line no-console
+  console.log("Emergency Fund Calculation:", {
+    totalLiquidAssets,
+    monthlyExpenses,
+    monthsCovered,
+    emergencyFundScore: metrics.emergencyFund,
+  });
+
+  // 4. Income/Expense Ratio (0-15 points)
+  const ratio = validExpenses > 0 ? validIncome / validExpenses : 1;
+  metrics.ratio = calculateRatioScore(ratio);
+  details.ratio = ratio;
+
+  // 5. Category Balance (0-10 points)
+  const categorySpending = data.categorySpending || {};
+  const categoryPercentages = Object.values(categorySpending).map((amount) =>
+    validExpenses > 0 ? (amount / validExpenses) * 100 : 0
+  );
+  const maxCategoryPercent = Math.max(...categoryPercentages, 0);
+  metrics.categoryBalance = calculateCategoryBalanceScore(maxCategoryPercent);
+  details.maxCategoryPercent = maxCategoryPercent;
+
+  // 6. Debt Management (0-10 points) - NEW
+  metrics.debtManagement = calculateDebtScore(debtToIncomeRatio);
+  details.debtToIncomeRatio = debtToIncomeRatio;
+
+  const score = Object.values(metrics).reduce((sum, val) => sum + val, 0);
+
+  const result = {
+    score: Math.min(100, Math.round(score)),
+    metrics,
+    details, // Add calculation details
+    grade: getFinancialGrade(score),
+    savingsRate: details.savingsRate.toFixed(1),
+    monthsCovered: details.monthsCovered.toFixed(1),
+    totalLiquidAssets: totalLiquidAssets.toFixed(0),
+    emergencyFundAmount: totalLiquidAssets.toFixed(0),
+    totalInvestments: totalInvestments.toFixed(0),
+    totalDeposits: totalDeposits.toFixed(0),
+    totalDebt: totalDebt.toFixed(0),
+    debtToIncomeRatio: details.debtToIncomeRatio.toFixed(1),
+  };
+
+  // eslint-disable-next-line no-console
+  console.log("calculateHealthScore - Output:", result);
+
+  return result;
 };
 
 /**

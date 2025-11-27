@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,33 +12,13 @@ import {
   LineElement,
   TimeScale,
 } from "chart.js";
-import {
-  LayoutDashboard,
-  TrendingUp,
-  Tags,
-  LineChart,
-  Target,
-  Repeat,
-  Lightbulb,
-  Receipt,
-} from "lucide-react";
 
 // Components
 import { Header } from "./shared/components/layout/Header";
 import { Footer } from "./shared/components/layout/Footer";
 import { Tabs, TabContent } from "./shared/components/ui/Tabs";
-
-// Section Components
-import {
-  OverviewSection,
-  IncomeExpenseSection,
-  CategoryAnalysisSection,
-  TrendsForecastsSection,
-  PatternsSection,
-  CategoryInsightsSection,
-} from "./shared/components/sections";
-import { TransactionsSection } from "./features/transactions/components/TransactionsSection";
-import { BudgetGoalsSection } from "./features/budget/components/BudgetGoalsSection";
+import { LoadingSpinner } from "./shared/components/ui/Loading";
+import { SectionSkeleton } from "./shared/components/ui/SectionSkeleton";
 
 // Hooks
 import {
@@ -55,6 +35,44 @@ import { useChartData } from "./shared/hooks/useChartData";
 
 // Utils
 import { initialCsvData } from "./shared/utils/constants";
+import { lazyLoad } from "./shared/utils/lazyLoad";
+
+// Config
+import { TABS_CONFIG } from "./config/tabs.config";
+
+// Lazy load section components for better performance
+const OverviewSection = lazyLoad(
+  () => import("./shared/components/sections/OverviewSection"),
+  "OverviewSection"
+);
+const IncomeExpenseSection = lazyLoad(
+  () => import("./shared/components/sections/IncomeExpenseSection"),
+  "IncomeExpenseSection"
+);
+const CategoryAnalysisSection = lazyLoad(
+  () => import("./shared/components/sections/CategoryAnalysisSection"),
+  "CategoryAnalysisSection"
+);
+const TrendsForecastsSection = lazyLoad(
+  () => import("./shared/components/sections/TrendsForecastsSection"),
+  "TrendsForecastsSection"
+);
+const PatternsSection = lazyLoad(
+  () => import("./shared/components/sections/PatternsSection"),
+  "PatternsSection"
+);
+const CategoryInsightsSection = lazyLoad(
+  () => import("./shared/components/sections/CategoryInsightsSection"),
+  "CategoryInsightsSection"
+);
+const TransactionsSection = lazyLoad(
+  () => import("./features/transactions/components/TransactionsSection"),
+  "TransactionsSection"
+);
+const BudgetGoalsSection = lazyLoad(
+  () => import("./features/budget/components/BudgetGoalsSection"),
+  "BudgetGoalsSection"
+);
 
 // Register Chart.js components
 ChartJS.register(
@@ -70,7 +88,6 @@ ChartJS.register(
   TimeScale
 );
 
-// eslint-disable-next-line max-lines-per-function
 const App = () => {
   // State
   const [activeTab, setActiveTab] = useState("overview");
@@ -82,15 +99,16 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const transactionsPerPage = 25;
 
-  // Chart refs
+  // Chart refs for download functionality
   const chartRefs = {
     doughnut: useRef(null),
     bar: useRef(null),
-    line: useRef(null),
     incomeSources: useRef(null),
     spendingByAccount: useRef(null),
+    line: useRef(null),
     spendingByDay: useRef(null),
     subcategoryBreakdown: useRef(null),
+    treemap: useRef(null),
     enhancedSubcategoryBreakdown: useRef(null),
     multiCategoryTimeAnalysis: useRef(null),
     netWorth: useRef(null),
@@ -100,13 +118,13 @@ const App = () => {
     spendingForecast: useRef(null),
     accountBalanceProgression: useRef(null),
     dayWeekSpendingPatterns: useRef(null),
-    treemap: useRef(null),
   };
 
   // Custom hooks
   const { data, loading, error, handleFileUpload } =
     useDataProcessor(initialCsvData);
   const uniqueValues = useUniqueValues(data);
+
   // Default filters for data processing
   const defaultFilters = {
     searchTerm: "",
@@ -116,6 +134,7 @@ const App = () => {
     startDate: "",
     endDate: "",
   };
+
   const filteredData = useFilteredData(data, defaultFilters, sortConfig);
   const { kpiData, additionalKpiData } = useKPIData(filteredData);
   const keyInsights = useKeyInsights(filteredData, kpiData, additionalKpiData);
@@ -142,7 +161,7 @@ const App = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-        <p>Loading...</p>
+        <LoadingSpinner size="xl" message="Loading your financial data..." />
       </div>
     );
   }
@@ -154,128 +173,96 @@ const App = () => {
     );
   }
 
-  // Tab configuration
-  const tabs = [
-    {
-      id: "overview",
-      label: "Overview",
-      icon: LayoutDashboard,
-      description: "Quick snapshot of your financial health",
-    },
-    {
-      id: "income-expense",
-      label: "Income & Expenses",
-      icon: TrendingUp,
-      description: "Detailed income and spending analysis",
-    },
-    {
-      id: "categories",
-      label: "Categories",
-      icon: Tags,
-      description: "Deep dive into spending categories",
-    },
-    {
-      id: "trends",
-      label: "Trends & Forecasts",
-      icon: LineChart,
-      description: "Advanced analytics and predictions",
-    },
-    {
-      id: "budget-goals",
-      label: "Budget & Planning",
-      icon: Target,
-      description: "Financial health, budgets, and planning tools",
-    },
-    {
-      id: "patterns",
-      label: "Subscriptions & Patterns",
-      icon: Repeat,
-      description: "Recurring payments and spending patterns",
-    },
-    {
-      id: "category-insights",
-      label: "Category Insights",
-      icon: Lightbulb,
-      description: "Specialized analytics for specific categories",
-    },
-    {
-      id: "transactions",
-      label: "Transactions",
-      icon: Receipt,
-      description: "Detailed transaction list with filters",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black text-gray-300 font-sans p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto">
         <Header onFileUpload={handleFileUpload} />
 
         {/* Tab Navigation */}
-        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+        <Tabs
+          tabs={TABS_CONFIG}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Tab Content */}
         <TabContent isActive={activeTab === "overview"}>
-          <OverviewSection
-            kpiData={kpiData}
-            additionalKpiData={additionalKpiData}
-            accountBalances={accountBalances}
-            keyInsights={keyInsights}
-            filteredData={filteredData}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <OverviewSection
+              kpiData={kpiData}
+              additionalKpiData={additionalKpiData}
+              accountBalances={accountBalances}
+              keyInsights={keyInsights}
+              filteredData={filteredData}
+            />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "income-expense"}>
-          <IncomeExpenseSection
-            chartData={chartData}
-            chartRefs={chartRefs}
-            filteredData={filteredData}
-            uniqueValues={uniqueValues}
-            drilldownCategory={drilldownCategory}
-            setDrilldownCategory={setDrilldownCategory}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <IncomeExpenseSection
+              chartData={chartData}
+              chartRefs={chartRefs}
+              filteredData={filteredData}
+              uniqueValues={uniqueValues}
+              drilldownCategory={drilldownCategory}
+              setDrilldownCategory={setDrilldownCategory}
+            />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "categories"}>
-          <CategoryAnalysisSection
-            chartRefs={chartRefs}
-            filteredData={filteredData}
-            uniqueValues={uniqueValues}
-            drilldownCategory={drilldownCategory}
-            setDrilldownCategory={setDrilldownCategory}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <CategoryAnalysisSection
+              chartRefs={chartRefs}
+              filteredData={filteredData}
+              uniqueValues={uniqueValues}
+              drilldownCategory={drilldownCategory}
+              setDrilldownCategory={setDrilldownCategory}
+            />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "trends"}>
-          <TrendsForecastsSection
-            chartRefs={chartRefs}
-            filteredData={filteredData}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <TrendsForecastsSection
+              chartRefs={chartRefs}
+              filteredData={filteredData}
+            />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "budget-goals"}>
-          <BudgetGoalsSection
-            filteredData={filteredData}
-            kpiData={kpiData}
-            accountBalances={accountBalances}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <BudgetGoalsSection
+              filteredData={filteredData}
+              kpiData={kpiData}
+              accountBalances={accountBalances}
+            />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "patterns"}>
-          <PatternsSection filteredData={filteredData} />
+          <Suspense fallback={<SectionSkeleton />}>
+            <PatternsSection filteredData={filteredData} />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "category-insights"}>
-          <CategoryInsightsSection filteredData={filteredData} />
+          <Suspense fallback={<SectionSkeleton />}>
+            <CategoryInsightsSection filteredData={filteredData} />
+          </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "transactions"}>
-          <TransactionsSection
-            filteredData={filteredData}
-            handleSort={handleSort}
-            currentPage={currentPage}
-            transactionsPerPage={transactionsPerPage}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <TransactionsSection
+              filteredData={filteredData}
+              handleSort={handleSort}
+              currentPage={currentPage}
+              transactionsPerPage={transactionsPerPage}
+            />
+          </Suspense>
         </TabContent>
 
         <Footer />

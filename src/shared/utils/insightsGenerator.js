@@ -24,8 +24,7 @@ export const generateSmartInsights = (transactions) => {
       t.type === "Expense" &&
       (t.subcategory?.includes("Delivery") ||
         t.subcategory?.includes("Swiggy") ||
-        t.subcategory?.includes("Zomato") ||
-        t.subcategory?.includes("Zomoto"))
+        t.subcategory?.includes("Zomato"))
   );
 
   if (deliveryTransactions.length > 0) {
@@ -41,7 +40,7 @@ export const generateSmartInsights = (transactions) => {
         priority: "high",
         icon: "💰",
         title: "Delivery App Savings Potential",
-        message: `You order food ${ordersPerWeek.toFixed(1)}x/week (avg ₹${avgPerOrder.toFixed(0)}/order). Reducing by 30% could save ₹${savings.monthlySavings.toFixed(0)}/month (₹${savings.yearlySavings.toFixed(0)}/year)`,
+        message: `You order food ${ordersPerWeek.toFixed(1)} times per week (avg ₹${avgPerOrder.toFixed(0)} per order). Reducing by 30% could save ₹${savings.monthlySavings.toFixed(0)} per month (₹${savings.yearlySavings.toFixed(0)} per year)`,
         actionable: true,
         category: "Food",
       });
@@ -75,7 +74,7 @@ export const generateSmartInsights = (transactions) => {
         priority: "medium",
         icon: "📊",
         title: "Weekend Spending Pattern",
-        message: `You spend ${((avgWeekend / avgWeekday - 1) * 100).toFixed(0)}% more on weekends (₹${avgWeekend.toFixed(0)}/day) vs weekdays (₹${avgWeekday.toFixed(0)}/day)`,
+        message: `You spend ${((avgWeekend / avgWeekday - 1) * 100).toFixed(0)}% more on weekends (₹${avgWeekend.toFixed(0)} per day) compared to weekdays (₹${avgWeekday.toFixed(0)} per day)`,
         actionable: false,
       });
     }
@@ -132,7 +131,7 @@ export const generateSmartInsights = (transactions) => {
         priority: "low",
         icon: "🔄",
         title: "High-Frequency Category",
-        message: `You make ${topCategory[1]} transactions in ${topCategory[0]} (${(frequency * 7).toFixed(1)}x/week on average)`,
+        message: `You make ${topCategory[1]} transactions in ${topCategory[0]} (${(frequency * 7).toFixed(1)} times per week on average)`,
         actionable: false,
         category: topCategory[0],
       });
@@ -164,7 +163,7 @@ export const generateSmartInsights = (transactions) => {
         priority: "medium",
         icon: "🍱",
         title: "Pack Lunch Savings",
-        message: `You eat at office cafeteria ${perDay.toFixed(2)}x/day (avg ₹${avgAmount.toFixed(0)}/meal). Packing lunch 50% of the time could save ₹${packLunchSavings.monthlySavings.toFixed(0)}/month`,
+        message: `You eat at the office cafeteria ${perDay.toFixed(1)} times per day (avg ₹${avgAmount.toFixed(0)} per meal). Packing lunch 50% of the time could save ₹${packLunchSavings.monthlySavings.toFixed(0)} per month`,
         actionable: true,
         category: "Food",
       });

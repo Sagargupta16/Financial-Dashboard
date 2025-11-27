@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import PropTypes from "prop-types";
 
 const DataContext = createContext();
@@ -24,17 +30,29 @@ export const DataProvider = ({ children }) => {
     setError(null);
   }, []);
 
-  const value = {
-    transactions,
-    updateTransactions,
-    dateRange,
-    updateDateRange,
-    loading,
-    setLoading,
-    error,
-    setError,
-    clearError,
-  };
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(
+    () => ({
+      transactions,
+      updateTransactions,
+      dateRange,
+      updateDateRange,
+      loading,
+      setLoading,
+      error,
+      setError,
+      clearError,
+    }),
+    [
+      transactions,
+      updateTransactions,
+      dateRange,
+      updateDateRange,
+      loading,
+      error,
+      clearError,
+    ]
+  );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };

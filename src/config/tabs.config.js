@@ -1,0 +1,66 @@
+/**
+ * Tab Configuration
+ * Centralized tab definitions for the application
+ */
+
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Tags,
+  LineChart,
+  Target,
+  Repeat,
+  Lightbulb,
+  Receipt,
+} from "lucide-react";
+
+export const TABS_CONFIG = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: LayoutDashboard,
+    description: "Quick snapshot of your financial health",
+  },
+  {
+    id: "income-expense",
+    label: "Income & Expenses",
+    icon: TrendingUp,
+    description: "Detailed income and spending analysis",
+  },
+  {
+    id: "categories",
+    label: "Categories",
+    icon: Tags,
+    description: "Deep dive into spending categories",
+  },
+  {
+    id: "trends",
+    label: "Trends & Forecasts",
+    icon: LineChart,
+    description: "Advanced analytics and predictions",
+  },
+  {
+    id: "budget-goals",
+    label: "Budget & Planning",
+    icon: Target,
+    description: "Financial health, budgets, and planning tools",
+  },
+  {
+    id: "patterns",
+    label: "Subscriptions & Patterns",
+    icon: Repeat,
+    description: "Recurring payments and spending patterns",
+  },
+  {
+    id: "category-insights",
+    label: "Category Insights",
+    icon: Lightbulb,
+    description: "Specialized analytics for specific categories",
+  },
+  {
+    id: "transactions",
+    label: "Transactions",
+    icon: Receipt,
+    description: "Detailed transaction list with filters",
+  },
+];

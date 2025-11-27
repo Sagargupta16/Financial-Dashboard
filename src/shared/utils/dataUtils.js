@@ -37,7 +37,7 @@ export const parseDate = (dateString, timeString) => {
     dateParts[1],
     timeParts[1],
     timeParts[2],
-    timeParts[3],
+    timeParts[3]
   );
   // Check if date is valid
   if (isNaN(date.getTime())) {

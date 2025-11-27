@@ -190,7 +190,7 @@ export const groupDataByMonth = (data) => {
 
     const date = new Date(item.date);
     const monthKey = `${date.getFullYear()}-${String(
-      date.getMonth() + 1,
+      date.getMonth() + 1
     ).padStart(2, "0")}`;
 
     if (!acc[monthKey]) {

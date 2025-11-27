@@ -67,7 +67,8 @@ export const calculateMonthlyCommuteProjection = (commuteData) => {
  * Calculate alternative commute options
  */
 export const calculateCommuteAlternatives = (commuteData) => {
-  const monthlySpending = (commuteData.total / 30) * 30; // Normalize to 30 days
+  const days = commuteData.dateRange?.days || 30;
+  const monthlySpending = calculateMonthlyAverage(commuteData.total, days);
 
   const alternatives = [
     {

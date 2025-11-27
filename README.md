@@ -166,8 +166,10 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 
 ### Prerequisites
 
-- Node.js 20.x or 22.x
-- npm or yarn
+- Node.js 20.x or higher
+- pnpm 9.x or higher (recommended) or npm
+
+> **Note**: This project uses pnpm for faster installs and better disk space usage. Install pnpm: `npm install -g pnpm`
 
 ### Installation
 
@@ -181,13 +183,13 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 2. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Start the development server**
 
    ```bash
-   npm start
+   pnpm start
    ```
 
 4. **Open your browser**
@@ -311,16 +313,16 @@ src/
 ### Development
 
 ```bash
-npm start          # Start development server
-npm test           # Run test suite
-npm run build      # Build for production
-npm run eject      # Eject from Create React App (one-way operation)
+pnpm start          # Start development server
+pnpm test           # Run test suite
+pnpm build          # Build for production
+pnpm eject          # Eject from Create React App (one-way operation)
 ```
 
 ### Production Deployment
 
 ```bash
-npm run build      # Creates optimized production build in /build folder
+pnpm build      # Creates optimized production build in /build folder
 ```
 
 ## 🔧 Customization
@@ -433,9 +435,9 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 
 **Build Failures**
 
-- Run `npm install` to ensure all dependencies are installed
-- Check Node.js version compatibility
-- Clear npm cache: `npm cache clean --force`
+- Run `pnpm install` to ensure all dependencies are installed
+- Check Node.js version compatibility (>=20.0.0 required)
+- Clear pnpm cache: `pnpm store prune`
 
 ## 🤝 Contributing
 

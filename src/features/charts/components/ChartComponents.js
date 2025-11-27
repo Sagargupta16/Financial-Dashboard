@@ -848,7 +848,6 @@ export const EnhancedSubcategoryBreakdownChart = ({
               }
               return `${monthNames[currentMonth - 1]} ${currentYear}`;
             })()}
-            : `${monthNames[currentMonth - 1]} ${currentYear}`}
           </div>
 
           <button

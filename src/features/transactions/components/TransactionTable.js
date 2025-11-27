@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { formatCurrency } from "../../../shared/utils/dataUtils";
+import { useDebouncedValue } from "../../../shared/hooks/useDebouncedValue";
 
 // Helper functions for styling
 const getTypeStyles = (type) => {
@@ -98,6 +99,10 @@ export const EnhancedTransactionTable = ({
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
+  // Debounce search and filter values to reduce re-renders
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+  const debouncedFilters = useDebouncedValue(filters, 300);
+
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
     return {
@@ -121,8 +126,8 @@ export const EnhancedTransactionTable = ({
     let filtered = data;
 
     // Apply search term across multiple fields
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (item) =>
           (item.account || "").toLowerCase().includes(searchLower) ||
@@ -135,8 +140,8 @@ export const EnhancedTransactionTable = ({
     }
 
     // Apply individual filters
-    if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
+    if (debouncedFilters.dateFrom) {
+      const fromDate = new Date(debouncedFilters.dateFrom);
       filtered = filtered.filter((item) => {
         const itemDate =
           item.date instanceof Date ? item.date : new Date(item.date);
@@ -144,8 +149,8 @@ export const EnhancedTransactionTable = ({
       });
     }
 
-    if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
+    if (debouncedFilters.dateTo) {
+      const toDate = new Date(debouncedFilters.dateTo);
       toDate.setHours(23, 59, 59, 999); // End of day
       filtered = filtered.filter((item) => {
         const itemDate =
@@ -154,47 +159,63 @@ export const EnhancedTransactionTable = ({
       });
     }
 
-    if (filters.amountMin !== "") {
-      const minAmount = parseFloat(filters.amountMin);
+    if (debouncedFilters.amountMin !== "") {
+      const minAmount = parseFloat(debouncedFilters.amountMin);
       if (!isNaN(minAmount)) {
         filtered = filtered.filter((item) => item.amount >= minAmount);
       }
     }
 
-    if (filters.amountMax !== "") {
-      const maxAmount = parseFloat(filters.amountMax);
+    if (debouncedFilters.amountMax !== "") {
+      const maxAmount = parseFloat(debouncedFilters.amountMax);
       if (!isNaN(maxAmount)) {
         filtered = filtered.filter((item) => item.amount <= maxAmount);
       }
     }
 
-    if (filters.account) {
-      filtered = filtered.filter((item) => item.account === filters.account);
-    }
-
-    if (filters.category) {
-      filtered = filtered.filter((item) => item.category === filters.category);
-    }
-
-    if (filters.subcategory) {
+    if (debouncedFilters.account) {
       filtered = filtered.filter(
-        (item) => item.subcategory === filters.subcategory
+        (item) => item.account === debouncedFilters.account
       );
     }
 
-    if (filters.type) {
-      filtered = filtered.filter((item) => item.type === filters.type);
+    if (debouncedFilters.category) {
+      filtered = filtered.filter(
+        (item) => item.category === debouncedFilters.category
+      );
     }
 
-    if (filters.note) {
-      const noteLower = filters.note.toLowerCase();
+    if (debouncedFilters.subcategory) {
+      filtered = filtered.filter(
+        (item) => item.subcategory === debouncedFilters.subcategory
+      );
+    }
+
+    if (debouncedFilters.type) {
+      filtered = filtered.filter((item) => item.type === debouncedFilters.type);
+    }
+
+    if (debouncedFilters.note) {
+      const noteLower = debouncedFilters.note.toLowerCase();
       filtered = filtered.filter((item) =>
         (item.note || "").toLowerCase().includes(noteLower)
       );
     }
 
     return filtered;
-  }, [data, searchTerm, filters]);
+  }, [
+    data,
+    debouncedSearchTerm,
+    debouncedFilters.dateFrom,
+    debouncedFilters.dateTo,
+    debouncedFilters.amountMin,
+    debouncedFilters.amountMax,
+    debouncedFilters.account,
+    debouncedFilters.category,
+    debouncedFilters.subcategory,
+    debouncedFilters.type,
+    debouncedFilters.note,
+  ]);
 
   // Add running balance to filtered data
   const dataWithBalance = useMemo(() => {
@@ -210,7 +231,7 @@ export const EnhancedTransactionTable = ({
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filters]);
+  }, [debouncedSearchTerm, debouncedFilters]);
 
   // Count active filters
   useEffect(() => {
@@ -318,12 +339,16 @@ export const EnhancedTransactionTable = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {/* Date Range */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-date-from"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <Calendar size={14} />
                   Date From
                 </label>
                 <div className="relative">
                   <input
+                    id="filter-date-from"
                     type="date"
                     value={filters.dateFrom}
                     onChange={(e) =>
@@ -343,12 +368,16 @@ export const EnhancedTransactionTable = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-date-to"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <Calendar size={14} />
                   Date To
                 </label>
                 <div className="relative">
                   <input
+                    id="filter-date-to"
                     type="date"
                     value={filters.dateTo}
                     onChange={(e) =>
@@ -369,12 +398,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Amount Range */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-amount-min"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <DollarSign size={14} />
                   Min Amount
                 </label>
                 <div className="relative">
                   <input
+                    id="filter-amount-min"
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -396,12 +429,16 @@ export const EnhancedTransactionTable = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-amount-max"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <DollarSign size={14} />
                   Max Amount
                 </label>
                 <div className="relative">
                   <input
+                    id="filter-amount-max"
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -424,12 +461,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Account Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-account"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <CreditCard size={14} />
                   Account
                 </label>
                 <div className="relative">
                   <select
+                    id="filter-account"
                     value={filters.account}
                     onChange={(e) =>
                       handleFilterChange("account", e.target.value)
@@ -456,12 +497,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Category Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-category"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <Tag size={14} />
                   Category
                 </label>
                 <div className="relative">
                   <select
+                    id="filter-category"
                     value={filters.category}
                     onChange={(e) =>
                       handleFilterChange("category", e.target.value)
@@ -488,12 +533,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Subcategory Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-subcategory"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <Tag size={14} />
                   Subcategory
                 </label>
                 <div className="relative">
                   <select
+                    id="filter-subcategory"
                     value={filters.subcategory}
                     onChange={(e) =>
                       handleFilterChange("subcategory", e.target.value)
@@ -520,12 +569,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Type Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-type"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <Settings size={14} />
                   Type
                 </label>
                 <div className="relative">
                   <select
+                    id="filter-type"
                     value={filters.type}
                     onChange={(e) => handleFilterChange("type", e.target.value)}
                     className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -550,12 +603,16 @@ export const EnhancedTransactionTable = ({
 
               {/* Note Filter */}
               <div className="space-y-2 md:col-span-2 lg:col-span-1 xl:col-span-2">
-                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <label
+                  htmlFor="filter-note"
+                  className="text-sm font-medium text-gray-300 flex items-center gap-2"
+                >
                   <FileText size={14} />
                   Note Contains
                 </label>
                 <div className="relative">
                   <input
+                    id="filter-note"
                     type="text"
                     placeholder="Search in notes..."
                     value={filters.note}

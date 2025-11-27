@@ -141,7 +141,7 @@ export const useChartDataProcessor = (data, options = {}) => {
     // Filter out in-pocket if needed
     if (excludeInPocket) {
       processedData = processedData.filter(
-        (item) => item.category !== "In-pocket",
+        (item) => item.category !== "In-pocket"
       );
     }
 
@@ -168,7 +168,7 @@ export const useChartDataProcessor = (data, options = {}) => {
       sortedData.sort(([, a], [, b]) => (sortOrder === "desc" ? b - a : a - b));
     } else if (sortBy === "name") {
       sortedData.sort(([a], [b]) =>
-        sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b),
+        sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b)
       );
     }
 
@@ -277,7 +277,7 @@ export const useTrendAnalysis = (data, _period = "month") => {
 export const useForecastData = (
   historicalData,
   forecastPeriods = 6,
-  method = "linear",
+  method = "linear"
 ) => {
   return useMemo(() => {
     const monthlyData = groupDataByMonth(historicalData);
@@ -304,11 +304,11 @@ export const useForecastData = (
       const sumY = recentData.reduce((sum, val) => sum + val, 0);
       const sumXY = recentData.reduce(
         (sum, val, index) => sum + index * val,
-        0,
+        0
       );
       const sumXX = recentData.reduce(
         (sum, _, index) => sum + index * index,
-        0,
+        0
       );
 
       const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);

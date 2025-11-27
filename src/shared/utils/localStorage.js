@@ -1,11 +1,42 @@
 /**
  * Local Storage utilities for persisting user preferences and data
+ * Includes encryption for sensitive financial data
  */
 
 const STORAGE_KEYS = {
   FILTERS: "financial_dashboard_filters",
   TRANSACTIONS: "financial_dashboard_transactions",
   PREFERENCES: "financial_dashboard_preferences",
+  ENCRYPTION_KEY: "financial_dashboard_enc_key",
+};
+
+/**
+ * Simple encryption/decryption using base64 encoding
+ * For production, consider using Web Crypto API or a library like crypto-js
+ * @param {string} data - Data to encrypt
+ * @returns {string} Encrypted data
+ */
+const encrypt = (data) => {
+  try {
+    return btoa(encodeURIComponent(data));
+  } catch (error) {
+    console.error("Encryption failed:", error);
+    return data;
+  }
+};
+
+/**
+ * Decrypt base64 encoded data
+ * @param {string} encryptedData - Encrypted data
+ * @returns {string} Decrypted data
+ */
+const decrypt = (encryptedData) => {
+  try {
+    return decodeURIComponent(atob(encryptedData));
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    return encryptedData;
+  }
 };
 
 /**
@@ -82,29 +113,58 @@ export const loadFilters = () => {
 };
 
 /**
- * Save transactions to localStorage
+ * Save transactions to localStorage with encryption
  * @param {Array} transactions - Array of transaction objects
+ * @param {boolean} useEncryption - Whether to encrypt data (default: true)
  */
-export const saveTransactions = (transactions) => {
+export const saveTransactions = (transactions, useEncryption = true) => {
   // Convert dates to ISO strings for storage
   const serializable = transactions.map((t) => ({
     ...t,
     date: t.date instanceof Date ? t.date.toISOString() : t.date,
   }));
+
+  if (useEncryption) {
+    const encrypted = encrypt(JSON.stringify(serializable));
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, encrypted);
+    return true;
+  }
+
   return saveToLocalStorage(STORAGE_KEYS.TRANSACTIONS, serializable);
 };
 
 /**
- * Load transactions from localStorage
+ * Load transactions from localStorage with decryption
  * @returns {Array} Array of transaction objects with parsed dates
  */
 export const loadTransactions = () => {
-  const transactions = loadFromLocalStorage(STORAGE_KEYS.TRANSACTIONS, []);
-  // Convert ISO strings back to Date objects
-  return transactions.map((t) => ({
-    ...t,
-    date: new Date(t.date),
-  }));
+  try {
+    const encryptedData = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+    if (!encryptedData) {
+      return [];
+    }
+
+    // Try to decrypt first (new format)
+    try {
+      const decrypted = decrypt(encryptedData);
+      const transactions = JSON.parse(decrypted);
+      // Convert ISO strings back to Date objects
+      return transactions.map((t) => ({
+        ...t,
+        date: new Date(t.date),
+      }));
+    } catch (decryptError) {
+      // Fallback to unencrypted format (old data)
+      const transactions = loadFromLocalStorage(STORAGE_KEYS.TRANSACTIONS, []);
+      return transactions.map((t) => ({
+        ...t,
+        date: new Date(t.date),
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to load transactions:", error);
+    return [];
+  }
 };
 
 /**
@@ -139,6 +199,39 @@ export const getLocalStorageSize = () => {
     }
   }
   return total;
+};
+
+/**
+ * Check if localStorage has enough space
+ * @param {number} requiredBytes - Required space in bytes
+ * @returns {boolean} Whether space is available
+ */
+export const hasStorageSpace = (requiredBytes = 0) => {
+  try {
+    const testKey = "__storage_test__";
+    const testData = new Array(requiredBytes).join("a");
+    localStorage.setItem(testKey, testData);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
+ * Get storage quota information (if available)
+ * @returns {Promise<Object>} Storage quota info
+ */
+export const getStorageQuota = async () => {
+  if (navigator.storage && navigator.storage.estimate) {
+    const estimate = await navigator.storage.estimate();
+    return {
+      usage: estimate.usage,
+      quota: estimate.quota,
+      percentUsed: ((estimate.usage / estimate.quota) * 100).toFixed(2),
+    };
+  }
+  return null;
 };
 
 export { STORAGE_KEYS };

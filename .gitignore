@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# pnpm
+.pnpm-store
+pnpm-debug.log*
+
 # testing
 /coverage
 

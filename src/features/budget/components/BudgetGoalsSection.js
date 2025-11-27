@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { SpendingSimulator } from "./SpendingSimulator";
 import { FinancialHealthScore } from "../../../shared/components/ui/FinancialHealthScore";
@@ -13,6 +13,70 @@ export const BudgetGoalsSection = ({
   kpiData,
   accountBalances,
 }) => {
+  // Extract investments and deposits from accountBalances (uploaded Excel data)
+  const { investments, deposits, bankAccounts } = useMemo(() => {
+    const investmentAccounts = {};
+    const depositAccounts = {};
+    const bankOnly = {};
+
+    // eslint-disable-next-line no-console
+    console.log("BudgetGoalsSection - accountBalances:", accountBalances);
+
+    if (accountBalances && typeof accountBalances === "object") {
+      // Handle array format: [{name, balance}]
+      const entries = Array.isArray(accountBalances)
+        ? accountBalances.map((acc) => [acc.name, acc.balance])
+        : Object.entries(accountBalances);
+
+      entries.forEach(([name, balance]) => {
+        const nameLower = name.toLowerCase();
+
+        // Classify as investments (mutual funds, stocks)
+        if (
+          (nameLower.includes("mutual") ||
+            nameLower.includes("stock") ||
+            nameLower.includes("equity") ||
+            nameLower.includes("fund")) &&
+          !nameLower.includes("fam") &&
+          !nameLower.includes("friend")
+        ) {
+          investmentAccounts[name] = balance;
+        }
+        // Classify as deposits (FD, RD, landed property, loans - fam/friend/flat)
+        else if (
+          nameLower.includes("fd") ||
+          nameLower.includes("deposit") ||
+          nameLower.includes("land") ||
+          nameLower.includes("property") ||
+          nameLower.includes("rd") ||
+          nameLower.includes("loan") ||
+          nameLower.includes("fam") ||
+          nameLower.includes("family") ||
+          nameLower.includes("friend") ||
+          nameLower.includes("flat")
+        ) {
+          depositAccounts[name] = balance;
+        }
+        // Everything else is liquid bank account (unless it's credit card debt)
+        else if (!nameLower.includes("credit card")) {
+          bankOnly[name] = balance;
+        }
+      });
+    }
+
+    // eslint-disable-next-line no-console
+    console.log("BudgetGoalsSection - Classified:", {
+      investments: investmentAccounts,
+      deposits: depositAccounts,
+      bankAccounts: bankOnly,
+    });
+
+    return {
+      investments: investmentAccounts,
+      deposits: depositAccounts,
+      bankAccounts: bankOnly,
+    };
+  }, [accountBalances]);
   return (
     <div className="space-y-8">
       {/* Section Header */}
@@ -30,7 +94,9 @@ export const BudgetGoalsSection = ({
         <FinancialHealthScore
           filteredData={filteredData}
           kpiData={kpiData}
-          accountBalances={accountBalances}
+          accountBalances={bankAccounts}
+          investments={investments}
+          deposits={deposits}
         />
       </div>
 

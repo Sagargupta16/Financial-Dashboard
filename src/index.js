@@ -2,13 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import ErrorBoundary from "./shared/components/ErrorBoundary";
+import EnhancedErrorBoundary from "./shared/components/EnhancedErrorBoundary";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <ErrorBoundary>
+    <EnhancedErrorBoundary>
       <App />
-    </ErrorBoundary>
+    </EnhancedErrorBoundary>
   </React.StrictMode>
 );

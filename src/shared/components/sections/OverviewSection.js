@@ -49,7 +49,7 @@ const filterTransactionsByTime = (transactions, year, month) => {
     const txYear = date.getFullYear();
     const txMonth = date.getMonth();
 
-    if (txYear !== parseInt(year)) {
+    if (txYear !== Number.parseInt(year, 10)) {
       return false;
     }
 
@@ -57,7 +57,7 @@ const filterTransactionsByTime = (transactions, year, month) => {
       return true;
     }
 
-    return txMonth === parseInt(month);
+    return txMonth === Number.parseInt(month, 10);
   });
 };
 

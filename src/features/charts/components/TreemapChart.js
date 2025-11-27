@@ -472,7 +472,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
               checked={showSubcategories}
               onChange={(e) => setShowSubcategories(e.target.checked)}
               className="mr-1"
-            />
+            />{" "}
             Subcategories
           </label>
         </div>

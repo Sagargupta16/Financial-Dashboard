@@ -3046,7 +3046,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         "Nov",
         "Dec",
       ];
-      return `${monthNames[parseInt(monthNum) - 1]} ${year}`;
+      return `${monthNames[Number.parseInt(monthNum, 10) - 1]} ${year}`;
     });
 
     const historicalIncome = historicalMonths
@@ -3061,7 +3061,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
       datasets: [
         {
           label: "Historical Net",
-          data: [...historicalNet, ...Array(forecastMonths).fill(null)],
+          data: [...historicalNet, ...new Array(forecastMonths).fill(null)],
           borderColor: "#10b981",
           backgroundColor: "rgba(16, 185, 129, 0.1)",
           borderWidth: 3,
@@ -3071,7 +3071,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         {
           label: "Forecast Net",
           data: [
-            ...Array(historicalNet.length).fill(null),
+            ...new Array(historicalNet.length).fill(null),
             ...forecastData.map((d) => d.net),
           ],
           borderColor: "#f59e0b",
@@ -3083,7 +3083,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         },
         {
           label: "Historical Income",
-          data: [...historicalIncome, ...Array(forecastMonths).fill(null)],
+          data: [...historicalIncome, ...new Array(forecastMonths).fill(null)],
           borderColor: "#3b82f6",
           backgroundColor: "rgba(59, 130, 246, 0.05)",
           borderWidth: 2,
@@ -3093,7 +3093,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         {
           label: "Forecast Income",
           data: [
-            ...Array(historicalIncome.length).fill(null),
+            ...new Array(historicalIncome.length).fill(null),
             ...forecastData.map((d) => d.income),
           ],
           borderColor: "#60a5fa",
@@ -3114,7 +3114,9 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         <div className="flex items-center space-x-4">
           <select
             value={forecastMonths}
-            onChange={(e) => setForecastMonths(parseInt(e.target.value))}
+            onChange={(e) =>
+              setForecastMonths(Number.parseInt(e.target.value, 10))
+            }
             className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
           >
             <option value={3}>3 Months</option>
@@ -3260,17 +3262,17 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
     accounts.forEach((account) => {
       let runningBalance = 0;
       allMonths.forEach((month) => {
-        if (!accountData[account][month]) {
+        if (accountData[account][month]) {
+          runningBalance +=
+            accountData[account][month].income -
+            accountData[account][month].expense;
+          accountData[account][month].balance = runningBalance;
+        } else {
           accountData[account][month] = {
             income: 0,
             expense: 0,
             balance: runningBalance,
           };
-        } else {
-          runningBalance +=
-            accountData[account][month].income -
-            accountData[account][month].expense;
-          accountData[account][month].balance = runningBalance;
         }
       });
     });
@@ -3291,7 +3293,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         "Nov",
         "Dec",
       ];
-      return `${monthNames[parseInt(monthNum) - 1]} ${year}`;
+      return `${monthNames[Number.parseInt(monthNum, 10) - 1]} ${year}`;
     });
 
     const colors = [
@@ -3347,7 +3349,8 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
               : data.income - data.expense;
           })
           .filter(
-            (value) => value !== undefined && value !== null && !isNaN(value)
+            (value) =>
+              value !== undefined && value !== null && !Number.isNaN(value)
           );
 
         if (accountValues.length === 0) {
@@ -3361,36 +3364,36 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
 
       // Add total portfolio line dataset
       if (showAverage) {
-        datasets.push({
-          label: "Total Portfolio Value",
-          data: totalPortfolioData,
-          borderColor: "#fbbf24",
-          backgroundColor: "rgba(251, 191, 36, 0.1)",
-          borderWidth: 3,
-          borderDash: [8, 4],
-          fill: false,
-          tension: 0.3,
-          pointBackgroundColor: "#fbbf24",
-          pointBorderColor: "#fbbf24",
-          pointRadius: 3,
-          pointHoverRadius: 5,
-        });
-
-        // Add average line dataset
-        datasets.push({
-          label: "Average Account Balance",
-          data: averageData,
-          borderColor: "#ffffff",
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
-          borderWidth: 3,
-          borderDash: [12, 6],
-          fill: false,
-          tension: 0.3,
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#ffffff",
-          pointRadius: 3,
-          pointHoverRadius: 5,
-        });
+        datasets.push(
+          {
+            label: "Total Portfolio Value",
+            data: totalPortfolioData,
+            borderColor: "#fbbf24",
+            backgroundColor: "rgba(251, 191, 36, 0.1)",
+            borderWidth: 3,
+            borderDash: [8, 4],
+            fill: false,
+            tension: 0.3,
+            pointBackgroundColor: "#fbbf24",
+            pointBorderColor: "#fbbf24",
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          },
+          {
+            label: "Average Account Balance",
+            data: averageData,
+            borderColor: "#ffffff",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            borderWidth: 3,
+            borderDash: [12, 6],
+            fill: false,
+            tension: 0.3,
+            pointBackgroundColor: "#ffffff",
+            pointBorderColor: "#ffffff",
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          }
+        );
       }
 
       return { labels, datasets };
@@ -3590,7 +3593,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         "Friday",
         "Saturday",
       ];
-      const weekData = Array(7)
+      const weekData = new Array(7)
         .fill(0)
         .map(() => ({ expense: 0, income: 0, count: 0 }));
 
@@ -3666,7 +3669,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         ],
       };
     } else {
-      const monthData = Array(31)
+      const monthData = new Array(31)
         .fill(0)
         .map(() => ({ expense: 0, income: 0, count: 0 }));
 
@@ -3690,40 +3693,34 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
 
       if (metricType === "expense") {
         data = monthData.map((d) => d.expense);
-        backgroundColors = Array(31)
-          .fill(0)
-          .map((_, index) => {
-            const maxValue = Math.max(...data.filter((v) => v > 0));
-            const intensity =
-              data[index] > 0
-                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-                : 0.1;
-            return `rgba(239, 68, 68, ${intensity})`;
-          });
+        backgroundColors = new Array(31).fill(0).map((_, index) => {
+          const maxValue = Math.max(...data.filter((v) => v > 0));
+          const intensity =
+            data[index] > 0
+              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+              : 0.1;
+          return `rgba(239, 68, 68, ${intensity})`;
+        });
       } else if (metricType === "income") {
         data = monthData.map((d) => d.income);
-        backgroundColors = Array(31)
-          .fill(0)
-          .map((_, index) => {
-            const maxValue = Math.max(...data.filter((v) => v > 0));
-            const intensity =
-              data[index] > 0
-                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-                : 0.1;
-            return `rgba(16, 185, 129, ${intensity})`;
-          });
+        backgroundColors = new Array(31).fill(0).map((_, index) => {
+          const maxValue = Math.max(...data.filter((v) => v > 0));
+          const intensity =
+            data[index] > 0
+              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+              : 0.1;
+          return `rgba(16, 185, 129, ${intensity})`;
+        });
       } else {
         data = monthData.map((d) => d.count);
-        backgroundColors = Array(31)
-          .fill(0)
-          .map((_, index) => {
-            const maxValue = Math.max(...data.filter((v) => v > 0));
-            const intensity =
-              data[index] > 0
-                ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-                : 0.1;
-            return `rgba(59, 130, 246, ${intensity})`;
-          });
+        backgroundColors = new Array(31).fill(0).map((_, index) => {
+          const maxValue = Math.max(...data.filter((v) => v > 0));
+          const intensity =
+            data[index] > 0
+              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
+              : 0.1;
+          return `rgba(59, 130, 246, ${intensity})`;
+        });
       }
 
       return {
@@ -3905,8 +3902,8 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
 
     const incomeData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
-      const amount = parseFloat(
-        (t.INR || t.Amount || "0").replace(/[â‚¹,$,]/g, "")
+      const amount = Number.parseFloat(
+        (t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, "")
       );
 
       return (
@@ -3918,8 +3915,8 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
 
     const expenseData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
-      const amount = parseFloat(
-        (t.INR || t.Amount || "0").replace(/[â‚¹,$,]/g, "")
+      const amount = Number.parseFloat(
+        (t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, "")
       );
 
       return (
@@ -3940,9 +3937,9 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       const account =
         transaction.Accounts || transaction.Account || "Other Income";
       const amount = Math.abs(
-        parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(
-            /[â‚¹,$,]/g,
+        Number.parseFloat(
+          (transaction.INR || transaction.Amount || "0").replaceAll(
+            /[₹,$]/g,
             ""
           )
         )
@@ -3956,9 +3953,9 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     const expensesByCategory = expenseData.reduce((acc, transaction) => {
       const category = transaction.Category || "Other Expenses";
       const amount = Math.abs(
-        parseFloat(
-          (transaction.INR || transaction.Amount || "0").replace(
-            /[â‚¹,$,]/g,
+        Number.parseFloat(
+          (transaction.INR || transaction.Amount || "0").replaceAll(
+            /[₹,$]/g,
             ""
           )
         )
@@ -4086,7 +4083,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       .map((row) => Object.values(row).join(","))
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
+    const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;

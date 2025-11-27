@@ -11,7 +11,7 @@ export const parseCurrency = (value) => {
   if (typeof value !== "string") {
     return 0;
   }
-  return Number.parseFloat(value.replace(/[₹,]/g, "")) || 0;
+  return Number.parseFloat(value.replaceAll(/[₹,]/g, "")) || 0;
 };
 
 /**
@@ -26,8 +26,10 @@ export const parseDate = (dateString, timeString) => {
   if (!dateString || !timeString) {
     return null;
   }
-  const dateParts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-  const timeParts = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
+  const dateRegex = /(\d{2})\/(\d{2})\/(\d{4})/;
+  const timeRegex = /(\d{2}):(\d{2}):(\d{2})/;
+  const dateParts = dateRegex.exec(dateString);
+  const timeParts = timeRegex.exec(timeString);
   if (!dateParts || !timeParts) {
     return null;
   }
@@ -40,7 +42,7 @@ export const parseDate = (dateString, timeString) => {
     timeParts[3]
   );
   // Check if date is valid
-  if (isNaN(date.getTime())) {
+  if (Number.isNaN(date.getTime())) {
     return null;
   }
   return date;

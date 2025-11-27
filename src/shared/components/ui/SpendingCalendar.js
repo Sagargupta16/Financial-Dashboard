@@ -109,7 +109,7 @@ export const SpendingCalendar = ({ filteredData }) => {
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
   };
 
-  const dates = Object.keys(dailySpending).sort();
+  const dates = Object.keys(dailySpending).sort((a, b) => a.localeCompare(b));
 
   return (
     <div>

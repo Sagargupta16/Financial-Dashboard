@@ -11,7 +11,7 @@ export const analyzeAccounts = (transactions) => {
 
   transactions.forEach((transaction) => {
     const account = transaction.account || "Unknown";
-    const amount = parseFloat(transaction.amount) || 0;
+    const amount = Number.parseFloat(transaction.amount) || 0;
     const isIncome = transaction.type === "Income";
 
     if (!accountMap[account]) {

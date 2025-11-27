@@ -31,7 +31,7 @@ export const RecurringPayments = ({ filteredData }) => {
 
   const getDaysUntil = (nextDate) => {
     const days = Math.ceil(
-      (new Date(nextDate) - new Date()) / (1000 * 60 * 60 * 24)
+      (new Date(nextDate) - Date.now()) / (1000 * 60 * 60 * 24)
     );
     if (days < 0) {
       return "Overdue";

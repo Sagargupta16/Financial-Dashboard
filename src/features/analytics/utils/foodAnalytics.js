@@ -44,7 +44,7 @@ export const analyzeFoodSpending = (transactions) => {
   };
 
   foodTransactions.forEach((transaction) => {
-    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
     const subcategory = transaction.subcategory || "";
 
     if (subcategory.includes("Office Cafeteria")) {

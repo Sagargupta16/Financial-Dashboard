@@ -78,7 +78,7 @@ export const FinancialHealthScore = ({
                 <div
                   className="h-full bg-gradient-to-r from-blue-600 to-purple-600"
                   style={{
-                    width: `${Math.min(100, (parseFloat(score?.savingsRate) || 0) * 5)}%`,
+                    width: `${Math.min(100, (Number.parseFloat(score?.savingsRate) || 0) * 5)}%`,
                   }}
                 />
               </div>

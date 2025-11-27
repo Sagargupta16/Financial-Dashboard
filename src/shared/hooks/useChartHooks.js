@@ -232,14 +232,16 @@ export const useMultipleFilters = (initialFilters = {}) => {
 export const useTrendAnalysis = (data, _period = "month") => {
   return useMemo(() => {
     const groupedData = groupDataByMonth(data);
-    const sortedMonths = Object.keys(groupedData).sort();
+    const sortedMonths = Object.keys(groupedData).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     if (sortedMonths.length < 2) {
       return { trend: "insufficient-data", change: 0, direction: "neutral" };
     }
 
-    const latest = groupedData[sortedMonths[sortedMonths.length - 1]];
-    const previous = groupedData[sortedMonths[sortedMonths.length - 2]];
+    const latest = groupedData[sortedMonths.at(-1)];
+    const previous = groupedData[sortedMonths.at(-2)];
 
     const change = ((latest.net - previous.net) / Math.abs(previous.net)) * 100;
 
@@ -281,7 +283,9 @@ export const useForecastData = (
 ) => {
   return useMemo(() => {
     const monthlyData = groupDataByMonth(historicalData);
-    const sortedMonths = Object.keys(monthlyData).sort();
+    const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     if (sortedMonths.length < 3) {
       return { forecast: [], confidence: "low" };
@@ -296,7 +300,7 @@ export const useForecastData = (
       // Simple moving average
       const average =
         recentData.reduce((sum, val) => sum + val, 0) / recentData.length;
-      forecast = Array(forecastPeriods).fill(average);
+      forecast = new Array(forecastPeriods).fill(average);
     } else if (method === "trend") {
       // Linear regression
       const n = recentData.length;

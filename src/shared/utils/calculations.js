@@ -13,7 +13,7 @@ export const calculateDateRange = (transactions) => {
 
   const dates = transactions
     .map((t) => new Date(t.date))
-    .filter((d) => !isNaN(d.getTime()));
+    .filter((d) => !Number.isNaN(d.getTime()));
 
   if (dates.length === 0) {
     return { days: 0, months: 0, years: 0 };
@@ -564,9 +564,7 @@ export const calculateDayOfMonthPattern = (transactions) => {
     return [];
   }
 
-  const byDay = Array(31)
-    .fill(0)
-    .map(() => ({ total: 0, count: 0 }));
+  const byDay = new Array(31).fill(0).map(() => ({ total: 0, count: 0 }));
 
   transactions
     .filter((t) => t.type === "Expense" && t.date)

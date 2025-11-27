@@ -91,7 +91,7 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
       "Friday",
       "Saturday",
     ];
-    const daySpending = Array(7).fill(0);
+    const daySpending = new Array(7).fill(0);
     const categoryCounts = {};
 
     filteredData.forEach((item) => {

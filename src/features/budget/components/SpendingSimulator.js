@@ -52,7 +52,7 @@ export const SpendingSimulator = ({ filteredData }) => {
   const handleAdjustmentChange = (category, value) => {
     setAdjustments((prev) => ({
       ...prev,
-      [category]: parseFloat(value),
+      [category]: Number.parseFloat(value),
     }));
   };
 

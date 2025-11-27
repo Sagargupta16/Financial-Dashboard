@@ -20,15 +20,14 @@ export const LoadingSpinner = ({ size = "md", message = "" }) => {
   };
 
   return (
-    <div
+    <output
       className="flex flex-col items-center justify-center gap-3"
-      role="status"
       aria-live="polite"
     >
       <Loader2 className={`${getSizeClass()} animate-spin text-blue-500`} />
       {message && <p className="text-gray-400 text-sm">{message}</p>}
       <span className="sr-only">Loading...</span>
-    </div>
+    </output>
   );
 };
 

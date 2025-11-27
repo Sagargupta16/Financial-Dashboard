@@ -162,7 +162,7 @@ export const useChartData = (filteredData, kpiData, drilldownCategory) => {
 
   const spendingByDayData = useMemo(() => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const spending = Array(7).fill(0);
+    const spending = new Array(7).fill(0);
     filteredData.forEach((item) => {
       if (item.type === "Expense" && item.date) {
         spending[item.date.getDay()] += item.amount;

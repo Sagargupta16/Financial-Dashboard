@@ -17,7 +17,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
     filteredData.forEach((item) => {
       if (item.date) {
         const date = new Date(item.date);
-        if (!isNaN(date.getTime())) {
+        if (!Number.isNaN(date.getTime())) {
           years.add(date.getFullYear());
         }
       }
@@ -33,7 +33,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       }
 
       const date = new Date(item.date);
-      if (isNaN(date.getTime())) {
+      if (Number.isNaN(date.getTime())) {
         return false;
       }
 
@@ -60,7 +60,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       }
 
       const date = new Date(item.date);
-      if (isNaN(date.getTime())) {
+      if (Number.isNaN(date.getTime())) {
         return acc;
       }
 
@@ -77,7 +77,9 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       return acc;
     }, {});
 
-    const sortedMonths = Object.keys(monthly).sort();
+    const sortedMonths = Object.keys(monthly).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     const formatMonthLabel = (monthString) => {
       const [year, month] = monthString.split("-");
@@ -97,9 +99,9 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       ];
 
       if (viewMode === "all-time") {
-        return `${monthNames[parseInt(month) - 1]} ${year}`;
+        return `${monthNames[Number.parseInt(month, 10) - 1]} ${year}`;
       } else {
-        return monthNames[parseInt(month) - 1];
+        return monthNames[Number.parseInt(month, 10) - 1];
       }
     };
 

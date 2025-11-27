@@ -33,17 +33,17 @@ export const parseCSV = (csvString) => {
       type: row.Type || row.type,
       category: row.Category || row.category,
       subcategory: row.Subcategory || row.subcategory || "",
-      amount: parseFloat(row.Amount || row.amount || 0),
+      amount: Number.parseFloat(row.Amount || row.amount || 0),
       account: row.Account || row.account || "",
       description: row.Description || row.description || "",
     };
 
     // Validate required fields
     if (
-      !isNaN(transaction.date.getTime()) &&
+      !Number.isNaN(transaction.date.getTime()) &&
       transaction.type &&
       transaction.category &&
-      !isNaN(transaction.amount)
+      !Number.isNaN(transaction.amount)
     ) {
       data.push(transaction);
     }
@@ -91,7 +91,7 @@ export const exportToCSV = (data) => {
     const escapedRow = row.map((field) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
+        return `"${str.replaceAll(/"/g, '""')}"`;
       }
       return str;
     });
@@ -117,7 +117,7 @@ export const downloadCSV = (csvString, filename = "transactions") => {
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(url);
   }
 };

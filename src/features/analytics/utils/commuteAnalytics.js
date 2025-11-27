@@ -30,7 +30,7 @@ export const analyzeCommuteSpending = (transactions) => {
   };
 
   commuteTransactions.forEach((transaction) => {
-    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
     breakdown.total += amount;
     breakdown.count += 1;
   });
@@ -116,7 +116,7 @@ export const analyzeCommutePatterns = (transactions) => {
 
   transactions.forEach((transaction) => {
     const note = transaction.note || "";
-    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
 
     if (note.toLowerCase().includes("flat to office")) {
       morningRides.push({ transaction, amount });

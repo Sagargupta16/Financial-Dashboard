@@ -341,30 +341,29 @@ export const useDataProcessor = (initialCsvData) => {
     const fileExtension = file.name.split(".").pop().toLowerCase();
 
     if (fileExtension === "csv") {
-      // Handle CSV files
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        parseData(e.target.result);
-      };
-      reader.onerror = (e) => {
-        console.error("File reading error:", e);
-        setError("Failed to read the uploaded CSV file.");
-        setLoading(false);
-      };
-      reader.readAsText(file);
+      // Handle CSV files using Blob.text()
+      file
+        .text()
+        .then((text) => {
+          parseData(text);
+        })
+        .catch((e) => {
+          console.error("File reading error:", e);
+          setError("Failed to read the uploaded CSV file.");
+          setLoading(false);
+        });
     } else if (fileExtension === "xlsx" || fileExtension === "xls") {
-      // Handle Excel files
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const arrayBuffer = e.target.result;
-        parseExcelData(arrayBuffer);
-      };
-      reader.onerror = (e) => {
-        console.error("File reading error:", e);
-        setError("Failed to read the uploaded Excel file.");
-        setLoading(false);
-      };
-      reader.readAsArrayBuffer(file);
+      // Handle Excel files using Blob.arrayBuffer()
+      file
+        .arrayBuffer()
+        .then((arrayBuffer) => {
+          parseExcelData(arrayBuffer);
+        })
+        .catch((e) => {
+          console.error("File reading error:", e);
+          setError("Failed to read the uploaded Excel file.");
+          setLoading(false);
+        });
     } else {
       setError("Unsupported file format. Please upload a CSV or Excel file.");
       setLoading(false);
@@ -388,9 +387,9 @@ export const useUniqueValues = (data) => {
     });
     return {
       types: ["All", "Income", "Expense", "Transfer-In", "Transfer-Out"],
-      categories: ["All", ...Array.from(categories)],
-      expenseCategories: [...Array.from(expenseCategories)],
-      accounts: ["All", ...Array.from(accounts)],
+      categories: ["All", ...categories],
+      expenseCategories: [...expenseCategories],
+      accounts: ["All", ...accounts],
     };
   }, [data]);
 };

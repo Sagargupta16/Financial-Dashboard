@@ -289,15 +289,17 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
             </div>
           </div>
 
-          {/* eslint-disable-next-line no-nested-ternary */}
           <div
-            className={`rounded-lg p-4 ${
-              analytics.cashFlowForecast.status === "growing"
-                ? "bg-green-900/20 border border-green-500/30"
-                : analytics.cashFlowForecast.status === "declining"
-                  ? "bg-red-900/20 border border-red-500/30"
-                  : "bg-yellow-900/20 border border-yellow-500/30"
-            }`}
+            className={(() => {
+              const status = analytics.cashFlowForecast.status;
+              if (status === "growing") {
+                return "rounded-lg p-4 bg-green-900/20 border border-green-500/30";
+              }
+              if (status === "declining") {
+                return "rounded-lg p-4 bg-red-900/20 border border-red-500/30";
+              }
+              return "rounded-lg p-4 bg-yellow-900/20 border border-yellow-500/30";
+            })()}
           >
             <p className="text-lg font-medium text-white">
               Status:{" "}
@@ -330,30 +332,32 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
               >
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-medium text-white">{cat.category}</span>
-                  {/* eslint-disable-next-line no-nested-ternary */}
                   <span
-                    className={`text-lg font-bold ${
-                      cat.direction === "increasing"
-                        ? "text-red-400"
-                        : cat.direction === "decreasing"
-                          ? "text-green-400"
-                          : "text-gray-400"
-                    }`}
+                    className={(() => {
+                      if (cat.direction === "increasing") {
+                        return "text-lg font-bold text-red-400";
+                      }
+                      if (cat.direction === "decreasing") {
+                        return "text-lg font-bold text-green-400";
+                      }
+                      return "text-lg font-bold text-gray-400";
+                    })()}
                   >
                     {cat.trend > 0 ? "+" : ""}
                     {cat.trend.toFixed(1)}%
                   </span>
                 </div>
                 <div className="w-full bg-gray-600 h-2 rounded-full overflow-hidden">
-                  {/* eslint-disable-next-line no-nested-ternary */}
                   <div
-                    className={`h-2 transition-all ${
-                      cat.direction === "increasing"
-                        ? "bg-red-500"
-                        : cat.direction === "decreasing"
-                          ? "bg-green-500"
-                          : "bg-gray-500"
-                    }`}
+                    className={(() => {
+                      if (cat.direction === "increasing") {
+                        return "h-2 transition-all bg-red-500";
+                      }
+                      if (cat.direction === "decreasing") {
+                        return "h-2 transition-all bg-green-500";
+                      }
+                      return "h-2 transition-all bg-gray-500";
+                    })()}
                     style={{ width: `${Math.min(Math.abs(cat.trend), 100)}%` }}
                   />
                 </div>
@@ -377,16 +381,17 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {analytics.monthlyHealthRatio.slice(-6).map((month) => (
-                /* eslint-disable-next-line no-nested-ternary */
                 <div
                   key={`monthly-health-${month.month}`}
-                  className={`rounded-lg p-4 ${
-                    month.status === "healthy"
-                      ? "bg-green-900/20 border border-green-500/30"
-                      : month.status === "tight"
-                        ? "bg-yellow-900/20 border border-yellow-500/30"
-                        : "bg-red-900/20 border border-red-500/30"
-                  }`}
+                  className={(() => {
+                    if (month.status === "healthy") {
+                      return "rounded-lg p-4 bg-green-900/20 border border-green-500/30";
+                    }
+                    if (month.status === "tight") {
+                      return "rounded-lg p-4 bg-yellow-900/20 border border-yellow-500/30";
+                    }
+                    return "rounded-lg p-4 bg-red-900/20 border border-red-500/30";
+                  })()}
                 >
                   <p className="text-sm text-gray-400 mb-2">{month.month}</p>
                   <div className="flex items-baseline gap-2">
@@ -395,15 +400,16 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
                     </span>
                     <span className="text-sm text-gray-400">of income</span>
                   </div>
-                  {/* eslint-disable-next-line no-nested-ternary */}
                   <p
-                    className={`text-xs mt-2 font-medium ${
-                      month.status === "healthy"
-                        ? "text-green-400"
-                        : month.status === "tight"
-                          ? "text-yellow-400"
-                          : "text-red-400"
-                    }`}
+                    className={(() => {
+                      if (month.status === "healthy") {
+                        return "text-xs mt-2 font-medium text-green-400";
+                      }
+                      if (month.status === "tight") {
+                        return "text-xs mt-2 font-medium text-yellow-400";
+                      }
+                      return "text-xs mt-2 font-medium text-red-400";
+                    })()}
                   >
                     {month.status.toUpperCase()}
                     {month.surplus > 0 && ` (+₹${month.surplus.toFixed(0)})`}

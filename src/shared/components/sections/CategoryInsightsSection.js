@@ -44,8 +44,7 @@ export const CategoryInsightsSection = ({ filteredData }) => {
       {/* Account Analytics */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-          <span className="mr-3">🏦</span>
-          Account Analytics
+          <span className="mr-3">🏦</span> Account Analytics
         </h2>
         <div id="account-dashboard">
           <AccountDashboard filteredData={filteredData} />

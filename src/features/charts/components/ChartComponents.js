@@ -2,7 +2,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
-import TreemapChart from "./TreemapChart";
 import {
   formatCurrency,
   getCommonChartOptions,
@@ -538,37 +537,6 @@ export const EnhancedSubcategoryBreakdownChart = ({
         .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
         .map(([sub]) => sub);
-
-      // Helper function to create cumulative data
-      const createDatasets = (subcategories, getData, labels) => {
-        if (dataMode === "cumulative") {
-          const cumulativeData = {};
-          subcategories.forEach((sub) => {
-            cumulativeData[sub] = 0;
-          });
-
-          return subcategories.map((sub, index) => ({
-            label: truncateLabel(sub, 15),
-            data: labels.map((_, labelIndex) => {
-              cumulativeData[sub] += getData(labelIndex, sub);
-              return cumulativeData[sub];
-            }),
-            borderColor: colors[index % colors.length],
-            backgroundColor: colors[index % colors.length] + "20",
-            tension: 0.4,
-            fill: false,
-          }));
-        } else {
-          return subcategories.map((sub, index) => ({
-            label: truncateLabel(sub, 15),
-            data: labels.map((_, labelIndex) => getData(labelIndex, sub)),
-            borderColor: colors[index % colors.length],
-            backgroundColor: colors[index % colors.length] + "20",
-            tension: 0.4,
-            fill: false,
-          }));
-        }
-      };
 
       return {
         labels: Array.from({ length: 10 }, (_, i) => `${decade + i}`),
@@ -1465,34 +1433,27 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
 
     let aggregatedData = netWorthData;
 
+    // Aggregate data by month for better readability when there's too much data
+    const aggregateByMonth = (data) => {
+      const monthlyData = {};
+      data.forEach((item) => {
+        const monthKey = item.date.substring(0, 7);
+        if (
+          !monthlyData[monthKey] ||
+          new Date(item.date) > new Date(monthlyData[monthKey].date)
+        ) {
+          monthlyData[monthKey] = item;
+        }
+      });
+      return Object.values(monthlyData).sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
+    };
+
     if (viewMode === "year" && netWorthData.length > 12) {
-      const monthlyData = {};
-      netWorthData.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      aggregatedData = Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
+      aggregatedData = aggregateByMonth(netWorthData);
     } else if (viewMode === "all-time" && netWorthData.length > 50) {
-      const monthlyData = {};
-      netWorthData.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      aggregatedData = Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
+      aggregatedData = aggregateByMonth(netWorthData);
     }
 
     return {
@@ -1589,8 +1550,9 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value, _index) {
-              const label = this.getLabelForValue(value);
+            callback: function (value, _index, ticks) {
+              const label =
+                ticks.length > 0 ? this.getLabelForValue(value) : value;
               return truncateLabel(label, 12);
             },
           },
@@ -1750,7 +1712,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLineJoin="round"
+            strokeLinejoin="round"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7,10 12,15 17,10" />
@@ -2075,34 +2037,27 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
 
     let aggregatedData = processedData;
 
+    // Aggregate data by month for better readability when there's too much data
+    const aggregateByMonth = (data) => {
+      const monthlyData = {};
+      data.forEach((item) => {
+        const monthKey = item.date.substring(0, 7);
+        if (
+          !monthlyData[monthKey] ||
+          new Date(item.date) > new Date(monthlyData[monthKey].date)
+        ) {
+          monthlyData[monthKey] = item;
+        }
+      });
+      return Object.values(monthlyData).sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
+    };
+
     if (viewMode === "yearly" && processedData.length > 12) {
-      const monthlyData = {};
-      processedData.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      aggregatedData = Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
+      aggregatedData = aggregateByMonth(processedData);
     } else if (viewMode === "all-time" && processedData.length > 50) {
-      const monthlyData = {};
-      processedData.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      aggregatedData = Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
+      aggregatedData = aggregateByMonth(processedData);
     }
 
     const colors = [
@@ -2221,8 +2176,9 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value, _index) {
-              const label = this.getLabelForValue(value);
+            callback: function (value, _index, ticks) {
+              const label =
+                ticks.length > 0 ? this.getLabelForValue(value) : value;
               return truncateLabel(label, 12);
             },
           },
@@ -2377,7 +2333,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLineJoin="round"
+            strokeLinejoin="round"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7,10 12,15 17,10" />
@@ -3333,7 +3289,8 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
               : data.income - data.expense;
           })
           .filter(
-            (value) => value !== undefined && value !== null && !isNaN(value)
+            (value) =>
+              value !== undefined && value !== null && !Number.isNaN(value)
           );
 
         return accountValues.reduce((sum, value) => sum + value, 0);
@@ -4083,6 +4040,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       .map((row) => Object.values(row).join(","))
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
+    // eslint-disable-next-line no-undef
     const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -4334,4 +4292,4 @@ SankeyFlowChart.propTypes = {
   chartRef: PropTypes.object,
 };
 
-export { TreemapChart };
+export { TreemapChart } from "./TreemapChart";

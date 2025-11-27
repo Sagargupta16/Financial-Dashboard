@@ -91,7 +91,7 @@ export const exportToCSV = (data) => {
     const escapedRow = row.map((field) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replaceAll(/"/g, '""')}"`;
+        return `"${str.replaceAll('"', '""')}"`;
       }
       return str;
     });
@@ -128,10 +128,5 @@ export const downloadCSV = (csvString, filename = "transactions") => {
  * @returns {Promise<string>} Promise that resolves to file content
  */
 export const readFileAsText = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = () => reject(new Error("Failed to read file"));
-    reader.readAsText(file);
-  });
+  return file.text();
 };

@@ -93,8 +93,7 @@ export const BudgetGoalsSection = ({
       {/* Planning Tools Section */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-          <span className="mr-2">🛠️</span>
-          Planning Tools
+          <span className="mr-2">🛠️</span> Planning Tools
         </h2>
         <div className="grid grid-cols-1 gap-6">
           {/* What-If Spending Simulator */}

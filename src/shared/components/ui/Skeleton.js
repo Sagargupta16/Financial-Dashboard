@@ -61,15 +61,22 @@ export const SmallSkeletonCard = () => (
 /**
  * TableRowSkeleton - Transaction table row skeleton
  */
-export const TableRowSkeleton = ({ columns = 6 }) => (
-  <tr className="border-b border-gray-700">
-    {Array.from({ length: columns }).map((_, index) => (
-      <td key={`skeleton-col-${index}`} className="p-4">
-        <Skeleton className="h-4 w-full" />
-      </td>
-    ))}
-  </tr>
-);
+export const TableRowSkeleton = ({ columns = 6 }) => {
+  const columnIds = Array.from(
+    { length: columns },
+    (_, i) => `col-${Date.now()}-${Math.random()}-${i}`
+  );
+
+  return (
+    <tr className="border-b border-gray-700">
+      {columnIds.map((id) => (
+        <td key={id} className="p-4">
+          <Skeleton className="h-4 w-full" />
+        </td>
+      ))}
+    </tr>
+  );
+};
 
 TableRowSkeleton.propTypes = {
   columns: PropTypes.number,
@@ -82,6 +89,9 @@ TableRowSkeleton.propTypes = {
 export const ChartSkeleton = ({ height = "300px" }) => {
   // Predefined heights for better visual consistency
   const barHeights = ["45%", "70%", "55%", "85%", "60%", "75%", "50%", "65%"];
+  const barIds = barHeights.map(
+    (_, i) => `bar-${Date.now()}-${Math.random()}-${i}`
+  );
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700">
@@ -89,7 +99,7 @@ export const ChartSkeleton = ({ height = "300px" }) => {
       <div className="flex items-end justify-between gap-2" style={{ height }}>
         {barHeights.map((barHeight, index) => (
           <Skeleton
-            key={`skeleton-bar-${index}`}
+            key={barIds[index]}
             className="w-full"
             style={{ height: barHeight }}
           />

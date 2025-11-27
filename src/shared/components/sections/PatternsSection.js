@@ -33,8 +33,7 @@ export const PatternsSection = ({ filteredData }) => {
       {/* Advanced Analytics */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-          <span className="mr-3">📊</span>
-          Advanced Analytics
+          <span className="mr-3">📊</span> Advanced Analytics
         </h2>
         <div id="advanced-analytics">
           <AdvancedAnalyticsDashboard filteredData={filteredData} />

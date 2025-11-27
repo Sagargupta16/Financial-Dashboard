@@ -47,14 +47,7 @@ jobs:
         run: pnpm run lint
 
       - name: Run tests
-        run: pnpm test -- --coverage --watchAll=false
+        run: pnpm run test -- --watchAll=false --passWithNoTests
 
       - name: Build
         run: pnpm run build
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          file: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella

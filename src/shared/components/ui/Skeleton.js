@@ -64,7 +64,7 @@ export const SmallSkeletonCard = () => (
 export const TableRowSkeleton = ({ columns = 6 }) => {
   const columnIds = Array.from(
     { length: columns },
-    (_, i) => `col-${Date.now()}-${Math.random()}-${i}`
+    () => `col-${crypto.randomUUID()}`
   );
 
   return (
@@ -89,9 +89,7 @@ TableRowSkeleton.propTypes = {
 export const ChartSkeleton = ({ height = "300px" }) => {
   // Predefined heights for better visual consistency
   const barHeights = ["45%", "70%", "55%", "85%", "60%", "75%", "50%", "65%"];
-  const barIds = barHeights.map(
-    (_, i) => `bar-${Date.now()}-${Math.random()}-${i}`
-  );
+  const barIds = barHeights.map(() => `bar-${crypto.randomUUID()}`);
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700">

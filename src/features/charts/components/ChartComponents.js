@@ -17,6 +17,23 @@ export const doughnutOptions = {
   scales: {},
 };
 
+// Helper function to aggregate data by month
+const aggregateByMonth = (data) => {
+  const monthlyData = {};
+  data.forEach((item) => {
+    const monthKey = item.date.substring(0, 7);
+    if (
+      !monthlyData[monthKey] ||
+      new Date(item.date) > new Date(monthlyData[monthKey].date)
+    ) {
+      monthlyData[monthKey] = item;
+    }
+  });
+  return Object.values(monthlyData).sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+};
+
 // eslint-disable-next-line max-lines-per-function
 export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   const {
@@ -126,23 +143,25 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
             boxHeight: 12,
             generateLabels: (chart) => {
               const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                const dataset = data.datasets[0];
-                return data.labels.map((label, i) => {
-                  const value = dataset.data[i];
-                  const total = dataset.data.reduce((sum, val) => sum + val, 0);
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return {
-                    text: `${label} (${percentage}%)`,
-                    fillStyle: dataset.backgroundColor[i],
-                    strokeStyle: dataset.borderColor,
-                    pointStyle: "circle",
-                    hidden: false,
-                    index: i,
-                  };
-                });
+              if (!data.labels.length || !data.datasets.length) {
+                return [];
               }
-              return [];
+
+              const dataset = data.datasets[0];
+              const total = dataset.data.reduce((sum, val) => sum + val, 0);
+
+              return data.labels.map((label, i) => {
+                const value = dataset.data[i];
+                const percentage = ((value / total) * 100).toFixed(1);
+                return {
+                  text: `${label} (${percentage}%)`,
+                  fillStyle: dataset.backgroundColor[i],
+                  strokeStyle: dataset.borderColor,
+                  pointStyle: "circle",
+                  hidden: false,
+                  index: i,
+                };
+              });
             },
           },
         },
@@ -478,27 +497,36 @@ export const EnhancedSubcategoryBreakdownChart = ({
           cumulativeData[sub] = 0;
         });
 
-        return subcategories.map((sub, index) => ({
-          label: truncateLabel(sub, 15),
-          data: labels.map((_, labelIndex) => {
+        const buildCumulativeData = (sub) => {
+          const dataPoints = labels.map((_, labelIndex) => {
             cumulativeData[sub] += getData(labelIndex, sub);
             return cumulativeData[sub];
-          }),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        }));
-      } else {
+          });
+          return dataPoints;
+        };
+
         return subcategories.map((sub, index) => ({
           label: truncateLabel(sub, 15),
-          data: labels.map((_, labelIndex) => getData(labelIndex, sub)),
+          data: buildCumulativeData(sub),
           borderColor: colors[index % colors.length],
           backgroundColor: colors[index % colors.length] + "20",
           tension: 0.4,
           fill: false,
         }));
       }
+
+      const buildRegularData = (sub) => {
+        return labels.map((_, labelIndex) => getData(labelIndex, sub));
+      };
+
+      return subcategories.map((sub, index) => ({
+        label: truncateLabel(sub, 15),
+        data: buildRegularData(sub),
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + "20",
+        tension: 0.4,
+        fill: false,
+      }));
     };
 
     if (viewMode === "decade") {
@@ -964,27 +992,36 @@ export const MultiCategoryTimeAnalysisChart = ({
           cumulativeData[category] = 0;
         });
 
-        return categories.map((category, index) => ({
-          label: category,
-          data: labels.map((_, labelIndex) => {
+        const buildCumulativeData = (category) => {
+          const dataPoints = labels.map((_, labelIndex) => {
             cumulativeData[category] += getData(labelIndex, category);
             return cumulativeData[category];
-          }),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        }));
-      } else {
+          });
+          return dataPoints;
+        };
+
         return categories.map((category, index) => ({
           label: category,
-          data: labels.map((_, labelIndex) => getData(labelIndex, category)),
+          data: buildCumulativeData(category),
           borderColor: colors[index % colors.length],
           backgroundColor: colors[index % colors.length] + "20",
           tension: 0.4,
           fill: false,
         }));
       }
+
+      const buildRegularData = (category) => {
+        return labels.map((_, labelIndex) => getData(labelIndex, category));
+      };
+
+      return categories.map((category, index) => ({
+        label: category,
+        data: buildRegularData(category),
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + "20",
+        tension: 0.4,
+        fill: false,
+      }));
     };
 
     if (viewMode === "decade") {
@@ -1432,25 +1469,10 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
     let aggregatedData = netWorthData;
 
     // Aggregate data by month for better readability when there's too much data
-    const aggregateByMonth = (data) => {
-      const monthlyData = {};
-      data.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      return Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
-    };
-
-    if (viewMode === "year" && netWorthData.length > 12) {
-      aggregatedData = aggregateByMonth(netWorthData);
-    } else if (viewMode === "all-time" && netWorthData.length > 50) {
+    if (
+      (viewMode === "year" && netWorthData.length > 12) ||
+      (viewMode === "all-time" && netWorthData.length > 50)
+    ) {
       aggregatedData = aggregateByMonth(netWorthData);
     }
 
@@ -1520,14 +1542,6 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
             },
             label: (context) => {
               const value = context.parsed.y;
-              const formatCurrency = (val) => {
-                return new Intl.NumberFormat("en-IN", {
-                  style: "currency",
-                  currency: "INR",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(val);
-              };
               return `Net Worth: ${formatCurrency(value)}`;
             },
           },
@@ -1548,9 +1562,8 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value, _index, ticks) {
-              const label =
-                ticks.length > 0 ? this.getLabelForValue(value) : value;
+            callback: function (value) {
+              const label = this.getLabelForValue(value);
               return truncateLabel(label, 12);
             },
           },
@@ -1894,7 +1907,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         categories.add(item.category);
       }
     });
-    return Array.from(categories).sort();
+    return Array.from(categories).sort((a, b) => a.localeCompare(b));
   }, [filteredData]);
 
   React.useEffect(() => {
@@ -2034,25 +2047,10 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
     let aggregatedData = processedData;
 
     // Aggregate data by month for better readability when there's too much data
-    const aggregateByMonth = (data) => {
-      const monthlyData = {};
-      data.forEach((item) => {
-        const monthKey = item.date.substring(0, 7);
-        if (
-          !monthlyData[monthKey] ||
-          new Date(item.date) > new Date(monthlyData[monthKey].date)
-        ) {
-          monthlyData[monthKey] = item;
-        }
-      });
-      return Object.values(monthlyData).sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
-    };
-
-    if (viewMode === "yearly" && processedData.length > 12) {
-      aggregatedData = aggregateByMonth(processedData);
-    } else if (viewMode === "all-time" && processedData.length > 50) {
+    if (
+      (viewMode === "yearly" && processedData.length > 12) ||
+      (viewMode === "all-time" && processedData.length > 50)
+    ) {
       aggregatedData = aggregateByMonth(processedData);
     }
 
@@ -2144,14 +2142,6 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
             },
             label: (context) => {
               const value = context.parsed.y;
-              const formatCurrency = (val) => {
-                return new Intl.NumberFormat("en-IN", {
-                  style: "currency",
-                  currency: "INR",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(val);
-              };
               return `${context.dataset.label}: ${formatCurrency(value)}`;
             },
           },
@@ -2172,9 +2162,8 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value, _index, ticks) {
-              const label =
-                ticks.length > 0 ? this.getLabelForValue(value) : value;
+            callback: function (value) {
+              const label = this.getLabelForValue(value);
               return truncateLabel(label, 12);
             },
           },
@@ -2186,17 +2175,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         y: {
           ticks: {
             color: "#9ca3af",
-            callback: (value) => {
-              const formatCurrency = (val) => {
-                if (Math.abs(val) >= 1000000) {
-                  return `â‚¹${(val / 1000000).toFixed(1)}M`;
-                } else if (Math.abs(val) >= 1000) {
-                  return `â‚¹${(val / 1000).toFixed(0)}K`;
-                }
-                return `â‚¹${val.toFixed(0)}`;
-              };
-              return formatCurrency(value);
-            },
+            callback: (value) => formatCurrency(value),
           },
           grid: {
             color: "#374151",
@@ -2473,7 +2452,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
         categories.add(item.category);
       }
     });
-    return Array.from(categories).sort();
+    return Array.from(categories).sort((a, b) => a.localeCompare(b));
   }, [filteredData]);
 
   const heatmapData = React.useMemo(() => {
@@ -2503,14 +2482,18 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     const years = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
+    const getMaxValue = (monthlyData) => {
+      return Math.max(
+        ...Object.values(monthlyData).flatMap((y) => Object.values(y))
+      );
+    };
+
     const datasets = years.map((year) => ({
       label: year,
       data: months.map((month) => monthlyData[year]?.[month] || 0),
       backgroundColor: months.map((month) => {
         const value = monthlyData[year]?.[month] || 0;
-        const maxValue = Math.max(
-          ...Object.values(monthlyData).flatMap((y) => Object.values(y))
-        );
+        const maxValue = getMaxValue(monthlyData);
         const intensity = value / (maxValue || 1);
         return `rgba(59, 130, 246, ${Math.max(0.1, intensity)})`;
       }),

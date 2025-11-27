@@ -369,7 +369,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
             lines.push(formatCurrency(d.data.value));
           }
 
-          lines.forEach((line, i) => {
+          const addTextLine = (line, i) => {
             text
               .append("tspan")
               .attr("x", 4)
@@ -377,7 +377,9 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
               .attr("font-size", i === 0 ? "12px" : "10px")
               .attr("font-weight", i === 0 ? "bold" : "normal")
               .text(line);
-          });
+          };
+
+          lines.forEach(addTextLine);
         });
 
       // Cleanup tooltip on component unmount

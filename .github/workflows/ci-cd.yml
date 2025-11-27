@@ -47,7 +47,9 @@ jobs:
         run: pnpm run lint
 
       - name: Run tests
-        run: pnpm run test -- --watchAll=false --passWithNoTests
+        run: pnpm run test
+        env:
+          CI: true
 
       - name: Build
         run: pnpm run build

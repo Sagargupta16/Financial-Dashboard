@@ -5,6 +5,17 @@ import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
 import { formatCurrency } from "../../../shared/utils/chartUtils";
 
+// Helper function to add text line to treemap labels
+const appendTextLine = (textElement, line, index) => {
+  textElement
+    .append("tspan")
+    .attr("x", 4)
+    .attr("dy", index === 0 ? 0 : "1.2em")
+    .attr("font-size", index === 0 ? "12px" : "10px")
+    .attr("font-weight", index === 0 ? "bold" : "normal")
+    .text(line);
+};
+
 // eslint-disable-next-line max-lines-per-function
 export const TreemapChart = ({ filteredData, chartRef }) => {
   const svgRef = useRef(null);
@@ -369,17 +380,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
             lines.push(formatCurrency(d.data.value));
           }
 
-          const addTextLine = (line, i) => {
-            text
-              .append("tspan")
-              .attr("x", 4)
-              .attr("dy", i === 0 ? 0 : "1.2em")
-              .attr("font-size", i === 0 ? "12px" : "10px")
-              .attr("font-weight", i === 0 ? "bold" : "normal")
-              .text(line);
-          };
-
-          lines.forEach(addTextLine);
+          lines.forEach((line, i) => appendTextLine(text, line, i));
         });
 
       // Cleanup tooltip on component unmount

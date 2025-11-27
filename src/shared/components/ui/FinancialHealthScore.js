@@ -12,6 +12,66 @@ import {
 } from "../../utils/healthScoreHelpers";
 
 /**
+ * Main Score Display Component
+ */
+const ScoreDisplay = ({ score }) => (
+  <div className="md:col-span-1">
+    <div
+      className={`bg-gradient-to-br ${getGradient(score?.score || 0)} rounded-xl p-6 text-center`}
+    >
+      <p className="text-white/80 text-sm mb-2">Overall Score</p>
+      <p className={`text-6xl font-bold ${getScoreColor(score?.score || 0)}`}>
+        {score?.score || 0}
+      </p>
+      <p className="text-white/60 text-sm mt-1">out of 100</p>
+      <div className="mt-4 pt-4 border-t border-white/20">
+        <p className="text-white text-xl font-bold">
+          Grade: {score?.grade || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+ScoreDisplay.propTypes = {
+  score: PropTypes.object,
+};
+
+/**
+ * Recommendation Card Component
+ */
+const RecommendationCard = ({ rec, index }) => {
+  let bgClass = "bg-blue-900/20 border-blue-500/30";
+  let textClass = "text-blue-400";
+
+  if (rec.type === "alert") {
+    bgClass = "bg-red-900/20 border-red-500/30";
+    textClass = "text-red-400";
+  } else if (rec.type === "warning") {
+    bgClass = "bg-yellow-900/20 border-yellow-500/30";
+    textClass = "text-yellow-400";
+  } else if (rec.type === "success") {
+    bgClass = "bg-green-900/20 border-green-500/30";
+    textClass = "text-green-400";
+  }
+
+  return (
+    <div
+      key={`${rec.type}-${rec.category}-${index}`}
+      className={`rounded-lg p-4 border ${bgClass}`}
+    >
+      <p className={`font-medium mb-2 ${textClass}`}>{rec.message}</p>
+      <p className="text-gray-300 text-sm">{rec.action}</p>
+    </div>
+  );
+};
+
+RecommendationCard.propTypes = {
+  rec: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
+};
+
+/**
  * Financial Health Score Dashboard
  * Calculates and displays overall financial health with recommendations
  */
@@ -47,24 +107,7 @@ export const FinancialHealthScore = ({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Score */}
-        <div className="md:col-span-1">
-          <div
-            className={`bg-gradient-to-br ${getGradient(score?.score || 0)} rounded-xl p-6 text-center`}
-          >
-            <p className="text-white/80 text-sm mb-2">Overall Score</p>
-            <p
-              className={`text-6xl font-bold ${getScoreColor(score?.score || 0)}`}
-            >
-              {score?.score || 0}
-            </p>
-            <p className="text-white/60 text-sm mt-1">out of 100</p>
-            <div className="mt-4 pt-4 border-t border-white/20">
-              <p className="text-white text-xl font-bold">
-                Grade: {score?.grade || "N/A"}
-              </p>
-            </div>
-          </div>
-        </div>
+        <ScoreDisplay score={score} />
 
         {/* Metrics Breakdown */}
         <div className="md:col-span-2 space-y-4">
@@ -250,33 +293,13 @@ export const FinancialHealthScore = ({
             💡 Recommendations
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendations.map((rec, index) => {
-              let bgClass = "bg-blue-900/20 border-blue-500/30";
-              let textClass = "text-blue-400";
-
-              if (rec.type === "alert") {
-                bgClass = "bg-red-900/20 border-red-500/30";
-                textClass = "text-red-400";
-              } else if (rec.type === "warning") {
-                bgClass = "bg-yellow-900/20 border-yellow-500/30";
-                textClass = "text-yellow-400";
-              } else if (rec.type === "success") {
-                bgClass = "bg-green-900/20 border-green-500/30";
-                textClass = "text-green-400";
-              }
-
-              return (
-                <div
-                  key={`${rec.type}-${rec.category}-${index}`}
-                  className={`rounded-lg p-4 border ${bgClass}`}
-                >
-                  <p className={`font-medium mb-2 ${textClass}`}>
-                    {rec.message}
-                  </p>
-                  <p className="text-gray-300 text-sm">{rec.action}</p>
-                </div>
-              );
-            })}
+            {recommendations.map((rec, index) => (
+              <RecommendationCard
+                key={`${rec.type}-${rec.category}-${index}`}
+                rec={rec}
+                index={index}
+              />
+            ))}
           </div>
         </div>
       )}

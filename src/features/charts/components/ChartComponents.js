@@ -34,6 +34,54 @@ const aggregateByMonth = (data) => {
   );
 };
 
+// Helper function to build cumulative data points
+const buildCumulativeDataPoints = (labels, getData, item, cumulativeData) => {
+  return labels.map((_, labelIndex) => {
+    cumulativeData[item] += getData(labelIndex, item);
+    return cumulativeData[item];
+  });
+};
+
+// Helper function to build regular data points
+const buildRegularDataPoints = (labels, getData, item) => {
+  return labels.map((_, labelIndex) => getData(labelIndex, item));
+};
+
+// Helper function to create dataset objects for charts
+const createDatasets = (
+  items,
+  getData,
+  labels,
+  colors,
+  dataMode,
+  labelTruncate = null
+) => {
+  if (dataMode === "cumulative") {
+    const cumulativeData = {};
+    items.forEach((item) => {
+      cumulativeData[item] = 0;
+    });
+
+    return items.map((item, index) => ({
+      label: labelTruncate ? truncateLabel(item, labelTruncate) : item,
+      data: buildCumulativeDataPoints(labels, getData, item, cumulativeData),
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length] + "20",
+      tension: 0.4,
+      fill: false,
+    }));
+  }
+
+  return items.map((item, index) => ({
+    label: labelTruncate ? truncateLabel(item, labelTruncate) : item,
+    data: buildRegularDataPoints(labels, getData, item),
+    borderColor: colors[index % colors.length],
+    backgroundColor: colors[index % colors.length] + "20",
+    tension: 0.4,
+    fill: false,
+  }));
+};
+
 // eslint-disable-next-line max-lines-per-function
 export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
   const {
@@ -489,46 +537,6 @@ export const EnhancedSubcategoryBreakdownChart = ({
 
     const colors = ["#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
-    // Helper function to create cumulative data
-    const createDatasets = (subcategories, getData, labels) => {
-      if (dataMode === "cumulative") {
-        const cumulativeData = {};
-        subcategories.forEach((sub) => {
-          cumulativeData[sub] = 0;
-        });
-
-        const buildCumulativeData = (sub) => {
-          const dataPoints = labels.map((_, labelIndex) => {
-            cumulativeData[sub] += getData(labelIndex, sub);
-            return cumulativeData[sub];
-          });
-          return dataPoints;
-        };
-
-        return subcategories.map((sub, index) => ({
-          label: truncateLabel(sub, 15),
-          data: buildCumulativeData(sub),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        }));
-      }
-
-      const buildRegularData = (sub) => {
-        return labels.map((_, labelIndex) => getData(labelIndex, sub));
-      };
-
-      return subcategories.map((sub, index) => ({
-        label: truncateLabel(sub, 15),
-        data: buildRegularData(sub),
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + "20",
-        tension: 0.4,
-        fill: false,
-      }));
-    };
-
     if (viewMode === "decade") {
       const decade = Math.floor(currentYear / 10) * 10;
       const yearlyData = {};
@@ -571,7 +579,10 @@ export const EnhancedSubcategoryBreakdownChart = ({
         datasets: createDatasets(
           topSubcategories,
           (yearIndex, sub) => yearlyData[decade + yearIndex][sub] || 0,
-          Array.from({ length: 10 }, (_, i) => `${decade + i}`)
+          Array.from({ length: 10 }, (_, i) => `${decade + i}`),
+          colors,
+          dataMode,
+          15
         ),
       };
     } else if (viewMode === "year") {
@@ -615,7 +626,10 @@ export const EnhancedSubcategoryBreakdownChart = ({
         datasets: createDatasets(
           topSubcategories,
           (monthIndex, sub) => monthlyData[monthIndex + 1][sub] || 0,
-          shortMonthNames
+          shortMonthNames,
+          colors,
+          dataMode,
+          15
         ),
       };
     } else {
@@ -663,7 +677,10 @@ export const EnhancedSubcategoryBreakdownChart = ({
         datasets: createDatasets(
           topSubcategories,
           (dayIndex, sub) => dailyData[dayIndex + 1][sub] || 0,
-          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)
+          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
+          colors,
+          dataMode,
+          15
         ),
       };
     }
@@ -984,46 +1001,6 @@ export const MultiCategoryTimeAnalysisChart = ({
       "#8b5cf6",
     ];
 
-    // Helper function to create cumulative data
-    const createDatasets = (categories, getData, labels) => {
-      if (dataMode === "cumulative") {
-        const cumulativeData = {};
-        categories.forEach((category) => {
-          cumulativeData[category] = 0;
-        });
-
-        const buildCumulativeData = (category) => {
-          const dataPoints = labels.map((_, labelIndex) => {
-            cumulativeData[category] += getData(labelIndex, category);
-            return cumulativeData[category];
-          });
-          return dataPoints;
-        };
-
-        return categories.map((category, index) => ({
-          label: category,
-          data: buildCumulativeData(category),
-          borderColor: colors[index % colors.length],
-          backgroundColor: colors[index % colors.length] + "20",
-          tension: 0.4,
-          fill: false,
-        }));
-      }
-
-      const buildRegularData = (category) => {
-        return labels.map((_, labelIndex) => getData(labelIndex, category));
-      };
-
-      return categories.map((category, index) => ({
-        label: category,
-        data: buildRegularData(category),
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + "20",
-        tension: 0.4,
-        fill: false,
-      }));
-    };
-
     if (viewMode === "decade") {
       const decade = Math.floor(currentYear / 10) * 10;
       const yearlyData = {};
@@ -1067,7 +1044,10 @@ export const MultiCategoryTimeAnalysisChart = ({
           topCategories,
           (yearIndex, category) =>
             yearlyData[decade + yearIndex][category] || 0,
-          Array.from({ length: 10 }, (_, i) => `${decade + i}`)
+          Array.from({ length: 10 }, (_, i) => `${decade + i}`),
+          colors,
+          dataMode,
+          null
         ),
       };
     } else if (viewMode === "year") {
@@ -1111,7 +1091,10 @@ export const MultiCategoryTimeAnalysisChart = ({
         datasets: createDatasets(
           topCategories,
           (monthIndex, category) => monthlyData[monthIndex + 1][category] || 0,
-          shortMonthNames
+          shortMonthNames,
+          colors,
+          dataMode,
+          null
         ),
       };
     } else {
@@ -1159,7 +1142,10 @@ export const MultiCategoryTimeAnalysisChart = ({
         datasets: createDatasets(
           topCategories,
           (dayIndex, category) => dailyData[dayIndex + 1][category] || 0,
-          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)
+          Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`),
+          colors,
+          dataMode,
+          null
         ),
       };
     }
@@ -1562,9 +1548,8 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value) {
-              const label = this.getLabelForValue(value);
-              return truncateLabel(label, 12);
+            callback: (value, _index, _ticks) => {
+              return truncateLabel(String(value), 12);
             },
           },
           grid: {
@@ -2162,9 +2147,8 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
               }
               return 10;
             })(),
-            callback: function (value) {
-              const label = this.getLabelForValue(value);
-              return truncateLabel(label, 12);
+            callback: (value, _index, _ticks) => {
+              return truncateLabel(String(value), 12);
             },
           },
           grid: {

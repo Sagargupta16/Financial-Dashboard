@@ -134,7 +134,7 @@ export const useChartData = (filteredData, kpiData, drilldownCategory) => {
         "Nov",
         "Dec",
       ];
-      return `${monthNames[parseInt(month) - 1]} ${year}`;
+      return `${monthNames[Number.parseInt(month, 10) - 1]} ${year}`;
     };
 
     return {

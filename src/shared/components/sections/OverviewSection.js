@@ -25,134 +25,18 @@ import { formatCurrency } from "../../../shared/utils/dataUtils";
 import { useEnhancedKPIData } from "../../hooks/useCalculations";
 import { useAdvancedAnalytics } from "../../hooks/useAdvancedAnalytics";
 import { generateSmartInsights } from "../../utils/insightsGenerator";
-
-// Helper functions to reduce complexity
-const getSavingsRateColor = (rate) => {
-  if (rate >= 20) {
-    return "bg-green-900/20 border-green-500/30";
-  }
-  if (rate >= 10) {
-    return "bg-yellow-900/20 border-yellow-500/30";
-  }
-  return "bg-red-900/20 border-red-500/30";
-};
-
-const getSavingsRateIconColor = (rate) => {
-  if (rate >= 20) {
-    return "text-green-400";
-  }
-  if (rate >= 10) {
-    return "text-yellow-400";
-  }
-  return "text-red-400";
-};
-
-const getSavingsRateMessage = (rate) => {
-  if (rate >= 20) {
-    return "Excellent! 🎉";
-  }
-  if (rate >= 10) {
-    return "Good, aim for 20%+";
-  }
-  return "Target: 20%+";
-};
-
-const getSpendingVelocityColor = (velocity) => {
-  if (velocity > 120) {
-    return "bg-red-900/20 border-red-500/30";
-  }
-  if (velocity < 80) {
-    return "bg-green-900/20 border-green-500/30";
-  }
-  return "bg-yellow-900/20 border-yellow-500/30";
-};
-
-const getSpendingVelocityIconColor = (velocity) => {
-  if (velocity > 120) {
-    return "text-red-400";
-  }
-  if (velocity < 80) {
-    return "text-green-400";
-  }
-  return "text-yellow-400";
-};
-
-const getInsightPriorityColor = (priority) => {
-  if (priority === "high") {
-    return "bg-red-900/20 border-red-500/30";
-  }
-  if (priority === "positive") {
-    return "bg-green-900/20 border-green-500/30";
-  }
-  if (priority === "medium") {
-    return "bg-yellow-900/20 border-yellow-500/30";
-  }
-  return "bg-blue-900/20 border-blue-500/30";
-};
-
-// Helper functions for advanced analytics
-const getMonthlyTrendDisplay = (monthlyComparison) => {
-  if (!monthlyComparison?.trend || monthlyComparison.avgGrowth === undefined) {
-    return "N/A";
-  }
-  if (monthlyComparison.trend === "increasing") {
-    return `↗️ +${monthlyComparison.avgGrowth.toFixed(1)}%`;
-  }
-  if (monthlyComparison.trend === "decreasing") {
-    return `↘️ ${monthlyComparison.avgGrowth.toFixed(1)}%`;
-  }
-  return "→ Stable";
-};
-
-const getAnomalyAlertDisplay = (anomaliesCount) => {
-  if (anomaliesCount > 0) {
-    const plural = anomaliesCount > 1 ? "s" : "";
-    return `⚠️ ${anomaliesCount} unusual transaction${plural}`;
-  }
-  return "✓ All normal";
-};
-
-const getSubscriptionsDisplay = (recurringTransactions) => {
-  if (!recurringTransactions || recurringTransactions.length === 0) {
-    return "None detected";
-  }
-  const totalMonthly = recurringTransactions.reduce(
-    (sum, t) => sum + Math.abs(t.averageAmount),
-    0
-  );
-  return `${recurringTransactions.length} (${formatCurrency(totalMonthly)}/mo)`;
-};
-
-// Extract unique years from transactions
-const getYearsAndMonths = (transactions) => {
-  const yearSet = new Set();
-
-  transactions.forEach((transaction) => {
-    const date = new Date(transaction.date);
-    yearSet.add(date.getFullYear());
-  });
-
-  const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
-  const monthLabels = [
-    { value: "0", label: "January" },
-    { value: "1", label: "February" },
-    { value: "2", label: "March" },
-    { value: "3", label: "April" },
-    { value: "4", label: "May" },
-    { value: "5", label: "June" },
-    { value: "6", label: "July" },
-    { value: "7", label: "August" },
-    { value: "8", label: "September" },
-    { value: "9", label: "October" },
-    { value: "10", label: "November" },
-    { value: "11", label: "December" },
-  ];
-
-  return {
-    years: sortedYears,
-    months: monthLabels,
-  };
-};
+import {
+  getSavingsRateColor,
+  getSavingsRateIconColor,
+  getSavingsRateMessage,
+  getSpendingVelocityColor,
+  getSpendingVelocityIconColor,
+  getInsightPriorityColor,
+  getMonthlyTrendDisplay,
+  getAnomalyAlertDisplay,
+  getSubscriptionsDisplay,
+  getYearsAndMonths,
+} from "../../utils/metricHelpers";
 
 // Filter transactions by year and month
 const filterTransactionsByTime = (transactions, year, month) => {
@@ -495,7 +379,7 @@ export const OverviewSection = ({
   const analytics = useAdvancedAnalytics(filteredData);
 
   // Extract unique years and months from filtered data
-  const { years, months } = useMemo(
+  const { sortedYears: years, monthLabels: months } = useMemo(
     () => getYearsAndMonths(filteredData),
     [filteredData]
   );
@@ -574,7 +458,10 @@ export const OverviewSection = ({
         />
         <SmallKPICard
           title="Active Subscriptions"
-          value={getSubscriptionsDisplay(analytics?.recurringTransactions)}
+          value={getSubscriptionsDisplay(
+            analytics?.recurringTransactions,
+            formatCurrency
+          )}
           icon={<Repeat size={22} />}
           isCount={false}
         />

@@ -76,22 +76,28 @@ TableRowSkeleton.propTypes = {
 };
 
 /**
- * ChartSkeleton - Chart placeholder skeleton
+ * Chart Skeleton - Animated loading skeleton for charts
+ * Using fixed heights for better visual consistency
  */
-export const ChartSkeleton = ({ height = "300px" }) => (
-  <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700">
-    <Skeleton className="h-6 w-48 mb-4" />
-    <div className="flex items-end justify-between gap-2" style={{ height }}>
-      {Array.from({ length: 8 }).map((_, index) => (
-        <Skeleton
-          key={index}
-          className="w-full"
-          style={{ height: `${Math.random() * 60 + 40}%` }}
-        />
-      ))}
+export const ChartSkeleton = ({ height = "300px" }) => {
+  // Predefined heights for better visual consistency
+  const barHeights = ["45%", "70%", "55%", "85%", "60%", "75%", "50%", "65%"];
+
+  return (
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700">
+      <Skeleton className="h-6 w-48 mb-4" />
+      <div className="flex items-end justify-between gap-2" style={{ height }}>
+        {barHeights.map((barHeight, index) => (
+          <Skeleton
+            key={`skeleton-bar-${index}`}
+            className="w-full"
+            style={{ height: barHeight }}
+          />
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 ChartSkeleton.propTypes = {
   height: PropTypes.string,

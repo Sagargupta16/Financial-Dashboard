@@ -23,7 +23,7 @@ export const SpendingCalendar = ({ filteredData }) => {
 
     // Calculate spending per day
     filteredData.forEach((transaction) => {
-      if (!transaction || !transaction.date) {
+      if (!transaction?.date) {
         return;
       }
 
@@ -31,15 +31,16 @@ export const SpendingCalendar = ({ filteredData }) => {
       let dateStr;
       try {
         const transDate = new Date(transaction.date);
-        if (isNaN(transDate.getTime())) {
+        if (Number.isNaN(transDate.getTime())) {
           return; // Skip invalid dates
         }
         dateStr = transDate.toISOString().split("T")[0];
-      } catch (e) {
+      } catch (error) {
+        console.warn("Failed to parse transaction date:", error);
         return; // Skip if date parsing fails
       }
 
-      const amount = Math.abs(parseFloat(transaction.amount) || 0);
+      const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
       const type = transaction.type;
 
       if (type === "Expense") {
@@ -180,10 +181,13 @@ export const SpendingCalendar = ({ filteredData }) => {
                         {data.transactions.length} transaction(s)
                       </p>
                       <div className="max-h-24 overflow-y-auto space-y-1">
-                        {data.transactions.slice(0, 3).map((t, i) => (
-                          <p key={i} className="text-gray-300 text-xs truncate">
+                        {data.transactions.slice(0, 3).map((t) => (
+                          <p
+                            key={`${t.date}-${t.category}-${t.amount}`}
+                            className="text-gray-300 text-xs truncate"
+                          >
                             {t.category}: ₹
-                            {Math.abs(parseFloat(t.amount)).toFixed(0)}
+                            {Math.abs(Number.parseFloat(t.amount)).toFixed(0)}
                           </p>
                         ))}
                         {data.transactions.length > 3 && (

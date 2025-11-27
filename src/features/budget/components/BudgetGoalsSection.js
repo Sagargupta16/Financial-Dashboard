@@ -19,9 +19,6 @@ export const BudgetGoalsSection = ({
     const depositAccounts = {};
     const bankOnly = {};
 
-    // eslint-disable-next-line no-console
-    console.log("BudgetGoalsSection - accountBalances:", accountBalances);
-
     if (accountBalances && typeof accountBalances === "object") {
       // Handle array format: [{name, balance}]
       const entries = Array.isArray(accountBalances)
@@ -63,13 +60,6 @@ export const BudgetGoalsSection = ({
         }
       });
     }
-
-    // eslint-disable-next-line no-console
-    console.log("BudgetGoalsSection - Classified:", {
-      investments: investmentAccounts,
-      deposits: depositAccounts,
-      bankAccounts: bankOnly,
-    });
 
     return {
       investments: investmentAccounts,

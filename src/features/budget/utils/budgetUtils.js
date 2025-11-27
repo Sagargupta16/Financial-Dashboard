@@ -56,7 +56,7 @@ export const calculateCategorySpending = (transactions) => {
 
   transactions.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
-    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
     const type = transaction.type;
 
     // Only count expenses
@@ -240,7 +240,7 @@ export const detectRecurringPayments = (transactions) => {
   // Group by category and similar amounts
   transactions.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
-    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
     const date = new Date(transaction.date);
 
     if (!categoryGroups[category]) {
@@ -305,7 +305,7 @@ export const detectRecurringPayments = (transactions) => {
 
           recurring.push({
             category,
-            amount: parseFloat(baseAmount),
+            amount: Number.parseFloat(baseAmount),
             frequency,
             interval: Math.round(avgInterval),
             occurrences: items.length,
@@ -320,18 +320,6 @@ export const detectRecurringPayments = (transactions) => {
 
   return recurring.sort((a, b) => b.amount - a.amount);
 };
-
-/**
- * Calculate savings rate score (legacy - kept for reference)
- * Now using dynamic calculation in calculateHealthScore
- */
-// const calculateSavingsRateScore = (savingsRate) => {
-//   if (savingsRate >= 20) return 30;
-//   if (savingsRate >= 15) return 25;
-//   if (savingsRate >= 10) return 20;
-//   if (savingsRate >= 5) return 10;
-//   return 5;
-// };
 
 /**
  * Calculate consistency score
@@ -357,32 +345,13 @@ const calculateSpendingVariance = (_expenses) => {
  * Calculate financial health score (0-100)
  */
 export const calculateHealthScore = (data) => {
-  const {
-    income,
-    expenses,
-    savings,
-    accountBalances,
-    investments,
-    deposits,
-    // eslint-disable-next-line no-unused-vars
-    filteredData, // Kept for future use, not needed in current calculation
-  } = data;
-
-  // Debug logging
-  // eslint-disable-next-line no-console
-  console.log("calculateHealthScore - Input:", {
-    income,
-    expenses,
-    savings,
-    accountBalances,
-    investments,
-    deposits,
-  });
+  const { income, expenses, savings, accountBalances, investments, deposits } =
+    data;
 
   // Ensure we have valid numbers
-  const validIncome = parseFloat(income) || 0;
-  const validExpenses = parseFloat(expenses) || 0;
-  const validSavings = parseFloat(savings) || 0;
+  const validIncome = Number.parseFloat(income) || 0;
+  const validExpenses = Number.parseFloat(expenses) || 0;
+  const validSavings = Number.parseFloat(savings) || 0;
 
   const metrics = {};
   const details = {}; // Store calculation details for visualization
@@ -415,15 +384,6 @@ export const calculateHealthScore = (data) => {
     monthlyExpenses > 0 ? totalLiquidAssets / monthlyExpenses : 0;
   metrics.emergencyFund = calculateEmergencyFundScore(monthsCovered);
   details.monthsCovered = monthsCovered;
-
-  // Debug emergency fund calculation
-  // eslint-disable-next-line no-console
-  console.log("Emergency Fund Calculation:", {
-    totalLiquidAssets,
-    monthlyExpenses,
-    monthsCovered,
-    emergencyFundScore: metrics.emergencyFund,
-  });
 
   // 4. Income/Expense Ratio (0-15 points)
   const ratio = validExpenses > 0 ? validIncome / validExpenses : 1;
@@ -460,9 +420,6 @@ export const calculateHealthScore = (data) => {
     debtToIncomeRatio: details.debtToIncomeRatio.toFixed(1),
   };
 
-  // eslint-disable-next-line no-console
-  console.log("calculateHealthScore - Output:", result);
-
   return result;
 };
 
@@ -491,8 +448,8 @@ export const generateRecommendations = (budgetComparison, healthScore) => {
     return recommendations;
   }
 
-  const savingsRate = parseFloat(healthScore.savingsRate) || 0;
-  const monthsCovered = parseFloat(healthScore.monthsCovered) || 0;
+  const savingsRate = Number.parseFloat(healthScore.savingsRate) || 0;
+  const monthsCovered = Number.parseFloat(healthScore.monthsCovered) || 0;
   const score = healthScore.score || 0;
 
   if (savingsRate < 10) {

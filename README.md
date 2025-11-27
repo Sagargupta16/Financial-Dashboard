@@ -16,37 +16,6 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## ✨ Features
 
-### 🆕 **Latest Updates (October 2025)**
-
-#### **Financial Health Dashboard**
-
-- **6 Advanced KPI Cards**: Savings rate, daily burn rate, monthly spending, net worth change, spending velocity (30-day), and category concentration
-- **Smart Color Coding**: Green (excellent), Yellow (good), Red (needs attention)
-- **Real-time Calculations**: All metrics update automatically with your data
-
-#### **AI-Style Smart Insights & Recommendations**
-
-- **💰 Savings Opportunities**: Identifies potential savings from delivery apps, cafeteria spending, etc.
-- **📊 Pattern Detection**: Weekend vs weekday spending, high-frequency categories, large transactions
-- **🎉 Achievements**: Celebrates good financial behaviors
-- **⚠️ Warnings**: Alerts for low savings rates and concerning patterns
-- **Time-Based Filtering**: Filter insights by year and month for targeted analysis
-- **Priority-Based Display**: High priority alerts shown first
-
-#### **Running Balance Tracking**
-
-- **Cumulative Balance Column**: See your balance after each transaction
-- **Visual Flow**: Color-coded positive (green) and negative (red) balances
-- **Historical View**: Track exactly when you went positive or negative
-- **All Transaction Types**: Handles income, expenses, and transfers
-
-#### **Enhanced Data Management**
-
-- **CSV Import/Export**: Import transactions and export filtered data
-- **Toast Notifications**: Real-time feedback for all actions
-- **Data Persistence**: Automatic saving to browser localStorage
-- **Smart Sorting**: Proper date, number, and string sorting in all tables
-
 ### 📊 **Comprehensive Analytics**
 
 - **KPI Overview**: Total income, expenses, net balance, transaction counts, and advanced financial health metrics
@@ -154,7 +123,7 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 **Example:**
 
-```
+```text
 Date    | Amount     | Type    | Running Balance
 --------|------------|---------|------------------
 Jan 1   | ₹50,000    | Income  | ₹50,000 (Positive)
@@ -250,104 +219,61 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 
 ### Core Technologies
 
-- **React 19.1.1**: Modern UI framework with latest features
-- **Chart.js 4.5.0**: Powerful charting library with custom plugins
+- **React 19.1.1**: Modern UI framework
+- **Chart.js 4.5.0**: Powerful charting library
 - **react-chartjs-2**: React wrapper for Chart.js
-- **TailwindCSS 3.4.17**: Utility-first CSS framework
-- **Lucide React**: Beautiful, consistent icon library
-- **xlsx 0.18.5**: Excel file parsing and processing
+- **TailwindCSS 3.4**: Utility-first CSS framework
+- **Lucide React**: Icon library
+- **xlsx**: Excel file parsing
 
-### Build Tools & Quality
+### Build & Development
 
-- **Create React App 5.0.1**: Zero-configuration setup
-- **PostCSS & Autoprefixer**: CSS processing and vendor prefixing
-- **ESLint**: Code quality and consistency
+- **Create React App**: Zero-configuration setup
+- **ESLint**: Code quality and linting
 - **PropTypes**: Runtime type checking
-- **React Scripts**: Build and development tools
+- **pnpm**: Fast, disk space efficient package manager
+- **Husky**: Git hooks for code quality
 
-### Performance
+### Browser Support
 
-- **Bundle Size**: 282.95 KB (gzipped)
-- **Memoization**: All expensive calculations properly memoized
-- **Code Splitting**: Optimized for fast initial load
-- **Browser Support**: Modern browsers (Chrome, Firefox, Safari, Edge)
+Modern browsers (Chrome, Firefox, Safari, Edge)
 
 ## 📁 Project Structure
 
-```
+```text
 src/
-├── features/                    # Feature-based modules
-│   ├── analytics/              # Analytics and insights
-│   │   ├── components/         # Analytics components
-│   │   └── utils/              # Analytics utilities
-│   ├── budget/                 # Budget tracking
-│   │   ├── components/         # Budget components
-│   │   └── utils/              # Budget utilities
-│   ├── charts/                 # Chart visualizations
-│   │   ├── components/         # Chart components
-│   │   └── utils/              # Chart utilities
-│   └── transactions/           # Transaction management
-│       ├── components/         # Transaction components
-│       └── utils/              # Transaction utilities
-├── shared/                      # Shared resources
-│   ├── components/             # Reusable components
-│   │   ├── layout/             # Layout components (Header, Footer)
-│   │   ├── sections/           # Section components (Overview, etc.)
-│   │   └── ui/                 # UI components (KPICards, Tables, etc.)
-│   ├── contexts/               # React contexts
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── useCalculations.js  # KPI and metrics calculations
-│   │   ├── useChartData.js     # Chart data preparation
-│   │   └── useDataProcessor.js # Data processing and filtering
-│   └── utils/                  # Utility functions
-│       ├── calculations.js     # Core calculation functions
-│       ├── dataUtils.js        # Data formatting utilities
-│       └── insightsGenerator.js # Smart insights generation
-├── App.js                       # Main application component
-├── index.js                     # Application entry point
-└── index.css                    # Global styles with Tailwind
+├── features/              # Feature modules (analytics, budget, charts, transactions)
+├── shared/                # Shared resources
+│   ├── components/        # Reusable UI components
+│   ├── hooks/             # Custom React hooks
+│   └── utils/             # Utility functions
+├── config/                # Configuration files
+├── App.js                 # Main application
+└── index.js               # Entry point
 ```
 
 ## 🎯 Available Scripts
 
-### Development
-
 ```bash
 pnpm start          # Start development server
-pnpm test           # Run test suite
 pnpm build          # Build for production
-pnpm eject          # Eject from Create React App (one-way operation)
+pnpm test           # Run test suite
+pnpm lint           # Run ESLint
+pnpm lint:fix       # Fix ESLint issues
+pnpm format         # Format code with Prettier
 ```
 
-### Production Deployment
+## 🔧 Configuration
 
-```bash
-pnpm build      # Creates optimized production build in /build folder
-```
+### Currency Format
 
-## 🔧 Customization
-
-### Adding New Chart Types
-
-1. Create new chart component in `src/features/charts/components/`
-2. Add chart data processing logic in `src/shared/hooks/useChartData.js`
-3. Import and use in `src/App.js` or relevant section component
-
-### Adding New Insights
-
-1. Add insight generation logic in `src/shared/utils/insightsGenerator.js`
-2. Define insight type, priority, and message template
-3. Insights will automatically appear in the Smart Insights section
-
-### Modifying Currency Format
-
-Update the `formatCurrency` function in `src/shared/utils/dataUtils.js`:
+Update the `formatCurrency` function in `src/shared/utils/dataUtils.js` to change currency:
 
 ```javascript
 export const formatCurrency = (value) => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD", // Change currency here
+    currency: "INR", // Change as needed
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
@@ -420,20 +346,20 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 
 ### Common Issues
 
-**CSV/Excel Upload Not Working**
+#### CSV/Excel Upload Not Working
 
 - Ensure file follows the exact format specified
 - Check that all required columns are present
 - Verify date format is DD/MM/YYYY
 - For Excel files, ensure data is in the first worksheet
 
-**Charts Not Displaying**
+#### Charts Not Displaying
 
 - Check browser console for JavaScript errors
 - Ensure all dependencies are installed correctly
 - Verify file data is properly formatted
 
-**Build Failures**
+#### Build Failures
 
 - Run `pnpm install` to ensure all dependencies are installed
 - Check Node.js version compatibility (>=20.0.0 required)
@@ -443,36 +369,9 @@ Modify the color scheme in `tailwind.config.js` or update the CSS classes in com
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -am 'Add new feature'`
+3. Commit changes: `git commit -m 'Add new feature'`
 4. Push to branch: `git push origin feature-name`
 5. Submit a Pull Request
-
-## 🆕 Recent Updates (October 2025)
-
-### Major Features Added
-
-✅ **Financial Health Dashboard** - 6 new KPI cards providing instant financial health assessment  
-✅ **Smart Insights Generator** - AI-style personalized recommendations and savings opportunities  
-✅ **Running Balance Tracking** - Cumulative balance column in transaction table  
-✅ **Time-Based Filtering** - Filter insights by year and month for targeted analysis  
-✅ **Enhanced Sorting** - Proper date, number, and string sorting throughout the app  
-✅ **Feature-Based Architecture** - Reorganized codebase for better maintainability
-
-### Build Status
-
-- **Status**: ✅ Compiles successfully
-- **Bundle Size**: 282.95 KB (gzipped)
-- **Code Quality**: ESLint compliant with proper PropTypes
-- **Performance**: All calculations properly memoized
-- **Browser Support**: Modern browsers fully supported
-
-### What Users Can Now Do
-
-1. **Assess Financial Health Instantly** - See savings rate, burn rate, and spending velocity at a glance
-2. **Get Personalized Insights** - Receive AI-style recommendations for saving money
-3. **Track Balance Over Time** - Visualize how each transaction affects your cumulative balance
-4. **Filter by Time Period** - Analyze insights for specific years or months
-5. **Make Data-Driven Decisions** - Use metrics and insights to improve financial habits
 
 ## 📄 License
 

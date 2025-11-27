@@ -1,42 +1,14 @@
 /**
  * Local Storage utilities for persisting user preferences and data
- * Includes encryption for sensitive financial data
+ * WARNING: Data is stored in plain text in browser localStorage.
+ * Do not store sensitive financial data here in production.
+ * For sensitive data, use server-side storage with proper encryption.
  */
 
 const STORAGE_KEYS = {
   FILTERS: "financial_dashboard_filters",
   TRANSACTIONS: "financial_dashboard_transactions",
   PREFERENCES: "financial_dashboard_preferences",
-  ENCRYPTION_KEY: "financial_dashboard_enc_key",
-};
-
-/**
- * Simple encryption/decryption using base64 encoding
- * For production, consider using Web Crypto API or a library like crypto-js
- * @param {string} data - Data to encrypt
- * @returns {string} Encrypted data
- */
-const encrypt = (data) => {
-  try {
-    return btoa(encodeURIComponent(data));
-  } catch (error) {
-    console.error("Encryption failed:", error);
-    return data;
-  }
-};
-
-/**
- * Decrypt base64 encoded data
- * @param {string} encryptedData - Encrypted data
- * @returns {string} Decrypted data
- */
-const decrypt = (encryptedData) => {
-  try {
-    return decodeURIComponent(atob(encryptedData));
-  } catch (error) {
-    console.error("Decryption failed:", error);
-    return encryptedData;
-  }
 };
 
 /**
@@ -113,54 +85,31 @@ export const loadFilters = () => {
 };
 
 /**
- * Save transactions to localStorage with encryption
+ * Save transactions to localStorage
  * @param {Array} transactions - Array of transaction objects
- * @param {boolean} useEncryption - Whether to encrypt data (default: true)
  */
-export const saveTransactions = (transactions, useEncryption = true) => {
+export const saveTransactions = (transactions) => {
   // Convert dates to ISO strings for storage
   const serializable = transactions.map((t) => ({
     ...t,
     date: t.date instanceof Date ? t.date.toISOString() : t.date,
   }));
 
-  if (useEncryption) {
-    const encrypted = encrypt(JSON.stringify(serializable));
-    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, encrypted);
-    return true;
-  }
-
   return saveToLocalStorage(STORAGE_KEYS.TRANSACTIONS, serializable);
 };
 
 /**
- * Load transactions from localStorage with decryption
+ * Load transactions from localStorage
  * @returns {Array} Array of transaction objects with parsed dates
  */
 export const loadTransactions = () => {
   try {
-    const encryptedData = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
-    if (!encryptedData) {
-      return [];
-    }
-
-    // Try to decrypt first (new format)
-    try {
-      const decrypted = decrypt(encryptedData);
-      const transactions = JSON.parse(decrypted);
-      // Convert ISO strings back to Date objects
-      return transactions.map((t) => ({
-        ...t,
-        date: new Date(t.date),
-      }));
-    } catch (decryptError) {
-      // Fallback to unencrypted format (old data)
-      const transactions = loadFromLocalStorage(STORAGE_KEYS.TRANSACTIONS, []);
-      return transactions.map((t) => ({
-        ...t,
-        date: new Date(t.date),
-      }));
-    }
+    const transactions = loadFromLocalStorage(STORAGE_KEYS.TRANSACTIONS, []);
+    // Convert ISO strings back to Date objects
+    return transactions.map((t) => ({
+      ...t,
+      date: new Date(t.date),
+    }));
   } catch (error) {
     console.error("Failed to load transactions:", error);
     return [];
@@ -194,7 +143,7 @@ export const loadPreferences = () => {
 export const getLocalStorageSize = () => {
   let total = 0;
   for (const key in localStorage) {
-    if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
+    if (Object.hasOwn(localStorage, key)) {
       total += localStorage[key].length + key.length;
     }
   }
@@ -213,7 +162,8 @@ export const hasStorageSpace = (requiredBytes = 0) => {
     localStorage.setItem(testKey, testData);
     localStorage.removeItem(testKey);
     return true;
-  } catch (e) {
+  } catch (error) {
+    console.warn("Storage space check failed:", error.message);
     return false;
   }
 };
@@ -223,7 +173,7 @@ export const hasStorageSpace = (requiredBytes = 0) => {
  * @returns {Promise<Object>} Storage quota info
  */
 export const getStorageQuota = async () => {
-  if (navigator.storage && navigator.storage.estimate) {
+  if (navigator.storage?.estimate) {
     const estimate = await navigator.storage.estimate();
     return {
       usage: estimate.usage,

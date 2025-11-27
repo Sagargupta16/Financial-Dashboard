@@ -145,9 +145,9 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
               {analytics.recurringTransactions
                 .filter((t) => t.isMonthly)
                 .slice(0, 6)
-                .map((sub, i) => (
+                .map((sub) => (
                   <div
-                    key={i}
+                    key={`recurring-${sub.category}-${sub.frequency.toFixed(0)}`}
                     className="bg-gray-700/50 rounded-lg p-4 hover:bg-gray-700/70 transition-colors"
                   >
                     <div className="flex justify-between items-start">
@@ -197,9 +197,9 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
           </h3>
 
           <div className="space-y-3">
-            {analytics.anomalies.slice(0, 5).map((anom, i) => (
+            {analytics.anomalies.slice(0, 5).map((anom) => (
               <div
-                key={i}
+                key={`anomaly-${anom.date}-${anom.amount}`}
                 className={`rounded-lg p-4 ${
                   anom.severity === "high"
                     ? "bg-red-900/40 border border-red-500/50"
@@ -323,8 +323,11 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
           </h3>
 
           <div className="space-y-4">
-            {analytics.categoryTrends.slice(0, 5).map((cat, i) => (
-              <div key={i} className="bg-gray-700/50 rounded-lg p-4">
+            {analytics.categoryTrends.slice(0, 5).map((cat) => (
+              <div
+                key={`category-trend-${cat.category}`}
+                className="bg-gray-700/50 rounded-lg p-4"
+              >
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-medium text-white">{cat.category}</span>
                   {/* eslint-disable-next-line no-nested-ternary */}
@@ -373,10 +376,10 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {analytics.monthlyHealthRatio.slice(-6).map((month, i) => (
+              {analytics.monthlyHealthRatio.slice(-6).map((month) => (
                 /* eslint-disable-next-line no-nested-ternary */
                 <div
-                  key={i}
+                  key={`monthly-health-${month.month}`}
                   className={`rounded-lg p-4 ${
                     month.status === "healthy"
                       ? "bg-green-900/20 border border-green-500/30"

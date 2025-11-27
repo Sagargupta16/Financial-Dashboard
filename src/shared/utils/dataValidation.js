@@ -26,7 +26,7 @@ export const transactionSchema = {
         return { valid: false, message: "Date is required" };
       }
       const date = new Date(value);
-      if (isNaN(date.getTime())) {
+      if (Number.isNaN(date.getTime())) {
         return { valid: false, message: "Invalid date format" };
       }
       // Check if date is not in the future
@@ -47,7 +47,7 @@ export const transactionSchema = {
         return { valid: false, message: "Amount is required" };
       }
       const num = Number(value);
-      if (isNaN(num)) {
+      if (Number.isNaN(num)) {
         return { valid: false, message: "Amount must be a number" };
       }
       if (num === 0) {
@@ -153,10 +153,9 @@ export const validateTransaction = (transaction, strict = false) => {
  * @param {Object} options - Validation options
  * @returns {Object} Validation result
  */
-export const validateTransactions = (
-  transactions,
-  options = { strict: false, skipInvalid: true }
-) => {
+export const validateTransactions = (transactions, options) => {
+  const { strict = false, skipInvalid = true } = options || {};
+
   const results = {
     valid: [],
     invalid: [],
@@ -172,11 +171,14 @@ export const validateTransactions = (
       results.valid.push({ index, transaction });
       results.validCount++;
     } else {
-      results.invalid.push({
-        index,
-        transaction,
-        errors: validation.errors,
-      });
+      const shouldSkip = skipInvalid && !strict;
+      if (!shouldSkip) {
+        results.invalid.push({
+          index,
+          transaction,
+          errors: validation.errors,
+        });
+      }
       results.invalidCount++;
     }
   });

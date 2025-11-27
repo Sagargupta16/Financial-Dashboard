@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import {
@@ -6,6 +5,11 @@ import {
   calculateHealthScore,
   generateRecommendations,
 } from "../../../features/budget/utils/budgetUtils";
+import {
+  getScoreColor,
+  getGradient,
+  prepareHealthData,
+} from "../../utils/healthScoreHelpers";
 
 /**
  * Financial Health Score Dashboard
@@ -18,68 +22,22 @@ export const FinancialHealthScore = ({
   investments,
   deposits,
 }) => {
-  const healthData = useMemo(() => {
-    const categorySpending = calculateCategorySpending(filteredData);
-    const totalExpenses = Object.values(categorySpending).reduce(
-      (sum, val) => sum + val,
-      0
-    );
-
-    const income = kpiData?.income || 0;
-    const data = {
-      income,
-      expenses: totalExpenses,
-      savings: income - totalExpenses,
-      accountBalances: accountBalances || {},
-      investments: investments || {},
-      deposits: deposits || {},
-      categorySpending,
-      filteredData, // Add filteredData for debt calculation
-    };
-
-    // Debug logging
-    // eslint-disable-next-line no-console
-    console.log("FinancialHealthScore - Data:", {
-      income,
-      totalExpenses,
-      savings: income - totalExpenses,
-      accountBalances,
-      investments,
-      deposits,
-      categorySpending,
-    });
-
-    const score = calculateHealthScore(data);
-    // eslint-disable-next-line no-console
-    console.log("FinancialHealthScore - Score:", score);
-
-    const budgetComparison = {}; // Can be enhanced with actual budgets later
-    const recommendations = generateRecommendations(budgetComparison, score);
-
-    return { score, recommendations, data };
-  }, [filteredData, kpiData, accountBalances, investments, deposits]);
+  const healthData = useMemo(
+    () =>
+      prepareHealthData({
+        filteredData,
+        kpiData,
+        accountBalances,
+        investments,
+        deposits,
+        calculateCategorySpending,
+        calculateHealthScore,
+        generateRecommendations,
+      }),
+    [filteredData, kpiData, accountBalances, investments, deposits]
+  );
 
   const { score, recommendations } = healthData;
-
-  const getScoreColor = (scoreValue) => {
-    if (scoreValue >= 80) {
-      return "text-green-400";
-    }
-    if (scoreValue >= 60) {
-      return "text-yellow-400";
-    }
-    return "text-red-400";
-  };
-
-  const getGradient = (scoreValue) => {
-    if (scoreValue >= 80) {
-      return "from-green-600 to-green-700";
-    }
-    if (scoreValue >= 60) {
-      return "from-yellow-600 to-yellow-700";
-    }
-    return "from-red-600 to-red-700";
-  };
 
   return (
     <div className="bg-gray-800/50 rounded-2xl p-6">

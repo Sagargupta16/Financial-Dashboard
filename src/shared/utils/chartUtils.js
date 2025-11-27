@@ -221,5 +221,5 @@ export const getAvailableYears = (data) => {
 
 export const formatMonthLabel = (monthKey) => {
   const [year, monthNum] = monthKey.split("-");
-  return `${shortMonthNames[parseInt(monthNum) - 1]} ${year}`;
+  return `${shortMonthNames[Number.parseInt(monthNum, 10) - 1]} ${year}`;
 };

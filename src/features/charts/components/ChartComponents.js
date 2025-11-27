@@ -4167,9 +4167,9 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
               </text>
 
               {/* Links (flows) */}
-              {sankeyData.links.map((link, i) => (
+              {sankeyData.links.map((link) => (
                 <path
-                  key={i}
+                  key={`sankey-link-${link.source}-${link.target}-${link.value}`}
                   d={generatePath(link)}
                   stroke="#60a5fa"
                   strokeWidth={Math.max(

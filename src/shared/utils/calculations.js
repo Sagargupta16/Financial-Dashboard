@@ -831,13 +831,13 @@ export const calculateTotal = (data) => {
     return data.reduce((sum, item) => {
       const value =
         typeof item === "object" ? item.balance || item.amount || 0 : item;
-      return sum + (parseFloat(value) || 0);
+      return sum + (Number.parseFloat(value) || 0);
     }, 0);
   }
 
   if (typeof data === "object") {
     return Object.values(data).reduce(
-      (sum, val) => sum + (parseFloat(val) || 0),
+      (sum, val) => sum + (Number.parseFloat(val) || 0),
       0
     );
   }
@@ -854,12 +854,12 @@ export const calculateTotalLiquidAssets = (accountBalances) => {
   if (accountBalances && typeof accountBalances === "object") {
     if (Array.isArray(accountBalances)) {
       totalBalance = accountBalances.reduce(
-        (sum, acc) => sum + (parseFloat(acc.balance) || 0),
+        (sum, acc) => sum + (Number.parseFloat(acc.balance) || 0),
         0
       );
     } else {
       totalBalance = Object.values(accountBalances).reduce(
-        (sum, val) => sum + (parseFloat(val) || 0),
+        (sum, val) => sum + (Number.parseFloat(val) || 0),
         0
       );
     }

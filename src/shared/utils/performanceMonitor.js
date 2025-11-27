@@ -58,20 +58,24 @@ export const measure = (name, startMark, endMark) => {
 };
 
 /**
- * Get performance metrics
+ * Get performance metrics using modern Navigation Timing API
  * @returns {Object} Performance metrics
  */
 export const getPerformanceMetrics = () => {
-  if (!window.performance || !window.performance.timing) {
+  if (!globalThis.performance) {
     return null;
   }
 
-  const timing = window.performance.timing;
-  const navigation = window.performance.navigation;
+  // Use modern PerformanceNavigationTiming API
+  const navEntries = performance.getEntriesByType("navigation");
+  if (navEntries.length === 0) {
+    return null;
+  }
+
+  const timing = navEntries[0];
 
   return {
     // Navigation timing
-    navigationStart: timing.navigationStart,
     fetchStart: timing.fetchStart,
     domainLookupStart: timing.domainLookupStart,
     domainLookupEnd: timing.domainLookupEnd,
@@ -80,7 +84,6 @@ export const getPerformanceMetrics = () => {
     requestStart: timing.requestStart,
     responseStart: timing.responseStart,
     responseEnd: timing.responseEnd,
-    domLoading: timing.domLoading,
     domInteractive: timing.domInteractive,
     domContentLoadedEventStart: timing.domContentLoadedEventStart,
     domContentLoadedEventEnd: timing.domContentLoadedEventEnd,
@@ -89,18 +92,18 @@ export const getPerformanceMetrics = () => {
     loadEventEnd: timing.loadEventEnd,
 
     // Navigation type
-    navigationType: navigation.type,
-    redirectCount: navigation.redirectCount,
+    navigationType: timing.type,
+    redirectCount: timing.redirectCount,
 
     // Calculated metrics
     dnsLookup: timing.domainLookupEnd - timing.domainLookupStart,
     tcpConnection: timing.connectEnd - timing.connectStart,
     requestTime: timing.responseEnd - timing.requestStart,
     responseTime: timing.responseEnd - timing.responseStart,
-    domProcessing: timing.domComplete - timing.domLoading,
-    timeToInteractive: timing.domInteractive - timing.navigationStart,
-    domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
-    pageLoad: timing.loadEventEnd - timing.navigationStart,
+    domProcessing: timing.domComplete - timing.domInteractive,
+    timeToInteractive: timing.domInteractive - timing.fetchStart,
+    domContentLoaded: timing.domContentLoadedEventEnd - timing.fetchStart,
+    pageLoad: timing.loadEventEnd - timing.fetchStart,
   };
 };
 
@@ -109,11 +112,11 @@ export const getPerformanceMetrics = () => {
  * @returns {Object} Resource sizes
  */
 export const getResourceSizes = () => {
-  if (!window.performance || !window.performance.getEntriesByType) {
+  if (!globalThis.performance?.getEntriesByType) {
     return null;
   }
 
-  const resources = window.performance.getEntriesByType("resource");
+  const resources = globalThis.performance.getEntriesByType("resource");
   const summary = {
     totalSize: 0,
     scriptSize: 0,
@@ -177,7 +180,7 @@ export const getMemoryUsage = () => {
  * @param {Function} callback - Callback when long task detected
  */
 export const observeLongTasks = (callback) => {
-  if ("PerformanceObserver" in window) {
+  if ("PerformanceObserver" in globalThis) {
     try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {

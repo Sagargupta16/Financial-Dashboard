@@ -9,7 +9,9 @@
  * @returns {string} Unique ID
  */
 export const generateA11yId = (prefix = "a11y") => {
-  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  // Use crypto.randomUUID() for cryptographically secure random IDs
+  const uuid = crypto.randomUUID().substring(0, 8);
+  return `${prefix}-${uuid}`;
 };
 
 /**
@@ -29,7 +31,7 @@ export const announceToScreenReader = (message, priority = "polite") => {
 
   // Remove after announcement
   setTimeout(() => {
-    document.body.removeChild(announcement);
+    announcement.remove();
   }, 1000);
 };
 
@@ -75,18 +77,14 @@ export const trapFocus = (element) => {
       return;
     }
 
-    if (e.shiftKey) {
+    if (e.shiftKey && document.activeElement === firstFocusable) {
       // Shift + Tab
-      if (document.activeElement === firstFocusable) {
-        e.preventDefault();
-        lastFocusable.focus();
-      }
-    } else {
+      e.preventDefault();
+      lastFocusable.focus();
+    } else if (!e.shiftKey && document.activeElement === lastFocusable) {
       // Tab
-      if (document.activeElement === lastFocusable) {
-        e.preventDefault();
-        firstFocusable.focus();
-      }
+      e.preventDefault();
+      firstFocusable.focus();
     }
   };
 
@@ -108,7 +106,7 @@ export const isAccessible = (element) => {
     return false;
   }
 
-  const style = window.getComputedStyle(element);
+  const style = globalThis.getComputedStyle(element);
   return (
     style.display !== "none" &&
     style.visibility !== "hidden" &&
@@ -184,9 +182,9 @@ export const addKeyboardSupport = (element, handlers = {}) => {
  */
 export const checkColorContrast = (foreground, background) => {
   const getRGB = (hex) => {
-    const r = parseInt(hex.substr(1, 2), 16);
-    const g = parseInt(hex.substr(3, 2), 16);
-    const b = parseInt(hex.substr(5, 2), 16);
+    const r = Number.parseInt(hex.substring(1, 3), 16);
+    const g = Number.parseInt(hex.substring(3, 5), 16);
+    const b = Number.parseInt(hex.substring(5, 7), 16);
     return [r, g, b];
   };
 

@@ -91,16 +91,17 @@ export const FinancialHealthScore = ({
               </p>
               <p className="text-gray-400 text-xs mt-1">
                 ₹
-                {parseInt(score?.emergencyFundAmount || 0).toLocaleString(
-                  "en-IN"
-                )}{" "}
+                {Number.parseInt(
+                  score?.emergencyFundAmount || 0,
+                  10
+                ).toLocaleString("en-IN")}{" "}
                 total
               </p>
               <div className="mt-2 h-2 bg-gray-600 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-green-600 to-blue-600"
                   style={{
-                    width: `${Math.min(100, ((parseFloat(score?.monthsCovered) || 0) / 6) * 100)}%`,
+                    width: `${Math.min(100, ((Number.parseFloat(score?.monthsCovered) || 0) / 6) * 100)}%`,
                   }}
                 />
               </div>
@@ -113,9 +114,10 @@ export const FinancialHealthScore = ({
               <p className="text-gray-400 text-xs">Liquid Assets</p>
               <p className="text-xl font-bold text-green-400 mt-1">
                 ₹
-                {parseInt(score?.totalLiquidAssets || 0).toLocaleString(
-                  "en-IN"
-                )}
+                {Number.parseInt(
+                  score?.totalLiquidAssets || 0,
+                  10
+                ).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">Bank</p>
             </div>
@@ -124,7 +126,10 @@ export const FinancialHealthScore = ({
               <p className="text-gray-400 text-xs">Investments</p>
               <p className="text-xl font-bold text-blue-400 mt-1">
                 ₹
-                {parseInt(score?.totalInvestments || 0).toLocaleString("en-IN")}
+                {Number.parseInt(
+                  score?.totalInvestments || 0,
+                  10
+                ).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">MF, Stocks</p>
             </div>
@@ -132,7 +137,10 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Deposits</p>
               <p className="text-xl font-bold text-purple-400 mt-1">
-                ₹{parseInt(score?.totalDeposits || 0).toLocaleString("en-IN")}
+                ₹
+                {Number.parseInt(score?.totalDeposits || 0, 10).toLocaleString(
+                  "en-IN"
+                )}
               </p>
               <p className="text-gray-400 text-xs mt-1">FD, Loans</p>
             </div>
@@ -140,11 +148,14 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Debt</p>
               <p className="text-xl font-bold text-red-400 mt-1">
-                ₹{parseInt(score?.totalDebt || 0).toLocaleString("en-IN")}
+                ₹
+                {Number.parseInt(score?.totalDebt || 0, 10).toLocaleString(
+                  "en-IN"
+                )}
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                {parseFloat(score?.debtToIncomeRatio || 0).toFixed(1)}% of
-                income
+                {Number.parseFloat(score?.debtToIncomeRatio || 0).toFixed(1)}%
+                of income
               </p>
             </div>
           </div>

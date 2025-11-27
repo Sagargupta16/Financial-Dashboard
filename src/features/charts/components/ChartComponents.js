@@ -1397,7 +1397,9 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
         return acc;
       }, {});
 
-    const sortedDates = Object.keys(dailyData).sort();
+    const sortedDates = Object.keys(dailyData).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     let cumulativeNetWorth = 0;
     const netWorthData = sortedDates.map((dateKey) => {
@@ -2003,7 +2005,9 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         dailyData[dateKey][transaction.category] += transaction.amount;
       });
 
-    const sortedDates = Object.keys(dailyData).sort();
+    const sortedDates = Object.keys(dailyData).sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     const cumulativeData = {};
     selectedCategories.forEach((category) => {
@@ -2544,7 +2548,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
       monthlyData[year][month] += item.amount;
     });
 
-    const years = Object.keys(monthlyData).sort();
+    const years = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
     const datasets = years.map((year) => ({
@@ -2947,8 +2951,10 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         monthlyData[monthKey].income - monthlyData[monthKey].expense;
     });
 
-    const historicalMonths = Object.keys(monthlyData).sort();
-    const lastMonth = historicalMonths[historicalMonths.length - 1];
+    const historicalMonths = Object.keys(monthlyData).sort((a, b) =>
+      a.localeCompare(b)
+    );
+    const lastMonth = historicalMonths.at(-1);
 
     let forecastData = [];
     if (forecastType === "linear") {
@@ -3215,7 +3221,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const chartData = React.useMemo(() => {
     const accounts = [
       ...new Set(filteredData.map((item) => item.account)),
-    ].sort();
+    ].sort((a, b) => a.localeCompare(b));
 
     const accountData = {};
     accounts.forEach((account) => {
@@ -3249,7 +3255,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
 
     const allMonths = [
       ...new Set(Object.values(accountData).flatMap((acc) => Object.keys(acc))),
-    ].sort();
+    ].sort((a, b) => a.localeCompare(b));
 
     accounts.forEach((account) => {
       let runningBalance = 0;
@@ -3438,9 +3444,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
     }
   }, [filteredData, selectedAccount, viewMode, showAverage]);
 
-  const accounts = [
-    ...new Set(filteredData.map((item) => item.account)),
-  ].sort();
+  const accounts = [...new Set(filteredData.map((item) => item.account))].sort(
+    (a, b) => a.localeCompare(b)
+  );
 
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">

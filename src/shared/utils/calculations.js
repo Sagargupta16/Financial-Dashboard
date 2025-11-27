@@ -898,7 +898,7 @@ export const calculateTotalDebt = (accountBalances) => {
 
     balances.forEach(({ name, balance }) => {
       const nameLower = (name || "").toLowerCase();
-      const balanceNum = parseFloat(balance) || 0;
+      const balanceNum = Number.parseFloat(balance) || 0;
 
       // Negative balances = debt
       if (balanceNum < 0) {
@@ -918,8 +918,8 @@ export const calculateTotalDebt = (accountBalances) => {
  * Calculate savings rate percentage
  */
 export const calculateSavingsRate = (savings, income) => {
-  const validIncome = parseFloat(income) || 0;
-  const validSavings = parseFloat(savings) || 0;
+  const validIncome = Number.parseFloat(income) || 0;
+  const validSavings = Number.parseFloat(savings) || 0;
   return validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
 };
 
@@ -927,8 +927,8 @@ export const calculateSavingsRate = (savings, income) => {
  * Calculate debt to income ratio
  */
 export const calculateDebtToIncomeRatio = (debt, income) => {
-  const validIncome = parseFloat(income) || 0;
-  const validDebt = parseFloat(debt) || 0;
+  const validIncome = Number.parseFloat(income) || 0;
+  const validDebt = Number.parseFloat(debt) || 0;
   return validIncome > 0 ? (validDebt / validIncome) * 100 : 0;
 };
 
@@ -936,8 +936,8 @@ export const calculateDebtToIncomeRatio = (debt, income) => {
  * Calculate emergency fund months covered
  */
 export const calculateEmergencyFundMonths = (liquidAssets, monthlyExpenses) => {
-  const validLiquid = parseFloat(liquidAssets) || 0;
-  const validExpenses = parseFloat(monthlyExpenses) || 0;
+  const validLiquid = Number.parseFloat(liquidAssets) || 0;
+  const validExpenses = Number.parseFloat(monthlyExpenses) || 0;
   return validExpenses > 0 ? validLiquid / validExpenses : 0;
 };
 
@@ -945,8 +945,8 @@ export const calculateEmergencyFundMonths = (liquidAssets, monthlyExpenses) => {
  * Calculate income to expense ratio
  */
 export const calculateIncomeExpenseRatio = (income, expenses) => {
-  const validIncome = parseFloat(income) || 0;
-  const validExpenses = parseFloat(expenses) || 0;
+  const validIncome = Number.parseFloat(income) || 0;
+  const validExpenses = Number.parseFloat(expenses) || 0;
   return validExpenses > 0 ? validIncome / validExpenses : 1;
 };
 

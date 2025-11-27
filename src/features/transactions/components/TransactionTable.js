@@ -160,15 +160,15 @@ export const EnhancedTransactionTable = ({
     }
 
     if (debouncedFilters.amountMin !== "") {
-      const minAmount = parseFloat(debouncedFilters.amountMin);
-      if (!isNaN(minAmount)) {
+      const minAmount = Number.parseFloat(debouncedFilters.amountMin);
+      if (!Number.isNaN(minAmount)) {
         filtered = filtered.filter((item) => item.amount >= minAmount);
       }
     }
 
     if (debouncedFilters.amountMax !== "") {
-      const maxAmount = parseFloat(debouncedFilters.amountMax);
-      if (!isNaN(maxAmount)) {
+      const maxAmount = Number.parseFloat(debouncedFilters.amountMax);
+      if (!Number.isNaN(maxAmount)) {
         filtered = filtered.filter((item) => item.amount <= maxAmount);
       }
     }

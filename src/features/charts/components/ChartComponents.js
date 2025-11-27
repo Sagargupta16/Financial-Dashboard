@@ -265,7 +265,7 @@ export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }) => {
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
-            strokeLineJoin="round"
+            strokeLinejoin="round"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7,10 12,15 17,10" />
@@ -1405,30 +1405,28 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
           "Dec",
         ];
         return monthNames[date.getMonth()];
-      } else {
-        if (total > 50) {
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-            2,
-            "0"
-          )}`;
-        } else {
-          const monthNames = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ];
-          return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-        }
       }
+      if (total > 50) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+      }
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     };
 
     let aggregatedData = netWorthData;
@@ -2009,30 +2007,28 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
           "Dec",
         ];
         return monthNames[date.getMonth()];
-      } else {
-        if (total > 50) {
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-            2,
-            "0"
-          )}`;
-        } else {
-          const monthNames = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ];
-          return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-        }
       }
+      if (total > 50) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+      }
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     };
 
     let aggregatedData = processedData;

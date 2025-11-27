@@ -2771,7 +2771,7 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
 
     const datasets = [];
     Array.from(selectedYears)
-      .sort()
+      .sort((a, b) => a - b)
       .forEach((year, yearIndex) => {
         datasets.push({
           label: `${year} Net`,

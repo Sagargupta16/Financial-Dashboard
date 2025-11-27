@@ -996,7 +996,7 @@ export const scoreIncomeExpenseRatio = (ratio) => {
   if (ratio >= 1.2) {
     return 12;
   }
-  if (ratio >= 1.0) {
+  if (ratio >= 1) {
     return 8;
   }
   return 3;

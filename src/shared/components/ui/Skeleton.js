@@ -64,7 +64,7 @@ export const SmallSkeletonCard = () => (
 export const TableRowSkeleton = ({ columns = 6 }) => (
   <tr className="border-b border-gray-700">
     {Array.from({ length: columns }).map((_, index) => (
-      <td key={index} className="p-4">
+      <td key={`skeleton-col-${index}`} className="p-4">
         <Skeleton className="h-4 w-full" />
       </td>
     ))}

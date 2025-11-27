@@ -52,6 +52,7 @@ class EnhancedErrorBoundary extends React.Component {
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
+      // Note: Using window for browser compatibility (globalThis not supported by react-scripts)
       url: window.location.href,
     };
 
@@ -71,10 +72,12 @@ class EnhancedErrorBoundary extends React.Component {
   };
 
   handleReload = () => {
+    // Note: Using window for browser compatibility (globalThis not supported by react-scripts)
     window.location.reload();
   };
 
   handleGoHome = () => {
+    // Note: Using window for browser compatibility (globalThis not supported by react-scripts)
     window.location.href = "/";
   };
 

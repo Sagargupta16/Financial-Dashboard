@@ -132,9 +132,9 @@ export const CreditCardFoodOptimizer = ({ filteredData }) => {
           label: (context) => {
             const label = context.label || context.dataset.label || "";
             const value =
-              context.parsed.y !== undefined
-                ? context.parsed.y
-                : context.parsed;
+              context.parsed.y === undefined
+                ? context.parsed
+                : context.parsed.y;
             return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
           },
         },

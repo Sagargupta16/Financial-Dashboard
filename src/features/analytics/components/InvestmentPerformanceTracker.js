@@ -347,7 +347,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
 
                 return (
                   <tr
-                    key={idx}
+                    key={`${t.date}-${t.type}-${t.amount}`}
                     className="border-b border-gray-700/50 hover:bg-gray-700/30"
                   >
                     <td className="py-3 px-4 text-gray-300 text-sm">

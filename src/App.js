@@ -57,6 +57,22 @@ const TrendsForecastsSection = lazyLoad(
   () => import("./shared/components/sections/TrendsForecastsSection"),
   "TrendsForecastsSection"
 );
+const InvestmentPerformanceTracker = lazyLoad(
+  () => import("./features/analytics/components/InvestmentPerformanceTracker"),
+  "InvestmentPerformanceTracker"
+);
+const TaxPlanningDashboard = lazyLoad(
+  () => import("./features/analytics/components/TaxPlanningDashboard"),
+  "TaxPlanningDashboard"
+);
+const FamilyHousingManager = lazyLoad(
+  () => import("./features/analytics/components/FamilyHousingManager"),
+  "FamilyHousingManager"
+);
+const CreditCardFoodOptimizer = lazyLoad(
+  () => import("./features/analytics/components/CreditCardFoodOptimizer"),
+  "CreditCardFoodOptimizer"
+);
 const PatternsSection = lazyLoad(
   () => import("./shared/components/sections/PatternsSection"),
   "PatternsSection"
@@ -229,6 +245,30 @@ const App = () => {
               chartRefs={chartRefs}
               filteredData={filteredData}
             />
+          </Suspense>
+        </TabContent>
+
+        <TabContent isActive={activeTab === "investments"}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <InvestmentPerformanceTracker filteredData={filteredData} />
+          </Suspense>
+        </TabContent>
+
+        <TabContent isActive={activeTab === "tax-planning"}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <TaxPlanningDashboard filteredData={filteredData} />
+          </Suspense>
+        </TabContent>
+
+        <TabContent isActive={activeTab === "family-housing"}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <FamilyHousingManager filteredData={filteredData} />
+          </Suspense>
+        </TabContent>
+
+        <TabContent isActive={activeTab === "lifestyle"}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <CreditCardFoodOptimizer filteredData={filteredData} />
           </Suspense>
         </TabContent>
 

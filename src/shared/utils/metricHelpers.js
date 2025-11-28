@@ -79,6 +79,38 @@ export const getSpendingVelocityIconColor = (velocity) => {
 };
 
 /**
+ * Get color class for net worth metric
+ * @param {number} netWorth - Net worth value
+ * @returns {string} Tailwind CSS class
+ */
+export const getNetWorthColor = (netWorth) => {
+  return netWorth >= 0
+    ? "bg-green-900/20 border-green-500/30"
+    : "bg-red-900/20 border-red-500/30";
+};
+
+/**
+ * Get icon color for net worth metric
+ * @param {number} netWorth - Net worth value
+ * @returns {string} Tailwind CSS class
+ */
+export const getNetWorthIconColor = (netWorth) => {
+  return netWorth >= 0 ? "text-green-400" : "text-red-400";
+};
+
+/**
+ * Get color class for category concentration
+ * @param {number} percentage - Concentration percentage
+ * @param {number} threshold - Warning threshold (default 50)
+ * @returns {string} Tailwind CSS class
+ */
+export const getCategoryConcentrationColor = (percentage, threshold = 50) => {
+  return percentage > threshold
+    ? "bg-orange-900/20 border-orange-500/30"
+    : "bg-blue-900/20 border-blue-500/30";
+};
+
+/**
  * Get color class for insight priority
  * @param {string} priority - Priority level (high, positive, medium, low)
  * @returns {string} Tailwind CSS class
@@ -198,11 +230,72 @@ export const getSubscriptionsDisplay = (
   if (!recurringTransactions || recurringTransactions.length === 0) {
     return "None detected";
   }
-  const totalMonthly = recurringTransactions.reduce(
-    (sum, t) => sum + Math.abs(t.averageAmount),
+
+  // Filter only active subscriptions
+  const activeSubscriptions = recurringTransactions.filter((t) => t.isActive);
+
+  if (activeSubscriptions.length === 0) {
+    return "None active";
+  }
+
+  // Calculate total monthly cost using monthlyEquivalent
+  const totalMonthly = activeSubscriptions.reduce(
+    (sum, t) => sum + (t.monthlyEquivalent || 0),
     0
   );
-  return `${recurringTransactions.length} (${formatCurrency(totalMonthly)}/mo)`;
+
+  const count = activeSubscriptions.length;
+  const plural = count > 1 ? "s" : "";
+
+  return `${count} active subscription${plural} (${formatCurrency(totalMonthly)}/mo)`;
+};
+
+/**
+ * Get gradient and border styles for a section
+ * @param {string} sectionType - Type of section (financial-health, insights, key-insights, transfer-info)
+ * @returns {Object} Object with gradient and border classes
+ */
+export const getSectionStyles = (sectionType) => {
+  const styles = {
+    "financial-health": {
+      gradient: "from-blue-900/20 to-purple-900/20",
+      border: "border-blue-500/30",
+    },
+    insights: {
+      gradient: "from-purple-900/20 to-pink-900/20",
+      border: "border-purple-500/30",
+    },
+    "key-insights": {
+      gradient: "from-gray-800/80 via-gray-800/60 to-gray-900/80",
+      border: "border-gray-700/50",
+    },
+    "transfer-info": {
+      gradient: "from-purple-900/20 to-purple-800/20",
+      border: "border-purple-500/30",
+    },
+  };
+  return (
+    styles[sectionType] || {
+      gradient: "from-gray-800/80 to-gray-900/80",
+      border: "border-gray-700/50",
+    }
+  );
+};
+
+/**
+ * Validate and provide default KPI data
+ * @param {Object} kpiData - KPI data object
+ * @param {Object} defaults - Default values
+ * @returns {Object} Validated KPI data with defaults
+ */
+export const validateKPIData = (kpiData, defaults) => {
+  if (!kpiData || typeof kpiData !== "object") {
+    return defaults;
+  }
+  return {
+    ...defaults,
+    ...kpiData,
+  };
 };
 
 /**

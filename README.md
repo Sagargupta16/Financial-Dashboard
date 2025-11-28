@@ -1,8 +1,8 @@
 # 💰 Financial Dashboard
 
-A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, and financial health.
+A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, financial health, investments, tax planning, and lifestyle optimization.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.1.0-brightgreen)
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.3.0-brightgreen)
 
 ## 🎯 Demo
 
@@ -16,6 +16,20 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## ✨ Features
 
+### 🆕 **NEW: Unified Calculation System v0.3.0**
+
+- **Single Source of Truth**: All financial calculations centralized in `financialCalculations.js`
+- **No Duplicates**: Clean, maintainable codebase with zero duplicate calculation logic
+- **Optimized Performance**: Efficient calculations reused across all components
+- **Easy to Extend**: Add new calculations in one place, use everywhere
+
+### 📊 **Advanced Financial Management**
+
+- **📈 Investment Performance Tracker**: Stock market P&L, brokerage fees, returns, and actionable insights
+- **📋 Tax Planning Dashboard**: Income tax calculations, deductions (80C, HRA), tax slab breakdown, saving recommendations
+- **👨‍👩‍👧 Family & Housing Manager**: Family expenses, rent payments, utilities, HRA benefits
+- **💳 Lifestyle Optimizer**: Credit card analytics, cashback tracking, food spending, commute cost analysis
+
 ### 📊 **Comprehensive Analytics**
 
 - **KPI Overview**: Total income, expenses, net balance, transaction counts, and advanced financial health metrics
@@ -26,12 +40,15 @@ _Upload your financial data and watch your dashboard come to life with interacti
 ### 📈 **Rich Visualizations**
 
 - **Income vs Expense Breakdown** (Doughnut Chart)
-- **Top Expense Categories** (Bar Chart) - _with time filtering_
-- **Income Sources Analysis** (Bar Chart) - _with time filtering_
+- **Top Expense Categories** (Bar Chart) - with time filtering
+- **Income Sources Analysis** (Bar Chart) - with time filtering
 - **Spending by Account** (Doughnut Chart)
-- **Monthly Trends** (Line Chart) - _with time filtering_
+- **Monthly Trends** (Line Chart) - with time filtering
 - **Daily Spending Patterns** (Bar Chart)
 - **Subcategory Analysis** with drill-down capabilities
+- **Investment P&L Charts**: Cumulative profit/loss tracking over time
+- **Tax Breakdown**: Visual representation of tax slabs and deductions
+- **Food & Transport Trends**: Monthly spending patterns and optimization opportunities
 
 ### 🕒 **Time-Based Analysis**
 
@@ -57,7 +74,127 @@ _Upload your financial data and watch your dashboard come to life with interacti
 - **Transfers**: Handle internal account transfers
 - **Categorization**: Organize transactions with categories and subcategories
 
+## 🏗️ Architecture
+
+### Clean Code Structure
+
+```
+src/
+├── shared/
+│   ├── utils/
+│   │   └── financialCalculations.js  ← Single source of truth for ALL calculations
+│   ├── hooks/
+│   │   ├── useCalculations.js        ← Uses unified calculations
+│   │   └── useChartData.js
+│   └── components/
+├── features/
+│   ├── analytics/
+│   │   └── components/               ← All use financialCalculations.js
+│   ├── budget/
+│   ├── charts/
+│   └── transactions/
+```
+
+### Key Principles
+
+- ✅ **Single Responsibility**: Each calculation function does one thing well
+- ✅ **No Duplicates**: Same calculation never written twice
+- ✅ **Easy to Test**: Pure functions with predictable outputs
+- ✅ **Easy to Extend**: Add new features without breaking existing ones
+
 ## 🎯 Key Features in Detail
+
+### Investment Performance Tracker 📈
+
+**Comprehensive stock market analysis:**
+
+1. **P&L Tracking**
+   - Total deposits and withdrawals
+   - Realized profits and losses
+   - Net profit/loss with return percentage
+   - Cumulative P&L chart over time
+
+2. **Brokerage Analysis**
+   - Total fees paid
+   - Fee percentage of invested amount
+   - Optimization recommendations
+
+3. **Investment Insights**
+   - Win/loss ratio calculation
+   - Tax loss harvesting opportunities
+   - Strategy recommendations based on performance
+   - Recent transaction history
+
+### Tax Planning Dashboard 📋
+
+**Complete income tax planning (FY 2025-26):**
+
+1. **Income Analysis**
+   - Salary, bonus, and other income breakdown
+   - Gross vs taxable income comparison
+   - Visual income distribution
+
+2. **Deductions Tracking**
+   - 80C investments (₹1.5L limit) with progress bar
+   - HRA exemption calculation
+   - Standard deduction (₹50,000)
+   - Professional tax
+
+3. **Tax Calculation**
+   - New tax regime slab-wise breakdown
+   - Effective tax rate calculation
+   - Post-tax income projection
+   - Year-end tax estimate
+
+4. **Recommendations**
+   - Tax-saving investment suggestions
+   - Unutilized deduction alerts
+   - Optimization opportunities
+
+### Family & Housing Manager 👨‍👩‍👧‍👦
+
+**Track family and housing expenses:**
+
+1. **Family Expenses**
+   - Total family support tracking
+   - Monthly average calculations
+   - Subcategory breakdown
+   - Top expense identification
+
+2. **Housing Costs**
+   - Rent payment history
+   - Utility bills tracking
+   - Monthly housing trends
+   - HRA tax benefit calculation
+
+3. **Insights**
+   - Spending patterns over time
+   - Budget recommendations
+   - Tax benefit alerts
+
+### Lifestyle Optimizer 💳
+
+**Optimize daily spending:**
+
+1. **Credit Card Analytics**
+   - Card-wise spending breakdown
+   - Total cashback earned
+   - Cashback rate calculation
+   - Category-wise card usage
+   - Card optimization tips
+
+2. **Food Spending**
+   - Delivery apps vs groceries
+   - Office cafeteria spending
+   - Dining out costs
+   - Daily food average
+   - Monthly trends and savings opportunities
+
+3. **Transportation**
+   - Daily commute costs
+   - Intercity travel expenses
+   - Per-trip averages
+   - Alternative suggestions (bike, monthly pass)
 
 ### Financial Health Metrics
 

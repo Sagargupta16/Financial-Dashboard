@@ -12,6 +12,10 @@ import {
   Repeat,
   Lightbulb,
   Receipt,
+  TrendingDown,
+  FileText,
+  Users,
+  CreditCard,
 } from "lucide-react";
 
 export const TABS_CONFIG = [
@@ -38,6 +42,30 @@ export const TABS_CONFIG = [
     label: "Trends & Forecasts",
     icon: LineChart,
     description: "Advanced analytics and predictions",
+  },
+  {
+    id: "investments",
+    label: "Investments",
+    icon: TrendingDown,
+    description: "Stock market performance and P&L tracking",
+  },
+  {
+    id: "tax-planning",
+    label: "Tax Planning",
+    icon: FileText,
+    description: "Income tax calculations and deductions",
+  },
+  {
+    id: "family-housing",
+    label: "Family & Housing",
+    icon: Users,
+    description: "Family expenses and housing costs",
+  },
+  {
+    id: "lifestyle",
+    label: "Lifestyle",
+    icon: CreditCard,
+    description: "Credit cards, food, and commute optimization",
   },
   {
     id: "budget-goals",

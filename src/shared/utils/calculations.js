@@ -308,20 +308,27 @@ export const calculateMonthlyComparison = (transactions) => {
   });
 
   const months = Object.keys(byMonth).sort((a, b) => a.localeCompare(b));
-  const growthRates = months.map((month, i) => {
-    if (i === 0) {
-      return 0;
-    }
-    return calculateGrowthRate(
-      byMonth[month].total,
-      byMonth[months[i - 1]].total
-    );
-  });
+
+  // Calculate Year-over-Year growth rates (compare same month across years)
+  const growthRates = months
+    .map((month) => {
+      const [year, monthNum] = month.split("-");
+      const previousYear = String(Number.parseInt(year, 10) - 1);
+      const sameMonthLastYear = `${previousYear}-${monthNum}`;
+
+      if (byMonth[sameMonthLastYear]) {
+        return calculateGrowthRate(
+          byMonth[month].total,
+          byMonth[sameMonthLastYear].total
+        );
+      }
+      return null;
+    })
+    .filter((rate) => rate !== null);
 
   const avgGrowth =
-    growthRates.length > 1
-      ? growthRates.slice(1).reduce((a, b) => a + b, 0) /
-        (growthRates.length - 1)
+    growthRates.length > 0
+      ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length
       : 0;
 
   let trend = "stable";
@@ -451,61 +458,145 @@ export const calculateCashFlowForecast = (transactions, forecastDays = 30) => {
  * 4. Detect Recurring Transactions
  * Find recurring patterns (subscriptions, salaries, etc.)
  */
+/**
+ * Detect Recurring Transactions (Subscriptions, Bills, etc.)
+ * Improved algorithm with better accuracy and flexibility
+ */
 export const detectRecurringTransactions = (transactions) => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
 
-  const patterns = {};
+  // Step 1: Group transactions by description/note (more accurate than category+amount)
+  const groupByDescription = {};
 
   transactions.forEach((t) => {
-    // Group by category and rounded amount
-    const key = `${t.category || "Unknown"}-${t.type}-${Math.round(Math.abs(t.amount || 0))}`;
-    if (!patterns[key]) {
-      patterns[key] = {
+    // Use note/description as primary identifier, fallback to category
+    const description = (t.note || t.description || t.category || "Unknown")
+      .trim()
+      .toLowerCase();
+    const amount = Math.abs(Number(t.amount) || 0);
+
+    // Skip very small amounts (likely not subscriptions)
+    if (amount < 10) {
+      return;
+    }
+
+    // Create a flexible key that groups similar transactions
+    // Round amount to nearest 10 for slight variations (e.g., ₹499 vs ₹500)
+    const amountKey = Math.round(amount / 10) * 10;
+    const key = `${description}-${t.type}-${amountKey}`;
+
+    if (!groupByDescription[key]) {
+      groupByDescription[key] = {
+        description: t.note || t.description || t.category || "Unknown",
         category: t.category,
         type: t.type,
-        amount: Math.abs(t.amount || 0),
+        amounts: [],
         dates: [],
+        transactions: [],
       };
     }
-    if (t.date) {
-      patterns[key].dates.push(new Date(t.date));
-    }
+
+    groupByDescription[key].amounts.push(amount);
+    groupByDescription[key].dates.push(new Date(t.date));
+    groupByDescription[key].transactions.push(t);
   });
 
-  return Object.entries(patterns)
-    .filter(([_, data]) => data.dates.length >= 3) // At least 3 occurrences
-    .map(([key, data]) => {
-      const dates = data.dates.sort((a, b) => a - b);
-      const intervals = [];
+  // Step 2: Analyze each group for recurring patterns
+  const recurring = [];
 
-      for (let i = 1; i < dates.length; i++) {
-        intervals.push((dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24));
+  Object.entries(groupByDescription).forEach(([_key, data]) => {
+    // Need at least 2 occurrences (lowered from 3 for better detection)
+    if (data.dates.length < 2) {
+      return;
+    }
+
+    const dates = data.dates.sort((a, b) => a - b);
+    const amounts = data.amounts; // Calculate intervals between transactions
+    const intervals = [];
+    for (let i = 1; i < dates.length; i++) {
+      const daysBetween = (dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
+      intervals.push(daysBetween);
+    }
+
+    // Calculate average interval and standard deviation
+    const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const variance =
+      intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) /
+      intervals.length;
+    const stdDev = Math.sqrt(variance);
+
+    // Check if intervals are consistent (low standard deviation = recurring)
+    // Allow for some flexibility: stdDev should be less than 20% of average
+    const isConsistent = stdDev < avgInterval * 0.2 || intervals.length === 1;
+
+    // Classify the frequency
+    let frequency = "irregular";
+    let isRecurring = false;
+
+    if (isConsistent) {
+      if (avgInterval >= 27 && avgInterval <= 33) {
+        frequency = "monthly";
+        isRecurring = true;
+      } else if (avgInterval >= 6 && avgInterval <= 8) {
+        frequency = "weekly";
+        isRecurring = true;
+      } else if (avgInterval >= 13 && avgInterval <= 16) {
+        frequency = "bi-weekly";
+        isRecurring = true;
+      } else if (avgInterval >= 60 && avgInterval <= 70) {
+        frequency = "bi-monthly";
+        isRecurring = true;
+      } else if (avgInterval >= 85 && avgInterval <= 95) {
+        frequency = "quarterly";
+        isRecurring = true;
+      } else if (avgInterval >= 175 && avgInterval <= 185) {
+        frequency = "semi-annually";
+        isRecurring = true;
+      } else if (avgInterval >= 360 && avgInterval <= 370) {
+        frequency = "annually";
+        isRecurring = true;
       }
+    }
 
-      const avgInterval =
-        intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    // Only include if it's actually recurring
+    if (isRecurring) {
+      const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
       const lastDate = dates[dates.length - 1];
       const nextExpected = new Date(
         lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000
       );
 
-      return {
+      // Check if subscription is still active (last occurrence within 2x interval)
+      const daysSinceLastOccurrence =
+        (Date.now() - lastDate) / (1000 * 60 * 60 * 24);
+      const isActive = daysSinceLastOccurrence < avgInterval * 2;
+
+      recurring.push({
+        description: data.description,
         category: data.category,
         type: data.type,
-        amount: data.amount,
-        frequency: avgInterval,
+        averageAmount: avgAmount,
+        minAmount: Math.min(...amounts),
+        maxAmount: Math.max(...amounts),
+        frequency,
+        intervalDays: Math.round(avgInterval),
         count: dates.length,
-        isMonthly: avgInterval >= 28 && avgInterval <= 32,
-        isWeekly: avgInterval >= 6 && avgInterval <= 8,
-        isBiWeekly: avgInterval >= 13 && avgInterval <= 15,
-        nextExpected,
+        consistency: ((1 - stdDev / avgInterval) * 100).toFixed(1), // Percentage
+        isActive,
+        firstOccurrence: dates[0],
         lastOccurrence: lastDate,
-        pattern: key,
-      };
-    })
-    .sort((a, b) => b.amount - a.amount);
+        nextExpected,
+        daysSinceLastOccurrence: Math.round(daysSinceLastOccurrence),
+        // Monthly equivalent for budgeting
+        monthlyEquivalent: (avgAmount / avgInterval) * 30.44,
+      });
+    }
+  });
+
+  // Sort by monthly equivalent (highest impact first)
+  return recurring.sort((a, b) => b.monthlyEquivalent - a.monthlyEquivalent);
 };
 
 /**

@@ -1,12 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import {
   TrendingUp,
-  TrendingDown,
-  Wallet,
-  Hash,
-  Target,
-  Sigma,
   CalendarDays,
   LayoutGrid,
   Calculator,
@@ -16,11 +11,14 @@ import {
   Calendar,
   Lightbulb,
   Filter,
-  AlertTriangle,
-  Repeat,
 } from "lucide-react";
-import { KPICard, SmallKPICard } from "../ui/KPICards";
+import { SmallKPICard } from "../ui/KPICards";
 import { AccountBalancesCard } from "../ui/AccountBalancesCard";
+import { MainKPISection } from "./MainKPISection";
+import {
+  SecondaryKPISection,
+  AdvancedAnalyticsKPISection,
+} from "./KPISections";
 import { formatCurrency } from "../../../shared/utils/dataUtils";
 import { useEnhancedKPIData } from "../../hooks/useCalculations";
 import { useAdvancedAnalytics } from "../../hooks/useAdvancedAnalytics";
@@ -32,11 +30,20 @@ import {
   getSpendingVelocityColor,
   getSpendingVelocityIconColor,
   getInsightPriorityColor,
-  getMonthlyTrendDisplay,
-  getAnomalyAlertDisplay,
-  getSubscriptionsDisplay,
   getYearsAndMonths,
+  getNetWorthColor,
+  getNetWorthIconColor,
+  getCategoryConcentrationColor,
+  getSectionStyles,
+  validateKPIData,
 } from "../../utils/metricHelpers";
+import {
+  CATEGORY_CONCENTRATION_THRESHOLD,
+  DEFAULT_KPI_VALUES,
+  DEFAULT_ADDITIONAL_KPI,
+  DEFAULT_KEY_INSIGHTS,
+  MESSAGES,
+} from "../../../config/overview.config";
 
 // Filter transactions by year and month
 const filterTransactionsByTime = (transactions, year, month) => {
@@ -62,125 +69,126 @@ const filterTransactionsByTime = (transactions, year, month) => {
 };
 
 // Financial Health Metrics Component
-const FinancialHealthMetrics = ({ enhancedKPI }) => (
-  <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-2xl p-6 mb-8">
-    <h3 className="text-2xl font-bold text-blue-300 mb-6 flex items-center">
-      <TrendingUp className="mr-3" size={24} />
-      Financial Health Metrics
-    </h3>
+const FinancialHealthMetrics = ({ enhancedKPI }) => {
+  // Validate and provide defaults for enhanced KPI data
+  const kpiData = validateKPIData(enhancedKPI, DEFAULT_KPI_VALUES);
+  const sectionStyles = getSectionStyles("financial-health");
 
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-      {/* Savings Rate */}
-      <div
-        className={`p-4 rounded-xl border transition-all duration-300 ${getSavingsRateColor(
-          enhancedKPI.savingsRate
-        )}`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-300">Savings Rate</span>
-          <PiggyBank
-            size={22}
-            className={getSavingsRateIconColor(enhancedKPI.savingsRate)}
-          />
-        </div>
-        <div className="text-3xl font-bold text-white">
-          {enhancedKPI.savingsRate.toFixed(1)}%
-        </div>
-        <div className="text-xs text-gray-400 mt-1">
-          {getSavingsRateMessage(enhancedKPI.savingsRate)}
-        </div>
-      </div>
+  return (
+    <div
+      className={`bg-gradient-to-br ${sectionStyles.gradient} border ${sectionStyles.border} rounded-2xl p-6 mb-8`}
+    >
+      <h3 className="text-2xl font-bold text-blue-300 mb-6 flex items-center">
+        <TrendingUp className="mr-3" size={24} />
+        Financial Health Metrics
+      </h3>
 
-      {/* Daily Spending */}
-      <SmallKPICard
-        title="Daily Spending"
-        value={enhancedKPI.dailySpendingRate}
-        icon={<Flame size={22} />}
-      />
-
-      {/* Monthly Burn Rate */}
-      <SmallKPICard
-        title="Monthly Burn Rate"
-        value={enhancedKPI.monthlyBurnRate}
-        icon={<Calendar size={22} />}
-      />
-
-      {/* Net Worth Change */}
-      <div
-        className={`p-4 rounded-xl border ${
-          enhancedKPI.netWorth >= 0
-            ? "bg-green-900/20 border-green-500/30"
-            : "bg-red-900/20 border-red-500/30"
-        }`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-300">Net Worth Change</span>
-          <TrendingUp
-            size={22}
-            className={
-              enhancedKPI.netWorth >= 0 ? "text-green-400" : "text-red-400"
-            }
-          />
-        </div>
-        <div className="text-2xl font-bold text-white">
-          {formatCurrency(enhancedKPI.netWorth)}
-        </div>
-        <div className="text-xs text-gray-400 mt-1">
-          {formatCurrency(Math.abs(enhancedKPI.netWorthPerMonth))}/month{" "}
-          {enhancedKPI.netWorth >= 0 ? "↑" : "↓"}
-        </div>
-      </div>
-
-      {/* Spending Velocity */}
-      <div
-        className={`p-4 rounded-xl border ${getSpendingVelocityColor(
-          enhancedKPI.spendingVelocity
-        )}`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-300">Spending Velocity (30d)</span>
-          <Calculator
-            size={22}
-            className={getSpendingVelocityIconColor(
-              enhancedKPI.spendingVelocity
-            )}
-          />
-        </div>
-        <div className="text-3xl font-bold text-white">
-          {enhancedKPI.spendingVelocity.toFixed(0)}%
-          {enhancedKPI.spendingVelocity > 100 ? " ↑" : " ↓"}
-        </div>
-        <div className="text-xs text-gray-400 mt-1">
-          {enhancedKPI.spendingVelocity > 100 ? "Above" : "Below"} average
-        </div>
-      </div>
-
-      {/* Category Concentration */}
-      {enhancedKPI.categoryConcentration && (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        {/* Savings Rate */}
         <div
-          className={`p-4 rounded-xl border ${
-            enhancedKPI.categoryConcentration.percentage > 50
-              ? "bg-orange-900/20 border-orange-500/30"
-              : "bg-blue-900/20 border-blue-500/30"
-          }`}
+          className={`p-4 rounded-xl border transition-all duration-300 ${getSavingsRateColor(
+            kpiData.savingsRate
+          )}`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-300">Top Category</span>
-            <LayoutGrid size={22} className="text-blue-400" />
+            <span className="text-sm text-gray-300">Savings Rate</span>
+            <PiggyBank
+              size={22}
+              className={getSavingsRateIconColor(kpiData.savingsRate)}
+            />
           </div>
-          <div className="text-lg font-bold text-white truncate">
-            {enhancedKPI.categoryConcentration.category}
+          <div className="text-3xl font-bold text-white">
+            {kpiData.savingsRate.toFixed(1)}%
           </div>
           <div className="text-xs text-gray-400 mt-1">
-            {enhancedKPI.categoryConcentration.percentage.toFixed(0)}% of
-            spending
-            {enhancedKPI.categoryConcentration.percentage > 50 && " ⚠️"}
+            {getSavingsRateMessage(kpiData.savingsRate)}
           </div>
         </div>
-      )}
+
+        {/* Daily Spending */}
+        <SmallKPICard
+          title="Daily Spending"
+          value={kpiData.dailySpendingRate}
+          icon={<Flame size={22} />}
+        />
+
+        {/* Monthly Burn Rate */}
+        <SmallKPICard
+          title="Monthly Burn Rate"
+          value={kpiData.monthlyBurnRate}
+          icon={<Calendar size={22} />}
+        />
+
+        {/* Net Worth Change */}
+        <div
+          className={`p-4 rounded-xl border ${getNetWorthColor(kpiData.netWorth)}`}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">Net Worth Change</span>
+            <TrendingUp
+              size={22}
+              className={getNetWorthIconColor(kpiData.netWorth)}
+            />
+          </div>
+          <div className="text-2xl font-bold text-white">
+            {formatCurrency(kpiData.netWorth)}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {formatCurrency(Math.abs(kpiData.netWorthPerMonth))}/month{" "}
+            {kpiData.netWorth >= 0 ? "↑" : "↓"}
+          </div>
+        </div>
+
+        {/* Spending Velocity */}
+        <div
+          className={`p-4 rounded-xl border ${getSpendingVelocityColor(
+            kpiData.spendingVelocity
+          )}`}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">
+              Spending Velocity (30d)
+            </span>
+            <Calculator
+              size={22}
+              className={getSpendingVelocityIconColor(kpiData.spendingVelocity)}
+            />
+          </div>
+          <div className="text-3xl font-bold text-white">
+            {kpiData.spendingVelocity.toFixed(0)}%
+            {kpiData.spendingVelocity > 100 ? " ↑" : " ↓"}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {kpiData.spendingVelocity > 100 ? "Above" : "Below"} average
+          </div>
+        </div>
+
+        {/* Category Concentration */}
+        {kpiData.categoryConcentration && (
+          <div
+            className={`p-4 rounded-xl border ${getCategoryConcentrationColor(
+              kpiData.categoryConcentration.percentage,
+              CATEGORY_CONCENTRATION_THRESHOLD
+            )}`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Top Category</span>
+              <LayoutGrid size={22} className="text-blue-400" />
+            </div>
+            <div className="text-lg font-bold text-white truncate">
+              {kpiData.categoryConcentration.category}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {kpiData.categoryConcentration.percentage.toFixed(0)}% of spending
+              {kpiData.categoryConcentration.percentage >
+                CATEGORY_CONCENTRATION_THRESHOLD && " ⚠️"}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 FinancialHealthMetrics.propTypes = {
   enhancedKPI: PropTypes.shape({
@@ -199,12 +207,16 @@ FinancialHealthMetrics.propTypes = {
 
 // Transfer Information Component
 const TransferInformationCard = ({ transferData }) => {
+  const sectionStyles = getSectionStyles("transfer-info");
+
   if (!transferData?.transferIn && !transferData?.transferOut) {
     return null;
   }
 
   return (
-    <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-6 mb-8">
+    <div
+      className={`bg-gradient-to-br ${sectionStyles.gradient} border ${sectionStyles.border} rounded-2xl p-6 mb-8`}
+    >
       <h3 className="text-xl font-semibold text-purple-300 mb-4 flex items-center">
         <div className="p-2 rounded-lg bg-purple-900/50 text-purple-400 mr-3">
           <ArrowLeftRight size={20} />
@@ -234,8 +246,7 @@ const TransferInformationCard = ({ transferData }) => {
         </div>
       </div>
       <p className="text-xs text-purple-300/70 mt-3">
-        * Transfers represent internal money movement between your accounts and
-        do not affect your total income or expenses.
+        * {MESSAGES.TRANSFER_DISCLAIMER}
       </p>
     </div>
   );
@@ -257,82 +268,92 @@ const SmartInsightsSection = ({
   selectedMonth,
   onYearChange,
   onMonthChange,
-}) => (
-  <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-2xl p-6 mt-6">
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-      <h3 className="text-2xl font-bold text-purple-300 flex items-center">
-        <Lightbulb className="mr-3" size={24} />
-        Smart Insights & Recommendations
-      </h3>
+}) => {
+  const sectionStyles = getSectionStyles("insights");
 
-      {/* Time Filter Controls */}
-      <div className="flex items-center gap-3">
-        <Filter size={18} className="text-purple-400" />
-        <select
-          value={selectedYear}
-          onChange={(e) => onYearChange(e.target.value)}
-          className="bg-gray-800/80 border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
-        >
-          <option value="all">All Years</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+  return (
+    <div
+      className={`bg-gradient-to-br ${sectionStyles.gradient} border ${sectionStyles.border} rounded-2xl p-6 mt-6`}
+    >
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <h3 className="text-2xl font-bold text-purple-300 flex items-center">
+          <Lightbulb className="mr-3" size={24} />
+          Smart Insights & Recommendations
+        </h3>
 
-        <select
-          value={selectedMonth}
-          onChange={(e) => onMonthChange(e.target.value)}
-          className="bg-gray-800/80 border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
-          disabled={selectedYear === "all"}
-        >
-          <option value="all">All Months</option>
-          {months.map((month) => (
-            <option key={month.value} value={month.value}>
-              {month.label}
-            </option>
-          ))}
-        </select>
+        {/* Time Filter Controls */}
+        <div className="flex items-center gap-3">
+          <Filter size={18} className="text-purple-400" />
+          <select
+            value={selectedYear}
+            onChange={(e) => onYearChange(e.target.value)}
+            className="bg-gray-800/80 border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+            aria-label="Select year for insights"
+          >
+            <option value="all">All Years</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="bg-gray-800/80 border border-purple-500/30 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+            disabled={selectedYear === "all"}
+            aria-label="Select month for insights"
+          >
+            <option value="all">All Months</option>
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div className="space-y-4">
-      {insights.map((insight) => (
-        <div
-          key={`${insight.type}-${insight.title}`}
-          className={`p-4 rounded-xl border transition-all hover:shadow-lg ${getInsightPriorityColor(
-            insight.priority
-          )}`}
-        >
-          <div className="flex items-start">
-            <span className="text-3xl mr-4 flex-shrink-0">{insight.icon}</span>
-            <div className="flex-1 min-w-0">
-              <h4 className="text-lg font-semibold text-white mb-2">
-                {insight.title}
-              </h4>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                {insight.message}
-              </p>
-              {insight.category && (
-                <span className="inline-block mt-2 px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">
-                  {insight.category}
-                </span>
-              )}
+      <div className="space-y-4">
+        {insights.map((insight, index) => (
+          <div
+            key={`${insight.type}-${insight.title}-${index}`}
+            className={`p-4 rounded-xl border transition-all hover:shadow-lg ${getInsightPriorityColor(
+              insight.priority
+            )}`}
+          >
+            <div className="flex items-start">
+              <span className="text-3xl mr-4 flex-shrink-0">
+                {insight.icon}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-lg font-semibold text-white mb-2">
+                  {insight.title}
+                </h4>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {insight.message}
+                </p>
+                {insight.category && (
+                  <span className="inline-block mt-2 px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">
+                    {insight.category}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
 
-      {insights.length === 0 && (
-        <div className="text-center text-gray-400 py-8">
-          <p>Not enough data to generate insights for this time period.</p>
-          <p className="text-sm mt-2">Try selecting a different time range!</p>
-        </div>
-      )}
+        {insights.length === 0 && (
+          <div className="text-center text-gray-400 py-8">
+            <p>{MESSAGES.NO_DATA}</p>
+            <p className="text-sm mt-2">{MESSAGES.TRY_DIFFERENT_RANGE}</p>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 SmartInsightsSection.propTypes = {
   insights: PropTypes.arrayOf(
@@ -372,6 +393,16 @@ export const OverviewSection = ({
   const [insightsYear, setInsightsYear] = useState("all");
   const [insightsMonth, setInsightsMonth] = useState("all");
 
+  // Validate input data with defaults
+  const validatedAdditionalKPI = validateKPIData(
+    additionalKpiData,
+    DEFAULT_ADDITIONAL_KPI
+  );
+  const validatedKeyInsights = validateKPIData(
+    keyInsights,
+    DEFAULT_KEY_INSIGHTS
+  );
+
   // Generate enhanced KPI data
   const enhancedKPI = useEnhancedKPIData(filteredData, kpiData);
 
@@ -397,93 +428,52 @@ export const OverviewSection = ({
   );
 
   // Handle year/month change and reset month when year changes to 'all'
-  const handleYearChange = (year) => {
+  const handleYearChange = useCallback((year) => {
     setInsightsYear(year);
     if (year === "all") {
       setInsightsMonth("all");
     }
-  };
+  }, []);
+
+  const handleMonthChange = useCallback((month) => {
+    setInsightsMonth(month);
+  }, []);
+
+  const sectionStyles = getSectionStyles("key-insights");
 
   return (
     <div>
       {/* Main KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <KPICard
-          title="Total Income"
-          value={kpiData.income}
-          icon={<TrendingUp size={24} />}
-          color="green"
-        />
-        <KPICard
-          title="Total Expense"
-          value={kpiData.expense}
-          icon={<TrendingDown size={24} />}
-          color="red"
-        />
-        <KPICard
-          title="Net Balance"
-          value={kpiData.income - kpiData.expense}
-          icon={<Wallet size={24} />}
-          color="blue"
-        />
-      </div>
+      <MainKPISection income={kpiData.income} expense={kpiData.expense} />
 
       {/* Secondary KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-        <SmallKPICard
-          title="Total Transactions"
-          value={additionalKpiData.totalTransactions}
-          icon={<Hash size={22} />}
-          isCount={true}
-        />
-        <SmallKPICard
-          title="Highest Expense"
-          value={additionalKpiData.highestExpense}
-          icon={<Target size={22} />}
-        />
-        <SmallKPICard
-          title="Average Expense"
-          value={additionalKpiData.averageExpense}
-          icon={<Sigma size={22} />}
-        />
-      </div>
+      <SecondaryKPISection
+        totalTransactions={validatedAdditionalKPI.totalTransactions}
+        highestExpense={validatedAdditionalKPI.highestExpense}
+        averageExpense={validatedAdditionalKPI.averageExpense}
+      />
 
-      {/* Advanced Analytics KPI Cards - NEW */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <SmallKPICard
-          title="Monthly Trend"
-          value={getMonthlyTrendDisplay(analytics?.monthlyComparison)}
-          icon={<TrendingUp size={22} />}
-          isCount={false}
-        />
-        <SmallKPICard
-          title="Active Subscriptions"
-          value={getSubscriptionsDisplay(
-            analytics?.recurringTransactions,
-            formatCurrency
-          )}
-          icon={<Repeat size={22} />}
-          isCount={false}
-        />
-        <SmallKPICard
-          title="Anomaly Alerts"
-          value={getAnomalyAlertDisplay(analytics?.anomalies?.length || 0)}
-          icon={<AlertTriangle size={22} />}
-          isCount={false}
-        />
-      </div>
+      {/* Advanced Analytics KPI Cards */}
+      <AdvancedAnalyticsKPISection
+        analytics={analytics}
+        formatCurrency={formatCurrency}
+      />
 
-      {/* Financial Health Metrics - NEW */}
+      {/* Financial Health Metrics */}
       <FinancialHealthMetrics enhancedKPI={enhancedKPI} />
 
       {/* Transfer Information Cards */}
-      <TransferInformationCard transferData={additionalKpiData.transferData} />
+      <TransferInformationCard
+        transferData={validatedAdditionalKPI.transferData}
+      />
 
       {/* Account Balances */}
       <AccountBalancesCard balances={accountBalances} />
 
       {/* Key Insights */}
-      <div className="bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 backdrop-blur-sm rounded-2xl p-6 mt-6 border border-gray-700/50">
+      <div
+        className={`bg-gradient-to-br ${sectionStyles.gradient} backdrop-blur-sm rounded-2xl p-6 mt-6 border ${sectionStyles.border}`}
+      >
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
           <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl mr-3 shadow-lg">
             <LayoutGrid size={24} className="text-white" />
@@ -493,23 +483,23 @@ export const OverviewSection = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SmallKPICard
             title="Busiest Spending Day"
-            value={keyInsights.busiestDay}
+            value={validatedKeyInsights.busiestDay}
             icon={<CalendarDays size={22} />}
           />
           <SmallKPICard
             title="Most Frequent Category"
-            value={keyInsights.mostFrequentCategory}
+            value={validatedKeyInsights.mostFrequentCategory}
             icon={<LayoutGrid size={22} />}
           />
           <SmallKPICard
             title="Avg. Transaction Value"
-            value={keyInsights.avgTransactionValue}
+            value={validatedKeyInsights.avgTransactionValue}
             icon={<Calculator size={22} />}
           />
         </div>
       </div>
 
-      {/* Smart Insights & Recommendations - NEW with Time Filters */}
+      {/* Smart Insights & Recommendations */}
       <SmartInsightsSection
         insights={insights}
         years={years}
@@ -517,7 +507,7 @@ export const OverviewSection = ({
         selectedYear={insightsYear}
         selectedMonth={insightsMonth}
         onYearChange={handleYearChange}
-        onMonthChange={setInsightsMonth}
+        onMonthChange={handleMonthChange}
       />
     </div>
   );

@@ -1,9 +1,15 @@
 import { useMemo } from "react";
-import { calculateDateRange } from "../utils/calculations";
+import {
+  calculateDateRange,
+  calculateTotalIncome,
+  calculateTotalExpense,
+  calculateSavingsRate,
+  calculateDailyAverage,
+  calculateMonthlyAverage,
+} from "../utils/financialCalculations";
 
 export const useKPIData = (filteredData) => {
   return useMemo(() => {
-    // Validate input
     if (!filteredData || filteredData.length === 0) {
       return {
         kpiData: { income: 0, expense: 0 },
@@ -16,34 +22,17 @@ export const useKPIData = (filteredData) => {
       };
     }
 
-    const kpiData = filteredData.reduce(
-      (acc, item) => {
-        // Validate amount is a number
-        const amount = Number(item.amount) || 0;
-
-        // Only count actual income and expenses, not transfers between accounts
-        if (item.type === "Income") {
-          acc.income += Math.abs(amount);
-        } else if (item.type === "Expense") {
-          acc.expense += Math.abs(amount);
-        }
-        // Note: Transfer-In and Transfer-Out are excluded from income/expense totals
-        // as they represent money movement, not wealth creation/destruction
-
-        return acc;
-      },
-      { income: 0, expense: 0 }
-    );
+    // Use unified calculations
+    const income = calculateTotalIncome(filteredData);
+    const expense = calculateTotalExpense(filteredData);
 
     const expenseTransactions = filteredData.filter(
       (item) => item.type === "Expense"
     );
 
-    // Calculate transfer metrics separately
     const transferData = filteredData.reduce(
       (acc, item) => {
         const amount = Math.abs(Number(item.amount) || 0);
-
         if (item.type === "Transfer-In") {
           acc.transferIn += amount;
         } else if (item.type === "Transfer-Out") {
@@ -61,13 +50,13 @@ export const useKPIData = (filteredData) => {
       ),
       averageExpense:
         expenseTransactions.length > 0
-          ? kpiData.expense / expenseTransactions.length
+          ? expense / expenseTransactions.length
           : 0,
       totalTransactions: filteredData.length,
-      transferData, // Add transfer data for display
+      transferData,
     };
 
-    return { kpiData, additionalKpiData };
+    return { kpiData: { income, expense }, additionalKpiData };
   }, [filteredData]);
 };
 
@@ -166,7 +155,6 @@ export const useAccountBalances = (data) => {
 
 export const useEnhancedKPIData = (filteredData, kpiData) => {
   return useMemo(() => {
-    // Validate input
     if (!filteredData || filteredData.length === 0 || !kpiData) {
       return {
         savingsRate: 0,
@@ -183,20 +171,12 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
     const dateRange = calculateDateRange(filteredData);
     const { income, expense } = kpiData;
 
-    // 1. Savings Rate
-    const savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0;
-
-    // 2. Daily Spending Rate
-    const dailySpendingRate = dateRange.days > 0 ? expense / dateRange.days : 0;
-
-    // 3. Monthly Burn Rate
-    const monthlyBurnRate =
-      dateRange.days > 0 ? (expense / dateRange.days) * 30.44 : 0;
-
-    // 4. Net Worth Trend
+    // Use unified calculations
+    const savingsRate = calculateSavingsRate(income, expense);
+    const dailySpendingRate = calculateDailyAverage(expense, dateRange.days);
+    const monthlyBurnRate = calculateMonthlyAverage(expense, dateRange.days);
     const netWorth = income - expense;
-    const netWorthPerMonth =
-      dateRange.days > 0 ? (netWorth / dateRange.days) * 30.44 : 0;
+    const netWorthPerMonth = calculateMonthlyAverage(netWorth, dateRange.days);
 
     // 5. Spending Velocity (Last 30 days vs All time)
     const last30DaysDate = new Date();

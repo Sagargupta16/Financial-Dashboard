@@ -1066,16 +1066,6 @@ export const calculateCommuteMetrics = (transactions) => {
 // ============================================================================
 
 /**
- * Format currency
- */
-export const formatCurrency = (amount) => {
-  return `₹${Math.abs(amount).toLocaleString("en-IN", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`;
-};
-
-/**
  * Format number with decimals
  */
 export const formatNumber = (number, decimals = 2) => {

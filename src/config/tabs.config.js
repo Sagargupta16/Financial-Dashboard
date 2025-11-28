@@ -10,7 +10,6 @@ import {
   LineChart,
   Target,
   Repeat,
-  Lightbulb,
   Receipt,
   TrendingDown,
   FileText,
@@ -78,12 +77,6 @@ export const TABS_CONFIG = [
     label: "Subscriptions & Patterns",
     icon: Repeat,
     description: "Recurring payments and spending patterns",
-  },
-  {
-    id: "category-insights",
-    label: "Category Insights",
-    icon: Lightbulb,
-    description: "Specialized analytics for specific categories",
   },
   {
     id: "transactions",

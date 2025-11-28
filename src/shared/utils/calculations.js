@@ -3,38 +3,21 @@
  * All shared formulas and calculations in one place
  */
 
-/**
- * Calculate actual date range from transactions
- */
-export const calculateDateRange = (transactions) => {
-  if (!transactions || transactions.length === 0) {
-    return { days: 0, months: 0, years: 0 };
-  }
+// Import and re-export shared calculation functions from financialCalculations.js to avoid duplication
+import {
+  calculateDateRange,
+  calculateDailyAverage,
+  calculateMonthlyAverage,
+  calculateAveragePerTransaction,
+  calculatePercentage,
+} from "./financialCalculations";
 
-  const dates = transactions
-    .map((t) => new Date(t.date))
-    .filter((d) => !Number.isNaN(d.getTime()));
-
-  if (dates.length === 0) {
-    return { days: 0, months: 0, years: 0 };
-  }
-
-  const minDate = new Date(Math.min(...dates));
-  const maxDate = new Date(Math.max(...dates));
-
-  // Calculate days, ensuring at least 1 day if dates exist (prevents division by zero)
-  const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-  const days = daysDiff === 0 ? 1 : daysDiff; // At least 1 day
-  const months = days / 30.44; // Average days per month
-  const years = months / 12;
-
-  return {
-    days,
-    months,
-    years,
-    minDate,
-    maxDate,
-  };
+export {
+  calculateDateRange,
+  calculateDailyAverage,
+  calculateMonthlyAverage,
+  calculateAveragePerTransaction,
+  calculatePercentage,
 };
 
 /**
@@ -65,56 +48,6 @@ export const calculatePerWeekFrequency = (count, totalDays) => {
     return 0;
   }
   return (count / totalDays) * 7;
-};
-
-/**
- * Calculate daily average amount
- */
-export const calculateDailyAverage = (total, totalDays) => {
-  if (totalDays === 0) {
-    return 0;
-  }
-  return total / totalDays;
-};
-
-/**
- * Calculate monthly average amount
- */
-export const calculateMonthlyAverage = (total, totalDays) => {
-  if (totalDays === 0) {
-    return 0;
-  }
-  return (total / totalDays) * 30.44;
-};
-
-/**
- * Calculate average per transaction
- */
-export const calculateAveragePerTransaction = (total, count) => {
-  if (count === 0) {
-    return 0;
-  }
-  return total / count;
-};
-
-/**
- * Calculate percentage of total
- */
-export const calculatePercentage = (part, total) => {
-  if (total === 0) {
-    return 0;
-  }
-  return (part / total) * 100;
-};
-
-/**
- * Format currency
- */
-export const formatCurrency = (amount) => {
-  return `₹${Math.abs(amount).toLocaleString("en-IN", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`;
 };
 
 /**

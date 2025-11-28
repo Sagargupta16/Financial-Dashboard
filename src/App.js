@@ -77,10 +77,6 @@ const PatternsSection = lazyLoad(
   () => import("./shared/components/sections/PatternsSection"),
   "PatternsSection"
 );
-const CategoryInsightsSection = lazyLoad(
-  () => import("./shared/components/sections/CategoryInsightsSection"),
-  "CategoryInsightsSection"
-);
 const TransactionsSection = lazyLoad(
   () => import("./features/transactions/components/TransactionsSection"),
   "TransactionsSection"
@@ -285,12 +281,6 @@ const App = () => {
         <TabContent isActive={activeTab === "patterns"}>
           <Suspense fallback={<SectionSkeleton />}>
             <PatternsSection filteredData={filteredData} />
-          </Suspense>
-        </TabContent>
-
-        <TabContent isActive={activeTab === "category-insights"}>
-          <Suspense fallback={<SectionSkeleton />}>
-            <CategoryInsightsSection filteredData={filteredData} />
           </Suspense>
         </TabContent>
 

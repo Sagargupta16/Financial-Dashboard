@@ -1,11 +1,6 @@
-export const formatCurrency = (value) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+// Import and re-export formatCurrency from dataUtils to avoid duplication
+import { formatCurrency } from "./dataUtils";
+export { formatCurrency };
 
 export const truncateLabel = (label, maxLength = 12) => {
   if (typeof label !== "string") {

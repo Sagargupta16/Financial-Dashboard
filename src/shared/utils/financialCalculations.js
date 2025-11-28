@@ -289,9 +289,73 @@ export const calculateInvestmentPerformance = (transactions) => {
 // ============================================================================
 
 /**
- * Calculate tax planning metrics
+ * Calculate tax planning metrics with financial year breakdown
  */
 export const calculateTaxPlanning = (transactions) => {
+  if (!transactions || transactions.length === 0) {
+    return {
+      overall: getDefaultTaxPlanningData(),
+      byFinancialYear: {},
+      availableYears: [],
+    };
+  }
+
+  const { getAllFinancialYears, getFinancialYear } = require("./dataUtils");
+  const availableYears = getAllFinancialYears(transactions);
+
+  // Group transactions by financial year
+  const transactionsByFY = {};
+  availableYears.forEach((fy) => {
+    transactionsByFY[fy] = transactions.filter(
+      (t) => getFinancialYear(t.date) === fy
+    );
+  });
+
+  // Calculate tax planning for each FY
+  const byFinancialYear = {};
+  availableYears.forEach((fy) => {
+    byFinancialYear[fy] = calculateTaxPlanningForYear(transactionsByFY[fy]);
+  });
+
+  // Calculate overall (all years combined)
+  const overall = calculateTaxPlanningForYear(transactions);
+
+  return {
+    overall,
+    byFinancialYear,
+    availableYears,
+  };
+};
+
+/**
+ * Helper: Get default tax planning data structure
+ */
+const getDefaultTaxPlanningData = () => ({
+  totalIncome: 0,
+  salaryIncome: 0,
+  bonusIncome: 0,
+  rsuIncome: 0,
+  otherIncome: 0,
+  section80CInvestments: 0,
+  section80CDeduction: 0,
+  hraExemption: 0,
+  professionalTax: 0,
+  epfDeduction: 0,
+  mealVoucherExemption: 0,
+  standardDeduction: 0,
+  taxableIncome: 0,
+  estimatedTax: 0,
+  cess: 0,
+  totalTaxLiability: 0,
+  deductions: [],
+  recommendations: [],
+  taxRegime: "new",
+});
+
+/**
+ * Calculate tax planning for a specific set of transactions (one FY)
+ */
+const calculateTaxPlanningForYear = (transactions) => {
   if (!transactions || transactions.length === 0) {
     return {
       totalIncome: 0,
@@ -884,9 +948,13 @@ export const calculateFoodMetrics = (transactions) => {
     };
   }
 
-  const foodTransactions = transactions.filter(
-    (t) => t.type === "Expense" && t.category === "Food & Drinks"
-  );
+  const foodTransactions = transactions.filter((t) => {
+    if (t.type !== "Expense") {
+      return false;
+    }
+    const category = (t.category || "").toLowerCase();
+    return category.includes("food") || category.includes("drink");
+  });
 
   const totalFood = foodTransactions.reduce(
     (sum, t) => sum + Math.abs(Number(t.amount) || 0),
@@ -898,7 +966,7 @@ export const calculateFoodMetrics = (transactions) => {
   const dailyAverage = calculateDailyAverage(totalFood, dateRange.days);
 
   const bySubcategory = foodTransactions.reduce((acc, t) => {
-    const sub = t.subcategory || "Other";
+    const sub = t.subcategory || t.Subcategory || "Other";
     if (!acc[sub]) {
       acc[sub] = { total: 0, count: 0 };
     }
@@ -907,17 +975,31 @@ export const calculateFoodMetrics = (transactions) => {
     return acc;
   }, {});
 
-  // Extract specific categories
-  const deliveryApps =
-    (bySubcategory["Delivery Apps"]?.total || 0) +
-    (bySubcategory["Food Delivery"]?.total || 0);
-  const groceries = bySubcategory["Groceries"]?.total || 0;
-  const diningOut =
-    (bySubcategory["Dining Out"]?.total || 0) +
-    (bySubcategory["Restaurant"]?.total || 0);
-  const officeCafeteria =
-    (bySubcategory["Office Cafeteria"]?.total || 0) +
-    (bySubcategory["Cafeteria"]?.total || 0);
+  // Extract specific categories with case-insensitive matching
+  let deliveryApps = 0;
+  let groceries = 0;
+  let diningOut = 0;
+  let officeCafeteria = 0;
+
+  Object.entries(bySubcategory).forEach(([key, value]) => {
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey.includes("delivery") ||
+      lowerKey.includes("swiggy") ||
+      lowerKey.includes("zomato")
+    ) {
+      deliveryApps += value.total;
+    }
+    if (lowerKey.includes("grocer") || lowerKey.includes("supermarket")) {
+      groceries += value.total;
+    }
+    if (lowerKey.includes("dining") || lowerKey.includes("restaurant")) {
+      diningOut += value.total;
+    }
+    if (lowerKey.includes("cafeteria") || lowerKey.includes("canteen")) {
+      officeCafeteria += value.total;
+    }
+  });
 
   // Create breakdown array for charts
   const breakdown = Object.entries(bySubcategory).map(([name, data]) => ({
@@ -992,9 +1074,17 @@ export const calculateCommuteMetrics = (transactions) => {
     };
   }
 
-  const commuteTransactions = transactions.filter(
-    (t) => t.type === "Expense" && t.category === "Transportation"
-  );
+  const commuteTransactions = transactions.filter((t) => {
+    if (t.type !== "Expense") {
+      return false;
+    }
+    const category = (t.category || "").toLowerCase();
+    return (
+      category.includes("transport") ||
+      category.includes("commute") ||
+      category.includes("travel")
+    );
+  });
 
   const totalCommute = commuteTransactions.reduce(
     (sum, t) => sum + Math.abs(Number(t.amount) || 0),
@@ -1006,7 +1096,7 @@ export const calculateCommuteMetrics = (transactions) => {
   const dailyAverage = calculateDailyAverage(totalCommute, dateRange.days);
 
   const byMode = commuteTransactions.reduce((acc, t) => {
-    const mode = t.subcategory || "Other";
+    const mode = t.subcategory || t.Subcategory || "Other";
     if (!acc[mode]) {
       acc[mode] = { total: 0, count: 0 };
     }
@@ -1015,16 +1105,33 @@ export const calculateCommuteMetrics = (transactions) => {
     return acc;
   }, {});
 
-  // Extract specific categories
-  const dailyCommute =
-    (byMode["Daily Commute"]?.total || 0) +
-    (byMode["Auto"]?.total || 0) +
-    (byMode["Metro"]?.total || 0) +
-    (byMode["Bus"]?.total || 0);
-  const intercityTravel =
-    (byMode["Intercity Travel"]?.total || 0) +
-    (byMode["Train"]?.total || 0) +
-    (byMode["Flight"]?.total || 0);
+  // Extract specific categories with case-insensitive matching
+  let dailyCommute = 0;
+  let intercityTravel = 0;
+
+  Object.entries(byMode).forEach(([key, value]) => {
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey.includes("daily") ||
+      lowerKey.includes("auto") ||
+      lowerKey.includes("metro") ||
+      lowerKey.includes("bus") ||
+      lowerKey.includes("cab") ||
+      lowerKey.includes("taxi") ||
+      lowerKey.includes("uber") ||
+      lowerKey.includes("ola")
+    ) {
+      dailyCommute += value.total;
+    }
+    if (
+      lowerKey.includes("intercity") ||
+      lowerKey.includes("train") ||
+      lowerKey.includes("flight") ||
+      lowerKey.includes("railway")
+    ) {
+      intercityTravel += value.total;
+    }
+  });
 
   // Create breakdown array for charts
   const breakdown = Object.entries(byMode).map(([name, data]) => ({

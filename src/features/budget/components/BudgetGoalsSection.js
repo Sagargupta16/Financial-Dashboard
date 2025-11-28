@@ -1,12 +1,15 @@
 /* eslint-disable max-lines-per-function */
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { SpendingSimulator } from "./SpendingSimulator";
+import { BudgetPlanner } from "./BudgetPlanner";
 import { FinancialHealthScore } from "../../../shared/components/ui/FinancialHealthScore";
 import { SpendingCalendar } from "../../../shared/components/ui/SpendingCalendar";
 
 /**
- * Budget & Planning Section - Financial health and planning tools
+ * Budget & Planning Section - Redesigned for Perfect Calculations
+ * - BudgetPlanner: Simplified budget tracking with 3-month trends
+ * - FinancialHealthScore: Comprehensive health metrics
+ * - SpendingCalendar: Visual spending patterns
  */
 export const BudgetGoalsSection = ({
   filteredData,
@@ -67,6 +70,7 @@ export const BudgetGoalsSection = ({
       bankAccounts: bankOnly,
     };
   }, [accountBalances]);
+
   return (
     <div className="space-y-8">
       {/* Section Header */}
@@ -85,27 +89,20 @@ export const BudgetGoalsSection = ({
           filteredData={filteredData}
           kpiData={kpiData}
           accountBalances={bankAccounts}
+          allAccountBalances={accountBalances}
           investments={investments}
           deposits={deposits}
         />
       </div>
 
-      {/* Planning Tools Section */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-          <span className="mr-2">🛠️</span> Planning Tools
-        </h2>
-        <div className="grid grid-cols-1 gap-6">
-          {/* What-If Spending Simulator */}
-          <div className="bg-gray-800/50 rounded-2xl p-6">
-            <SpendingSimulator filteredData={filteredData} />
-          </div>
+      {/* Budget Planner - Replaces SpendingSimulator */}
+      <div className="bg-gray-800/50 rounded-2xl p-6">
+        <BudgetPlanner filteredData={filteredData} />
+      </div>
 
-          {/* Spending Calendar Heatmap */}
-          <div className="bg-gray-800/50 rounded-2xl p-6">
-            <SpendingCalendar filteredData={filteredData} />
-          </div>
-        </div>
+      {/* Spending Calendar Heatmap */}
+      <div className="bg-gray-800/50 rounded-2xl p-6">
+        <SpendingCalendar filteredData={filteredData} />
       </div>
     </div>
   );

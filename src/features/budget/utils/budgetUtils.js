@@ -1,9 +1,8 @@
 /**
- * Budget and Goal Management Utilities
- * Handles budget calculations, goal tracking, and localStorage persistence
+ * Budget and Planning Utilities - Redesigned for Perfect Calculations
+ * Simplified, accurate budget tracking with trend analysis
  */
 
-// Import centralized calculation formulas
 import {
   calculateTotalLiquidAssets,
   calculateTotalInvestments,
@@ -12,18 +11,27 @@ import {
   scoreConsistency,
   scoreEmergencyFund,
   scoreIncomeExpenseRatio,
-  scoreCategoryBalance,
   scoreDebtManagement,
   getFinancialGrade,
 } from "../../../shared/utils/calculations";
+import {
+  parseAmount,
+  filterByType,
+  getMonthKey,
+} from "../../../shared/utils/dataUtils";
 
 // Storage keys for budget data
 const BUDGET_KEY = "financial_dashboard_budgets";
 const GOALS_KEY = "financial_dashboard_goals";
-const SCENARIOS_KEY = "financial_dashboard_scenarios";
 
 /**
- * Get all budgets from localStorage
+ * ==========================================
+ * BUDGET MANAGEMENT
+ * ==========================================
+ */
+
+/**
+ * Load budgets from localStorage
  */
 export const loadBudgets = () => {
   try {
@@ -49,59 +57,127 @@ export const saveBudgets = (budgets) => {
 };
 
 /**
- * Calculate category spending from transactions
+ * Calculate total spending by category using optimized helpers
  */
 export const calculateCategorySpending = (transactions) => {
   const spending = {};
+  const expenses = filterByType(transactions, "Expense");
 
-  transactions.forEach((transaction) => {
+  expenses.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
-    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
-    const type = transaction.type;
+    const amount = parseAmount(transaction);
 
-    // Only count expenses
-    if (type === "Expense") {
-      spending[category] = (spending[category] || 0) + amount;
-    }
+    spending[category] = (spending[category] || 0) + amount;
   });
 
   return spending;
+}; /**
+ * Calculate spending trends over time
+ */
+export const calculateSpendingTrends = (transactions) => {
+  const monthlySpending = {};
+  const expenses = filterByType(transactions, "Expense");
+
+  expenses.forEach((transaction) => {
+    const monthKey = getMonthKey(transaction);
+    const category = transaction.category || "Uncategorized";
+    const amount = parseAmount(transaction);
+
+    if (!monthlySpending[monthKey]) {
+      monthlySpending[monthKey] = {};
+    }
+    monthlySpending[monthKey][category] =
+      (monthlySpending[monthKey][category] || 0) + amount;
+  });
+
+  return monthlySpending;
 };
 
 /**
- * Calculate budget vs actual comparison
+ * Calculate 3-month average spending per category
  */
-export const calculateBudgetComparison = (budgets, actualSpending) => {
+export const calculateAverageSpending = (transactions) => {
+  const trends = calculateSpendingTrends(transactions);
+  const months = Object.keys(trends)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(-3); // Last 3 months
+
+  if (months.length === 0) {
+    return {};
+  }
+
+  const categoryTotals = {};
+  months.forEach((month) => {
+    Object.entries(trends[month]).forEach(([category, amount]) => {
+      categoryTotals[category] = (categoryTotals[category] || 0) + amount;
+    });
+  });
+
+  const averages = {};
+  Object.entries(categoryTotals).forEach(([category, total]) => {
+    averages[category] = total / months.length;
+  });
+
+  return averages;
+};
+
+/**
+ * Enhanced budget comparison with trend analysis
+ */
+export const calculateBudgetComparison = (actualSpending, budgets) => {
   const comparison = {};
-  const categories = new Set([
-    ...Object.keys(budgets),
-    ...Object.keys(actualSpending),
-  ]);
 
-  categories.forEach((category) => {
+  Object.keys(actualSpending).forEach((category) => {
+    const actual = actualSpending[category];
     const budget = budgets[category] || 0;
-    const actual = actualSpending[category] || 0;
-    const remaining = budget - actual;
-    const percentage = budget > 0 ? (actual / budget) * 100 : 0;
 
-    let status = "good";
-    if (percentage > 100) {
-      status = "over";
-    } else if (percentage > 80) {
-      status = "warning";
+    if (budget > 0) {
+      const remaining = budget - actual;
+      const percentage = (actual / budget) * 100;
+
+      // More nuanced status based on percentage
+      let status = "good";
+      if (percentage >= 100) {
+        status = "over";
+      } else if (percentage >= 90) {
+        status = "critical"; // New: nearly over budget
+      } else if (percentage >= 75) {
+        status = "warning";
+      }
+
+      comparison[category] = {
+        budget,
+        actual,
+        remaining,
+        percentage: Math.round(percentage),
+        status,
+      };
     }
-
-    comparison[category] = {
-      budget,
-      actual,
-      remaining,
-      percentage,
-      status,
-    };
   });
 
   return comparison;
 };
+
+/**
+ * Suggest budgets based on spending patterns
+ */
+export const suggestBudgets = (transactions) => {
+  const averages = calculateAverageSpending(transactions);
+  const suggestions = {};
+
+  Object.entries(averages).forEach(([category, average]) => {
+    // Add 10% buffer to average spending for realistic budgets
+    suggestions[category] = Math.round(average * 1.1);
+  });
+
+  return suggestions;
+};
+
+/**
+ * ==========================================
+ * GOAL MANAGEMENT
+ * ==========================================
+ */
 
 /**
  * Load goals from localStorage
@@ -130,117 +206,80 @@ export const saveGoals = (goals) => {
 };
 
 /**
- * Calculate goal progress
+ * Calculate comprehensive goal progress with accurate projections
  */
 export const calculateGoalProgress = (goal, currentAmount) => {
-  const progress = (currentAmount / goal.targetAmount) * 100;
-  const remaining = goal.targetAmount - currentAmount;
+  const progress = Math.min(100, (currentAmount / goal.targetAmount) * 100);
+  const remaining = Math.max(0, goal.targetAmount - currentAmount);
 
-  // Calculate required monthly savings
+  // Calculate time remaining
   const now = new Date();
   const deadline = new Date(goal.deadline);
-  const monthsRemaining = Math.max(
-    1,
-    Math.ceil((deadline - now) / (1000 * 60 * 60 * 24 * 30))
+  const daysRemaining = Math.max(
+    0,
+    Math.ceil((deadline - now) / (1000 * 60 * 60 * 24))
   );
-  const requiredMonthlySavings = remaining / monthsRemaining;
+  const monthsRemaining = Math.max(1, Math.ceil(daysRemaining / 30));
 
-  // Projected completion date based on current rate
-  const projectedMonths =
-    goal.monthlySavings > 0 ? Math.ceil(remaining / goal.monthlySavings) : null;
-  const projectedDate = projectedMonths
-    ? new Date(now.getTime() + projectedMonths * 30 * 24 * 60 * 60 * 1000)
-    : null;
+  // Required monthly savings to meet goal
+  const requiredMonthlySavings =
+    monthsRemaining > 0 ? remaining / monthsRemaining : 0;
+
+  // Projected completion based on current savings rate
+  const monthlySavings = goal.monthlySavings || 0;
+  let projectedDate = null;
+  let onTrack = false;
+
+  if (monthlySavings > 0 && remaining > 0) {
+    const monthsNeeded = Math.ceil(remaining / monthlySavings);
+    projectedDate = new Date(
+      now.getTime() + monthsNeeded * 30 * 24 * 60 * 60 * 1000
+    );
+    onTrack = projectedDate <= deadline;
+  } else if (remaining <= 0) {
+    projectedDate = now;
+    onTrack = true;
+  }
+
+  // Determine status
+  let status = "behind";
+  if (remaining <= 0) {
+    status = "completed";
+  } else if (onTrack) {
+    status = "on-track";
+  }
 
   return {
-    progress: Math.min(100, progress),
+    progress: Math.round(progress * 10) / 10, // One decimal place
     remaining,
+    daysRemaining,
     monthsRemaining,
-    requiredMonthlySavings,
+    requiredMonthlySavings: Math.round(requiredMonthlySavings),
     projectedDate,
-    onTrack: projectedDate ? projectedDate <= deadline : false,
+    onTrack,
+    status,
   };
 };
 
 /**
- * Load scenarios from localStorage
+ * ==========================================
+ * RECURRING PAYMENTS DETECTION
+ * ==========================================
  */
-export const loadScenarios = () => {
-  try {
-    const data = localStorage.getItem(SCENARIOS_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error("Error loading scenarios:", error);
-    return [];
-  }
-};
 
 /**
- * Save scenarios to localStorage
- */
-export const saveScenarios = (scenarios) => {
-  try {
-    localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
-    return true;
-  } catch (error) {
-    console.error("Error saving scenarios:", error);
-    return false;
-  }
-};
-
-/**
- * Calculate simulated spending based on adjustments
- */
-export const calculateSimulatedSpending = (actualSpending, adjustments) => {
-  const simulated = {};
-
-  Object.keys(actualSpending).forEach((category) => {
-    const actual = actualSpending[category];
-    const adjustment = adjustments[category] || 0; // percentage
-    simulated[category] = actual * (1 + adjustment / 100);
-  });
-
-  return simulated;
-};
-
-/**
- * Calculate total impact of spending changes
- */
-export const calculateImpact = (actualSpending, simulatedSpending) => {
-  const actualTotal = Object.values(actualSpending).reduce(
-    (sum, val) => sum + val,
-    0
-  );
-  const simulatedTotal = Object.values(simulatedSpending).reduce(
-    (sum, val) => sum + val,
-    0
-  );
-
-  const monthlySavings = actualTotal - simulatedTotal;
-  const annualSavings = monthlySavings * 12;
-  const percentageChange =
-    actualTotal > 0 ? (monthlySavings / actualTotal) * 100 : 0;
-
-  return {
-    actualTotal,
-    simulatedTotal,
-    monthlySavings,
-    annualSavings,
-    percentageChange,
-  };
-};
-
-/**
- * Detect recurring transactions
+ * Detect recurring payments (simplified algorithm)
  */
 export const detectRecurringPayments = (transactions) => {
   const recurring = [];
   const categoryGroups = {};
 
+  const expenses = filterByType(transactions, "Expense");
+
   // Group by category and similar amounts
-  transactions.forEach((transaction) => {
+  expenses.forEach((transaction) => {
     const category = transaction.category || "Uncategorized";
-    const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
+    const amount = parseAmount(transaction);
     const date = new Date(transaction.date);
 
     if (!categoryGroups[category]) {
@@ -251,12 +290,13 @@ export const detectRecurringPayments = (transactions) => {
   });
 
   // Analyze each category for recurring patterns
-  Object.entries(categoryGroups).forEach(([category, transactions]) => {
+  Object.entries(categoryGroups).forEach(([category, items]) => {
     // Group by similar amounts (within 10% variance)
     const amountGroups = {};
 
-    transactions.forEach(({ amount, date, transaction }) => {
+    items.forEach(({ amount, date, transaction }) => {
       const baseAmount = Math.round(amount / 100) * 100; // Round to nearest 100
+
       if (!amountGroups[baseAmount]) {
         amountGroups[baseAmount] = [];
       }
@@ -264,26 +304,26 @@ export const detectRecurringPayments = (transactions) => {
     });
 
     // Check for recurring patterns
-    Object.entries(amountGroups).forEach(([baseAmount, items]) => {
-      if (items.length >= 3) {
-        // Need at least 3 occurrences
+    Object.entries(amountGroups).forEach(([baseAmount, groupItems]) => {
+      if (groupItems.length >= 3) {
         // Sort by date
-        items.sort((a, b) => a.date - b.date);
+        groupItems.sort((a, b) => a.date - b.date);
 
-        // Calculate intervals
+        // Calculate intervals between payments
         const intervals = [];
-        for (let i = 1; i < items.length; i++) {
+        for (let i = 1; i < groupItems.length; i++) {
           const days = Math.round(
-            (items[i].date - items[i - 1].date) / (1000 * 60 * 60 * 24)
+            (groupItems[i].date - groupItems[i - 1].date) /
+              (1000 * 60 * 60 * 24)
           );
           intervals.push(days);
         }
 
-        // Check if intervals are consistent (within 3 days variance)
+        // Check if intervals are consistent (within 5 days variance)
         const avgInterval =
           intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
         const isConsistent = intervals.every(
-          (interval) => Math.abs(interval - avgInterval) <= 3
+          (interval) => Math.abs(interval - avgInterval) <= 5
         );
 
         if (isConsistent) {
@@ -291,14 +331,14 @@ export const detectRecurringPayments = (transactions) => {
           let frequency = "monthly";
           if (avgInterval <= 10) {
             frequency = "weekly";
-          } else if (avgInterval >= 80) {
+          } else if (avgInterval >= 80 && avgInterval <= 100) {
             frequency = "quarterly";
           } else if (avgInterval >= 350) {
             frequency = "yearly";
           }
 
           // Calculate next payment date
-          const lastDate = items[items.length - 1].date;
+          const lastDate = groupItems[groupItems.length - 1].date;
           const nextDate = new Date(
             lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000
           );
@@ -308,10 +348,10 @@ export const detectRecurringPayments = (transactions) => {
             amount: Number.parseFloat(baseAmount),
             frequency,
             interval: Math.round(avgInterval),
-            occurrences: items.length,
+            occurrences: groupItems.length,
             lastDate,
             nextDate,
-            description: items[0].transaction.Note || category,
+            description: groupItems[0].transaction.Note || category,
           });
         }
       }
@@ -322,122 +362,179 @@ export const detectRecurringPayments = (transactions) => {
 };
 
 /**
- * Calculate consistency score
+ * ==========================================
+ * FINANCIAL HEALTH SCORE
+ * ==========================================
  */
-// Note: All calculation and scoring functions now imported from shared/utils/calculations.js
-// Using imported functions directly with aliases for compatibility
-
-const calculateConsistencyScore = scoreConsistency;
-const calculateEmergencyFundScore = scoreEmergencyFund;
-const calculateRatioScore = scoreIncomeExpenseRatio;
-const calculateCategoryBalanceScore = scoreCategoryBalance;
-const calculateDebtScore = scoreDebtManagement;
 
 /**
- * Calculate spending variance (coefficient of variation)
+ * Calculate spending variance (lower is better - indicates consistent spending)
  */
-const calculateSpendingVariance = (_expenses) => {
-  // This would need historical data - placeholder for now
-  return 20; // Default moderate variance
+const calculateSpendingVariance = (transactions) => {
+  const monthlyTotals = {};
+  const expenses = filterByType(transactions, "Expense");
+
+  // Group by month
+  expenses.forEach((transaction) => {
+    const monthKey = getMonthKey(transaction);
+    const amount = parseAmount(transaction);
+    monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + amount;
+  });
+
+  const values = Object.values(monthlyTotals);
+  if (values.length < 2) {
+    return 0; // Need at least 2 months
+  }
+
+  // Calculate coefficient of variation (CV)
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const variance =
+    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+    values.length;
+  const stdDev = Math.sqrt(variance);
+  const cv = mean > 0 ? (stdDev / mean) * 100 : 0;
+
+  return cv;
 };
 
 /**
- * Calculate financial health score (0-100)
+ * Calculate comprehensive financial health score (0-100)
  */
 export const calculateHealthScore = (data) => {
-  const { income, expenses, savings, accountBalances, investments, deposits } =
-    data;
+  const {
+    income,
+    expenses,
+    savings,
+    accountBalances,
+    allAccountBalances, // All accounts including credit cards
+    investments,
+    deposits,
+    filteredData,
+  } = data;
 
-  // Ensure we have valid numbers
+  // Ensure valid numbers
   const validIncome = Number.parseFloat(income) || 0;
   const validExpenses = Number.parseFloat(expenses) || 0;
   const validSavings = Number.parseFloat(savings) || 0;
 
   const metrics = {};
-  const details = {}; // Store calculation details for visualization
+  const details = {};
 
-  // Calculate total wealth for reference
+  // Calculate totals
   const totalInvestments = calculateTotalInvestments(investments);
   const totalDeposits = calculateTotalDeposits(deposits);
   const totalLiquidAssets = calculateTotalLiquidAssets(accountBalances);
+  const totalDebt = calculateTotalDebt(allAccountBalances || accountBalances); // Use all accounts for debt
 
-  // Calculate debt (only current balances, not historical transactions)
-  const totalDebt = calculateTotalDebt(accountBalances);
-  const debtToIncomeRatio =
-    validIncome > 0 ? (totalDebt / validIncome) * 100 : 0;
+  // Calculate average monthly expenses from actual transaction data (last 3 months)
+  let averageMonthlyExpenses = validExpenses; // Fallback to current month
+  if (filteredData && filteredData.length > 0) {
+    const monthlyExpenseTotals = {};
+    const expenseTransactions = filterByType(filteredData, "Expense");
 
-  // 1. Savings Rate (0-25 points) - Reduced from 30 to make room for debt
+    expenseTransactions.forEach((transaction) => {
+      const monthKey = getMonthKey(transaction);
+      const amount = parseAmount(transaction);
+      monthlyExpenseTotals[monthKey] =
+        (monthlyExpenseTotals[monthKey] || 0) + amount;
+    });
+
+    const expenseValues = Object.values(monthlyExpenseTotals);
+    if (expenseValues.length > 0) {
+      // Calculate average from last 3 months (or all available months if less than 3)
+      const recentMonths = Object.keys(monthlyExpenseTotals)
+        .sort((a, b) => a.localeCompare(b))
+        .slice(-3);
+      const recentExpenses = recentMonths.map(
+        (month) => monthlyExpenseTotals[month]
+      );
+      averageMonthlyExpenses =
+        recentExpenses.reduce((sum, val) => sum + val, 0) /
+        recentExpenses.length;
+    }
+  }
+
+  // Final fallback: if still 0, use total expenses from category spending
+  if (averageMonthlyExpenses === 0 && expenses > 0) {
+    averageMonthlyExpenses = expenses;
+  }
+
+  // 1. Savings Rate (0-30 points) - Most important metric
   const savingsRate = validIncome > 0 ? (validSavings / validIncome) * 100 : 0;
-  const savingsScore = Math.min(25, Math.round((savingsRate / 20) * 25)); // 20% savings = full points
-  metrics.savingsRate = savingsScore;
+  metrics.savingsRate = Math.min(30, Math.round((savingsRate / 20) * 30)); // 20% savings = full 30 points
   details.savingsRate = savingsRate;
 
-  // 2. Spending Consistency (0-15 points) - Reduced from 20
-  const variance = calculateSpendingVariance(validExpenses);
-  metrics.consistency = calculateConsistencyScore(variance);
-  details.consistency = variance;
-
-  // 3. Emergency Fund (0-25 points)
-  // Emergency fund should cover 6 months of expenses with liquid bank assets
-  const monthlyExpenses = validExpenses;
+  // 2. Emergency Fund Coverage (0-25 points)
+  // Emergency fund should use ONLY liquid bank cash, not investments/deposits
+  // Calculate months covered using average monthly expenses from transaction history
   const monthsCovered =
-    monthlyExpenses > 0 ? totalLiquidAssets / monthlyExpenses : 0;
-  metrics.emergencyFund = calculateEmergencyFundScore(monthsCovered);
+    averageMonthlyExpenses > 0 ? totalLiquidAssets / averageMonthlyExpenses : 0;
+  metrics.emergencyFund = scoreEmergencyFund(monthsCovered);
   details.monthsCovered = monthsCovered;
+  details.averageMonthlyExpenses = averageMonthlyExpenses;
 
-  // 4. Income/Expense Ratio (0-15 points)
-  const ratio = validExpenses > 0 ? validIncome / validExpenses : 1;
-  metrics.ratio = calculateRatioScore(ratio);
-  details.ratio = ratio;
-
-  // 5. Category Balance (0-10 points)
-  const categorySpending = data.categorySpending || {};
-  const categoryPercentages = Object.values(categorySpending).map((amount) =>
-    validExpenses > 0 ? (amount / validExpenses) * 100 : 0
-  );
-  const maxCategoryPercent = Math.max(...categoryPercentages, 0);
-  metrics.categoryBalance = calculateCategoryBalanceScore(maxCategoryPercent);
-  details.maxCategoryPercent = maxCategoryPercent;
-
-  // 6. Debt Management (0-10 points) - NEW
-  metrics.debtManagement = calculateDebtScore(debtToIncomeRatio);
+  // 3. Debt Management (0-20 points)
+  const debtToIncomeRatio =
+    validIncome > 0 ? (totalDebt / (validIncome * 12)) * 100 : 0;
+  metrics.debtManagement = scoreDebtManagement(debtToIncomeRatio);
   details.debtToIncomeRatio = debtToIncomeRatio;
+  details.totalDebt = totalDebt; // Store raw debt value
 
-  const score = Object.values(metrics).reduce((sum, val) => sum + val, 0);
+  // 4. Income/Expense Balance (0-15 points)
+  const incomeExpenseRatio =
+    validExpenses > 0 ? validIncome / validExpenses : 1;
+  metrics.incomeExpenseRatio = scoreIncomeExpenseRatio(incomeExpenseRatio);
+  details.incomeExpenseRatio = incomeExpenseRatio;
 
-  const result = {
-    score: Math.min(100, Math.round(score)),
+  // 5. Spending Consistency (0-10 points)
+  const variance = filteredData ? calculateSpendingVariance(filteredData) : 20;
+  metrics.consistency = scoreConsistency(variance);
+  details.spendingVariance = variance;
+
+  // Calculate total score
+  const totalScore = Object.values(metrics).reduce((sum, val) => sum + val, 0);
+
+  return {
+    score: Math.min(100, Math.round(totalScore)),
     metrics,
-    details, // Add calculation details
-    grade: getFinancialGrade(score),
+    details,
+    grade: getFinancialGrade(totalScore),
+    // Formatted values for display
     savingsRate: details.savingsRate.toFixed(1),
     monthsCovered: details.monthsCovered.toFixed(1),
+    averageMonthlyExpenses: details.averageMonthlyExpenses.toFixed(0),
     totalLiquidAssets: totalLiquidAssets.toFixed(0),
     emergencyFundAmount: totalLiquidAssets.toFixed(0),
     totalInvestments: totalInvestments.toFixed(0),
     totalDeposits: totalDeposits.toFixed(0),
     totalDebt: totalDebt.toFixed(0),
     debtToIncomeRatio: details.debtToIncomeRatio.toFixed(1),
+    incomeExpenseRatio: details.incomeExpenseRatio.toFixed(2),
   };
-
-  return result;
 };
 
 /**
- * Generate smart recommendations based on spending patterns
+ * Generate actionable recommendations based on financial health
  */
 export const generateRecommendations = (budgetComparison, healthScore) => {
   const recommendations = [];
 
-  // Budget-based recommendations
+  // Budget-specific recommendations
   if (budgetComparison && Object.keys(budgetComparison).length > 0) {
     Object.entries(budgetComparison).forEach(([category, data]) => {
       if (data.status === "over") {
         recommendations.push({
+          type: "alert",
+          category,
+          message: `${category} is ₹${Math.abs(data.remaining).toFixed(0)} over budget`,
+          action: `Reduce ${category} spending by ${(data.percentage - 100).toFixed(0)}% next month`,
+        });
+      } else if (data.status === "critical") {
+        recommendations.push({
           type: "warning",
           category,
-          message: `${category} is over budget by ₹${Math.abs(data.remaining).toFixed(0)}`,
-          action: `Reduce ${category} spending by ${(data.percentage - 100).toFixed(0)}%`,
+          message: `${category} at ${data.percentage}% of budget`,
+          action: `Monitor ${category} spending carefully for rest of month`,
         });
       }
     });
@@ -450,53 +547,96 @@ export const generateRecommendations = (budgetComparison, healthScore) => {
 
   const savingsRate = Number.parseFloat(healthScore.savingsRate) || 0;
   const monthsCovered = Number.parseFloat(healthScore.monthsCovered) || 0;
+  const debtRatio = Number.parseFloat(healthScore.debtToIncomeRatio) || 0;
   const score = healthScore.score || 0;
 
+  // Savings recommendations
   if (savingsRate < 10) {
     recommendations.push({
       type: "alert",
       category: "Savings",
-      message: `Savings rate is ${savingsRate.toFixed(1)}% (Target: 20%+)`,
-      action: "Try to save at least 10-20% of your income",
+      message: `Low savings rate: ${savingsRate.toFixed(1)}% (Target: 20%+)`,
+      action: "Aim to save at least 10-20% of your monthly income",
     });
-  } else if (savingsRate < 15) {
+  } else if (savingsRate < 20) {
     recommendations.push({
       type: "tip",
       category: "Savings",
-      message: `Savings rate is ${savingsRate.toFixed(1)}% (Good, but aim higher)`,
-      action: "Increase savings rate to 20% for excellent financial health",
+      message: `Good savings rate: ${savingsRate.toFixed(1)}%`,
+      action: "Increase to 20%+ for excellent financial health",
+    });
+  } else {
+    recommendations.push({
+      type: "success",
+      category: "Savings",
+      message: `Excellent savings rate: ${savingsRate.toFixed(1)}%! 🎉`,
+      action: "Continue your disciplined saving habits",
     });
   }
 
+  // Emergency fund recommendations
   if (monthsCovered < 3) {
     recommendations.push({
       type: "alert",
       category: "Emergency Fund",
-      message: `Emergency fund covers ${monthsCovered.toFixed(1)} months (Target: 6 months)`,
+      message: `Emergency fund covers only ${monthsCovered.toFixed(1)} months`,
       action: "Build emergency fund to cover 3-6 months of expenses",
     });
   } else if (monthsCovered < 6) {
     recommendations.push({
       type: "tip",
       category: "Emergency Fund",
-      message: `Emergency fund covers ${monthsCovered.toFixed(1)} months (On track!)`,
-      action: "Continue building to reach 6-month target",
+      message: `Emergency fund covers ${monthsCovered.toFixed(1)} months`,
+      action: "Almost there! Target is 6 months coverage",
+    });
+  } else {
+    recommendations.push({
+      type: "success",
+      category: "Emergency Fund",
+      message: `Strong emergency fund: ${monthsCovered.toFixed(1)} months! 💪`,
+      action: "Well protected against financial emergencies",
     });
   }
 
+  // Debt recommendations
+  if (debtRatio > 40) {
+    recommendations.push({
+      type: "alert",
+      category: "Debt",
+      message: `High debt-to-income ratio: ${debtRatio.toFixed(1)}%`,
+      action: "Prioritize debt repayment - aim for <36% of annual income",
+    });
+  } else if (debtRatio > 30) {
+    recommendations.push({
+      type: "warning",
+      category: "Debt",
+      message: `Moderate debt burden: ${debtRatio.toFixed(1)}%`,
+      action: "Keep debt under control and avoid taking on more",
+    });
+  }
+
+  // Overall health assessment
   if (score >= 80) {
     recommendations.push({
       type: "success",
       category: "Overall",
-      message: "Excellent financial health! 🎉",
-      action: "Keep up the great work with your current financial habits",
+      message: "Excellent financial health! 🌟",
+      action: "Maintain your great financial habits",
     });
-  } else if (score < 60) {
+  } else if (score >= 60) {
+    recommendations.push({
+      type: "tip",
+      category: "Overall",
+      message: "Good financial health, room for improvement",
+      action: "Focus on increasing savings and building emergency fund",
+    });
+  } else {
     recommendations.push({
       type: "warning",
       category: "Overall",
       message: "Financial health needs attention",
-      action: "Focus on increasing savings rate and building emergency fund",
+      action:
+        "Focus on: 1) Reduce expenses 2) Increase savings 3) Build emergency fund",
     });
   }
 

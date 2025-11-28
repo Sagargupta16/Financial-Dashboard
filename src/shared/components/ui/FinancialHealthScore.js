@@ -79,6 +79,7 @@ export const FinancialHealthScore = ({
   filteredData,
   kpiData,
   accountBalances,
+  allAccountBalances,
   investments,
   deposits,
 }) => {
@@ -88,13 +89,21 @@ export const FinancialHealthScore = ({
         filteredData,
         kpiData,
         accountBalances,
+        allAccountBalances,
         investments,
         deposits,
         calculateCategorySpending,
         calculateHealthScore,
         generateRecommendations,
       }),
-    [filteredData, kpiData, accountBalances, investments, deposits]
+    [
+      filteredData,
+      kpiData,
+      accountBalances,
+      allAccountBalances,
+      investments,
+      deposits,
+    ]
   );
 
   const { score, recommendations } = healthData;
@@ -138,8 +147,13 @@ export const FinancialHealthScore = ({
                   score?.emergencyFundAmount || 0,
                   10
                 ).toLocaleString("en-IN")}{" "}
-                total
+                / ₹
+                {Number.parseInt(
+                  score?.averageMonthlyExpenses || 0,
+                  10
+                ).toLocaleString("en-IN")}
               </p>
+              <p className="text-gray-500 text-xs">Cash / Avg Monthly</p>
               <div className="mt-2 h-2 bg-gray-600 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-green-600 to-blue-600"
@@ -310,7 +324,8 @@ export const FinancialHealthScore = ({
 FinancialHealthScore.propTypes = {
   filteredData: PropTypes.array.isRequired,
   kpiData: PropTypes.object.isRequired,
-  accountBalances: PropTypes.object.isRequired,
+  accountBalances: PropTypes.object,
+  allAccountBalances: PropTypes.object,
   investments: PropTypes.object,
   deposits: PropTypes.object,
 };

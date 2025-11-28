@@ -77,13 +77,39 @@ export const parseAmount = (transaction) => {
 
 /**
  * Gets month key from date (YYYY-MM format)
- * @param {string|Date} date - Date string or Date object
+ * @param {string|Date|Object} dateOrTransaction - Date string, Date object, or transaction object with date property
  * @returns {string} Month key in YYYY-MM format
  * @example
  * getMonthKey("2024-01-15") // returns "2024-01"
+ * getMonthKey(new Date()) // returns "2024-01"
+ * getMonthKey({date: new Date()}) // returns "2024-01"
  */
-export const getMonthKey = (date) => {
-  return new Date(date).toISOString().slice(0, 7);
+export const getMonthKey = (dateOrTransaction) => {
+  let dateValue = dateOrTransaction;
+
+  // If it's an object (transaction), extract the date property
+  if (
+    dateOrTransaction &&
+    typeof dateOrTransaction === "object" &&
+    !(dateOrTransaction instanceof Date)
+  ) {
+    dateValue = dateOrTransaction.date;
+  }
+
+  // If already a Date object, use it directly
+  if (dateValue instanceof Date) {
+    if (Number.isNaN(dateValue.getTime())) {
+      return new Date().toISOString().slice(0, 7); // Fallback to current month
+    }
+    return dateValue.toISOString().slice(0, 7);
+  }
+
+  // Try to parse as date string
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date().toISOString().slice(0, 7); // Fallback to current month
+  }
+  return parsed.toISOString().slice(0, 7);
 };
 
 /**
@@ -106,7 +132,10 @@ export const sumAmounts = (transactions) => {
  * filterByType(transactions, "Expense")
  */
 export const filterByType = (transactions, type) => {
-  return transactions.filter((t) => t.type === type);
+  const lowerType = type.toLowerCase();
+  return transactions.filter(
+    (t) => t.type && t.type.toLowerCase() === lowerType
+  );
 };
 
 /**
@@ -123,4 +152,57 @@ export const downloadChart = (ref, fileName) => {
       download: fileName,
     }).click();
   }
+};
+
+/**
+ * Get financial year from a date
+ * Indian FY runs from April 1st to March 31st
+ * @param {Date|string} date - Date object or string
+ * @returns {string} Financial year in format "FY 2024-25"
+ * @example
+ * getFinancialYear(new Date('2024-04-15')) // returns "FY 2024-25"
+ * getFinancialYear(new Date('2024-03-15')) // returns "FY 2023-24"
+ */
+export const getFinancialYear = (date) => {
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) {
+    return null;
+  }
+
+  const year = d.getFullYear();
+  const month = d.getMonth(); // 0-indexed
+
+  // If month is 0-2 (Jan-Mar), FY is previous year to current year
+  // If month is 3-11 (Apr-Dec), FY is current year to next year
+  if (month >= 3) {
+    // Apr-Dec: FY starts this year
+    return `FY ${year}-${String(year + 1).slice(-2)}`;
+  } else {
+    // Jan-Mar: FY started last year
+    return `FY ${year - 1}-${String(year).slice(-2)}`;
+  }
+};
+
+/**
+ * Get all unique financial years from a list of transactions
+ * @param {Array} transactions - Array of transaction objects
+ * @returns {Array} Sorted array of FY strings (newest first)
+ * @example
+ * getAllFinancialYears(transactions) // returns ["FY 2024-25", "FY 2023-24"]
+ */
+export const getAllFinancialYears = (transactions) => {
+  if (!transactions || transactions.length === 0) {
+    return [];
+  }
+
+  const fys = new Set();
+  transactions.forEach((t) => {
+    const fy = getFinancialYear(t.date);
+    if (fy) {
+      fys.add(fy);
+    }
+  });
+
+  // Sort in descending order (newest first)
+  return Array.from(fys).sort((a, b) => b.localeCompare(a));
 };

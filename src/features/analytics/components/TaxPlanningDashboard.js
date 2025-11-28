@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import {
   FileText,
@@ -17,9 +17,20 @@ import { calculateTaxPlanning } from "../../../shared/utils/financialCalculation
  * Income tax calculations, deductions, and planning
  */
 export const TaxPlanningDashboard = ({ filteredData }) => {
-  const taxData = useMemo(() => {
+  const taxPlanningData = useMemo(() => {
     return calculateTaxPlanning(filteredData);
   }, [filteredData]);
+
+  const { overall, byFinancialYear, availableYears } = taxPlanningData;
+
+  // State for selected financial year
+  const [selectedFY, setSelectedFY] = useState(
+    availableYears.length > 0 ? availableYears[0] : "overall"
+  );
+
+  // Get data for selected FY or overall
+  const taxData =
+    selectedFY === "overall" ? overall : byFinancialYear[selectedFY] || overall;
 
   const {
     totalIncome,
@@ -91,12 +102,43 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          📋 Tax Planning Dashboard (FY 2025-26)
-        </h2>
-        <p className="text-blue-100">
-          Plan your taxes, maximize deductions, and optimize your savings
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              📋 Tax Planning Dashboard
+            </h2>
+            <p className="text-blue-100">
+              Plan your taxes, maximize deductions, and optimize your savings
+            </p>
+          </div>
+
+          {/* Financial Year Selector */}
+          {availableYears.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="fy-select"
+                className="text-white text-sm font-medium"
+              >
+                Select FY:
+              </label>
+              <select
+                id="fy-select"
+                value={selectedFY}
+                onChange={(e) => setSelectedFY(e.target.value)}
+                className="bg-white/20 text-white rounded-lg px-4 py-2 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+              >
+                <option value="overall" className="bg-gray-800">
+                  Overall (All Years)
+                </option>
+                {availableYears.map((fy) => (
+                  <option key={fy} value={fy} className="bg-gray-800">
+                    {fy}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <div className="mt-2 inline-block bg-white/20 rounded-full px-3 py-1 text-sm text-white">
           Tax Regime: {taxRegime === "new" ? "NEW" : "OLD"} | Standard
           Deduction: ₹{standardDeduction.toLocaleString("en-IN")}

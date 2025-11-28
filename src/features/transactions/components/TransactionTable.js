@@ -84,6 +84,10 @@ export const EnhancedTransactionTable = ({
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [sortConfig, setSortConfig] = useState({
+    key: "date",
+    direction: "desc",
+  });
   const [filters, setFilters] = useState({
     dateFrom: "",
     dateTo: "",
@@ -222,11 +226,52 @@ export const EnhancedTransactionTable = ({
     return addRunningBalance(filteredData);
   }, [filteredData]);
 
+  // Apply sorting to data with balance
+  const sortedData = useMemo(() => {
+    const sorted = [...dataWithBalance];
+    if (sortConfig.key) {
+      sorted.sort((a, b) => {
+        let aVal = a[sortConfig.key];
+        let bVal = b[sortConfig.key];
+
+        // Handle date sorting
+        if (sortConfig.key === "date") {
+          aVal = a.date instanceof Date ? a.date : new Date(a.date);
+          bVal = b.date instanceof Date ? b.date : new Date(b.date);
+          return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+        }
+
+        // Handle numeric sorting (amount, runningBalance)
+        if (
+          sortConfig.key === "amount" ||
+          sortConfig.key === "runningBalance"
+        ) {
+          aVal = Number(aVal) || 0;
+          bVal = Number(bVal) || 0;
+          return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+        }
+
+        // Handle string sorting (default)
+        aVal = String(aVal || "").toLowerCase();
+        bVal = String(bVal || "").toLowerCase();
+
+        if (aVal < bVal) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aVal > bVal) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sorted;
+  }, [dataWithBalance, sortConfig]);
+
   // Pagination calculations
-  const totalPages = Math.ceil(dataWithBalance.length / transactionsPerPage);
+  const totalPages = Math.ceil(sortedData.length / transactionsPerPage);
   const startIndex = (currentPage - 1) * transactionsPerPage;
   const endIndex = startIndex + transactionsPerPage;
-  const paginatedData = dataWithBalance.slice(startIndex, endIndex);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -266,6 +311,17 @@ export const EnhancedTransactionTable = ({
       ...prev,
       [key]: "",
     }));
+  };
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    // Also call parent's onSort if provided
+    if (onSort) {
+      onSort(key);
+    }
   };
 
   return (
@@ -650,26 +706,31 @@ export const EnhancedTransactionTable = ({
           <thead className="bg-gray-700/50">
             <tr>
               {[
-                "date",
-                "time",
-                "account",
-                "category",
-                "subcategory",
-                "note",
-                "amount",
-                "type",
-                "runningBalance",
-              ].map((key) => (
+                { key: "date", label: "Date" },
+                { key: "time", label: "Time" },
+                { key: "account", label: "Account" },
+                { key: "category", label: "Category" },
+                { key: "subcategory", label: "Subcategory" },
+                { key: "note", label: "Note" },
+                { key: "amount", label: "Amount" },
+                { key: "type", label: "Type" },
+                { key: "runningBalance", label: "Running Balance" },
+              ].map((column) => (
                 <th
-                  key={key}
-                  className="p-4 text-sm font-semibold text-gray-300 uppercase tracking-wider cursor-pointer"
-                  onClick={() => onSort(key)}
+                  key={column.key}
+                  className="p-4 text-sm font-semibold text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600/50 transition-colors"
+                  onClick={() => handleSort(column.key)}
                 >
-                  <div className="flex items-center">
-                    {key === "type" && "Income/Expense"}
-                    {key === "runningBalance" && "Running Balance"}
-                    {key !== "type" && key !== "runningBalance" && key}
-                    <ArrowUpDown size={14} className="ml-2 opacity-50" />
+                  <div className="flex items-center gap-2">
+                    <span>{column.label}</span>
+                    {sortConfig.key === column.key && (
+                      <span className="text-blue-400">
+                        {sortConfig.direction === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
+                    {sortConfig.key !== column.key && (
+                      <ArrowUpDown size={14} className="opacity-30" />
+                    )}
                   </div>
                 </th>
               ))}
@@ -783,8 +844,8 @@ export const EnhancedTransactionTable = ({
       {totalPages > 1 && (
         <div className="flex justify-between items-center p-4 bg-gray-800 border-t border-gray-700">
           <p className="text-sm text-gray-400">
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)}{" "}
-            of {filteredData.length}
+            Showing {startIndex + 1}-{Math.min(endIndex, sortedData.length)} of{" "}
+            {sortedData.length}
             {(searchTerm || activeFiltersCount > 0) && (
               <span className="text-gray-500">
                 {" "}

@@ -3,21 +3,44 @@
  * All shared formulas and calculations in one place
  */
 
-// Import and re-export shared calculation functions from financialCalculations.js to avoid duplication
-import {
-  calculateDateRange,
-  calculateDailyAverage,
-  calculateMonthlyAverage,
-  calculateAveragePerTransaction,
-  calculatePercentage,
-} from "./financialCalculations";
+/**
+ * Calculate date range from transaction data
+ */
+export const calculateDateRange = (data) => {
+  if (!data || data.length === 0) {
+    return { startDate: null, endDate: null, totalDays: 0 };
+  }
 
-export {
-  calculateDateRange,
-  calculateDailyAverage,
-  calculateMonthlyAverage,
-  calculateAveragePerTransaction,
-  calculatePercentage,
+  const dates = data
+    .filter((item) => item?.date)
+    .map((item) => new Date(item.date))
+    .filter((d) => d && !Number.isNaN(d.getTime()));
+  if (dates.length === 0) {
+    return { startDate: null, endDate: null, totalDays: 0 };
+  }
+
+  const startDate = new Date(Math.min(...dates));
+  const endDate = new Date(Math.max(...dates));
+  const totalDays =
+    Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+  return { startDate, endDate, totalDays };
+};
+
+export const calculateDailyAverage = (total, totalDays) => {
+  return totalDays > 0 ? total / totalDays : 0;
+};
+
+export const calculateMonthlyAverage = (total, totalMonths) => {
+  return totalMonths > 0 ? total / totalMonths : 0;
+};
+
+export const calculateAveragePerTransaction = (total, count) => {
+  return count > 0 ? total / count : 0;
+};
+
+export const calculatePercentage = (value, total) => {
+  return total > 0 ? (value / total) * 100 : 0;
 };
 
 /**
@@ -54,7 +77,10 @@ export const calculatePerWeekFrequency = (count, totalDays) => {
  * Format number with decimals
  */
 export const formatNumber = (number, decimals = 2) => {
-  return number.toFixed(decimals);
+  if (number === null || number === undefined || Number.isNaN(number)) {
+    return "0";
+  }
+  return Number(number).toFixed(decimals);
 };
 
 /**
@@ -388,6 +414,31 @@ export const calculateCashFlowForecast = (transactions, forecastDays = 30) => {
 };
 
 /**
+ * Classify frequency based on average interval
+ * @param {number} avgInterval - Average days between occurrences
+ * @returns {Object} frequency classification and isRecurring flag
+ */
+const classifyFrequency = (avgInterval) => {
+  const frequencyRanges = [
+    { min: 360, max: 370, name: "annually" },
+    { min: 175, max: 185, name: "semi-annually" },
+    { min: 85, max: 95, name: "quarterly" },
+    { min: 60, max: 70, name: "bi-monthly" },
+    { min: 27, max: 33, name: "monthly" },
+    { min: 13, max: 16, name: "bi-weekly" },
+    { min: 6, max: 8, name: "weekly" },
+  ];
+
+  for (const range of frequencyRanges) {
+    if (avgInterval >= range.min && avgInterval <= range.max) {
+      return { frequency: range.name, isRecurring: true };
+    }
+  }
+
+  return { frequency: "irregular", isRecurring: false };
+};
+
+/**
  * 4. Detect Recurring Transactions
  * Find recurring patterns (subscriptions, salaries, etc.)
  */
@@ -464,34 +515,10 @@ export const detectRecurringTransactions = (transactions) => {
     // Allow for some flexibility: stdDev should be less than 20% of average
     const isConsistent = stdDev < avgInterval * 0.2 || intervals.length === 1;
 
-    // Classify the frequency
-    let frequency = "irregular";
-    let isRecurring = false;
-
-    if (isConsistent) {
-      if (avgInterval >= 27 && avgInterval <= 33) {
-        frequency = "monthly";
-        isRecurring = true;
-      } else if (avgInterval >= 6 && avgInterval <= 8) {
-        frequency = "weekly";
-        isRecurring = true;
-      } else if (avgInterval >= 13 && avgInterval <= 16) {
-        frequency = "bi-weekly";
-        isRecurring = true;
-      } else if (avgInterval >= 60 && avgInterval <= 70) {
-        frequency = "bi-monthly";
-        isRecurring = true;
-      } else if (avgInterval >= 85 && avgInterval <= 95) {
-        frequency = "quarterly";
-        isRecurring = true;
-      } else if (avgInterval >= 175 && avgInterval <= 185) {
-        frequency = "semi-annually";
-        isRecurring = true;
-      } else if (avgInterval >= 360 && avgInterval <= 370) {
-        frequency = "annually";
-        isRecurring = true;
-      }
-    }
+    // Classify the frequency using helper function
+    const { frequency, isRecurring } = isConsistent
+      ? classifyFrequency(avgInterval)
+      : { frequency: "irregular", isRecurring: false };
 
     // Only include if it's actually recurring
     if (isRecurring) {
@@ -637,19 +664,25 @@ export const calculateCategoryTrends = (transactions) => {
       }
 
       const dateRange = calculateDateRange(catTransactions);
+
+      // Check if we have valid dates
+      if (!dateRange.startDate || !dateRange.endDate) {
+        return null;
+      }
+
       const midPoint = new Date(
-        (dateRange.minDate.getTime() + dateRange.maxDate.getTime()) / 2
+        (dateRange.startDate.getTime() + dateRange.endDate.getTime()) / 2
       );
 
       const firstHalf = filterByDateRange(
         catTransactions,
-        dateRange.minDate,
+        dateRange.startDate,
         midPoint
       );
       const secondHalf = filterByDateRange(
         catTransactions,
         midPoint,
-        dateRange.maxDate
+        dateRange.endDate
       );
 
       const firstTotal = firstHalf.reduce(

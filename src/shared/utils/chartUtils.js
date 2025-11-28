@@ -1,6 +1,7 @@
-// Import and re-export formatCurrency from dataUtils to avoid duplication
-import { formatCurrency } from "./dataUtils";
-export { formatCurrency };
+// Import formatCurrency from dataUtils
+import { formatCurrency as formatCurrencyUtil } from "./dataUtils";
+
+export const formatCurrency = formatCurrencyUtil;
 
 export const truncateLabel = (label, maxLength = 12) => {
   if (typeof label !== "string") {

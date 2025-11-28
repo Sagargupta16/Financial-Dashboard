@@ -98,7 +98,7 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
             />
           </div>
           <div className="text-3xl font-bold text-white">
-            {kpiData.savingsRate.toFixed(1)}%
+            {(kpiData.savingsRate ?? 0).toFixed(1)}%
           </div>
           <div className="text-xs text-gray-400 mt-1">
             {getSavingsRateMessage(kpiData.savingsRate)}
@@ -155,8 +155,8 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
             />
           </div>
           <div className="text-3xl font-bold text-white">
-            {kpiData.spendingVelocity.toFixed(0)}%
-            {kpiData.spendingVelocity > 100 ? " ↑" : " ↓"}
+            {(kpiData.spendingVelocity ?? 0).toFixed(0)}%
+            {(kpiData.spendingVelocity ?? 0) > 100 ? " ↑" : " ↓"}
           </div>
           <div className="text-xs text-gray-400 mt-1">
             {kpiData.spendingVelocity > 100 ? "Above" : "Below"} average
@@ -179,8 +179,9 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
               {kpiData.categoryConcentration.category}
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {kpiData.categoryConcentration.percentage.toFixed(0)}% of spending
-              {kpiData.categoryConcentration.percentage >
+              {(kpiData.categoryConcentration?.percentage ?? 0).toFixed(0)}% of
+              spending
+              {(kpiData.categoryConcentration?.percentage ?? 0) >
                 CATEGORY_CONCENTRATION_THRESHOLD && " ⚠️"}
             </div>
           </div>

@@ -251,17 +251,14 @@ export const EnhancedTransactionTable = ({
           return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
         }
 
-        // Handle string sorting (default)
-        aVal = String(aVal || "").toLowerCase();
-        bVal = String(bVal || "").toLowerCase();
+        // Handle string sorting (default) with localeCompare
+        const strA = String(aVal || "").toLowerCase();
+        const strB = String(bVal || "").toLowerCase();
 
-        if (aVal < bVal) {
-          return sortConfig.direction === "asc" ? -1 : 1;
-        }
-        if (aVal > bVal) {
-          return sortConfig.direction === "asc" ? 1 : -1;
-        }
-        return 0;
+        const compareResult = strA.localeCompare(strB, undefined, {
+          sensitivity: "base",
+        });
+        return sortConfig.direction === "asc" ? compareResult : -compareResult;
       });
     }
     return sorted;

@@ -25,14 +25,20 @@ const analyzeDeliverySpending = (transactions, dateRange) => {
 
   const total = deliveryTransactions.reduce((sum, t) => sum + t.amount, 0);
   const avgPerOrder = total / deliveryTransactions.length;
+  const totalDays = dateRange.totalDays || 1;
   const ordersPerWeek =
-    calculatePerDayFrequency(deliveryTransactions.length, dateRange.days) * 7;
+    calculatePerDayFrequency(deliveryTransactions.length, totalDays) * 7;
 
   if (ordersPerWeek <= 3) {
     return null;
   }
 
-  const savings = calculateSavingsPotential(total, dateRange.days, 0.3);
+  const savings = calculateSavingsPotential(total, totalDays, 0.3);
+
+  if (!savings || !savings.monthlySavings || !savings.yearlySavings) {
+    return null;
+  }
+
   return {
     type: "saving-opportunity",
     priority: "high",
@@ -130,7 +136,10 @@ const analyzeHighFrequencyCategory = (expenseTransactions, dateRange) => {
     return null;
   }
 
-  const frequency = calculatePerDayFrequency(topCategory[1], dateRange.days);
+  const frequency = calculatePerDayFrequency(
+    topCategory[1],
+    dateRange.totalDays || 1
+  );
   if (frequency <= 0.5) {
     return null;
   }
@@ -158,7 +167,7 @@ const analyzeCafeteriaSpending = (transactions, dateRange) => {
   const total = cafeteriaTransactions.reduce((sum, t) => sum + t.amount, 0);
   const perDay = calculatePerDayFrequency(
     cafeteriaTransactions.length,
-    dateRange.days
+    dateRange.totalDays || 1
   );
   const avgAmount = total / cafeteriaTransactions.length;
 
@@ -168,7 +177,7 @@ const analyzeCafeteriaSpending = (transactions, dateRange) => {
 
   const packLunchSavings = calculateSavingsPotential(
     total,
-    dateRange.days,
+    dateRange.totalDays || 1,
     0.5
   );
   return {
@@ -209,7 +218,7 @@ export const generateSmartInsights = (transactions) => {
   const insights = [];
   const dateRange = calculateDateRange(transactions);
 
-  if (dateRange.days === 0 || transactions.length === 0) {
+  if ((dateRange.totalDays || 0) === 0 || transactions.length === 0) {
     return insights;
   }
 

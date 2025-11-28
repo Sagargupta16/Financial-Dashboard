@@ -238,7 +238,7 @@ export const analyzeSeasonalPatterns = (transactions) => {
     const peakMonths = Object.entries(seasonalAnalysis.indices)
       .filter(([, index]) => index > 1.2)
       .map(([month, index]) => ({
-        month: monthNames[parseInt(month, 10) - 1],
+        month: monthNames[Number.parseInt(month, 10) - 1],
         index,
         percent: ((index - 1) * 100).toFixed(0),
       }))
@@ -259,7 +259,7 @@ export const analyzeSeasonalPatterns = (transactions) => {
     const lowMonths = Object.entries(seasonalAnalysis.indices)
       .filter(([, index]) => index < 0.8)
       .map(([month, index]) => ({
-        month: monthNames[parseInt(month, 10) - 1],
+        month: monthNames[Number.parseInt(month, 10) - 1],
         index,
         percent: ((1 - index) * 100).toFixed(0),
       }))

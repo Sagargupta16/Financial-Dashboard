@@ -102,14 +102,14 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
             <h4 className="text-sm font-semibold text-red-400 mb-2 uppercase tracking-wide">
               ⚠️ Urgent Attention
             </h4>
-            {highPriorityInsights.map((insight, index) => (
+            {highPriorityInsights.map((insight) => (
               <div
-                key={`high-${index}`}
+                key={`high-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type, insight.priority)}
+                    {getIcon(insight.type)}
                   </div>
                   <div className="flex-1">
                     <h5 className="text-white font-semibold mb-1">
@@ -139,14 +139,14 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
             <h4 className="text-sm font-semibold text-yellow-400 mb-2 uppercase tracking-wide">
               📊 Worth Monitoring
             </h4>
-            {mediumPriorityInsights.map((insight, index) => (
+            {mediumPriorityInsights.map((insight) => (
               <div
-                key={`medium-${index}`}
+                key={`medium-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type, insight.priority)}
+                    {getIcon(insight.type)}
                   </div>
                   <div className="flex-1">
                     <h5 className="text-white font-semibold mb-1">
@@ -176,14 +176,14 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
             <h4 className="text-sm font-semibold text-blue-400 mb-2 uppercase tracking-wide">
               💡 Good to Know
             </h4>
-            {lowPriorityInsights.map((insight, index) => (
+            {lowPriorityInsights.map((insight) => (
               <div
-                key={`low-${index}`}
+                key={`low-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type, insight.priority)}
+                    {getIcon(insight.type)}
                   </div>
                   <div className="flex-1">
                     <h5 className="text-white font-semibold mb-1">

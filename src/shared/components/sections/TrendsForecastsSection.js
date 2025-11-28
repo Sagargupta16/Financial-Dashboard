@@ -8,6 +8,7 @@ import {
   SpendingForecastChart,
   AccountBalanceProgressionChart,
   DayWeekSpendingPatternsChart,
+  SmartInsightsPanel,
 } from "../../../features/charts/components";
 
 /**
@@ -16,6 +17,9 @@ import {
 export const TrendsForecastsSection = ({ chartRefs, filteredData }) => {
   return (
     <div className="grid grid-cols-1 gap-6">
+      {/* Smart Insights Panel - NEW! */}
+      <SmartInsightsPanel filteredData={filteredData} />
+
       {/* Net Worth Trend */}
       <NetWorthTrendChart
         filteredData={filteredData}

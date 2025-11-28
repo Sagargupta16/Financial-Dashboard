@@ -12,3 +12,6 @@ export { default as TreemapChart } from "./TreemapChart";
 
 // Re-export complex charts from ChartComponents.js
 export * from "./ChartComponents";
+
+// Re-export SmartInsightsPanel
+export { SmartInsightsPanel } from "./SmartInsightsPanel";

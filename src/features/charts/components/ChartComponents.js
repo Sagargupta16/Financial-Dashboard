@@ -9,6 +9,8 @@ import {
 } from "../../../shared/utils/chartUtils";
 import logger from "../../../shared/utils/logger";
 import { useTimeNavigation } from "../../../shared/hooks/useChartHooks";
+import { comprehensiveForecast } from "../../../shared/utils/forecastUtils";
+import { detectSeasonality } from "../../../shared/utils/forecastUtils";
 
 export const commonChartOptions = getCommonChartOptions();
 
@@ -2439,7 +2441,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     return Array.from(categories).sort((a, b) => a.localeCompare(b));
   }, [filteredData]);
 
-  const heatmapData = React.useMemo(() => {
+  const { heatmapData, seasonalAnalysis } = React.useMemo(() => {
     const data = filteredData.filter(
       (item) =>
         item.type === "Expense" &&
@@ -2448,10 +2450,13 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     );
 
     const monthlyData = {};
+    const monthlyDataForSeasonality = {};
+
     data.forEach((item) => {
       const date = new Date(item.date);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
+      const monthKey = `${year}-${String(month).padStart(2, "0")}`;
 
       if (!monthlyData[year]) {
         monthlyData[year] = {};
@@ -2461,7 +2466,12 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
       }
 
       monthlyData[year][month] += item.amount;
+      monthlyDataForSeasonality[monthKey] =
+        (monthlyDataForSeasonality[monthKey] || 0) + item.amount;
     });
+
+    // Calculate seasonal indices
+    const seasonality = detectSeasonality(monthlyDataForSeasonality);
 
     const years = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -2486,30 +2496,85 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     }));
 
     return {
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-      datasets,
+      heatmapData: {
+        labels: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+        datasets,
+      },
+      seasonalAnalysis: seasonality,
     };
   }, [filteredData, selectedCategory]);
 
+  // Get peak and low months
+  const seasonalInfo = React.useMemo(() => {
+    if (!seasonalAnalysis || !seasonalAnalysis.hasSeasonality) {
+      return null;
+    }
+
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const entries = Object.entries(seasonalAnalysis.indices || {});
+    const peak = entries.reduce(
+      (max, [month, index]) =>
+        index > (max?.index || 0)
+          ? { month: monthNames[parseInt(month, 10) - 1], index }
+          : max,
+      null
+    );
+
+    const low = entries.reduce(
+      (min, [month, index]) =>
+        index < (min?.index || Infinity)
+          ? { month: monthNames[parseInt(month, 10) - 1], index }
+          : min,
+      null
+    );
+
+    return { peak, low };
+  }, [seasonalAnalysis]);
+
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[400px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Seasonal Spending Heatmap
-        </h3>
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h3 className="text-xl font-semibold text-white">
+            Seasonal Spending Heatmap
+          </h3>
+          {seasonalInfo && (
+            <div className="text-xs text-gray-400 mt-1">
+              Peak: {seasonalInfo.peak?.month} (
+              {((seasonalInfo.peak?.index - 1) * 100).toFixed(0)}% above avg) |
+              Low: {seasonalInfo.low?.month} (
+              {((1 - seasonalInfo.low?.index) * 100).toFixed(0)}% below avg) |
+              Seasonality: {seasonalAnalysis.hasSeasonality ? "Strong" : "Weak"}
+            </div>
+          )}
+        </div>
         <div className="flex items-center space-x-4">
           <select
             value={selectedCategory}
@@ -2841,10 +2906,11 @@ YearOverYearComparisonChart.propTypes = {
 export const SpendingForecastChart = ({ filteredData, chartRef }) => {
   // eslint-disable-next-line max-lines-per-function
   const [forecastMonths, setForecastMonths] = React.useState(6);
-  const [forecastType, setForecastType] = React.useState("linear");
+  const [forecastType, setForecastType] = React.useState("best");
+  const [showConfidence, setShowConfidence] = React.useState(true);
 
   // eslint-disable-next-line max-lines-per-function
-  const chartData = React.useMemo(() => {
+  const { chartData, forecastInfo } = React.useMemo(() => {
     const monthlyData = {};
     filteredData.forEach((item) => {
       if (item.category === "In-pocket") {
@@ -2875,77 +2941,39 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
     );
     const lastMonth = historicalMonths.at(-1);
 
-    let forecastData = [];
-    if (forecastType === "linear") {
-      const recentMonths = historicalMonths.slice(-6);
-      const avgIncome =
-        recentMonths.reduce(
-          (sum, month) => sum + monthlyData[month].income,
-          0
-        ) / recentMonths.length;
-      const avgExpense =
-        recentMonths.reduce(
-          (sum, month) => sum + monthlyData[month].expense,
-          0
-        ) / recentMonths.length;
-      const avgNet = avgIncome - avgExpense;
+    // Prepare data for advanced forecasting
+    const historicalNet = historicalMonths.map((m) => monthlyData[m].net);
+    // Note: historicalExpense and historicalIncome can be used for category-specific forecasts
 
-      forecastData = Array.from({ length: forecastMonths }, () => ({
-        income: avgIncome,
-        expense: avgExpense,
-        net: avgNet,
-      }));
-    } else {
-      const recentMonths = historicalMonths.slice(-12);
-      const trendData = recentMonths.map((month, index) => ({
-        x: index,
-        income: monthlyData[month].income,
-        expense: monthlyData[month].expense,
-        net: monthlyData[month].net,
-      }));
+    // Use comprehensive forecasting
+    const netForecast = comprehensiveForecast(historicalNet, forecastMonths);
 
-      const calculateTrend = (data, key) => {
-        const n = data.length;
-        const sumX = data.reduce((sum, item) => sum + item.x, 0);
-        const sumY = data.reduce((sum, item) => sum + item[key], 0);
-        const sumXY = data.reduce((sum, item) => sum + item.x * item[key], 0);
-        const sumXX = data.reduce((sum, item) => sum + item.x * item.x, 0);
+    // Select forecast based on type
+    let selectedNetForecast = netForecast?.best.forecast || [];
+    let selectedNetConfidence = netForecast?.best.confidence || null;
+    const forecastMethod = netForecast?.best.method || "simple";
 
-        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-        const intercept = (sumY - slope * sumX) / n;
-
-        return { slope, intercept };
-      };
-
-      const incomeTrend = calculateTrend(trendData, "income");
-      const expenseTrend = calculateTrend(trendData, "expense");
-
-      forecastData = Array.from({ length: forecastMonths }, (_, index) => {
-        const futureX = trendData.length + index;
-        const income = Math.max(
-          0,
-          incomeTrend.slope * futureX + incomeTrend.intercept
-        );
-        const expense = Math.max(
-          0,
-          expenseTrend.slope * futureX + expenseTrend.intercept
-        );
-        return {
-          income,
-          expense,
-          net: income - expense,
-        };
-      });
+    if (forecastType === "simple") {
+      selectedNetForecast = netForecast?.simple.forecast || [];
+      selectedNetConfidence = null;
+    } else if (forecastType === "exponential") {
+      selectedNetForecast = netForecast?.exponential.forecast || [];
+      selectedNetConfidence = null;
+    } else if (forecastType === "regression") {
+      selectedNetForecast = netForecast?.regression.forecast || [];
+      selectedNetConfidence = null;
     }
 
     const futureMonths = [];
-    const currentDate = new Date(lastMonth + "-01");
-    for (let i = 0; i < forecastMonths; i++) {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      const monthKey = `${currentDate.getFullYear()}-${String(
-        currentDate.getMonth() + 1
-      ).padStart(2, "0")}`;
-      futureMonths.push(monthKey);
+    if (lastMonth) {
+      const currentDate = new Date(lastMonth + "-01");
+      for (let i = 0; i < forecastMonths; i++) {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        const monthKey = `${currentDate.getFullYear()}-${String(
+          currentDate.getMonth() + 1
+        ).padStart(2, "0")}`;
+        futureMonths.push(monthKey);
+      }
     }
 
     const allMonths = [...historicalMonths.slice(-12), ...futureMonths];
@@ -2968,75 +2996,106 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
       return `${monthNames[Number.parseInt(monthNum, 10) - 1]} ${year}`;
     });
 
-    const historicalIncome = historicalMonths
-      .slice(-12)
-      .map((month) => monthlyData[month]?.income || 0);
-    const historicalNet = historicalMonths
+    const historicalNetDisplay = historicalMonths
       .slice(-12)
       .map((month) => monthlyData[month]?.net || 0);
 
+    const datasets = [
+      {
+        label: "Historical Net Cash Flow",
+        data: [
+          ...historicalNetDisplay,
+          ...new Array(forecastMonths).fill(null),
+        ],
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.1)",
+        borderWidth: 3,
+        fill: false,
+        tension: 0.3,
+      },
+      {
+        label: `Forecast (${forecastMethod})`,
+        data: [
+          ...new Array(historicalNetDisplay.length).fill(null),
+          ...selectedNetForecast,
+        ],
+        borderColor: "#f59e0b",
+        backgroundColor: "rgba(245, 158, 11, 0.1)",
+        borderWidth: 3,
+        borderDash: [5, 5],
+        fill: false,
+        tension: 0.3,
+      },
+    ];
+
+    // Add confidence intervals if available and enabled
+    if (showConfidence && selectedNetConfidence && forecastType === "best") {
+      datasets.push(
+        {
+          label: "Upper Bound (95%)",
+          data: [
+            ...new Array(historicalNetDisplay.length).fill(null),
+            ...selectedNetConfidence.upper,
+          ],
+          borderColor: "rgba(245, 158, 11, 0.3)",
+          backgroundColor: "rgba(245, 158, 11, 0.05)",
+          borderWidth: 1,
+          borderDash: [2, 2],
+          fill: "+1",
+          tension: 0.3,
+          pointRadius: 0,
+        },
+        {
+          label: "Lower Bound (95%)",
+          data: [
+            ...new Array(historicalNetDisplay.length).fill(null),
+            ...selectedNetConfidence.lower,
+          ],
+          borderColor: "rgba(245, 158, 11, 0.3)",
+          backgroundColor: "rgba(245, 158, 11, 0.05)",
+          borderWidth: 1,
+          borderDash: [2, 2],
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0,
+        }
+      );
+    }
+
     return {
-      labels,
-      datasets: [
-        {
-          label: "Historical Net",
-          data: [...historicalNet, ...new Array(forecastMonths).fill(null)],
-          borderColor: "#10b981",
-          backgroundColor: "rgba(16, 185, 129, 0.1)",
-          borderWidth: 3,
-          fill: false,
-          tension: 0.3,
-        },
-        {
-          label: "Forecast Net",
-          data: [
-            ...new Array(historicalNet.length).fill(null),
-            ...forecastData.map((d) => d.net),
-          ],
-          borderColor: "#f59e0b",
-          backgroundColor: "rgba(245, 158, 11, 0.1)",
-          borderWidth: 3,
-          borderDash: [5, 5],
-          fill: false,
-          tension: 0.3,
-        },
-        {
-          label: "Historical Income",
-          data: [...historicalIncome, ...new Array(forecastMonths).fill(null)],
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.05)",
-          borderWidth: 2,
-          fill: false,
-          tension: 0.3,
-        },
-        {
-          label: "Forecast Income",
-          data: [
-            ...new Array(historicalIncome.length).fill(null),
-            ...forecastData.map((d) => d.income),
-          ],
-          borderColor: "#60a5fa",
-          backgroundColor: "rgba(96, 165, 250, 0.05)",
-          borderWidth: 2,
-          borderDash: [3, 3],
-          fill: false,
-          tension: 0.3,
-        },
-      ],
+      chartData: { labels, datasets },
+      forecastInfo: {
+        method: forecastMethod,
+        volatility: netForecast?.volatility,
+        dataQuality: netForecast?.dataQuality,
+        outliers: netForecast?.outliers || 0,
+      },
     };
-  }, [filteredData, forecastMonths, forecastType]);
+  }, [filteredData, forecastMonths, forecastType, showConfidence]);
 
   return (
-    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">Spending Forecast</h3>
-        <div className="flex items-center space-x-4">
+    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h3 className="text-xl font-semibold text-white">
+            Advanced Spending Forecast
+          </h3>
+          {forecastInfo && (
+            <div className="text-xs text-gray-400 mt-1">
+              Method: {forecastInfo.method} | Volatility:{" "}
+              {forecastInfo.volatility?.level || "N/A"} | R²:{" "}
+              {(forecastInfo.dataQuality?.r2 || 0).toFixed(2)} | Outliers:{" "}
+              {forecastInfo.outliers}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center space-x-2">
           <select
             value={forecastMonths}
             onChange={(e) =>
               setForecastMonths(Number.parseInt(e.target.value, 10))
             }
-            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+            className="bg-gray-700 text-white px-2 py-1 rounded-lg text-xs"
           >
             <option value={3}>3 Months</option>
             <option value={6}>6 Months</option>
@@ -3045,11 +3104,22 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
           <select
             value={forecastType}
             onChange={(e) => setForecastType(e.target.value)}
-            className="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm"
+            className="bg-gray-700 text-white px-2 py-1 rounded-lg text-xs"
           >
-            <option value="linear">Average</option>
-            <option value="trend">Trend</option>
+            <option value="best">Best Fit</option>
+            <option value="simple">Simple Avg</option>
+            <option value="exponential">Exponential</option>
+            <option value="regression">Regression</option>
           </select>
+          <label className="flex items-center text-xs text-gray-300">
+            <input
+              type="checkbox"
+              checked={showConfidence}
+              onChange={(e) => setShowConfidence(e.target.checked)}
+              className="mr-1"
+            />{" "}
+            CI
+          </label>
           <button
             onClick={() => {
               if (chartRef?.current) {
@@ -3087,7 +3157,10 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { labels: { color: "#9ca3af", font: { size: 11 } } },
+              legend: {
+                labels: { color: "#9ca3af", font: { size: 10 } },
+                position: "bottom",
+              },
               tooltip: {
                 backgroundColor: "#111827",
                 titleColor: "#ffffff",

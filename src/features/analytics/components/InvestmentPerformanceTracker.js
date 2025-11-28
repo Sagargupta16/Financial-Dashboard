@@ -311,7 +311,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
               </tr>
             </thead>
             <tbody>
-              {transactions.slice(0, 10).map((t, idx) => {
+              {transactions.slice(0, 10).map((t) => {
                 const getTypeBadgeClass = (type) => {
                   if (type === "Profit") {
                     return "bg-green-500/20 text-green-300";

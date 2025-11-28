@@ -458,7 +458,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
             💡 Tax Saving Recommendations
           </h3>
           <div className="space-y-3">
-            {recommendations.map((rec, idx) => {
+            {recommendations.map((rec) => {
               const isHigh = rec.priority === "high";
               const isMedium = rec.priority === "medium";
 

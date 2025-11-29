@@ -9,7 +9,7 @@ import {
   DollarSign,
   Target,
 } from "lucide-react";
-import { useAdvancedAnalytics } from "../../../shared/hooks/useAdvancedAnalytics";
+import { useAdvancedAnalytics } from "../../features/analytics/hooks/useAdvancedAnalytics";
 
 /**
  * Advanced Analytics Dashboard Component

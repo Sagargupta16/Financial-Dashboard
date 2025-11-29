@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { formatCurrency } from "../../../shared/utils/dataUtils";
+import { formatCurrency } from "../../../lib/data";
 
 export const AccountBalancesCard = ({ balances }) => (
   <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">

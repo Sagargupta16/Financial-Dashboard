@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import * as d3 from "d3-selection";
 import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
-import { formatCurrency } from "../../../shared/utils/chartUtils";
+import { formatCurrency } from "../../../lib/charts";
 
 // Helper function to add text line to treemap labels
 const appendTextLine = (textElement, line, index) => {

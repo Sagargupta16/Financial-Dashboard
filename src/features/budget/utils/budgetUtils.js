@@ -13,12 +13,8 @@ import {
   scoreIncomeExpenseRatio,
   scoreDebtManagement,
   getFinancialGrade,
-} from "../../../shared/utils/calculations";
-import {
-  parseAmount,
-  filterByType,
-  getMonthKey,
-} from "../../../shared/utils/dataUtils";
+} from "../../../lib/calculations";
+import { parseAmount, filterByType, getMonthKey } from "../../../lib/data";
 
 // Storage keys for budget data
 const BUDGET_KEY = "financial_dashboard_budgets";

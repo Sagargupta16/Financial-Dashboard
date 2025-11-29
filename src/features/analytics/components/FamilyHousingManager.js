@@ -6,7 +6,7 @@ import { Bar, Line } from "react-chartjs-2";
 import {
   calculateFamilyExpenses,
   calculateHousingExpenses,
-} from "../../../shared/utils/financialCalculations";
+} from "../../../lib/calculations/financial";
 
 /**
  * Family & Housing Expense Manager

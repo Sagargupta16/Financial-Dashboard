@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
-import { detectRecurringTransactions } from "../../../shared/utils/calculations";
+import { detectRecurringTransactions } from "../../../lib/calculations";
 import {
   Clock,
   TrendingUp,

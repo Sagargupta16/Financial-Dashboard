@@ -1,4 +1,4 @@
-import { getCommonChartOptions } from "../../../shared/utils/chartUtils";
+import { getCommonChartOptions } from "../../../lib/charts";
 
 // Chart configuration will be moved here gradually
 // For now, these are exported from ChartComponents.js to avoid conflicts

@@ -6,11 +6,11 @@ import {
   formatCurrency,
   getCommonChartOptions,
   truncateLabel,
-} from "../../../shared/utils/chartUtils";
-import logger from "../../../shared/utils/logger";
-import { useTimeNavigation } from "../../../shared/hooks/useChartHooks";
-import { comprehensiveForecast } from "../../../shared/utils/forecastUtils";
-import { detectSeasonality } from "../../../shared/utils/forecastUtils";
+} from "../../../lib/charts";
+import logger from "../../../utils/logger";
+import { useTimeNavigation } from "../hooks/useChartHooks";
+import { comprehensiveForecast } from "../../../lib/analytics/forecasts";
+import { detectSeasonality } from "../../../lib/analytics/forecasts";
 
 export const commonChartOptions = getCommonChartOptions();
 

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { formatCurrency } from "../../../shared/utils/dataUtils";
+import { formatCurrency } from "../../../lib/data";
 
 /**
  * KPICard Component - Memoized for performance

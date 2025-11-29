@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { exportChartAsPNG } from "../../../shared/utils/chartUtils";
+import { exportChartAsPNG } from "../../lib/charts";
 
 // Common chart container component
 export const ChartContainer = ({

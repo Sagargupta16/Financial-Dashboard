@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "../styles/index.css";
 import App from "./App";
-import EnhancedErrorBoundary from "../shared/components/EnhancedErrorBoundary";
+import EnhancedErrorBoundary from "../components/errors/EnhancedErrorBoundary";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

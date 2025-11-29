@@ -14,8 +14,8 @@ import {
   CreditCard,
   Settings,
 } from "lucide-react";
-import { formatCurrency } from "../../../shared/utils/dataUtils";
-import { useDebouncedValue } from "../../../shared/hooks/useDebouncedValue";
+import { formatCurrency } from "../../../lib/data";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 
 // Helper functions for styling
 const getTypeStyles = (type) => {

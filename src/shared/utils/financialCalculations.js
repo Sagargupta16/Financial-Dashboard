@@ -18,22 +18,14 @@ import {
   DAYS_IN_YEAR,
 } from "./constants";
 
-// Import canonical implementations for internal use
+// Import only what's used internally
 import {
   calculateDateRange,
   calculateDailyAverage,
   calculateMonthlyAverage,
-  calculateAveragePerTransaction,
-  calculateTotalIncome,
-  calculateTotalExpense,
-  calculateSavings,
-  calculateSavingsRate,
-  calculatePercentage,
-  groupByCategory,
-  getTopCategories,
 } from "./calculations/index";
 
-// Re-export canonical implementations for external consumers
+// Re-export all canonical implementations for external consumers
 export {
   calculateDateRange,
   calculateDailyAverage,
@@ -461,8 +453,7 @@ const calculateTaxPlanningForYear = (transactions) => {
   let estimatedTax = 0;
   // Use tax slab constants
   if (taxableIncome <= TAX_SLABS_NEW_REGIME[0].max) {
-    // ₹0 - ₹4,00,000: 0%
-    estimatedTax = 0;
+    // ₹0 - ₹4,00,000: 0% (already 0, no assignment needed)
   } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
     // ₹4,00,000 - ₹8,00,000: 5%
     estimatedTax =

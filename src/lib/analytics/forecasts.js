@@ -44,7 +44,7 @@ export const exponentialSmoothing = (data, alpha = 0.3, periods = 6) => {
   }
 
   // Forecast future values (flat forecast - last smoothed value)
-  const lastSmoothed = smoothed[smoothed.length - 1];
+  const lastSmoothed = smoothed.at(-1);
   const forecast = new Array(periods).fill(lastSmoothed);
 
   return { smoothed, forecast };
@@ -85,8 +85,8 @@ export const doubleExponentialSmoothing = (
   }
 
   // Forecast with trend
-  const lastLevel = level[level.length - 1];
-  const lastTrend = trend[trend.length - 1];
+  const lastLevel = level.at(-1);
+  const lastTrend = trend.at(-1);
   const forecast = [];
 
   for (let i = 1; i <= periods; i++) {

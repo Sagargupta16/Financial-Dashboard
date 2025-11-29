@@ -378,6 +378,7 @@ const getDefaultTaxPlanningData = () => ({
 /**
  * Calculate tax planning for a specific set of transactions (one FY)
  */
+/* eslint-disable max-lines-per-function */
 const calculateTaxPlanningForYear = (transactions) => {
   if (!transactions || transactions.length === 0) {
     return {

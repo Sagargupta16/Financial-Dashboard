@@ -782,22 +782,30 @@ export const EnhancedTransactionTable = ({
                   <span
                     className="px-2 py-1 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 truncate block"
                     style={{
-                      backgroundColor:
-                        item.type === "Income"
-                          ? "rgba(16, 185, 129, 0.5)"
-                          : item.type === "Expense"
-                            ? "rgba(239, 68, 68, 0.5)"
-                            : item.type === "Transfer-In"
-                              ? "rgba(59, 130, 246, 0.5)"
-                              : "rgba(245, 158, 11, 0.5)",
-                      color:
-                        item.type === "Income"
-                          ? "rgb(167, 243, 208)"
-                          : item.type === "Expense"
-                            ? "rgb(252, 165, 165)"
-                            : item.type === "Transfer-In"
-                              ? "rgb(147, 197, 253)"
-                              : "rgb(253, 186, 116)",
+                      backgroundColor: (() => {
+                        if (item.type === "Income") {
+                          return "rgba(16, 185, 129, 0.5)";
+                        }
+                        if (item.type === "Expense") {
+                          return "rgba(239, 68, 68, 0.5)";
+                        }
+                        if (item.type === "Transfer-In") {
+                          return "rgba(59, 130, 246, 0.5)";
+                        }
+                        return "rgba(245, 158, 11, 0.5)";
+                      })(),
+                      color: (() => {
+                        if (item.type === "Income") {
+                          return "rgb(167, 243, 208)";
+                        }
+                        if (item.type === "Expense") {
+                          return "rgb(252, 165, 165)";
+                        }
+                        if (item.type === "Transfer-In") {
+                          return "rgb(147, 197, 253)";
+                        }
+                        return "rgb(253, 186, 116)";
+                      })(),
                     }}
                     title={item.category}
                   >

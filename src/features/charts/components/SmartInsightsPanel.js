@@ -10,7 +10,7 @@ import {
   Info,
   CheckCircle,
 } from "lucide-react";
-import { generateComprehensiveInsights } from "../../../shared/utils/trendInsights";
+import { generateComprehensiveInsights } from "../../../lib/analytics/trends";
 
 /**
  * Smart Insights Panel

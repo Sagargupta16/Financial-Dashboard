@@ -14,7 +14,7 @@ import {
   calculateCreditCardMetrics,
   calculateFoodMetrics,
   calculateCommuteMetrics,
-} from "../../../shared/utils/financialCalculations";
+} from "../../../lib/calculations/financial";
 
 /**
  * Credit Card & Lifestyle Optimizer

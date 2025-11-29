@@ -2,8 +2,8 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { BudgetPlanner } from "./BudgetPlanner";
-import { FinancialHealthScore } from "../../../shared/components/ui/FinancialHealthScore";
-import { SpendingCalendar } from "../../../shared/components/ui/SpendingCalendar";
+import { FinancialHealthScore } from "../../../components/data-display/FinancialHealthScore";
+import { SpendingCalendar } from "../../../components/data-display/SpendingCalendar";
 
 /**
  * Budget & Planning Section - Redesigned for Perfect Calculations

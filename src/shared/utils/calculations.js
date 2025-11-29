@@ -1,46 +1,45 @@
 /**
  * Centralized Calculation Utilities
- * All shared formulas and calculations in one place
+ *
+ * @deprecated This file is being phased out. Use canonical functions from:
+ * - src/shared/utils/calculations/index.js for core calculations
+ * - Individual modules in src/shared/utils/calculations/ for specific domains
+ *
+ * Many functions here are duplicates or variations of canonical implementations.
+ * For new code, import from the canonical location.
  */
+
+import {
+  calculateDateRange as canonicalDateRange,
+  calculateDailyAverage as canonicalDailyAverage,
+  calculateMonthlyAverage as canonicalMonthlyAverage,
+  calculateAveragePerTransaction as canonicalAveragePerTransaction,
+  calculatePercentage as canonicalPercentage,
+} from "./calculations/index";
+
+// Re-export canonical implementations with deprecation notice
+export {
+  calculateDailyAverage,
+  calculateMonthlyAverage,
+  calculateAveragePerTransaction,
+  calculatePercentage,
+} from "./calculations/index";
 
 /**
  * Calculate date range from transaction data
+ * @deprecated Use canonicalDateRange from calculations/dateRange
+ * NOTE: This returns {startDate, endDate, totalDays} vs canonical {days, months, years, startDate, endDate}
+ * For compatibility, we maintain this wrapper
  */
 export const calculateDateRange = (data) => {
-  if (!data || data.length === 0) {
-    return { startDate: null, endDate: null, totalDays: 0 };
-  }
-
-  const dates = data
-    .filter((item) => item?.date)
-    .map((item) => new Date(item.date))
-    .filter((d) => d && !Number.isNaN(d.getTime()));
-  if (dates.length === 0) {
-    return { startDate: null, endDate: null, totalDays: 0 };
-  }
-
-  const startDate = new Date(Math.min(...dates));
-  const endDate = new Date(Math.max(...dates));
-  const totalDays =
-    Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-
-  return { startDate, endDate, totalDays };
-};
-
-export const calculateDailyAverage = (total, totalDays) => {
-  return totalDays > 0 ? total / totalDays : 0;
-};
-
-export const calculateMonthlyAverage = (total, totalMonths) => {
-  return totalMonths > 0 ? total / totalMonths : 0;
-};
-
-export const calculateAveragePerTransaction = (total, count) => {
-  return count > 0 ? total / count : 0;
-};
-
-export const calculatePercentage = (value, total) => {
-  return total > 0 ? (value / total) * 100 : 0;
+  const canonical = canonicalDateRange(data);
+  // Map to old format for compatibility
+  return {
+    startDate: canonical.startDate,
+    endDate: canonical.endDate,
+    totalDays: canonical.days,
+    days: canonical.days, // Also include new property
+  };
 };
 
 /**
@@ -91,7 +90,7 @@ export const calculateSavingsPotential = (
   totalDays,
   reductionPercentage
 ) => {
-  const monthlyAmount = calculateMonthlyAverage(total, totalDays);
+  const monthlyAmount = canonicalMonthlyAverage(total, totalDays);
   const monthlySavings = monthlyAmount * reductionPercentage;
   const annualSavings = monthlySavings * 12;
 
@@ -148,7 +147,7 @@ export const calculateMetrics = (transactions, category = null) => {
   }
 
   const expenseTransactions = filtered.filter((t) => t.type === "Expense");
-  const dateRange = calculateDateRange(filtered);
+  const dateRange = canonicalDateRange(filtered);
 
   const total = expenseTransactions.reduce(
     (sum, t) => sum + Math.abs(t.amount || 0),
@@ -160,9 +159,9 @@ export const calculateMetrics = (transactions, category = null) => {
     total,
     count,
     dateRange,
-    averagePerTransaction: calculateAveragePerTransaction(total, count),
-    dailyAverage: calculateDailyAverage(total, dateRange.days),
-    monthlyAverage: calculateMonthlyAverage(total, dateRange.days),
+    averagePerTransaction: canonicalAveragePerTransaction(total, count),
+    dailyAverage: canonicalDailyAverage(total, dateRange.days),
+    monthlyAverage: canonicalMonthlyAverage(total, dateRange.days),
     frequencyPerDay: calculatePerDayFrequency(count, dateRange.days),
     frequencyPerWeek: calculatePerWeekFrequency(count, dateRange.days),
     frequencyPerMonth: calculatePerMonthFrequency(count, dateRange.days),
@@ -334,7 +333,7 @@ export const calculateCategoryBudgetStatus = (transactions, budgets = {}) => {
     const spent = categorySpending[category] || 0;
     const budget = budgets[category] || spent * 1.2; // Suggest 20% buffer if no budget
     const remaining = budget - spent;
-    const percentUsed = calculatePercentage(spent, budget);
+    const percentUsed = canonicalPercentage(spent, budget);
 
     let status = "under";
     if (spent > budget) {
@@ -370,7 +369,7 @@ export const calculateCashFlowForecast = (transactions, forecastDays = 30) => {
     };
   }
 
-  const dateRange = calculateDateRange(transactions);
+  const dateRange = canonicalDateRange(transactions);
   const income = transactions
     .filter((t) => t.type === "Income")
     .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
@@ -378,8 +377,8 @@ export const calculateCashFlowForecast = (transactions, forecastDays = 30) => {
     .filter((t) => t.type === "Expense")
     .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
 
-  const dailyIncome = calculateDailyAverage(income, dateRange.days);
-  const dailyExpense = calculateDailyAverage(expense, dateRange.days);
+  const dailyIncome = canonicalDailyAverage(income, dateRange.days);
+  const dailyExpense = canonicalDailyAverage(expense, dateRange.days);
   const netDaily = dailyIncome - dailyExpense;
   const currentBalance = income - expense;
 
@@ -663,7 +662,7 @@ export const calculateCategoryTrends = (transactions) => {
         return null;
       }
 
-      const dateRange = calculateDateRange(catTransactions);
+      const dateRange = canonicalDateRange(catTransactions);
 
       // Check if we have valid dates
       if (!dateRange.startDate || !dateRange.endDate) {
@@ -709,7 +708,7 @@ export const calculateCategoryTrends = (transactions) => {
         secondHalfTotal: secondTotal,
         trend,
         direction,
-        monthlyAverage: calculateMonthlyAverage(
+        monthlyAverage: canonicalMonthlyAverage(
           firstTotal + secondTotal,
           dateRange.days
         ),
@@ -813,7 +812,7 @@ export const calculateMonthlyHealthRatio = (transactions) => {
         month,
         income: data.income,
         expense: data.expense,
-        ratio: calculatePercentage(data.expense, data.income),
+        ratio: canonicalPercentage(data.expense, data.income),
         surplus: data.income - data.expense,
         isHealthy: data.expense < data.income * 0.8, // Spending less than 80%
         status,
@@ -846,7 +845,7 @@ export const calculateGoalProgress = (
     return {
       remaining: goal - currentBalance,
       monthsNeeded: Infinity,
-      percentComplete: calculatePercentage(currentBalance, goal),
+      percentComplete: canonicalPercentage(currentBalance, goal),
       estimatedDate: null,
       isAchievable: false,
       status: "not-achievable",
@@ -862,7 +861,7 @@ export const calculateGoalProgress = (
   return {
     remaining,
     monthsNeeded: Math.ceil(monthsNeeded),
-    percentComplete: calculatePercentage(currentBalance, goal),
+    percentComplete: canonicalPercentage(currentBalance, goal),
     estimatedDate,
     isAchievable: true,
     status: monthsNeeded <= 12 ? "on-track" : "long-term",

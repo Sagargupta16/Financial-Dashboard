@@ -6,11 +6,13 @@ import {
   formatCurrency,
   getCommonChartOptions,
   truncateLabel,
-} from "../../../shared/utils/chartUtils";
-import logger from "../../../shared/utils/logger";
-import { useTimeNavigation } from "../../../shared/hooks/useChartHooks";
-import { comprehensiveForecast } from "../../../shared/utils/forecastUtils";
-import { detectSeasonality } from "../../../shared/utils/forecastUtils";
+} from "../../../lib/charts";
+import logger from "../../../utils/logger";
+import { useTimeNavigation } from "../hooks/useChartHooks";
+import {
+  comprehensiveForecast,
+  detectSeasonality,
+} from "../../../lib/analytics/forecasts";
 
 export const commonChartOptions = getCommonChartOptions();
 
@@ -2542,7 +2544,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     const peak = entries.reduce(
       (max, [month, index]) =>
         index > (max?.index || 0)
-          ? { month: monthNames[parseInt(month, 10) - 1], index }
+          ? { month: monthNames[Number.parseInt(month, 10) - 1], index }
           : max,
       null
     );
@@ -2550,7 +2552,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     const low = entries.reduce(
       (min, [month, index]) =>
         index < (min?.index || Infinity)
-          ? { month: monthNames[parseInt(month, 10) - 1], index }
+          ? { month: monthNames[Number.parseInt(month, 10) - 1], index }
           : min,
       null
     );

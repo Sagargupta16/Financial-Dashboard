@@ -123,7 +123,7 @@ export const detectSpendingAnomalies = (transactions) => {
     monthlyData[month].byCategory[t.category] += Math.abs(t.amount || 0);
   });
 
-  const months = Object.keys(monthlyData).sort();
+  const months = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
   if (months.length < 3) {
     return insights;
   }

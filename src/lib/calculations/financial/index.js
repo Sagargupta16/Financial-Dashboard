@@ -19,92 +19,29 @@ import {
 } from "../../../constants";
 
 import {
-  calculateDateRange as canonicalDateRange,
-  calculateDailyAverage as canonicalDailyAverage,
-  calculateMonthlyAverage as canonicalMonthlyAverage,
-  calculateAveragePerTransaction as canonicalAveragePerTransaction,
-  calculateTotalIncome as canonicalTotalIncome,
-  calculateTotalExpense as canonicalTotalExpense,
-  calculateSavings as canonicalSavings,
-  calculateSavingsRate as canonicalSavingsRate,
-  calculatePercentage as canonicalPercentage,
-  groupByCategory as canonicalGroupByCategory,
-  getTopCategories as canonicalGetTopCategories,
+  calculateDateRange,
+  calculateDailyAverage,
+  calculateMonthlyAverage,
 } from "../index";
 
 // ============================================================================
 // BASIC CALCULATIONS
 // ============================================================================
 
-/**
- * Calculate date range from transactions
- * @deprecated Use canonical implementation from calculations/dateRange
- */
-export const calculateDateRange = canonicalDateRange;
-
-/**
- * Calculate total income from transactions
- * @deprecated Use canonical implementation from calculations/aggregations
- */
-export const calculateTotalIncome = canonicalTotalIncome;
-
-/**
- * Calculate total expense from transactions
- * @deprecated Use canonical implementation from calculations/aggregations
- */
-export const calculateTotalExpense = canonicalTotalExpense;
-
-/**
- * Calculate savings (income - expense)
- * @deprecated Use canonical implementation from calculations/savings
- */
-export const calculateSavings = canonicalSavings;
-
-/**
- * Calculate savings rate percentage
- * @deprecated Use canonical implementation from calculations/savings
- */
-export const calculateSavingsRate = canonicalSavingsRate;
-
-/**
- * Calculate daily average
- * @deprecated Use canonical implementation from calculations/averages
- */
-export const calculateDailyAverage = canonicalDailyAverage;
-
-/**
- * Calculate monthly average
- * @deprecated Use canonical implementation from calculations/averages
- */
-export const calculateMonthlyAverage = canonicalMonthlyAverage;
-
-/**
- * Calculate average per transaction
- * @deprecated Use canonical implementation from calculations/averages
- */
-export const calculateAveragePerTransaction = canonicalAveragePerTransaction;
-
-/**
- * Calculate percentage
- * @deprecated Use canonical implementation from calculations/savings
- */
-export const calculatePercentage = canonicalPercentage;
-
-// ============================================================================
-// CATEGORY ANALYSIS
-// ============================================================================
-
-/**
- * Group transactions by category with totals
- * @deprecated Use canonical implementation from calculations/category
- */
-export const groupByCategory = canonicalGroupByCategory;
-
-/**
- * Get top categories by spending
- * @deprecated Use canonical implementation from calculations/category
- */
-export const getTopCategories = canonicalGetTopCategories;
+// Re-export canonical implementations for external consumers
+export {
+  calculateDateRange,
+  calculateDailyAverage,
+  calculateMonthlyAverage,
+  calculateAveragePerTransaction,
+  calculateTotalIncome,
+  calculateTotalExpense,
+  calculateSavings,
+  calculateSavingsRate,
+  calculatePercentage,
+  groupByCategory,
+  getTopCategories,
+} from "../index";
 
 // ============================================================================
 // INVESTMENT PERFORMANCE
@@ -454,7 +391,7 @@ const calculateTaxPlanningForYear = (transactions) => {
   // Use tax slab constants
   if (taxableIncome <= TAX_SLABS_NEW_REGIME[0].max) {
     // ₹0 - ₹4,00,000: 0%
-    estimatedTax = 0;
+    // estimatedTax is already 0
   } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
     // ₹4,00,000 - ₹8,00,000: 5%
     estimatedTax =

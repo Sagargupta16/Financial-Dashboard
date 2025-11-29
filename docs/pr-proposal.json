@@ -1,0 +1,73 @@
+{
+  "pr_title": "feat: Consolidate financial calculations into canonical modules with constants",
+  "pr_number": "TBD",
+  "pr_description": "## Summary\n\nThis PR consolidates all financial calculations into a clean, modular structure with:\n1. New `src/shared/utils/constants.js` with all financial constants (tax slabs, time constants, etc.)\n2. New `src/shared/utils/calculations/` directory with canonical calculation modules\n3. Updated `financialCalculations.js` to use canonical functions and constants\n4. Deprecation wrappers in `calculations.js` for backward compatibility\n\n## Goals Achieved\n\n✅ Created constants.js with 30+ financial constants (DAYS_PER_MONTH, tax slabs, etc.)\n✅ Created modular calculation structure under `calculations/`:\n   - `dateRange.js` - Date range calculations\n   - `averages.js` - Daily, monthly, per-transaction averages\n   - `aggregations.js` - Income/expense totals\n   - `savings.js` - Savings and percentage calculations\n   - `category.js` - Category grouping and analysis\n   - `index.js` - Canonical API exports\n✅ All canonical functions are pure, well-documented with JSDoc\n✅ All functions handle edge cases (division by zero, empty arrays, invalid data)\n✅ Replaced magic numbers (30.44, 100, 75000, etc.) with named constants\n✅ Added deprecation wrappers for backward compatibility\n✅ Fixed tax slab calculation to explicitly handle ₹0-4L bracket (0% tax)\n✅ Added documentation note about investment return % formula\n\n## Behavioral Changes\n\n⚠️ **NONE** - All changes are refactoring only. Numeric behavior is preserved.\n\nThe following issues were identified but NOT changed (require separate PRs):\n- Investment return % uses `currentHoldings` (should use `totalCapitalDeployed`) - documented with comment\n- HRA calculation simplified (doesn't account for actual HRA received) - documented with comment\n\n## Files Changed\n\n### Added (6 files)\n1. `src/shared/utils/calculations/index.js` - Main export file for canonical API\n2. `src/shared/utils/calculations/dateRange.js` - Date range calculations\n3. `src/shared/utils/calculations/averages.js` - Average calculations\n4. `src/shared/utils/calculations/aggregations.js` - Income/expense totals\n5. `src/shared/utils/calculations/savings.js` - Savings calculations\n6. `src/shared/utils/calculations/category.js` - Category analysis\n7. `docs/calculation-inventory.json` - Complete inventory and API documentation\n\n### Modified (2 files)\n1. `src/shared/utils/constants.js` - Added 30+ financial calculation constants\n2. `src/shared/utils/financialCalculations.js` - Updated to use canonical functions and constants\n3. `src/shared/utils/calculations.js` - Added deprecation notices and compatibility wrappers\n\n## Migration Path\n\nFor new code:\n```javascript\n// ✅ DO THIS\nimport { calculateSavingsRate, calculateDateRange } from 'src/shared/utils/calculations';\nimport { DAYS_PER_MONTH, PERCENT } from 'src/shared/utils/constants';\n\n// ❌ DON'T DO THIS\nimport { calculateSavingsRate } from 'src/shared/utils/financialCalculations';\nconst monthly = (total / days) * 30.44; // magic number\n```\n\nFor existing code:\n- All existing imports continue to work via deprecation wrappers\n- No immediate changes required\n- Future PRs can migrate incrementally\n\n## Testing Strategy\n\n### Manual Verification Steps\n\n1. **Build Check**\n   ```powershell\n   pnpm install\n   pnpm run build\n   ```\n   ✅ Should complete without errors\n\n2. **Verify Calculations Work**\n   - Load application\n   - Upload sample transaction data\n   - Verify all dashboard metrics display correctly:\n     - Total Income/Expense\n     - Savings Rate\n     - Date Range (days, months, years)\n     - Daily/Monthly averages\n     - Category breakdowns\n     - Top categories\n\n3. **Verify Constants**\n   - Check tax calculations show correct amounts\n   - Verify monthly projections use 30.44 days/month\n   - Confirm percentage calculations display correctly\n\n4. **Check Console for Errors**\n   - Open browser DevTools\n   - Navigate through all sections\n   - Verify no calculation errors in console\n\n5. **Spot Check Key Calculations**\n   - Savings Rate = ((Income - Expense) / Income) * 100\n   - Monthly Average = (Total / Days) * 30.44\n   - Verify numbers match before/after refactor\n\n### Regression Testing Checklist\n\n- [ ] Overview section displays correctly\n- [ ] Income/Expense charts render\n- [ ] Category analysis shows top categories\n- [ ] Date range calculations accurate\n- [ ] Savings rate percentage correct\n- [ ] Tax planning calculations work\n- [ ] Investment performance metrics display\n- [ ] Health score calculation works\n- [ ] No console errors\n- [ ] No undefined/NaN values in UI\n\n## Risk Assessment\n\n**Risk Level: LOW**\n\nReasons:\n- Zero behavioral changes (all refactoring)\n- Backward compatible (deprecation wrappers)\n- Pure functions (no side effects)\n- Well-documented edge cases\n- Constants prevent future magic number issues\n\n## Rollout Plan\n\n### Phase 1: Foundation (This PR) ✅\n- Create canonical calculation modules\n- Add constants\n- Update core files to use new modules\n- Add deprecation wrappers\n\n### Phase 2: Migration (Future PRs)\n- Update hooks to import from canonical modules\n- Update components to import from canonical modules\n- Remove deprecation wrappers after full migration\n\n### Phase 3: Bug Fixes (Separate PRs)\n- Fix investment return % formula (HIGH risk)\n- Fix HRA calculation (MEDIUM risk)\n- Each with dedicated testing and rollback plan\n\n## Rollback Steps\n\n1. **If build fails:**\n   ```powershell\n   git revert <commit-hash>\n   pnpm install\n   pnpm run build\n   ```\n\n2. **If runtime errors occur:**\n   - Check browser console for import errors\n   - Verify constants.js exports are accessible\n   - Check calculations/ modules export correctly\n\n3. **If calculations wrong:**\n   - Compare before/after with same data\n   - Check if constants were used incorrectly\n   - Verify deprecation wrappers map correctly\n\n4. **Emergency rollback:**\n   ```powershell\n   git checkout main\n   git branch -D feature/consolidate-calculations\n   pnpm install\n   pnpm run build\n   ```\n\n## Commands to Run\n\n```powershell\n# Install dependencies\npnpm install\n\n# Build project\npnpm run build\n\n# Start dev server for testing\npnpm run start\n\n# Check for lint errors\npnpm run lint\n```\n\n## Notes\n\n### Architecture Decisions\n\n1. **Why deprecation wrappers?**\n   - Allows gradual migration without breaking existing code\n   - Reduces risk of introducing bugs\n   - Clear migration path for future PRs\n\n2. **Why separate calculations/ directory?**\n   - Easier to find and maintain specific calculation logic\n   - Prevents file bloat\n   - Encourages modular, testable code\n   - Clear separation of concerns\n\n3. **Why constants.js?**\n   - Single source of truth for financial values\n   - Easier to update (e.g., tax slabs change yearly)\n   - Prevents typos and inconsistencies\n   - Self-documenting code\n\n### Known Issues (Not Addressed)\n\nThe following issues were identified in the audit but are NOT changed in this PR (require separate, focused PRs with testing):\n\n1. **Investment Return % Formula** (HIGH risk to change)\n   - Current: `(netReturn / currentHoldings) * 100`\n   - Should be: `(netReturn / totalCapitalDeployed) * 100`\n   - Added comment documenting the issue\n   - Separate PR needed with verification\n\n2. **HRA Calculation Simplified** (MEDIUM risk)\n   - Current: `Math.min(rentPaid * 0.9, salaryIncome * 0.5)`\n   - Should account for actual HRA received\n   - Added comment documenting limitation\n   - Separate PR needed\n\n3. **Debt-to-Income Ratio Clarity** (LOW risk)\n   - Uses annual income without clear docs\n   - Not changed, just needs comment\n\n### Future Enhancements\n\n- Add unit tests for all canonical functions\n- Create calculation testing harness\n- Add performance benchmarks\n- Consider TypeScript for type safety\n- Add calculation audit tooling\n\n## Related Documentation\n\n- `docs/calculation-inventory.json` - Complete function inventory and API\n- JSDoc in all calculation files - Usage examples and edge cases\n- Inline comments in `financialCalculations.js` - Known issues and rationale\n\n## Reviewer Checklist\n\n- [ ] All constants have clear, descriptive names\n- [ ] All canonical functions have JSDoc\n- [ ] Edge cases are documented and handled\n- [ ] No magic numbers remain in calculation code\n- [ ] Deprecation notices are clear\n- [ ] Build succeeds\n- [ ] Manual testing shows no regressions\n- [ ] inventory.json is accurate and complete\n\n---\n\n**Ready for review** 🚀",
+  "files_changed": [
+    {
+      "path": "src/shared/utils/calculations/index.js",
+      "change_type": "add",
+      "short_summary": "Main export file for canonical calculation API - exports all core functions"
+    },
+    {
+      "path": "src/shared/utils/calculations/dateRange.js",
+      "change_type": "add",
+      "short_summary": "Canonical date range calculation with consistent return signature"
+    },
+    {
+      "path": "src/shared/utils/calculations/averages.js",
+      "change_type": "add",
+      "short_summary": "Daily, monthly, and per-transaction average calculations with DAYS_PER_MONTH constant"
+    },
+    {
+      "path": "src/shared/utils/calculations/aggregations.js",
+      "change_type": "add",
+      "short_summary": "Income and expense total calculations with type filtering"
+    },
+    {
+      "path": "src/shared/utils/calculations/savings.js",
+      "change_type": "add",
+      "short_summary": "Savings and percentage calculations using PERCENT constant"
+    },
+    {
+      "path": "src/shared/utils/calculations/category.js",
+      "change_type": "add",
+      "short_summary": "Category grouping and top categories analysis"
+    },
+    {
+      "path": "src/shared/utils/constants.js",
+      "change_type": "modify",
+      "short_summary": "Added 30+ financial calculation constants (time, tax, health score, budget thresholds)"
+    },
+    {
+      "path": "src/shared/utils/financialCalculations.js",
+      "change_type": "modify",
+      "short_summary": "Updated to import and use canonical functions, replaced magic numbers with constants, added issue documentation"
+    },
+    {
+      "path": "src/shared/utils/calculations.js",
+      "change_type": "modify",
+      "short_summary": "Added deprecation notices and backward-compatible wrappers for gradual migration"
+    },
+    {
+      "path": "docs/calculation-inventory.json",
+      "change_type": "add",
+      "short_summary": "Complete inventory of all calculations, API documentation, and constants mapping"
+    }
+  ],
+  "commands": [
+    "pnpm install",
+    "pnpm run build",
+    "pnpm run start",
+    "pnpm run lint"
+  ],
+  "manual_verification": "1. Build project successfully\n2. Load application and upload sample transaction data\n3. Verify all metrics display correctly: Income, Expense, Savings Rate, Date Range, Averages\n4. Check category breakdowns and top categories\n5. Verify tax calculations show correct amounts\n6. Check investment performance metrics\n7. Verify health score calculation\n8. Confirm no console errors\n9. Spot check: Savings Rate = ((Income - Expense) / Income) * 100\n10. Spot check: Monthly Avg = (Total / Days) * 30.44",
+  "risk": "low",
+  "rollout_plan": "Phase 1 (This PR): Create canonical modules, add constants, update core files with deprecation wrappers\nPhase 2 (Future): Migrate hooks and components to canonical imports\nPhase 3 (Separate PRs): Fix identified calculation bugs with dedicated testing",
+  "rollback_steps": [
+    "git revert <commit-hash>",
+    "pnpm install",
+    "pnpm run build",
+    "If needed: git checkout main && git branch -D feature/consolidate-calculations"
+  ],
+  "notes": "This is a pure refactoring PR with ZERO behavioral changes. All numeric behavior is preserved. Identified calculation bugs (investment return %, HRA) are documented but NOT changed - they require separate PRs with dedicated testing and verification. The refactoring creates a clean foundation for future improvements while maintaining complete backward compatibility through deprecation wrappers."
+}

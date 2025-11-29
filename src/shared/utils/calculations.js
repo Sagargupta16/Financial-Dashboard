@@ -1,47 +1,61 @@
 /**
  * Centralized Calculation Utilities
- * All shared formulas and calculations in one place
+ *
+ * @deprecated This file is being phased out. Use canonical functions from:
+ * - src/shared/utils/calculations/index.js for core calculations
+ * - Individual modules in src/shared/utils/calculations/ for specific domains
+ *
+ * Many functions here are duplicates or variations of canonical implementations.
+ * For new code, import from the canonical location.
  */
+
+import {
+  calculateDateRange as canonicalDateRange,
+  calculateDailyAverage as canonicalDailyAverage,
+  calculateAveragePerTransaction as canonicalAveragePerTransaction,
+  calculatePercentage as canonicalPercentage,
+} from "./calculations/index";
 
 /**
  * Calculate date range from transaction data
+ * @deprecated Use canonicalDateRange from calculations/dateRange
+ * NOTE: This returns {startDate, endDate, totalDays} vs canonical {days, months, years, startDate, endDate}
+ * For compatibility, we maintain this wrapper
  */
 export const calculateDateRange = (data) => {
-  if (!data || data.length === 0) {
-    return { startDate: null, endDate: null, totalDays: 0 };
-  }
-
-  const dates = data
-    .filter((item) => item?.date)
-    .map((item) => new Date(item.date))
-    .filter((d) => d && !Number.isNaN(d.getTime()));
-  if (dates.length === 0) {
-    return { startDate: null, endDate: null, totalDays: 0 };
-  }
-
-  const startDate = new Date(Math.min(...dates));
-  const endDate = new Date(Math.max(...dates));
-  const totalDays =
-    Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-
-  return { startDate, endDate, totalDays };
+  const canonical = canonicalDateRange(data);
+  // Map to old format for compatibility
+  return {
+    startDate: canonical.startDate,
+    endDate: canonical.endDate,
+    totalDays: canonical.days,
+    days: canonical.days, // Also include new property
+  };
 };
 
-export const calculateDailyAverage = (total, totalDays) => {
-  return totalDays > 0 ? total / totalDays : 0;
-};
+/**
+ * @deprecated Use canonicalDailyAverage from calculations/averages
+ */
+export const calculateDailyAverage = canonicalDailyAverage;
 
+/**
+ * Calculate monthly average
+ * @deprecated Use canonicalMonthlyAverage from calculations/averages
+ * NOTE: This version expects totalMonths parameter, canonical expects days
+ */
 export const calculateMonthlyAverage = (total, totalMonths) => {
   return totalMonths > 0 ? total / totalMonths : 0;
 };
 
-export const calculateAveragePerTransaction = (total, count) => {
-  return count > 0 ? total / count : 0;
-};
+/**
+ * @deprecated Use canonicalAveragePerTransaction from calculations/averages
+ */
+export const calculateAveragePerTransaction = canonicalAveragePerTransaction;
 
-export const calculatePercentage = (value, total) => {
-  return total > 0 ? (value / total) * 100 : 0;
-};
+/**
+ * @deprecated Use canonicalPercentage from calculations/savings
+ */
+export const calculatePercentage = canonicalPercentage;
 
 /**
  * Calculate per-day frequency

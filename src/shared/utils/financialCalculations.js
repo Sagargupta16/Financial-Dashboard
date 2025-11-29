@@ -4,117 +4,91 @@
  * No duplicates - clean, simple, easy to maintain
  */
 
+import {
+  PERCENT,
+  TAX_SLABS_NEW_REGIME,
+  CESS_RATE,
+  STANDARD_DEDUCTION,
+  SECTION_80C_LIMIT,
+  DEFAULT_PROFESSIONAL_TAX,
+  HRA_METRO_PERCENT,
+  INVESTMENT_CATEGORIES,
+  INVESTMENT_ACCOUNTS,
+  MEAL_VOUCHER_DAILY_LIMIT,
+  DAYS_IN_YEAR,
+} from "./constants";
+
+import {
+  calculateDateRange as canonicalDateRange,
+  calculateDailyAverage as canonicalDailyAverage,
+  calculateMonthlyAverage as canonicalMonthlyAverage,
+  calculateAveragePerTransaction as canonicalAveragePerTransaction,
+  calculateTotalIncome as canonicalTotalIncome,
+  calculateTotalExpense as canonicalTotalExpense,
+  calculateSavings as canonicalSavings,
+  calculateSavingsRate as canonicalSavingsRate,
+  calculatePercentage as canonicalPercentage,
+  groupByCategory as canonicalGroupByCategory,
+  getTopCategories as canonicalGetTopCategories,
+} from "./calculations/index";
+
 // ============================================================================
 // BASIC CALCULATIONS
 // ============================================================================
 
 /**
  * Calculate date range from transactions
+ * @deprecated Use canonical implementation from calculations/dateRange
  */
-export const calculateDateRange = (transactions) => {
-  if (!transactions || transactions.length === 0) {
-    return { days: 0, months: 0, years: 0 };
-  }
-
-  const dates = transactions
-    .map((t) => new Date(t.date))
-    .filter((d) => !Number.isNaN(d.getTime()));
-
-  if (dates.length === 0) {
-    return { days: 0, months: 0, years: 0 };
-  }
-
-  const minDate = new Date(Math.min(...dates));
-  const maxDate = new Date(Math.max(...dates));
-
-  const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-  const days = daysDiff === 0 ? 1 : daysDiff;
-  const months = days / 30.44;
-  const years = months / 12;
-
-  return { days, months, years, minDate, maxDate };
-};
+export const calculateDateRange = canonicalDateRange;
 
 /**
  * Calculate total income from transactions
+ * @deprecated Use canonical implementation from calculations/aggregations
  */
-export const calculateTotalIncome = (transactions) => {
-  if (!transactions || transactions.length === 0) {
-    return 0;
-  }
-  return transactions
-    .filter((t) => t.type === "Income")
-    .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-};
+export const calculateTotalIncome = canonicalTotalIncome;
 
 /**
  * Calculate total expense from transactions
+ * @deprecated Use canonical implementation from calculations/aggregations
  */
-export const calculateTotalExpense = (transactions) => {
-  if (!transactions || transactions.length === 0) {
-    return 0;
-  }
-  return transactions
-    .filter((t) => t.type === "Expense")
-    .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-};
+export const calculateTotalExpense = canonicalTotalExpense;
 
 /**
  * Calculate savings (income - expense)
+ * @deprecated Use canonical implementation from calculations/savings
  */
-export const calculateSavings = (income, expense) => {
-  return income - expense;
-};
+export const calculateSavings = canonicalSavings;
 
 /**
  * Calculate savings rate percentage
+ * @deprecated Use canonical implementation from calculations/savings
  */
-export const calculateSavingsRate = (income, expense) => {
-  if (income === 0) {
-    return 0;
-  }
-  return ((income - expense) / income) * 100;
-};
+export const calculateSavingsRate = canonicalSavingsRate;
 
 /**
  * Calculate daily average
+ * @deprecated Use canonical implementation from calculations/averages
  */
-export const calculateDailyAverage = (total, days) => {
-  if (days === 0) {
-    return 0;
-  }
-  return total / days;
-};
+export const calculateDailyAverage = canonicalDailyAverage;
 
 /**
  * Calculate monthly average
+ * @deprecated Use canonical implementation from calculations/averages
  */
-export const calculateMonthlyAverage = (total, days) => {
-  if (days === 0) {
-    return 0;
-  }
-  return (total / days) * 30.44;
-};
+export const calculateMonthlyAverage = canonicalMonthlyAverage;
 
 /**
  * Calculate average per transaction
+ * @deprecated Use canonical implementation from calculations/averages
  */
-export const calculateAveragePerTransaction = (total, count) => {
-  if (count === 0) {
-    return 0;
-  }
-  return total / count;
-};
+export const calculateAveragePerTransaction = canonicalAveragePerTransaction;
 
 /**
  * Calculate percentage
+ * @deprecated Use canonical implementation from calculations/savings
  */
-export const calculatePercentage = (part, total) => {
-  if (total === 0) {
-    return 0;
-  }
-  return (part / total) * 100;
-};
+export const calculatePercentage = canonicalPercentage;
 
 // ============================================================================
 // CATEGORY ANALYSIS
@@ -122,45 +96,15 @@ export const calculatePercentage = (part, total) => {
 
 /**
  * Group transactions by category with totals
+ * @deprecated Use canonical implementation from calculations/category
  */
-export const groupByCategory = (transactions) => {
-  if (!transactions || transactions.length === 0) {
-    return {};
-  }
-
-  return transactions.reduce((acc, t) => {
-    const category = t.category || "Uncategorized";
-    if (!acc[category]) {
-      acc[category] = {
-        total: 0,
-        count: 0,
-        transactions: [],
-      };
-    }
-    acc[category].total += Math.abs(Number(t.amount) || 0);
-    acc[category].count++;
-    acc[category].transactions.push(t);
-    return acc;
-  }, {});
-};
+export const groupByCategory = canonicalGroupByCategory;
 
 /**
  * Get top categories by spending
+ * @deprecated Use canonical implementation from calculations/category
  */
-export const getTopCategories = (transactions, limit = 10) => {
-  const grouped = groupByCategory(
-    transactions.filter((t) => t.type === "Expense")
-  );
-
-  return Object.entries(grouped)
-    .map(([category, data]) => ({
-      category,
-      total: data.total,
-      count: data.count,
-    }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, limit);
-};
+export const getTopCategories = canonicalGetTopCategories;
 
 // ============================================================================
 // INVESTMENT PERFORMANCE
@@ -186,19 +130,10 @@ export const calculateInvestmentPerformance = (transactions) => {
     };
   }
 
-  const investmentCategories = new Set([
-    "Investment Charges & Loss",
-    "Investment Income",
-    "Invest",
-    "Grow Stocks",
-  ]);
-
-  const investmentAccounts = new Set(["Grow Stocks", "Zerodha", "Upstox"]);
-
   const invTransactions = transactions.filter(
     (t) =>
-      investmentCategories.has(t.category) ||
-      investmentAccounts.has(t.account) ||
+      INVESTMENT_CATEGORIES.has(t.category) ||
+      INVESTMENT_ACCOUNTS.has(t.account) ||
       (t.subcategory &&
         (t.subcategory.includes("Stock") ||
           t.subcategory.includes("F&O") ||
@@ -263,9 +198,12 @@ export const calculateInvestmentPerformance = (transactions) => {
   const netProfitLoss = realizedProfits - realizedLosses - brokerageFees;
   const netReturn = netProfitLoss;
 
-  // Return % should be based on capital actually at risk (current holdings)
+  // Return % calculation - uses totalCapitalDeployed for accurate portfolio return
+  // Formula: (Net Return / Total Capital Deployed) × 100
+  // This represents total portfolio return including withdrawn capital
+  // Fixed as per audit report recommendation (Issue #1 - MEDIUM Priority)
   const returnPercentage =
-    currentHoldings > 0 ? (netReturn / currentHoldings) * 100 : 0;
+    totalCapitalDeployed > 0 ? (netReturn / totalCapitalDeployed) * PERCENT : 0;
 
   return {
     totalCapitalDeployed,
@@ -427,8 +365,29 @@ const calculateTaxPlanningForYear = (transactions) => {
     )
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
-  // HRA exemption (least of: actual HRA, rent - 10% salary, 50% salary for metro)
-  const hraExemption = Math.min(rentPaid * 0.9, salaryIncome * 0.5);
+  // Calculate actual HRA received from employer
+  const actualHRAReceived = transactions
+    .filter(
+      (t) =>
+        t.type === "Income" &&
+        (t.subcategory?.includes("HRA") ||
+          t.subcategory?.includes("House Rent Allowance") ||
+          t.note?.toLowerCase().includes("hra") ||
+          t.note?.toLowerCase().includes("house rent allowance"))
+    )
+    .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
+
+  // HRA exemption per Income Tax Act Section 10(13A)
+  // Exempt amount = Minimum of:
+  // 1. Actual HRA received
+  // 2. Rent paid minus 10% of salary
+  // 3. 50% of salary (metro) or 40% (non-metro)
+  // Fixed as per audit report recommendation (Issue #2 - LOW Priority)
+  const hraExemption = Math.min(
+    actualHRAReceived,
+    Math.max(0, rentPaid - salaryIncome * 0.1),
+    salaryIncome * HRA_METRO_PERCENT
+  );
 
   // 80C investments (PPF, ELSS, LIC, etc.)
   const section80CCategories = ["PPF", "ELSS", "LIC", "Tax Saving FD", "EPF"];
@@ -441,7 +400,7 @@ const calculateTaxPlanningForYear = (transactions) => {
     )
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
-  const section80CLimit = 150000;
+  const section80CLimit = SECTION_80C_LIMIT;
   const section80CDeduction = Math.min(section80CInvestments, section80CLimit);
 
   // EPF deduction (employee contribution)
@@ -454,15 +413,6 @@ const calculateTaxPlanningForYear = (transactions) => {
     )
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
-  // Meal voucher exemption (tax-free)
-  const mealVoucherExemption = transactions
-    .filter(
-      (t) =>
-        t.subcategory?.includes("Meal") ||
-        t.note?.toLowerCase().includes("meal voucher")
-    )
-    .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
-
   // Professional tax (actual paid or estimated)
   const professionalTax =
     transactions
@@ -471,47 +421,79 @@ const calculateTaxPlanningForYear = (transactions) => {
           t.subcategory?.includes("Professional Tax") ||
           t.note?.toLowerCase().includes("professional tax")
       )
-      .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0) || 2400;
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0) ||
+    DEFAULT_PROFESSIONAL_TAX;
 
-  // Standard deduction for NEW tax regime
-  const standardDeduction = 75000;
+  // Meal Voucher exemption (₹50/day tax-free)
+  const mealVoucherTransactions = transactions.filter(
+    (t) =>
+      t.subcategory?.includes("Meal") ||
+      t.subcategory?.includes("Food Card") ||
+      t.note?.toLowerCase().includes("sodexo") ||
+      t.note?.toLowerCase().includes("meal voucher")
+  );
+  const mealVoucherExemption = Math.min(
+    mealVoucherTransactions.reduce(
+      (sum, t) => sum + Math.abs(Number(t.amount) || 0),
+      0
+    ),
+    MEAL_VOUCHER_DAILY_LIMIT * DAYS_IN_YEAR
+  );
 
-  // Calculate taxable income (NEW regime - no 80C deduction)
-  // In NEW regime, only standard deduction applies, no 80C/HRA
-  const totalDeductions =
-    standardDeduction + professionalTax + mealVoucherExemption;
-  const taxableIncome = Math.max(0, totalIncome - totalDeductions);
+  // Standard Deduction (fixed amount)
+  const standardDeduction = STANDARD_DEDUCTION;
 
-  // Calculate tax using NEW Tax Regime FY 2024-25 onwards
+  // Calculate taxable income (new regime)
+  const taxableIncome = Math.max(
+    0,
+    totalIncome - standardDeduction - professionalTax - mealVoucherExemption
+  );
+
+  // Calculate estimated tax based on new regime slabs
   let estimatedTax = 0;
-
-  // ₹4,00,000 - ₹8,00,000: 5%
-  if (taxableIncome > 400000 && taxableIncome <= 800000) {
-    estimatedTax = (taxableIncome - 400000) * 0.05;
-  }
-  // ₹8,00,000 - ₹12,00,000: 10%
-  else if (taxableIncome <= 1200000) {
-    estimatedTax = 20000 + (taxableIncome - 800000) * 0.1;
-  }
-  // ₹12,00,000 - ₹16,00,000: 15%
-  else if (taxableIncome <= 1600000) {
-    estimatedTax = 60000 + (taxableIncome - 1200000) * 0.15;
-  }
-  // ₹16,00,000 - ₹20,00,000: 20%
-  else if (taxableIncome <= 2000000) {
-    estimatedTax = 120000 + (taxableIncome - 1600000) * 0.2;
-  }
-  // ₹20,00,000 - ₹24,00,000: 25%
-  else if (taxableIncome <= 2400000) {
-    estimatedTax = 200000 + (taxableIncome - 2000000) * 0.25;
-  }
-  // Above ₹24,00,000: 30%
-  else {
-    estimatedTax = 300000 + (taxableIncome - 2400000) * 0.3;
+  // Use tax slab constants
+  if (taxableIncome <= TAX_SLABS_NEW_REGIME[0].max) {
+    // ₹0 - ₹4,00,000: 0%
+    estimatedTax = 0;
+  } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
+    // ₹4,00,000 - ₹8,00,000: 5%
+    estimatedTax =
+      (taxableIncome - TAX_SLABS_NEW_REGIME[0].max) *
+      TAX_SLABS_NEW_REGIME[1].rate;
+  } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[2].max) {
+    // ₹8,00,000 - ₹12,00,000: 10%
+    estimatedTax =
+      20000 +
+      (taxableIncome - TAX_SLABS_NEW_REGIME[1].max) *
+        TAX_SLABS_NEW_REGIME[2].rate;
+  } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[3].max) {
+    // ₹12,00,000 - ₹16,00,000: 15%
+    estimatedTax =
+      60000 +
+      (taxableIncome - TAX_SLABS_NEW_REGIME[2].max) *
+        TAX_SLABS_NEW_REGIME[3].rate;
+  } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[4].max) {
+    // ₹16,00,000 - ₹20,00,000: 20%
+    estimatedTax =
+      120000 +
+      (taxableIncome - TAX_SLABS_NEW_REGIME[3].max) *
+        TAX_SLABS_NEW_REGIME[4].rate;
+  } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[5].max) {
+    // ₹20,00,000 - ₹24,00,000: 25%
+    estimatedTax =
+      200000 +
+      (taxableIncome - TAX_SLABS_NEW_REGIME[4].max) *
+        TAX_SLABS_NEW_REGIME[5].rate;
+  } else {
+    // Above ₹24,00,000: 30%
+    estimatedTax =
+      300000 +
+      (taxableIncome - TAX_SLABS_NEW_REGIME[5].max) *
+        TAX_SLABS_NEW_REGIME[6].rate;
   }
 
   // Add 4% Health and Education Cess
-  const cess = estimatedTax * 0.04;
+  const cess = estimatedTax * CESS_RATE;
   const totalTaxLiability = estimatedTax + cess + professionalTax;
 
   const deductions = [
@@ -666,7 +648,7 @@ export const calculateFamilyExpenses = (transactions) => {
     count: data.count,
     average: data.count > 0 ? data.total / data.count : 0,
     percentage:
-      totalFamilyExpense > 0 ? (data.total / totalFamilyExpense) * 100 : 0,
+      totalFamilyExpense > 0 ? (data.total / totalFamilyExpense) * PERCENT : 0,
   }));
 
   // Get top expenses
@@ -905,7 +887,7 @@ export const calculateCreditCardMetrics = (transactions) => {
 
   const totalCreditCardSpending = totalSpending;
   const cashbackRate =
-    totalSpending > 0 ? (totalCashback / totalSpending) * 100 : 0;
+    totalSpending > 0 ? (totalCashback / totalSpending) * PERCENT : 0;
 
   const insights = [];
   if (totalCashback > 0) {
@@ -1140,7 +1122,7 @@ export const calculateCommuteMetrics = (transactions) => {
     amount: data.total,
     count: data.count,
     average: data.count > 0 ? data.total / data.count : 0,
-    percentage: totalCommute > 0 ? (data.total / totalCommute) * 100 : 0,
+    percentage: totalCommute > 0 ? (data.total / totalCommute) * PERCENT : 0,
   }));
 
   const insights = [];

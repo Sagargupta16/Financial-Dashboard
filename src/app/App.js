@@ -14,48 +14,48 @@ import {
 } from "chart.js";
 
 // Components
-import { Header } from "./shared/components/layout/Header";
-import { Footer } from "./shared/components/layout/Footer";
-import { Tabs, TabContent } from "./shared/components/ui/Tabs";
-import { LoadingSpinner } from "./shared/components/ui/Loading";
-import { SectionSkeleton } from "./shared/components/ui/SectionSkeleton";
+import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
+import { Tabs, TabContent } from "../components/ui/Tabs";
+import { LoadingSpinner } from "../components/ui/Loading";
+import { SectionSkeleton } from "../components/ui/SectionSkeleton";
 
 // Hooks
 import {
   useDataProcessor,
   useUniqueValues,
   useFilteredData,
-} from "./shared/hooks/useDataProcessor";
+} from "../hooks/useDataProcessor";
 import {
   useKPIData,
   useKeyInsights,
   useAccountBalances,
-} from "./shared/hooks/useCalculations";
-import { useChartData } from "./shared/hooks/useChartData";
+} from "../features/kpi/hooks/useCalculations";
+import { useChartData } from "../features/charts/hooks/useChartData";
 
 // Utils
-import { initialCsvData } from "./shared/utils/constants";
-import { lazyLoad } from "./shared/utils/lazyLoad";
+import { initialCsvData } from "../constants/index";
+import { lazyLoad } from "../utils/lazyLoad";
 
 // Config
-import { TABS_CONFIG } from "./config/tabs.config";
+import { TABS_CONFIG } from "../config/tabs";
 
-// Lazy load section components for better performance
-const OverviewSection = lazyLoad(
-  () => import("./shared/components/sections/OverviewSection"),
-  "OverviewSection"
+// Lazy load page components for better performance
+const OverviewPage = lazyLoad(
+  () => import("../pages/OverviewPage/OverviewPage"),
+  "OverviewPage"
 );
-const IncomeExpenseSection = lazyLoad(
-  () => import("./shared/components/sections/IncomeExpenseSection"),
-  "IncomeExpenseSection"
+const IncomeExpensePage = lazyLoad(
+  () => import("../pages/IncomeExpensePage/IncomeExpensePage"),
+  "IncomeExpensePage"
 );
-const CategoryAnalysisSection = lazyLoad(
-  () => import("./shared/components/sections/CategoryAnalysisSection"),
-  "CategoryAnalysisSection"
+const CategoryAnalysisPage = lazyLoad(
+  () => import("../pages/CategoryAnalysisPage/CategoryAnalysisPage"),
+  "CategoryAnalysisPage"
 );
-const TrendsForecastsSection = lazyLoad(
-  () => import("./shared/components/sections/TrendsForecastsSection"),
-  "TrendsForecastsSection"
+const TrendsForecastsPage = lazyLoad(
+  () => import("../pages/TrendsForecastsPage/TrendsForecastsPage"),
+  "TrendsForecastsPage"
 );
 const InvestmentPerformanceTracker = lazyLoad(
   () => import("./features/analytics/components/InvestmentPerformanceTracker"),
@@ -73,13 +73,13 @@ const CreditCardFoodOptimizer = lazyLoad(
   () => import("./features/analytics/components/CreditCardFoodOptimizer"),
   "CreditCardFoodOptimizer"
 );
-const PatternsSection = lazyLoad(
-  () => import("./shared/components/sections/PatternsSection"),
-  "PatternsSection"
+const PatternsPage = lazyLoad(
+  () => import("../pages/PatternsPage/PatternsPage"),
+  "PatternsPage"
 );
-const TransactionsSection = lazyLoad(
-  () => import("./features/transactions/components/TransactionsSection"),
-  "TransactionsSection"
+const TransactionsPage = lazyLoad(
+  () => import("../pages/TransactionsPage/TransactionsPage"),
+  "TransactionsPage"
 );
 const BudgetGoalsSection = lazyLoad(
   () => import("./features/budget/components/BudgetGoalsSection"),
@@ -200,7 +200,7 @@ const App = () => {
         {/* Tab Content */}
         <TabContent isActive={activeTab === "overview"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <OverviewSection
+            <OverviewPage
               kpiData={kpiData}
               additionalKpiData={additionalKpiData}
               accountBalances={accountBalances}
@@ -212,7 +212,7 @@ const App = () => {
 
         <TabContent isActive={activeTab === "income-expense"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <IncomeExpenseSection
+            <IncomeExpensePage
               chartData={chartData}
               chartRefs={chartRefs}
               filteredData={filteredData}
@@ -225,7 +225,7 @@ const App = () => {
 
         <TabContent isActive={activeTab === "categories"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <CategoryAnalysisSection
+            <CategoryAnalysisPage
               chartRefs={chartRefs}
               filteredData={filteredData}
               uniqueValues={uniqueValues}
@@ -237,7 +237,7 @@ const App = () => {
 
         <TabContent isActive={activeTab === "trends"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <TrendsForecastsSection
+            <TrendsForecastsPage
               chartRefs={chartRefs}
               filteredData={filteredData}
             />
@@ -280,13 +280,13 @@ const App = () => {
 
         <TabContent isActive={activeTab === "patterns"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <PatternsSection filteredData={filteredData} />
+            <PatternsPage filteredData={filteredData} />
           </Suspense>
         </TabContent>
 
         <TabContent isActive={activeTab === "transactions"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <TransactionsSection
+            <TransactionsPage
               filteredData={filteredData}
               handleSort={handleSort}
               currentPage={currentPage}

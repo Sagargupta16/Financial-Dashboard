@@ -2,7 +2,7 @@
 
 A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, financial health, investments, tax planning, and lifestyle optimization.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.3.0-brightgreen)
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.4.0-brightgreen)
 
 ## 🎯 Demo
 
@@ -16,12 +16,14 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## ✨ Features
 
-### 🆕 **NEW: Unified Calculation System v0.3.0**
+### 🆕 **NEW: Refactored Architecture v0.4.0**
 
-- **Single Source of Truth**: All financial calculations centralized in `financialCalculations.js`
+- **Clean Folder Structure**: Modular organization by feature and concern
+- **Single Source of Truth**: All financial calculations centralized in `lib/calculations`
 - **No Duplicates**: Clean, maintainable codebase with zero duplicate calculation logic
+- **SonarQube Compliant**: All code quality warnings resolved
 - **Optimized Performance**: Efficient calculations reused across all components
-- **Easy to Extend**: Add new calculations in one place, use everywhere
+- **Easy to Extend**: Add new features in isolated, focused modules
 
 ### 📊 **Advanced Financial Management**
 
@@ -76,31 +78,83 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## 🏗️ Architecture
 
-### Clean Code Structure
+### Clean Modular Structure
 
 ```
 src/
-├── shared/
-│   ├── utils/
-│   │   └── financialCalculations.js  ← Single source of truth for ALL calculations
-│   ├── hooks/
-│   │   ├── useCalculations.js        ← Uses unified calculations
-│   │   └── useChartData.js
-│   └── components/
-├── features/
-│   ├── analytics/
-│   │   └── components/               ← All use financialCalculations.js
-│   ├── budget/
-│   ├── charts/
-│   └── transactions/
+├── app/
+│   └── App.js                        # Main application component
+├── pages/                            # Page-level components
+│   ├── OverviewPage/
+│   ├── AdvancedAnalyticsPage/
+│   ├── CategoryAnalysisPage/
+│   ├── IncomeExpensePage/
+│   ├── PatternsPage/
+│   ├── TransactionsPage/
+│   └── TrendsForecastsPage/
+├── features/                         # Feature modules
+│   ├── analytics/                    # Advanced analytics components
+│   │   ├── components/
+│   │   └── hooks/
+│   ├── budget/                       # Budget & goals features
+│   │   ├── components/
+│   │   └── utils/
+│   ├── charts/                       # Chart components & logic
+│   │   ├── components/
+│   │   └── hooks/
+│   ├── kpi/                          # KPI cards & metrics
+│   │   ├── components/
+│   │   └── hooks/
+│   └── transactions/                 # Transaction management
+│       └── components/
+├── components/                       # Shared UI components
+│   ├── data-display/                 # Charts, health scores, calendars
+│   ├── errors/                       # Error boundaries
+│   ├── import-export/                # CSV/Excel import
+│   ├── layout/                       # Header, footer
+│   └── ui/                          # Reusable UI elements
+├── lib/                             # Core libraries
+│   ├── calculations/                # Financial calculation engine
+│   │   ├── aggregations/            # Averages, totals, categories
+│   │   ├── financial/               # Financial calculations
+│   │   ├── time/                    # Date range calculations
+│   │   ├── index.js                 # Main calculation exports
+│   │   └── legacy.js                # Backward compatibility
+│   ├── analytics/                   # Analytics utilities
+│   │   ├── forecasts.js
+│   │   ├── insights.js
+│   │   ├── trends.js
+│   │   └── healthScore.js
+│   ├── charts/                      # Chart utilities
+│   └── data/                        # Data processing & validation
+├── contexts/                        # React contexts
+│   └── DataContext.js
+├── hooks/                           # Custom React hooks
+│   ├── useDataProcessor.js
+│   └── useDebouncedValue.js
+├── utils/                           # General utilities
+│   ├── accessibility.js
+│   ├── localStorage.js
+│   ├── logger.js
+│   └── performance.js
+├── config/                          # Configuration files
+│   ├── overview.js
+│   └── tabs.js
+├── constants/                       # App constants
+│   └── index.js
+└── styles/                          # Global styles
+    └── index.css
 ```
 
 ### Key Principles
 
-- ✅ **Single Responsibility**: Each calculation function does one thing well
-- ✅ **No Duplicates**: Same calculation never written twice
+- ✅ **Feature-Based Structure**: Organize code by feature, not by file type
+- ✅ **Separation of Concerns**: Pages, features, components, and libraries are clearly separated
+- ✅ **Single Responsibility**: Each module and function does one thing well
+- ✅ **No Duplicates**: Same calculation or component never written twice
 - ✅ **Easy to Test**: Pure functions with predictable outputs
 - ✅ **Easy to Extend**: Add new features without breaking existing ones
+- ✅ **Code Quality**: SonarQube compliant with proper error handling and logging
 
 ## 🎯 Key Features in Detail
 
@@ -379,14 +433,17 @@ Modern browsers (Chrome, Firefox, Safari, Edge)
 
 ```text
 src/
-├── features/              # Feature modules (analytics, budget, charts, transactions)
-├── shared/                # Shared resources
-│   ├── components/        # Reusable UI components
-│   ├── hooks/             # Custom React hooks
-│   └── utils/             # Utility functions
+├── app/                   # Main application entry
+├── pages/                 # Page-level components for routing
+├── features/              # Feature modules (analytics, budget, charts, kpi, transactions)
+├── components/            # Shared UI components (data-display, errors, import-export, layout, ui)
+├── lib/                   # Core libraries (calculations, analytics, charts, data)
+├── contexts/              # React contexts (DataContext)
+├── hooks/                 # Custom React hooks
+├── utils/                 # General utilities (logger, localStorage, performance)
 ├── config/                # Configuration files
-├── App.js                 # Main application
-└── index.js               # Entry point
+├── constants/             # Application constants
+└── styles/                # Global styles
 ```
 
 ## 🎯 Available Scripts

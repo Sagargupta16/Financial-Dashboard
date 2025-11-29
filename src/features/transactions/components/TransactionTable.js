@@ -322,35 +322,38 @@ export const EnhancedTransactionTable = ({
   };
 
   return (
-    <div className="group relative bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 rounded-2xl shadow-xl hover:shadow-2xl border border-gray-700 hover:border-gray-600 transition-all duration-500 overflow-hidden">
-      {/* Floating orbs */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-purple-600/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-      <div className="absolute -bottom-20 -left-20 w-32 h-32 bg-gradient-to-br from-purple-500/5 to-pink-600/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-300"></div>
+    <div className="glass border border-gray-700/30 rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
       {/* Header with Search and Filter Controls */}
-      <div className="p-6 border-b border-gray-700">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Transactions</h3>
+      <div className="p-7 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/50 to-gray-900/50">
+        <div className="flex flex-col lg:flex-row gap-5 items-start lg:items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-2xl">
+              <FileText className="text-blue-400" size={24} />
+            </div>
+            <h3 className="text-2xl font-bold text-white">All Transactions</h3>
+          </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Global Search */}
-            <div className="relative">
+            <div className="relative group">
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={16}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-blue-400 transition-colors duration-300"
+                size={18}
               />
               <input
                 type="text"
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-search w-full sm:w-80 shadow-xl"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                  aria-label="Clear search"
                 >
-                  <X size={16} />
+                  <X size={18} />
                 </button>
               )}
             </div>
@@ -358,16 +361,16 @@ export const EnhancedTransactionTable = ({
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg ${
                 showFilters
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-blue-500/50 scale-105"
+                  : "glass text-gray-300 hover:text-white hover:scale-105"
               }`}
             >
-              <Filter size={16} />
-              Filters
+              <Filter size={18} />
+              <span>Filters</span>
               {activeFiltersCount > 0 && (
-                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] h-5 flex items-center justify-center">
+                <span className="bg-red-500 text-white text-xs rounded-full px-2.5 py-1 min-w-[1.5rem] h-6 flex items-center justify-center font-extrabold shadow-lg pulse-glow">
                   {activeFiltersCount}
                 </span>
               )}
@@ -377,10 +380,11 @@ export const EnhancedTransactionTable = ({
             {(activeFiltersCount > 0 || searchTerm) && (
               <button
                 onClick={clearAllFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-red-500/50 hover:scale-105"
+                aria-label="Clear all filters"
               >
-                <X size={16} />
-                Clear All
+                <X size={18} />
+                <span>Clear All</span>
               </button>
             )}
           </div>
@@ -388,8 +392,8 @@ export const EnhancedTransactionTable = ({
 
         {/* Advanced Filters Panel */}
         {showFilters && (
-          <div className="mt-4 p-4 bg-gray-700/50 rounded-lg">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="mt-6 p-6 glass rounded-2xl border border-gray-700/30 animate-fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {/* Date Range */}
               <div className="space-y-2">
                 <label
@@ -407,14 +411,14 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("dateFrom", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.dateFrom && (
                     <button
                       onClick={() => clearFilter("dateFrom")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -436,14 +440,14 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("dateTo", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.dateTo && (
                     <button
                       onClick={() => clearFilter("dateTo")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -468,14 +472,14 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("amountMin", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.amountMin && (
                     <button
                       onClick={() => clearFilter("amountMin")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -499,14 +503,14 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("amountMax", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.amountMax && (
                     <button
                       onClick={() => clearFilter("amountMax")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -528,7 +532,7 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("account", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Accounts</option>
                     {uniqueValues.accounts.map((account) => (
@@ -540,9 +544,9 @@ export const EnhancedTransactionTable = ({
                   {filters.account && (
                     <button
                       onClick={() => clearFilter("account")}
-                      className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -564,7 +568,7 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("category", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Categories</option>
                     {uniqueValues.categories.map((category) => (
@@ -576,9 +580,9 @@ export const EnhancedTransactionTable = ({
                   {filters.category && (
                     <button
                       onClick={() => clearFilter("category")}
-                      className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -600,7 +604,7 @@ export const EnhancedTransactionTable = ({
                     onChange={(e) =>
                       handleFilterChange("subcategory", e.target.value)
                     }
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Subcategories</option>
                     {uniqueValues.subcategories.map((subcategory) => (
@@ -612,9 +616,9 @@ export const EnhancedTransactionTable = ({
                   {filters.subcategory && (
                     <button
                       onClick={() => clearFilter("subcategory")}
-                      className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -634,7 +638,7 @@ export const EnhancedTransactionTable = ({
                     id="filter-type"
                     value={filters.type}
                     onChange={(e) => handleFilterChange("type", e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Types</option>
                     {uniqueValues.types.map((type) => (
@@ -646,9 +650,9 @@ export const EnhancedTransactionTable = ({
                   {filters.type && (
                     <button
                       onClick={() => clearFilter("type")}
-                      className="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -670,14 +674,14 @@ export const EnhancedTransactionTable = ({
                     placeholder="Search in notes..."
                     value={filters.note}
                     onChange={(e) => handleFilterChange("note", e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.note && (
                     <button
                       onClick={() => clearFilter("note")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                      <X size={14} />
+                      <X size={16} />
                     </button>
                   )}
                 </div>
@@ -686,11 +690,17 @@ export const EnhancedTransactionTable = ({
 
             {/* Filter Summary */}
             {activeFiltersCount > 0 && (
-              <div className="mt-4 text-sm text-gray-300">
-                <span className="font-medium">Active filters:</span>{" "}
-                {activeFiltersCount} |
-                <span className="font-medium"> Showing:</span>{" "}
-                {filteredData.length} of {data.length} transactions
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl animate-fade-in">
+                <p className="text-sm font-semibold text-gray-200">
+                  <span className="text-blue-400 font-bold">
+                    {activeFiltersCount} active filter
+                    {activeFiltersCount > 1 ? "s" : ""}
+                  </span>
+                  {" • "}
+                  <span className="text-white">
+                    Showing {filteredData.length} of {data.length} transactions
+                  </span>
+                </p>
               </div>
             )}
           </div>
@@ -700,7 +710,7 @@ export const EnhancedTransactionTable = ({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-700/50">
+          <thead className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border-b-2 border-blue-500/30">
             <tr>
               {[
                 { key: "date", label: "Date" },
@@ -715,94 +725,82 @@ export const EnhancedTransactionTable = ({
               ].map((column) => (
                 <th
                   key={column.key}
-                  className="p-4 text-sm font-semibold text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-600/50 transition-colors"
+                  className="p-5 text-xs font-bold text-gray-300 uppercase tracking-widest cursor-pointer hover:bg-gray-700/50 transition-all duration-300 group"
                   onClick={() => handleSort(column.key)}
                 >
-                  <div className="flex items-center gap-2">
-                    <span>{column.label}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="group-hover:text-white transition-colors duration-300">
+                      {column.label}
+                    </span>
                     {sortConfig.key === column.key && (
-                      <span className="text-blue-400">
+                      <span className="text-blue-400 font-extrabold text-base animate-pulse">
                         {sortConfig.direction === "asc" ? "↑" : "↓"}
                       </span>
                     )}
                     {sortConfig.key !== column.key && (
-                      <ArrowUpDown size={14} className="opacity-30" />
+                      <ArrowUpDown
+                        size={14}
+                        className="opacity-30 group-hover:opacity-60 transition-opacity duration-300"
+                      />
                     )}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
-            {paginatedData.map((item) => (
+          <tbody className="divide-y divide-gray-700/50 bg-gray-900/40">
+            {paginatedData.map((item, index) => (
               <tr
                 key={item.id}
-                style={{
-                  transition: "background-color 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#374151";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "";
-                }}
+                className="transition-all duration-300 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 hover:shadow-lg group animate-fade-in"
+                style={{ animationDelay: `${index * 30}ms` }}
               >
-                <td
-                  className="p-4 whitespace-nowrap text-sm"
-                  style={{ color: "#f3f4f6" }}
-                >
+                <td className="p-5 whitespace-nowrap text-sm font-medium text-gray-100 group-hover:text-white transition-colors duration-300">
                   {item.date?.toLocaleDateString()}
                 </td>
-                <td
-                  className="p-4 whitespace-nowrap text-sm"
-                  style={{ color: "#f3f4f6" }}
-                >
+                <td className="p-5 whitespace-nowrap text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300">
                   {item.time}
                 </td>
-                <td
-                  className="p-4 whitespace-nowrap text-sm"
-                  style={{ color: "#f3f4f6" }}
-                >
+                <td className="p-5 whitespace-nowrap text-sm font-semibold text-gray-100 group-hover:text-white transition-colors duration-300">
                   {item.account}
                 </td>
-                <td className="p-4 whitespace-nowrap">
+                <td className="p-5 whitespace-nowrap">
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${getTypeStyles(
+                    className={`px-3 py-1.5 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 ${getTypeStyles(
                       item.type
                     )}`}
                   >
                     {item.category}
                   </span>
                 </td>
-                <td className="p-4 text-sm" style={{ color: "#f3f4f6" }}>
+                <td className="p-5 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300">
                   {item.subcategory || "-"}
                 </td>
                 <td
-                  className="p-4 text-sm max-w-xs truncate"
-                  style={{ color: "#f3f4f6" }}
+                  className="p-5 text-sm text-gray-400 max-w-xs truncate group-hover:text-gray-200 transition-colors duration-300"
                   title={item.note}
                 >
                   {item.note || "-"}
                 </td>
                 <td
-                  className={`p-4 whitespace-nowrap font-medium text-sm ${getAmountTextColor(
+                  className={`p-5 whitespace-nowrap font-bold text-base ${getAmountTextColor(
                     item.type
-                  )}`}
+                  )} transition-transform duration-300 group-hover:scale-105`}
                 >
                   {formatCurrency(item.amount)}
                 </td>
-                <td className="p-4 whitespace-nowrap text-sm">
+                <td className="p-5 whitespace-nowrap text-sm">
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${getTypeStyles(
+                    className={`px-3 py-1.5 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 ${getTypeStyles(
                       item.type
                     )}`}
                   >
                     {item.type}
                   </span>
                 </td>
-                <td className="p-4 whitespace-nowrap">
+                <td className="p-5 whitespace-nowrap">
                   <div
-                    className={`text-sm font-medium ${
+                    className={`text-base font-bold transition-transform duration-300 group-hover:scale-105 ${
                       item.runningBalance >= 0
                         ? "text-green-400"
                         : "text-red-400"
@@ -810,7 +808,7 @@ export const EnhancedTransactionTable = ({
                   >
                     {formatCurrency(Math.abs(item.runningBalance))}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs font-semibold text-gray-500 mt-1">
                     {item.runningBalance >= 0 ? "Positive" : "Negative"}
                   </div>
                 </td>
@@ -819,16 +817,19 @@ export const EnhancedTransactionTable = ({
           </tbody>
         </table>
         {paginatedData.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-400">
+          <div className="text-center py-20 animate-fade-in">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-700/50 to-gray-800/50 mb-5">
+              <Search className="text-gray-400" size={36} />
+            </div>
+            <p className="text-xl font-semibold text-gray-300 mb-2">
               {searchTerm || activeFiltersCount > 0
-                ? "No transactions match your search criteria."
-                : "No transactions found."}
+                ? "No transactions match your search criteria"
+                : "No transactions found"}
             </p>
             {(searchTerm || activeFiltersCount > 0) && (
               <button
                 onClick={clearAllFilters}
-                className="mt-2 text-blue-400 hover:text-blue-300 underline"
+                className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-500/50 hover:scale-105"
               >
                 Clear all filters
               </button>
@@ -839,35 +840,40 @@ export const EnhancedTransactionTable = ({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center p-4 bg-gray-800 border-t border-gray-700">
-          <p className="text-sm text-gray-400">
-            Showing {startIndex + 1}-{Math.min(endIndex, sortedData.length)} of{" "}
-            {sortedData.length}
+        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-800/60 to-gray-900/60 border-t border-gray-700/50">
+          <p className="text-sm font-medium text-gray-300">
+            Showing{" "}
+            <span className="font-bold text-white">
+              {startIndex + 1}-{Math.min(endIndex, sortedData.length)}
+            </span>{" "}
+            of <span className="font-bold text-white">{sortedData.length}</span>
             {(searchTerm || activeFiltersCount > 0) && (
-              <span className="text-gray-500">
-                {" "}
+              <span className="text-gray-400 ml-1">
                 (filtered from {data.length})
               </span>
             )}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 disabled:hover:scale-100"
             >
               <ChevronLeft size={18} />
+              <span>Previous</span>
             </button>
-            <span className="text-white">
-              Page {currentPage} of {totalPages}
+            <span className="text-base font-bold text-white px-4">
+              Page <span className="text-blue-400">{currentPage}</span> of{" "}
+              {totalPages}
             </span>
             <button
               onClick={() =>
                 setCurrentPage(Math.min(currentPage + 1, totalPages))
               }
               disabled={currentPage === totalPages}
-              className="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 disabled:hover:scale-100"
             >
+              <span>Next</span>
               <ChevronRight size={18} />
             </button>
           </div>

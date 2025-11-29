@@ -2,35 +2,82 @@ import React from "react";
 import PropTypes from "prop-types";
 import { formatCurrency } from "../../../lib/data";
 
+// Helper function to get color classes based on color prop
+const getColorClasses = (color) => {
+  const colorMap = {
+    green: {
+      icon: "from-green-600/20 to-green-800/20 text-green-400",
+      bar: "from-green-600 via-green-500 to-emerald-400",
+      side: "bg-gradient-to-b from-green-400 to-emerald-600",
+    },
+    red: {
+      icon: "from-red-600/20 to-red-800/20 text-red-400",
+      bar: "from-red-600 via-red-500 to-rose-400",
+      side: "bg-gradient-to-b from-red-400 to-rose-600",
+    },
+    blue: {
+      icon: "from-blue-600/20 to-blue-800/20 text-blue-400",
+      bar: "from-blue-600 via-blue-500 to-cyan-400",
+      side: "bg-gradient-to-b from-blue-400 to-cyan-600",
+    },
+    purple: {
+      icon: "from-purple-600/20 to-purple-800/20 text-purple-400",
+      bar: "from-purple-600 via-purple-500 to-pink-400",
+      side: "bg-gradient-to-b from-purple-400 to-pink-600",
+    },
+    orange: {
+      icon: "from-orange-600/20 to-orange-800/20 text-orange-400",
+      bar: "from-orange-600 via-orange-500 to-yellow-400",
+      side: "bg-gradient-to-b from-orange-400 to-yellow-600",
+    },
+  };
+  return colorMap[color] || colorMap.blue;
+};
+
 /**
  * KPICard Component - Memoized for performance
  * Only re-renders when value changes
  */
 export const KPICard = React.memo(
-  ({ title, value, icon, color }) => (
-    <div className="group relative bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-700 hover:border-gray-600 overflow-hidden">
-      <div className="relative z-10 flex items-center justify-between text-gray-400 mb-4">
-        <span className="text-lg font-medium group-hover:text-gray-300 transition-colors duration-300">
-          {title}
-        </span>
-        <div
-          className={`p-3 rounded-xl bg-gradient-to-br from-${color}-600/20 to-${color}-800/20 text-${color}-400 group-hover:from-${color}-500/30 group-hover:to-${color}-700/30 group-hover:scale-110 transition-all duration-300 shadow-lg`}
-        >
-          {icon}
-        </div>
-      </div>
-      <div className="relative z-10">
-        <h2 className="text-4xl font-bold text-white group-hover:text-gray-100 transition-colors duration-300">
-          {formatCurrency(value)}
-        </h2>
-      </div>
+  ({ title, value, icon, color }) => {
+    const colors = getColorClasses(color);
 
-      {/* Bottom accent line */}
-      <div
-        className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-${color}-600 to-${color}-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}
-      ></div>
-    </div>
-  ),
+    return (
+      <div className="group relative glass border border-gray-700/30 p-7 rounded-2xl shadow-2xl hover:shadow-blue-500/20 transform hover:scale-105 transition-all duration-300 overflow-hidden animate-scale-in">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+        {/* Decorative corner accent */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+
+        <div className="relative z-10 flex items-center justify-between mb-5">
+          <span className="text-base font-semibold text-gray-400 group-hover:text-gray-300 transition-colors duration-300 tracking-wide">
+            {title}
+          </span>
+          <div
+            className={`p-3.5 rounded-2xl bg-gradient-to-br ${colors.icon} group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-xl`}
+          >
+            {icon}
+          </div>
+        </div>
+        <div className="relative z-10">
+          <h2 className="text-4xl font-extrabold text-white group-hover:text-gradient-primary transition-all duration-300 mb-1">
+            {formatCurrency(value)}
+          </h2>
+        </div>
+
+        {/* Bottom accent bar with animation */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r ${colors.bar} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left shadow-lg`}
+        ></div>
+
+        {/* Side glow effect */}
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-1 ${colors.side} transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500`}
+        ></div>
+      </div>
+    );
+  },
   (prevProps, nextProps) =>
     prevProps.value === nextProps.value && prevProps.title === nextProps.title
 );
@@ -61,30 +108,29 @@ export const SmallKPICard = React.memo(
     };
 
     return (
-      <div className="group bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center border border-gray-700 hover:border-gray-600 relative overflow-hidden">
+      <div className="group glass border border-gray-700/30 p-6 rounded-2xl shadow-xl hover:shadow-blue-500/20 transition-all duration-300 flex items-center relative overflow-hidden animate-fade-in">
         {/* Hover background effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-        <div className="relative z-10 p-3 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 text-blue-400 mr-4 group-hover:from-blue-600/20 group-hover:to-blue-800/20 group-hover:scale-110 transition-all duration-300 shadow-lg">
+        <div className="relative z-10 p-4 rounded-2xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 text-blue-400 mr-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl">
           {icon}
         </div>
-        <div className="relative z-10">
-          <span className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+        <div className="relative z-10 flex-1">
+          <span className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors duration-300 block mb-1">
             {title}
           </span>
-          <p className="text-xl font-bold text-white group-hover:text-gray-100 transition-colors duration-300">
+          <p className="text-2xl font-extrabold text-white group-hover:text-gradient-primary transition-all duration-300">
             {displayValue()}
             {unit && (
-              <span className="text-base font-normal text-gray-400">
-                {" "}
+              <span className="text-base font-normal text-gray-400 ml-1">
                 {unit}
               </span>
             )}
           </p>
         </div>
 
-        {/* Side accent */}
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 to-purple-600 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500"></div>
+        {/* Side accent bar */}
+        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-purple-600 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 shadow-lg"></div>
       </div>
     );
   }

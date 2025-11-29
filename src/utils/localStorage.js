@@ -5,6 +5,8 @@
  * For sensitive data, use server-side storage with proper encryption.
  */
 
+import logger from "./logger";
+
 const STORAGE_KEYS = {
   FILTERS: "financial_dashboard_filters",
   TRANSACTIONS: "financial_dashboard_transactions",
@@ -23,7 +25,7 @@ export const saveToLocalStorage = (key, data) => {
     localStorage.setItem(key, serialized);
     return true;
   } catch (error) {
-    console.error("Failed to save to localStorage:", error);
+    logger.error("Failed to save to localStorage:", error);
     return false;
   }
 };
@@ -37,12 +39,12 @@ export const saveToLocalStorage = (key, data) => {
 export const loadFromLocalStorage = (key, defaultValue = null) => {
   try {
     const serialized = localStorage.getItem(key);
-    if (serialized === null) {
+    if (serialized === null || serialized === undefined) {
       return defaultValue;
     }
     return JSON.parse(serialized);
   } catch (error) {
-    console.error("Failed to load from localStorage:", error);
+    logger.error("Failed to load from localStorage:", error);
     return defaultValue;
   }
 };
@@ -55,7 +57,7 @@ export const removeFromLocalStorage = (key) => {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error("Failed to remove from localStorage:", error);
+    logger.error("Failed to remove from localStorage:", error);
   }
 };
 
@@ -111,7 +113,7 @@ export const loadTransactions = () => {
       date: new Date(t.date),
     }));
   } catch (error) {
-    console.error("Failed to load transactions:", error);
+    logger.error("Failed to load transactions:", error);
     return [];
   }
 };
@@ -163,7 +165,7 @@ export const hasStorageSpace = (requiredBytes = 0) => {
     localStorage.removeItem(testKey);
     return true;
   } catch (error) {
-    console.warn("Storage space check failed:", error.message);
+    logger.warn("Storage space check failed:", error.message);
     return false;
   }
 };

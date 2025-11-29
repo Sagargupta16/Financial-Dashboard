@@ -3,6 +3,7 @@
  * Simplified, accurate budget tracking with trend analysis
  */
 
+import logger from "../../../utils/logger";
 import {
   calculateTotalLiquidAssets,
   calculateTotalInvestments,
@@ -34,7 +35,7 @@ export const loadBudgets = () => {
     const data = localStorage.getItem(BUDGET_KEY);
     return data ? JSON.parse(data) : {};
   } catch (error) {
-    console.error("Error loading budgets:", error);
+    logger.error("Error loading budgets:", error);
     return {};
   }
 };
@@ -47,7 +48,7 @@ export const saveBudgets = (budgets) => {
     localStorage.setItem(BUDGET_KEY, JSON.stringify(budgets));
     return true;
   } catch (error) {
-    console.error("Error saving budgets:", error);
+    logger.error("Error saving budgets:", error);
     return false;
   }
 };
@@ -183,7 +184,7 @@ export const loadGoals = () => {
     const data = localStorage.getItem(GOALS_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error("Error loading goals:", error);
+    logger.error("Error loading goals:", error);
     return [];
   }
 };
@@ -196,7 +197,7 @@ export const saveGoals = (goals) => {
     localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
     return true;
   } catch (error) {
-    console.error("Error saving goals:", error);
+    logger.error("Error saving goals:", error);
     return false;
   }
 };

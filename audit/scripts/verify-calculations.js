@@ -12,8 +12,8 @@
  *   --verbose      : Show detailed calculation steps
  */
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 // Constants (matching src/shared/utils/constants.js)
 const DAYS_PER_MONTH = 30.44;
@@ -21,7 +21,7 @@ const MONTHS_PER_YEAR = 12;
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 const PERCENT = 100;
 const TAX_SLABS_NEW_REGIME = [
-  { max: 400000, rate: 0.0 },
+  { max: 400000, rate: 0 },
   { max: 800000, rate: 0.05 },
   { max: 1200000, rate: 0.1 },
   { max: 1600000, rate: 0.15 },
@@ -42,30 +42,29 @@ const verbose = args.includes("--verbose");
 /**
  * Parse CSV data
  */
+// Parse CSV with quoted fields
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (const char of line) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 function parseCSV(filePath) {
   const content = fs.readFileSync(filePath, "utf-8");
   const lines = content.trim().split("\n");
-
-  // Parse CSV with quoted fields
-  function parseCSVLine(line) {
-    const result = [];
-    let current = "";
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === "," && !inQuotes) {
-        result.push(current.trim());
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  }
 
   const headers = parseCSVLine(lines[0]);
 
@@ -81,8 +80,8 @@ function parseCSV(filePath) {
     obj.date = new Date(`${year}-${month}-${day}`);
 
     // Parse amount (remove currency symbols, commas, and quotes)
-    const amountStr = obj.INR.replace(/["₹,]/g, "").trim();
-    obj.amount = Math.abs(parseFloat(amountStr)) || 0;
+    const amountStr = obj.INR.replaceAll(/["₹,]/g, "").trim();
+    obj.amount = Math.abs(Number.parseFloat(amountStr)) || 0;
 
     // Determine transaction type
     obj.type = obj["Income/Expense"];
@@ -115,7 +114,7 @@ function calculateDateRange(transactions) {
 
   const dates = transactions
     .map((t) => t.date)
-    .filter((d) => !isNaN(d.getTime()));
+    .filter((d) => !Number.isNaN(d.getTime()));
 
   if (dates.length === 0) {
     return {
@@ -172,19 +171,19 @@ function calculateSavingsRate(income, expense) {
 
 // Daily Average
 function calculateDailyAverage(total, days) {
-  if (days === 0 || isNaN(total) || isNaN(days)) return 0;
+  if (days === 0 || Number.isNaN(total) || Number.isNaN(days)) return 0;
   return total / days;
 }
 
 // Monthly Average
 function calculateMonthlyAverage(total, days) {
-  if (days === 0 || isNaN(total) || isNaN(days)) return 0;
+  if (days === 0 || Number.isNaN(total) || Number.isNaN(days)) return 0;
   return (total / days) * DAYS_PER_MONTH;
 }
 
 // Average per Transaction
 function calculateAveragePerTransaction(total, count) {
-  if (count === 0 || isNaN(total) || isNaN(count)) return 0;
+  if (count === 0 || Number.isNaN(total) || Number.isNaN(count)) return 0;
   return total / count;
 }
 
@@ -235,11 +234,11 @@ const results = {
 
 function addResult(metric, expected, actual, tolerance = 0.01, notes = "") {
   const diff = Math.abs(expected - actual);
-  const diffPercent = expected !== 0 ? (diff / Math.abs(expected)) * 100 : 0;
+  const diffPercent = expected === 0 ? 0 : (diff / Math.abs(expected)) * 100;
   const status = diff <= tolerance ? "OK" : "MISMATCH";
 
   results.metrics.push({
-    metric_id: metric.toLowerCase().replace(/\s+/g, "_"),
+    metric_id: metric.toLowerCase().replaceAll(/\s+/g, "_"),
     ui_label: metric,
     expected_value: expected,
     recomputed_value: actual,

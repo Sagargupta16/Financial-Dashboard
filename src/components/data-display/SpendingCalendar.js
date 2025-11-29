@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
+import logger from "../../utils/logger";
 
 /**
  * Spending Calendar Heatmap
@@ -36,7 +37,7 @@ export const SpendingCalendar = ({ filteredData }) => {
         }
         dateStr = transDate.toISOString().split("T")[0];
       } catch (error) {
-        console.warn("Failed to parse transaction date:", error);
+        logger.warn("Failed to parse transaction date:", error);
         return; // Skip if date parsing fails
       }
 

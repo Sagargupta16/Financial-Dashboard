@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { RecurringPayments } from "../../features/budget/components/RecurringPayments";
 import { AdvancedAnalyticsDashboard } from "../AdvancedAnalyticsPage/AdvancedAnalyticsPage";

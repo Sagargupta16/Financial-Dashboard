@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { Upload, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
 

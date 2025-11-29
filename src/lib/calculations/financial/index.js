@@ -164,6 +164,154 @@ export const calculateInvestmentPerformance = (transactions) => {
 // ============================================================================
 
 /**
+ * Calculate gross salary from net (post-tax) salary
+ * This function reverse-calculates the gross income needed to result in the given net income
+ * after all deductions and taxes under the new tax regime.
+ *
+ * @param {number} netIncome - Post-tax income received
+ * @param {number} professionalTax - Annual professional tax (default: ₹2,400)
+ * @param {number} mealVoucherExemption - Annual meal voucher exemption (default: ₹18,250)
+ * @returns {object} - { grossIncome, taxableIncome, estimatedTax, cess, totalTaxLiability }
+ */
+export const calculateGrossFromNet = (
+  netIncome,
+  professionalTax = DEFAULT_PROFESSIONAL_TAX,
+  mealVoucherExemption = MEAL_VOUCHER_DAILY_LIMIT * DAYS_IN_YEAR
+) => {
+  // Start with an initial guess (net income is typically 70-90% of gross)
+  let grossIncome = netIncome / 0.8; // Initial guess: net is 80% of gross
+  let iterations = 0;
+  const maxIterations = 50;
+  const tolerance = 1; // ₹1 accuracy is sufficient
+
+  // Newton-Raphson method to converge to correct gross income
+  while (iterations < maxIterations) {
+    // Calculate taxable income from current gross estimate
+    const taxableIncome = Math.max(
+      0,
+      grossIncome - STANDARD_DEDUCTION - professionalTax - mealVoucherExemption
+    );
+
+    // Calculate tax on this taxable income
+    let estimatedTax;
+    if (taxableIncome <= TAX_SLABS_NEW_REGIME[0].max) {
+      estimatedTax = 0;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
+      estimatedTax =
+        (taxableIncome - TAX_SLABS_NEW_REGIME[0].max) *
+        TAX_SLABS_NEW_REGIME[1].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[2].max) {
+      estimatedTax =
+        20000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[1].max) *
+          TAX_SLABS_NEW_REGIME[2].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[3].max) {
+      estimatedTax =
+        60000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[2].max) *
+          TAX_SLABS_NEW_REGIME[3].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[4].max) {
+      estimatedTax =
+        120000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[3].max) *
+          TAX_SLABS_NEW_REGIME[4].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[5].max) {
+      estimatedTax =
+        200000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[4].max) *
+          TAX_SLABS_NEW_REGIME[5].rate;
+    } else {
+      estimatedTax =
+        300000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[5].max) *
+          TAX_SLABS_NEW_REGIME[6].rate;
+    }
+
+    const cess = estimatedTax * CESS_RATE;
+    const totalTaxLiability = estimatedTax + cess + professionalTax;
+
+    // Calculate net income from this gross
+    const calculatedNet = grossIncome - totalTaxLiability;
+
+    // Check if we're close enough
+    const error = calculatedNet - netIncome;
+    if (Math.abs(error) < tolerance) {
+      return {
+        grossIncome: Math.round(grossIncome),
+        taxableIncome: Math.round(taxableIncome),
+        estimatedTax: Math.round(estimatedTax),
+        cess: Math.round(cess),
+        totalTaxLiability: Math.round(totalTaxLiability),
+        netIncome: Math.round(calculatedNet),
+        standardDeduction: STANDARD_DEDUCTION,
+        professionalTax,
+        mealVoucherExemption,
+      };
+    }
+
+    // Adjust gross income estimate
+    // If calculated net is too high, increase gross (need to pay more tax)
+    // If calculated net is too low, decrease gross (paying too much tax)
+    grossIncome += error;
+
+    iterations++;
+  }
+
+  // Return best estimate if didn't converge
+  const taxableIncome = Math.max(
+    0,
+    grossIncome - STANDARD_DEDUCTION - professionalTax - mealVoucherExemption
+  );
+  let estimatedTax = 0;
+  if (taxableIncome > TAX_SLABS_NEW_REGIME[0].max) {
+    if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
+      estimatedTax =
+        (taxableIncome - TAX_SLABS_NEW_REGIME[0].max) *
+        TAX_SLABS_NEW_REGIME[1].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[2].max) {
+      estimatedTax =
+        20000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[1].max) *
+          TAX_SLABS_NEW_REGIME[2].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[3].max) {
+      estimatedTax =
+        60000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[2].max) *
+          TAX_SLABS_NEW_REGIME[3].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[4].max) {
+      estimatedTax =
+        120000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[3].max) *
+          TAX_SLABS_NEW_REGIME[4].rate;
+    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[5].max) {
+      estimatedTax =
+        200000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[4].max) *
+          TAX_SLABS_NEW_REGIME[5].rate;
+    } else {
+      estimatedTax =
+        300000 +
+        (taxableIncome - TAX_SLABS_NEW_REGIME[5].max) *
+          TAX_SLABS_NEW_REGIME[6].rate;
+    }
+  }
+  const cess = estimatedTax * CESS_RATE;
+
+  return {
+    grossIncome: Math.round(grossIncome),
+    taxableIncome: Math.round(taxableIncome),
+    estimatedTax: Math.round(estimatedTax),
+    cess: Math.round(cess),
+    totalTaxLiability: Math.round(estimatedTax + cess + professionalTax),
+    netIncome,
+    standardDeduction: STANDARD_DEDUCTION,
+    professionalTax,
+    mealVoucherExemption,
+    note: "Estimation did not fully converge after 50 iterations",
+  };
+};
+
+/**
  * Calculate tax planning metrics with financial year breakdown
  */
 export const calculateTaxPlanning = (transactions) => {
@@ -433,6 +581,17 @@ const calculateTaxPlanningForYear = (transactions) => {
   const cess = estimatedTax * CESS_RATE;
   const totalTaxLiability = estimatedTax + cess + professionalTax;
 
+  // Calculate net income (post-tax) from gross income
+  const netIncome = totalIncome - totalTaxLiability;
+
+  // Also calculate reverse: what gross income would result in this net income
+  // This helps users understand their actual pre-tax salary if they only know post-tax
+  const reverseCalculation = calculateGrossFromNet(
+    totalIncome, // Assuming current income is NET (post-tax)
+    professionalTax,
+    mealVoucherExemption
+  );
+
   const deductions = [
     {
       name: "Standard Deduction",
@@ -510,6 +669,8 @@ const calculateTaxPlanningForYear = (transactions) => {
 
   return {
     totalIncome,
+    netIncome,
+    reverseCalculation, // Gross income if totalIncome is treated as net (post-tax)
     salaryIncome,
     bonusIncome,
     rsuIncome,

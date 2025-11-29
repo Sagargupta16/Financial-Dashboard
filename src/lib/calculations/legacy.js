@@ -1,12 +1,6 @@
 /**
- * Centralized Calculation Utilities
- *
- * @deprecated This file is being phased out. Use canonical functions from:
- * - src/shared/utils/calculations/index.js for core calculations
- * - Individual modules in src/shared/utils/calculations/ for specific domains
- *
- * Many functions here are duplicates or variations of canonical implementations.
- * For new code, import from the canonical location.
+ * Extended Calculation Utilities
+ * Additional financial calculations used across the application
  */
 
 import {
@@ -16,86 +10,33 @@ import {
   calculatePercentage as canonicalPercentage,
 } from "./index";
 
-/**
- * Calculate date range from transaction data
- * @deprecated Use canonicalDateRange from calculations/dateRange
- * NOTE: This returns {startDate, endDate, totalDays} vs canonical {days, months, years, startDate, endDate}
- * For compatibility, we maintain this wrapper
- */
 export const calculateDateRange = (data) => {
   const canonical = canonicalDateRange(data);
-  // Map to old format for compatibility
   return {
     startDate: canonical.startDate,
     endDate: canonical.endDate,
     totalDays: canonical.days,
-    days: canonical.days, // Also include new property
+    days: canonical.days,
   };
 };
 
-/**
- * @deprecated Use canonicalDailyAverage from calculations/averages
- */
 export const calculateDailyAverage = canonicalDailyAverage;
-
-/**
- * Calculate monthly average
- * @deprecated Use canonicalMonthlyAverage from calculations/averages
- * NOTE: This version expects totalMonths parameter, canonical expects days
- */
-export const calculateMonthlyAverage = (total, totalMonths) => {
-  return totalMonths > 0 ? total / totalMonths : 0;
-};
-
-/**
- * @deprecated Use canonicalAveragePerTransaction from calculations/averages
- */
+export const calculateMonthlyAverage = (total, totalMonths) =>
+  totalMonths > 0 ? total / totalMonths : 0;
 export const calculateAveragePerTransaction = canonicalAveragePerTransaction;
-
-/**
- * @deprecated Use canonicalPercentage from calculations/savings
- */
 export const calculatePercentage = canonicalPercentage;
 
-/**
- * Calculate per-day frequency
- */
-export const calculatePerDayFrequency = (count, totalDays) => {
-  if (totalDays === 0) {
-    return 0;
-  }
-  return count / totalDays;
-};
+export const calculatePerDayFrequency = (count, totalDays) =>
+  totalDays === 0 ? 0 : count / totalDays;
+export const calculatePerMonthFrequency = (count, totalDays) =>
+  totalDays === 0 ? 0 : (count / totalDays) * 30.44;
+export const calculatePerWeekFrequency = (count, totalDays) =>
+  totalDays === 0 ? 0 : (count / totalDays) * 7;
 
-/**
- * Calculate per-month frequency
- */
-export const calculatePerMonthFrequency = (count, totalDays) => {
-  if (totalDays === 0) {
-    return 0;
-  }
-  return (count / totalDays) * 30.44; // Average days per month
-};
-
-/**
- * Calculate per-week frequency
- */
-export const calculatePerWeekFrequency = (count, totalDays) => {
-  if (totalDays === 0) {
-    return 0;
-  }
-  return (count / totalDays) * 7;
-};
-
-/**
- * Format number with decimals
- */
-export const formatNumber = (number, decimals = 2) => {
-  if (number === null || number === undefined || Number.isNaN(number)) {
-    return "0";
-  }
-  return Number(number).toFixed(decimals);
-};
+export const formatNumber = (number, decimals = 2) =>
+  number === null || number === undefined || Number.isNaN(number)
+    ? "0"
+    : Number(number).toFixed(decimals);
 
 /**
  * Calculate savings potential with percentage
@@ -469,6 +410,11 @@ export const detectRecurringTransactions = (transactions) => {
   const groupByDescription = {};
 
   transactions.forEach((t) => {
+    // Skip Income transactions (Salary, etc.) - only track expense subscriptions
+    if (t.type === "Income" || t.type === "Transfer-In") {
+      return;
+    }
+
     // Use note/description as primary identifier, fallback to category
     const description = (t.note || t.description || t.category || "Unknown")
       .trim()

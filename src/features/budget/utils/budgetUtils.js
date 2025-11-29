@@ -16,6 +16,7 @@ import {
   getFinancialGrade,
 } from "../../../lib/calculations";
 import { parseAmount, filterByType, getMonthKey } from "../../../lib/data";
+import { INVESTMENT_CATEGORIES, INVESTMENT_ACCOUNTS } from "../../../constants";
 
 // Storage keys for budget data
 const BUDGET_KEY = "financial_dashboard_budgets";
@@ -369,7 +370,13 @@ export const detectRecurringPayments = (transactions) => {
  */
 const calculateSpendingVariance = (transactions) => {
   const monthlyTotals = {};
-  const expenses = filterByType(transactions, "Expense");
+  // Exclude investment-related transactions for consistency calculation
+  const expenses = transactions.filter(
+    (t) =>
+      t.type === "Expense" &&
+      !INVESTMENT_CATEGORIES.has(t.category) &&
+      !INVESTMENT_ACCOUNTS.has(t.account)
+  );
 
   // Group by month
   expenses.forEach((transaction) => {
@@ -380,7 +387,7 @@ const calculateSpendingVariance = (transactions) => {
 
   const values = Object.values(monthlyTotals);
   if (values.length < 2) {
-    return 0; // Need at least 2 months
+    return 25; // Need at least 2 months, return moderate variance
   }
 
   // Calculate coefficient of variation (CV)
@@ -389,9 +396,9 @@ const calculateSpendingVariance = (transactions) => {
     values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
     values.length;
   const stdDev = Math.sqrt(variance);
-  const cv = mean > 0 ? (stdDev / mean) * 100 : 0;
+  const cv = mean > 0 ? (stdDev / mean) * 100 : 25;
 
-  return cv;
+  return Math.min(100, cv); // Cap at 100%
 };
 
 /**
@@ -424,10 +431,16 @@ export const calculateHealthScore = (data) => {
   const totalDebt = calculateTotalDebt(allAccountBalances || accountBalances); // Use all accounts for debt
 
   // Calculate average monthly expenses from actual transaction data (last 3 months)
+  // IMPORTANT: Exclude investment-related transactions for emergency fund calculation
   let averageMonthlyExpenses = validExpenses; // Fallback to current month
   if (filteredData && filteredData.length > 0) {
     const monthlyExpenseTotals = {};
-    const expenseTransactions = filterByType(filteredData, "Expense");
+    const expenseTransactions = filteredData.filter(
+      (t) =>
+        t.type === "Expense" &&
+        !INVESTMENT_CATEGORIES.has(t.category) &&
+        !INVESTMENT_ACCOUNTS.has(t.account)
+    );
 
     expenseTransactions.forEach((transaction) => {
       const monthKey = getMonthKey(transaction);

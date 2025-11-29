@@ -709,7 +709,18 @@ export const EnhancedTransactionTable = ({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left">
+        <table className="w-full text-left table-fixed">
+          <colgroup>
+            <col className="w-28" /> {/* Date */}
+            <col className="w-20" /> {/* Time */}
+            <col className="w-36" /> {/* Account */}
+            <col className="w-32" /> {/* Category */}
+            <col className="w-32" /> {/* Subcategory */}
+            <col className="w-48" /> {/* Note */}
+            <col className="w-28" /> {/* Amount */}
+            <col className="w-28" /> {/* Type */}
+            <col className="w-36" /> {/* Running Balance */}
+          </colgroup>
           <thead className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border-b-2 border-blue-500/30">
             <tr>
               {[
@@ -721,15 +732,15 @@ export const EnhancedTransactionTable = ({
                 { key: "note", label: "Note" },
                 { key: "amount", label: "Amount" },
                 { key: "type", label: "Type" },
-                { key: "runningBalance", label: "Running Balance" },
+                { key: "runningBalance", label: "Balance" },
               ].map((column) => (
                 <th
                   key={column.key}
-                  className="p-5 text-xs font-bold text-gray-300 uppercase tracking-widest cursor-pointer hover:bg-gray-700/50 transition-all duration-300 group"
+                  className="p-4 text-xs font-bold text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-700/50 transition-all duration-300 group"
                   onClick={() => handleSort(column.key)}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <span className="group-hover:text-white transition-colors duration-300">
+                  <div className="flex items-center gap-2">
+                    <span className="group-hover:text-white transition-colors duration-300 truncate">
                       {column.label}
                     </span>
                     {sortConfig.key === column.key && (
@@ -755,52 +766,75 @@ export const EnhancedTransactionTable = ({
                 className="transition-all duration-300 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 hover:shadow-lg group animate-fade-in"
                 style={{ animationDelay: `${index * 30}ms` }}
               >
-                <td className="p-5 whitespace-nowrap text-sm font-medium text-gray-100 group-hover:text-white transition-colors duration-300">
+                <td className="p-3 text-sm font-medium text-gray-100 group-hover:text-white transition-colors duration-300 truncate">
                   {item.date?.toLocaleDateString()}
                 </td>
-                <td className="p-5 whitespace-nowrap text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300">
+                <td className="p-3 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300 truncate">
                   {item.time}
                 </td>
-                <td className="p-5 whitespace-nowrap text-sm font-semibold text-gray-100 group-hover:text-white transition-colors duration-300">
+                <td
+                  className="p-3 text-sm font-semibold text-gray-100 group-hover:text-white transition-colors duration-300 truncate"
+                  title={item.account}
+                >
                   {item.account}
                 </td>
-                <td className="p-5 whitespace-nowrap">
+                <td className="p-3">
                   <span
-                    className={`px-3 py-1.5 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 ${getTypeStyles(
-                      item.type
-                    )}`}
+                    className="px-2 py-1 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 truncate block"
+                    style={{
+                      backgroundColor:
+                        item.type === "Income"
+                          ? "rgba(16, 185, 129, 0.5)"
+                          : item.type === "Expense"
+                            ? "rgba(239, 68, 68, 0.5)"
+                            : item.type === "Transfer-In"
+                              ? "rgba(59, 130, 246, 0.5)"
+                              : "rgba(245, 158, 11, 0.5)",
+                      color:
+                        item.type === "Income"
+                          ? "rgb(167, 243, 208)"
+                          : item.type === "Expense"
+                            ? "rgb(252, 165, 165)"
+                            : item.type === "Transfer-In"
+                              ? "rgb(147, 197, 253)"
+                              : "rgb(253, 186, 116)",
+                    }}
+                    title={item.category}
                   >
                     {item.category}
                   </span>
                 </td>
-                <td className="p-5 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300">
+                <td
+                  className="p-3 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300 truncate"
+                  title={item.subcategory}
+                >
                   {item.subcategory || "-"}
                 </td>
                 <td
-                  className="p-5 text-sm text-gray-400 max-w-xs truncate group-hover:text-gray-200 transition-colors duration-300"
+                  className="p-3 text-sm text-gray-400 truncate group-hover:text-gray-200 transition-colors duration-300"
                   title={item.note}
                 >
                   {item.note || "-"}
                 </td>
                 <td
-                  className={`p-5 whitespace-nowrap font-bold text-base ${getAmountTextColor(
+                  className={`p-3 font-bold text-sm ${getAmountTextColor(
                     item.type
-                  )} transition-transform duration-300 group-hover:scale-105`}
+                  )} transition-transform duration-300 group-hover:scale-105 text-right`}
                 >
                   {formatCurrency(item.amount)}
                 </td>
-                <td className="p-5 whitespace-nowrap text-sm">
+                <td className="p-3">
                   <span
-                    className={`px-3 py-1.5 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 ${getTypeStyles(
+                    className={`px-2 py-1 text-xs font-bold rounded-full border border-transparent group-hover:border-current transition-all duration-300 ${getTypeStyles(
                       item.type
                     )}`}
                   >
                     {item.type}
                   </span>
                 </td>
-                <td className="p-5 whitespace-nowrap">
+                <td className="p-3">
                   <div
-                    className={`text-base font-bold transition-transform duration-300 group-hover:scale-105 ${
+                    className={`text-sm font-bold transition-transform duration-300 group-hover:scale-105 text-right ${
                       item.runningBalance >= 0
                         ? "text-green-400"
                         : "text-red-400"
@@ -808,8 +842,8 @@ export const EnhancedTransactionTable = ({
                   >
                     {formatCurrency(Math.abs(item.runningBalance))}
                   </div>
-                  <div className="text-xs font-semibold text-gray-500 mt-1">
-                    {item.runningBalance >= 0 ? "Positive" : "Negative"}
+                  <div className="text-xs font-semibold text-gray-500 mt-0.5 text-right">
+                    {item.runningBalance >= 0 ? "+" : "-"}
                   </div>
                 </td>
               </tr>

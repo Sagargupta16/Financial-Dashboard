@@ -170,22 +170,14 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
 
     const dateRange = calculateDateRange(filteredData);
     const { income, expense } = kpiData;
+    const totalDays = dateRange.totalDays || dateRange.days || 1;
 
     // Use unified calculations
     const savingsRate = calculateSavingsRate(income, expense);
-    const dailySpendingRate = calculateDailyAverage(
-      expense,
-      dateRange.totalDays || 0
-    );
-    const monthlyBurnRate = calculateMonthlyAverage(
-      expense,
-      dateRange.totalDays || 0
-    );
+    const dailySpendingRate = calculateDailyAverage(expense, totalDays);
+    const monthlyBurnRate = calculateMonthlyAverage(expense, totalDays);
     const netWorth = income - expense;
-    const netWorthPerMonth = calculateMonthlyAverage(
-      netWorth,
-      dateRange.totalDays || 0
-    );
+    const netWorthPerMonth = calculateMonthlyAverage(netWorth, totalDays);
 
     // 5. Spending Velocity (Last 30 days vs All time)
     const last30DaysDate = new Date();

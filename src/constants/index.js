@@ -171,7 +171,7 @@ export const EPSILON = 1e-9;
 // ============================================================================
 
 /**
- * New Tax Regime Slabs (FY 2024-25 onwards)
+ * New Tax Regime Slabs (FY 2025-26 - Updated as per Budget 2025)
  * Each slab: { min, max, rate }
  * Amounts in INR
  */
@@ -191,7 +191,7 @@ export const TAX_SLABS_NEW_REGIME = [
 export const CESS_RATE = 0.04;
 
 /**
- * Standard deduction for salaried employees (New Regime)
+ * Standard deduction for salaried employees (New Regime FY 2025-26)
  */
 export const STANDARD_DEDUCTION_NEW_REGIME = 75000;
 

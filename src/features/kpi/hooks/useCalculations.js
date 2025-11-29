@@ -6,7 +6,7 @@ import {
   calculateSavingsRate,
   calculateDailyAverage,
   calculateMonthlyAverage,
-} from "../../../lib/calculations/financial";
+} from "../../../lib/calculations";
 
 export const useKPIData = (filteredData) => {
   return useMemo(() => {

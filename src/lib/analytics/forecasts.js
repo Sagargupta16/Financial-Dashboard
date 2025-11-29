@@ -142,7 +142,7 @@ export const detectSeasonality = (monthlyData) => {
   // Group by month (1-12) across all years
   const monthGroups = {};
   Object.entries(monthlyData).forEach(([key, value]) => {
-    const month = parseInt(key.split("-")[1], 10);
+    const month = Number.parseInt(key.split("-")[1], 10);
     if (!monthGroups[month]) {
       monthGroups[month] = [];
     }

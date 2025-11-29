@@ -8,12 +8,12 @@ import {
   Repeat,
   AlertTriangle,
 } from "lucide-react";
-import { SmallKPICard } from "../ui/KPICards";
+import { SmallKPICard } from "./KPICards";
 import {
   getMonthlyTrendDisplay,
   getAnomalyAlertDisplay,
   getSubscriptionsDisplay,
-} from "../../utils/metricHelpers";
+} from "../../../lib/analytics/metrics";
 
 /**
  * Secondary KPI Cards Section

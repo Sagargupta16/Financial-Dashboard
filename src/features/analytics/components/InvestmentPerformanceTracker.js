@@ -10,7 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Line } from "react-chartjs-2";
-import { calculateInvestmentPerformance } from "../../../shared/utils/financialCalculations";
+import { calculateInvestmentPerformance } from "../../../lib/calculations/financial";
 
 /**
  * Investment Performance Tracker

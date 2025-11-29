@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Download } from "lucide-react";
-import { downloadChart } from "../../../shared/utils/dataUtils";
+import { downloadChart } from "../../../lib/data";
 
 export const ChartCard = ({
   title,

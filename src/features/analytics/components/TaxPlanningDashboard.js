@@ -10,7 +10,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
-import { calculateTaxPlanning } from "../../../shared/utils/financialCalculations";
+import { calculateTaxPlanning } from "../../../lib/calculations/financial";
 
 /**
  * Tax Planning Dashboard

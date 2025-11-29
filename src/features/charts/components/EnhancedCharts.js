@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Bar } from "react-chartjs-2";
-import { truncateLabel } from "../../../shared/utils/chartUtils";
+import { truncateLabel } from "../../../lib/charts";
 import { commonChartOptions } from "./ChartConfig";
 import {
   ChartContainer,
   ExportButton,
   TimeNavigationControls,
-} from "../../../shared/components/ui/ChartUIComponents";
-import { useTimeNavigation } from "../../../shared/hooks/useChartHooks";
+} from "../../../components/data-display/ChartUIComponents";
+import { useTimeNavigation } from "../hooks/useChartHooks";
 
 const monthNames = [
   "January",

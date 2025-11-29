@@ -3,7 +3,7 @@
  * Canonical implementation for daily, monthly, and transaction averages
  */
 
-import { DAYS_PER_MONTH } from "../constants";
+import { DAYS_PER_MONTH } from "../../../constants";
 
 /**
  * Calculate daily average

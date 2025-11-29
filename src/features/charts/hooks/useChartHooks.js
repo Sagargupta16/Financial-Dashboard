@@ -4,7 +4,7 @@ import {
   filterDataByTimeRange,
   groupDataByCategory,
   groupDataByMonth,
-} from "../utils/chartUtils";
+} from "../../../lib/charts";
 
 const monthNames = [
   "January",

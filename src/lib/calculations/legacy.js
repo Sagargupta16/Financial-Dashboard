@@ -14,7 +14,7 @@ import {
   calculateDailyAverage as canonicalDailyAverage,
   calculateAveragePerTransaction as canonicalAveragePerTransaction,
   calculatePercentage as canonicalPercentage,
-} from "./calculations/index";
+} from "./index";
 
 /**
  * Calculate date range from transaction data

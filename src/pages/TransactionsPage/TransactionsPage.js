@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import EnhancedTransactionTable from "./TransactionTable";
+import EnhancedTransactionTable from "../../features/transactions/components/TransactionTable";
 
 /**
  * Transactions Section - Detailed transaction table with filters

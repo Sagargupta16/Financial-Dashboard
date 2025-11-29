@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
-import { KPICard } from "../ui/KPICards";
+import { KPICard } from "../../../features/kpi/components/KPICards";
 
 /**
  * Main KPI Cards Section

@@ -1,5 +1,5 @@
 // Import formatCurrency from dataUtils
-import { formatCurrency as formatCurrencyUtil } from "./dataUtils";
+import { formatCurrency as formatCurrencyUtil } from "../data";
 
 export const formatCurrency = formatCurrencyUtil;
 

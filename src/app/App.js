@@ -58,19 +58,19 @@ const TrendsForecastsPage = lazyLoad(
   "TrendsForecastsPage"
 );
 const InvestmentPerformanceTracker = lazyLoad(
-  () => import("./features/analytics/components/InvestmentPerformanceTracker"),
+  () => import("../features/analytics/components/InvestmentPerformanceTracker"),
   "InvestmentPerformanceTracker"
 );
 const TaxPlanningDashboard = lazyLoad(
-  () => import("./features/analytics/components/TaxPlanningDashboard"),
+  () => import("../features/analytics/components/TaxPlanningDashboard"),
   "TaxPlanningDashboard"
 );
 const FamilyHousingManager = lazyLoad(
-  () => import("./features/analytics/components/FamilyHousingManager"),
+  () => import("../features/analytics/components/FamilyHousingManager"),
   "FamilyHousingManager"
 );
 const CreditCardFoodOptimizer = lazyLoad(
-  () => import("./features/analytics/components/CreditCardFoodOptimizer"),
+  () => import("../features/analytics/components/CreditCardFoodOptimizer"),
   "CreditCardFoodOptimizer"
 );
 const PatternsPage = lazyLoad(
@@ -82,7 +82,7 @@ const TransactionsPage = lazyLoad(
   "TransactionsPage"
 );
 const BudgetGoalsSection = lazyLoad(
-  () => import("./features/budget/components/BudgetGoalsSection"),
+  () => import("../features/budget/components/BudgetGoalsSection"),
   "BudgetGoalsSection"
 );
 

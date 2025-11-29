@@ -10,24 +10,27 @@
  */
 
 // Date Range Calculations
-export { calculateDateRange } from "./dateRange";
+export { calculateDateRange } from "./time/dateRange";
 
 // Average Calculations
 export {
   calculateDailyAverage,
   calculateMonthlyAverage,
   calculateAveragePerTransaction,
-} from "./averages";
+} from "./aggregations/averages";
 
 // Aggregation Calculations
-export { calculateTotalIncome, calculateTotalExpense } from "./aggregations";
+export {
+  calculateTotalIncome,
+  calculateTotalExpense,
+} from "./aggregations/totals";
 
 // Savings Calculations
 export {
   calculateSavings,
   calculateSavingsRate,
   calculatePercentage,
-} from "./savings";
+} from "./financial/savings";
 
 // Category Analysis
-export { groupByCategory, getTopCategories } from "./category";
+export { groupByCategory, getTopCategories } from "./aggregations/category";

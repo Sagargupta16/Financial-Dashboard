@@ -3,7 +3,7 @@
  * Canonical implementation for savings and savings rate calculations
  */
 
-import { PERCENT } from "../constants";
+import { PERCENT } from "../../../constants";
 
 /**
  * Calculate savings (income minus expense)

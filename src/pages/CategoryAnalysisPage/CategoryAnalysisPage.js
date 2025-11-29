@@ -4,7 +4,7 @@ import {
   TreemapChart,
   EnhancedSubcategoryBreakdownChart,
   MultiCategoryTimeAnalysisChart,
-} from "../../../features/charts/components";
+} from "../../features/charts/components";
 
 /**
  * Category Analysis Section - Deep dive into spending categories

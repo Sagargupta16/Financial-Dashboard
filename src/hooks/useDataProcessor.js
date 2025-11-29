@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { parseCurrency, parseDate } from "../utils/dataUtils";
+import { parseCurrency, parseDate } from "../lib/data";
 import logger from "../utils/logger";
 import * as XLSX from "xlsx";
 

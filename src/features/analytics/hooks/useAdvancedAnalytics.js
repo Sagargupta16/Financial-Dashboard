@@ -11,7 +11,7 @@ import {
   calculateMonthlyHealthRatio,
   calculateGoalProgress,
   calculateDateRange,
-} from "../utils/calculations";
+} from "../../../lib/calculations";
 
 /**
  * Custom hook for advanced financial analytics

@@ -4,12 +4,12 @@ import {
   calculateCategorySpending,
   calculateHealthScore,
   generateRecommendations,
-} from "../../../features/budget/utils/budgetUtils";
+} from "../../features/budget/utils/budgetUtils";
 import {
   getScoreColor,
   getGradient,
   prepareHealthData,
-} from "../../utils/healthScoreHelpers";
+} from "../../lib/analytics/healthScore";
 
 /**
  * Main Score Display Component

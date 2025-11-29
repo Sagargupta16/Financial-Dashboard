@@ -12,17 +12,17 @@ import {
   Lightbulb,
   Filter,
 } from "lucide-react";
-import { SmallKPICard } from "../ui/KPICards";
-import { AccountBalancesCard } from "../ui/AccountBalancesCard";
-import { MainKPISection } from "./MainKPISection";
+import { SmallKPICard } from "../../features/kpi/components/KPICards";
+import { AccountBalancesCard } from "./components/AccountBalancesCard";
+import { MainKPISection } from "./components/MainKPISection";
 import {
   SecondaryKPISection,
   AdvancedAnalyticsKPISection,
-} from "./KPISections";
+} from "../../features/kpi/components/KPISections";
 import { formatCurrency } from "../../lib/data";
-import { useEnhancedKPIData } from "../../hooks/useCalculations";
-import { useAdvancedAnalytics } from "../../hooks/useAdvancedAnalytics";
-import { generateSmartInsights } from "../../utils/insightsGenerator";
+import { useEnhancedKPIData } from "../../features/kpi/hooks/useCalculations";
+import { useAdvancedAnalytics } from "../../features/analytics/hooks/useAdvancedAnalytics";
+import { generateSmartInsights } from "../../lib/analytics/insights";
 import {
   getSavingsRateColor,
   getSavingsRateIconColor,
@@ -36,14 +36,14 @@ import {
   getCategoryConcentrationColor,
   getSectionStyles,
   validateKPIData,
-} from "../../utils/metricHelpers";
+} from "../../lib/analytics/metrics";
 import {
   CATEGORY_CONCENTRATION_THRESHOLD,
   DEFAULT_KPI_VALUES,
   DEFAULT_ADDITIONAL_KPI,
   DEFAULT_KEY_INSIGHTS,
   MESSAGES,
-} from "../../../config/overview.config";
+} from "../../config/overview";
 
 // Filter transactions by year and month
 const filterTransactionsByTime = (transactions, year, month) => {

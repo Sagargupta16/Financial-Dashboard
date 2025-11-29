@@ -7,7 +7,7 @@ import {
   calculateDateRange,
   calculatePerDayFrequency,
   calculateSavingsPotential,
-} from "./calculations";
+} from "../calculations";
 
 // Helper functions to reduce complexity
 const analyzeDeliverySpending = (transactions, dateRange) => {

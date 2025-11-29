@@ -9,7 +9,7 @@ import {
   AccountBalanceProgressionChart,
   DayWeekSpendingPatternsChart,
   SmartInsightsPanel,
-} from "../../../features/charts/components";
+} from "../../features/charts/components";
 
 /**
  * Trends & Forecasts Section - Advanced analytics and predictions

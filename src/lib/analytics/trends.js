@@ -4,8 +4,8 @@
  * Automatically detects patterns and generates actionable insights
  */
 
-import { getMonthKey } from "./dataUtils";
-import { detectSeasonality, detectOutliers } from "./forecastUtils";
+import { getMonthKey } from "../data";
+import { detectSeasonality, detectOutliers } from "./forecasts";
 
 /**
  * Analyze spending patterns by day of week

@@ -8,7 +8,7 @@ import {
   EnhancedMonthlyTrendsChart,
   SpendingByDayChart,
   SubcategoryBreakdownChart,
-} from "../../../features/charts/components";
+} from "../../features/charts/components";
 
 /**
  * Income & Expense Section - Core spending and earning analysis

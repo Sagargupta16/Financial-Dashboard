@@ -16,7 +16,7 @@ import {
   INVESTMENT_ACCOUNTS,
   MEAL_VOUCHER_DAILY_LIMIT,
   DAYS_IN_YEAR,
-} from "./constants";
+} from "../../../constants";
 
 import {
   calculateDateRange as canonicalDateRange,
@@ -30,7 +30,7 @@ import {
   calculatePercentage as canonicalPercentage,
   groupByCategory as canonicalGroupByCategory,
   getTopCategories as canonicalGetTopCategories,
-} from "./calculations/index";
+} from "../index";
 
 // ============================================================================
 // BASIC CALCULATIONS
@@ -238,7 +238,7 @@ export const calculateTaxPlanning = (transactions) => {
     };
   }
 
-  const { getAllFinancialYears, getFinancialYear } = require("./dataUtils");
+  const { getAllFinancialYears, getFinancialYear } = require("../../data");
   const availableYears = getAllFinancialYears(transactions);
 
   // Group transactions by financial year

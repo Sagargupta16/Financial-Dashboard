@@ -14,7 +14,7 @@ import {
 /**
  * Trends & Forecasts Section - Advanced analytics and predictions
  */
-export const TrendsForecastsSection = ({ chartRefs, filteredData }) => {
+export const TrendsForecastsPage = ({ chartRefs, filteredData }) => {
   return (
     <div className="grid grid-cols-1 gap-6">
       {/* Smart Insights Panel - NEW! */}
@@ -73,7 +73,7 @@ export const TrendsForecastsSection = ({ chartRefs, filteredData }) => {
   );
 };
 
-TrendsForecastsSection.propTypes = {
+TrendsForecastsPage.propTypes = {
   chartRefs: PropTypes.object.isRequired,
   filteredData: PropTypes.array.isRequired,
 };

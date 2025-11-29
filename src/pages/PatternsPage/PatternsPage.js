@@ -7,7 +7,7 @@ import { AdvancedAnalyticsDashboard } from "../AdvancedAnalyticsPage/AdvancedAna
  * Subscriptions & Patterns Section
  * Recurring payments, subscriptions, and advanced spending analytics
  */
-export const PatternsSection = ({ filteredData }) => {
+export const PatternsPage = ({ filteredData }) => {
   return (
     <div className="space-y-8">
       {/* Section Header */}
@@ -43,6 +43,6 @@ export const PatternsSection = ({ filteredData }) => {
   );
 };
 
-PatternsSection.propTypes = {
+PatternsPage.propTypes = {
   filteredData: PropTypes.array.isRequired,
 };

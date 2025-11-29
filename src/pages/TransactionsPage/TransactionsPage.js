@@ -5,7 +5,7 @@ import EnhancedTransactionTable from "../../features/transactions/components/Tra
 /**
  * Transactions Section - Detailed transaction table with filters
  */
-export const TransactionsSection = ({
+export const TransactionsPage = ({
   filteredData,
   handleSort,
   currentPage,
@@ -23,7 +23,7 @@ export const TransactionsSection = ({
   );
 };
 
-TransactionsSection.propTypes = {
+TransactionsPage.propTypes = {
   filteredData: PropTypes.array.isRequired,
   handleSort: PropTypes.func.isRequired,
   currentPage: PropTypes.number.isRequired,

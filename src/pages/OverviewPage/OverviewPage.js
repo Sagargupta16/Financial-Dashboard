@@ -383,7 +383,7 @@ SmartInsightsSection.propTypes = {
 /**
  * Overview Section - Dashboard home with KPIs and key metrics
  */
-export const OverviewSection = ({
+export const OverviewPage = ({
   kpiData,
   additionalKpiData,
   accountBalances,
@@ -514,7 +514,7 @@ export const OverviewSection = ({
   );
 };
 
-OverviewSection.propTypes = {
+OverviewPage.propTypes = {
   kpiData: PropTypes.shape({
     income: PropTypes.number.isRequired,
     expense: PropTypes.number.isRequired,

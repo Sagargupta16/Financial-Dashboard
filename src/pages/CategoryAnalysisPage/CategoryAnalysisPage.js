@@ -9,7 +9,7 @@ import {
 /**
  * Category Analysis Section - Deep dive into spending categories
  */
-export const CategoryAnalysisSection = ({
+export const CategoryAnalysisPage = ({
   chartRefs,
   filteredData,
   uniqueValues,
@@ -48,7 +48,7 @@ export const CategoryAnalysisSection = ({
   );
 };
 
-CategoryAnalysisSection.propTypes = {
+CategoryAnalysisPage.propTypes = {
   chartRefs: PropTypes.object.isRequired,
   filteredData: PropTypes.array.isRequired,
   uniqueValues: PropTypes.object.isRequired,

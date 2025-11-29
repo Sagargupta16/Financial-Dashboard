@@ -13,7 +13,7 @@ import {
 /**
  * Income & Expense Section - Core spending and earning analysis
  */
-export const IncomeExpenseSection = ({
+export const IncomeExpensePage = ({
   chartData,
   chartRefs,
   filteredData,
@@ -74,7 +74,7 @@ export const IncomeExpenseSection = ({
   );
 };
 
-IncomeExpenseSection.propTypes = {
+IncomeExpensePage.propTypes = {
   chartData: PropTypes.object.isRequired,
   chartRefs: PropTypes.object.isRequired,
   filteredData: PropTypes.array.isRequired,

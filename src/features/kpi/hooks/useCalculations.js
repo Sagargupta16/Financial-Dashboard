@@ -6,6 +6,10 @@ import {
   calculateSavingsRate,
   calculateDailyAverage,
   calculateMonthlyAverage,
+  calculateTotalCashbackEarned,
+  calculateCashbackShared,
+  calculateActualCashback,
+  calculateTotalReimbursements,
 } from "../../../lib/calculations";
 
 export const useKPIData = (filteredData) => {
@@ -18,6 +22,14 @@ export const useKPIData = (filteredData) => {
           averageExpense: 0,
           totalTransactions: 0,
           transferData: { transferIn: 0, transferOut: 0 },
+          cashbackData: {
+            totalCashbackEarned: 0,
+            cashbackShared: 0,
+            actualCashback: 0,
+          },
+          reimbursementData: {
+            totalReimbursements: 0,
+          },
         },
       };
     }
@@ -43,6 +55,24 @@ export const useKPIData = (filteredData) => {
       { transferIn: 0, transferOut: 0 }
     );
 
+    // Calculate cashback metrics
+    const totalCashbackEarned = calculateTotalCashbackEarned(filteredData);
+    const cashbackShared = calculateCashbackShared(filteredData);
+    const actualCashback = calculateActualCashback(filteredData);
+
+    const cashbackData = {
+      totalCashbackEarned,
+      cashbackShared,
+      actualCashback,
+    };
+
+    // Calculate reimbursement metrics
+    const totalReimbursements = calculateTotalReimbursements(filteredData);
+
+    const reimbursementData = {
+      totalReimbursements,
+    };
+
     const additionalKpiData = {
       highestExpense: Math.max(
         0,
@@ -54,6 +84,8 @@ export const useKPIData = (filteredData) => {
           : 0,
       totalTransactions: filteredData.length,
       transferData,
+      cashbackData,
+      reimbursementData,
     };
 
     return { kpiData: { income, expense }, additionalKpiData };

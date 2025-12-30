@@ -33,20 +33,25 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
     selectedFY === "overall" ? overall : byFinancialYear[selectedFY] || overall;
 
   const {
-    totalIncome,
-    salaryIncome,
-    bonusIncome,
-    rsuIncome,
-    otherIncome,
-    taxableIncome,
-    estimatedTax,
-    cess,
-    totalTaxLiability,
-    deductions,
-    recommendations,
-    standardDeduction,
-    taxRegime,
-  } = taxData;
+    totalIncome = 0,
+    grossSalaryTotal = 0,
+    actualTdsPaid = 0,
+    calculatedGrossIncome = 0,
+    salaryIncome = 0,
+    bonusIncome = 0,
+    rsuIncome = 0,
+    rsuGrossIncome = 0,
+    rsuTaxPaid = 0,
+    otherIncome = 0,
+    taxableIncome = 0,
+    estimatedTax = 0,
+    cess = 0,
+    totalTaxLiability = 0,
+    deductions = [],
+    recommendations = [],
+    standardDeduction = 0,
+    taxRegime = "New Regime",
+  } = taxData || {};
 
   // Chart data for income breakdown
   const incomeChartData = {
@@ -94,9 +99,103 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
     },
   };
 
-  const postTaxIncome = totalIncome - totalTaxLiability;
-  const effectiveTaxRate =
-    totalIncome > 0 ? (totalTaxLiability / totalIncome) * 100 : 0;
+  // Calculate projected annual tax based on recent salary trends
+  const projectedTaxData = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) {
+      return null;
+    }
+
+    // Get current date and financial year info
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-11 (0 = January)
+
+    // Calculate which month of FY we're in (0-11, where 0 = April)
+    let fyMonth;
+    if (currentMonth >= 3) {
+      // Apr to Dec: months 0-8
+      fyMonth = currentMonth - 3;
+    } else {
+      // Jan to Mar: months 9-11
+      fyMonth = currentMonth + 9;
+    }
+
+    // Months remaining AFTER current month (since current month salary is already received)
+    // If we're in December (fyMonth = 8), remaining = 3 (Jan, Feb, Mar)
+    const monthsRemaining = Math.max(0, 11 - fyMonth);
+
+    if (monthsRemaining === 0) {
+      return null; // Last month of FY, no projection needed
+    }
+
+    // Get salary transactions from last 3-4 months
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    const recentSalaryTransactions = filteredData.filter((t) => {
+      const txDate = new Date(t.date);
+      return (
+        t.type === "Income" &&
+        t.category === "Employment Income" &&
+        (t.subcategory === "Salary" || t.subcategory === "Base Salary") &&
+        txDate >= threeMonthsAgo &&
+        txDate <= now
+      );
+    });
+
+    if (recentSalaryTransactions.length === 0) {
+      return null;
+    }
+
+    // Calculate average monthly salary from recent months
+    const totalRecentSalary = recentSalaryTransactions.reduce(
+      (sum, t) => sum + Math.abs(Number(t.amount) || 0),
+      0
+    );
+    const avgMonthlySalary =
+      totalRecentSalary / recentSalaryTransactions.length;
+
+    // Project total annual income
+    const projectedAnnualSalary =
+      totalIncome + avgMonthlySalary * monthsRemaining;
+
+    // Calculate projected tax (simplified - using new regime calculation)
+    const projectedTaxableIncome = Math.max(
+      0,
+      projectedAnnualSalary - standardDeduction - 2400 // Professional tax estimate
+    );
+
+    // Calculate tax using FY 2025-26 slabs
+    let projectedTax = 0;
+    if (projectedTaxableIncome > 400000) {
+      if (projectedTaxableIncome <= 800000) {
+        projectedTax = (projectedTaxableIncome - 400000) * 0.05;
+      } else if (projectedTaxableIncome <= 1200000) {
+        projectedTax = 20000 + (projectedTaxableIncome - 800000) * 0.1;
+      } else if (projectedTaxableIncome <= 1600000) {
+        projectedTax = 60000 + (projectedTaxableIncome - 1200000) * 0.15;
+      } else if (projectedTaxableIncome <= 2000000) {
+        projectedTax = 120000 + (projectedTaxableIncome - 1600000) * 0.2;
+      } else if (projectedTaxableIncome <= 2400000) {
+        projectedTax = 200000 + (projectedTaxableIncome - 2000000) * 0.25;
+      } else {
+        projectedTax = 300000 + (projectedTaxableIncome - 2400000) * 0.3;
+      }
+    }
+
+    const projectedCess = projectedTax * 0.04;
+    const projectedTotalTax = projectedTax + projectedCess;
+    const additionalTaxLiability = projectedTotalTax - totalTaxLiability;
+
+    return {
+      avgMonthlySalary,
+      monthsRemaining,
+      projectedAnnualSalary,
+      projectedTaxableIncome,
+      projectedTotalTax,
+      additionalTaxLiability,
+      currentTax: totalTaxLiability,
+    };
+  }, [filteredData, totalIncome, standardDeduction, totalTaxLiability]);
 
   return (
     <div className="space-y-6">
@@ -147,18 +246,38 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Income */}
+        {/* Total Income (Post-TDS) */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-blue-100 text-sm font-medium">
-              Total Income
+              {selectedFY === "FY 2024-25" && calculatedGrossIncome > 0
+                ? "Gross Income"
+                : "Net Income Received"}
             </span>
             <DollarSign className="text-blue-200" size={24} />
           </div>
           <div className="text-3xl font-bold text-white">
-            ₹{totalIncome.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            ₹
+            {(selectedFY === "FY 2024-25" && calculatedGrossIncome > 0
+              ? calculatedGrossIncome
+              : totalIncome
+            ).toLocaleString("en-IN", {
+              maximumFractionDigits: 0,
+            })}
           </div>
-          <div className="text-sm text-blue-100 mt-1">Gross Annual Income</div>
+          <div className="text-sm text-blue-100 mt-1">
+            {selectedFY === "FY 2024-25" && calculatedGrossIncome > 0
+              ? "Before TDS (calculated)"
+              : "Post-TDS (as recorded)"}
+          </div>
+          {selectedFY === "FY 2024-25" && calculatedGrossIncome > 0 && (
+            <div className="text-xs text-blue-200 mt-1">
+              Net: ₹
+              {totalIncome.toLocaleString("en-IN", {
+                maximumFractionDigits: 0,
+              })}
+            </div>
+          )}
         </div>
 
         {/* Taxable Income */}
@@ -182,24 +301,41 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
         <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-red-100 text-sm font-medium">
-              Total Tax Liability
+              {selectedFY === "FY 2024-25" && actualTdsPaid > 0
+                ? "Actual Tax Paid"
+                : "Estimated Tax"}
             </span>
             <TrendingDown className="text-red-200" size={24} />
           </div>
           <div className="text-3xl font-bold text-white">
             ₹
-            {totalTaxLiability.toLocaleString("en-IN", {
+            {(selectedFY === "FY 2024-25" && actualTdsPaid > 0
+              ? actualTdsPaid
+              : totalTaxLiability
+            ).toLocaleString("en-IN", {
               maximumFractionDigits: 0,
             })}
           </div>
           <div className="text-sm text-red-100 mt-1">
-            {effectiveTaxRate.toFixed(2)}% Effective Rate
+            {selectedFY === "FY 2024-25" && actualTdsPaid > 0
+              ? "Calculated using reverse TDS"
+              : "On recorded income"}
           </div>
           <div className="text-xs text-red-200 mt-1">
-            Tax: ₹
-            {estimatedTax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}{" "}
-            + Cess: ₹
-            {cess.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            {selectedFY === "FY 2024-25" && actualTdsPaid > 0 ? (
+              `Salary TDS: ₹${((actualTdsPaid || 0) - (rsuTaxPaid || 0)).toLocaleString("en-IN", { maximumFractionDigits: 0 })} + RSU: ₹${(rsuTaxPaid || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
+            ) : (
+              <>
+                Tax: ₹
+                {(estimatedTax || 0).toLocaleString("en-IN", {
+                  maximumFractionDigits: 0,
+                })}
+                {cess > 0 &&
+                  ` + Cess: ₹${(cess || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`}
+                {rsuTaxPaid > 0 &&
+                  ` + RSU: ₹${(rsuTaxPaid || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`}
+              </>
+            )}
           </div>
         </div>
 
@@ -213,13 +349,194 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
           </div>
           <div className="text-3xl font-bold text-white">
             ₹
-            {postTaxIncome.toLocaleString("en-IN", {
+            {(totalIncome - totalTaxLiability).toLocaleString("en-IN", {
               maximumFractionDigits: 0,
             })}
           </div>
           <div className="text-sm text-green-100 mt-1">Take Home Amount</div>
         </div>
       </div>
+
+      {/* Important Note about Tax Calculation */}
+      <div
+        className={`${
+          selectedFY === "FY 2024-25" && actualTdsPaid > 0
+            ? "bg-green-900/30 border-green-500/50"
+            : "bg-yellow-900/30 border-yellow-500/50"
+        } border rounded-xl p-4 flex items-start gap-3`}
+      >
+        {selectedFY === "FY 2024-25" && actualTdsPaid > 0 ? (
+          <>
+            <CheckCircle2
+              className="text-green-400 flex-shrink-0 mt-0.5"
+              size={20}
+            />
+            <div className="text-sm text-green-100">
+              <strong className="text-green-300">
+                FY 2024-25 Calculation:
+              </strong>{" "}
+              Using reverse TDS formula to calculate actual gross income and TDS
+              paid.
+              <span className="block mt-2 text-green-200">
+                • <strong>Gross Income:</strong> ₹
+                {calculatedGrossIncome.toLocaleString("en-IN")}
+                <br />• <strong>Net Received:</strong> ₹
+                {totalIncome.toLocaleString("en-IN")}
+                <br />• <strong>Actual TDS Paid:</strong> ₹
+                {actualTdsPaid.toLocaleString("en-IN")}
+                <br />
+              </span>
+              <span className="block mt-2 text-green-300 text-xs">
+                Formula: Gross = ₹15L + (Net - ₹13.44L) / 0.688, where 0.688 = 1
+                - (30% × 1.04)
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <AlertCircle
+              className="text-yellow-400 flex-shrink-0 mt-0.5"
+              size={20}
+            />
+            <div className="text-sm text-yellow-100">
+              <strong className="text-yellow-300">Important:</strong> Income
+              shown is POST-TDS (net amount received after tax deduction). Tax
+              calculated here is based on this net income, so it will be LOWER
+              than actual TDS paid.
+              {(selectedFY === "FY 2022-23" || selectedFY === "FY 2023-24") && (
+                <span className="block mt-2 text-yellow-200">
+                  <strong>{selectedFY}:</strong> Your income was below taxable
+                  limit (₹2.5L under old slabs) - ₹0 tax paid.
+                </span>
+              )}
+              <span className="block mt-2 text-yellow-300 font-medium">
+                💡 For accurate TDS tracking: Add a &quot;TDS Paid&quot; expense
+                entry for each salary month with the TDS amount deducted.
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Projected Annual Tax (Based on Recent Salary) */}
+      {projectedTaxData && projectedTaxData.monthsRemaining > 0 && (
+        <div className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-xl p-6 shadow-lg border border-purple-700/50">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <TrendingDown className="text-purple-400" size={24} />
+                Year-End Tax Projection
+              </h3>
+              <p className="text-purple-200 text-sm">
+                Based on last 3 months average for next{" "}
+                {projectedTaxData.monthsRemaining} month(s)
+              </p>
+            </div>
+            <div className="bg-purple-500/20 rounded-lg px-4 py-2">
+              <div className="text-xs text-purple-300">Months Remaining</div>
+              <div className="text-2xl font-bold text-purple-400">
+                {projectedTaxData.monthsRemaining}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="text-xs text-gray-400 mb-1">
+                Avg Monthly Salary
+              </div>
+              <div className="text-lg font-bold text-white">
+                ₹
+                {projectedTaxData.avgMonthlySalary.toLocaleString("en-IN", {
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">(Last 3 months)</div>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="text-xs text-gray-400 mb-1">
+                Projected Annual Income
+              </div>
+              <div className="text-lg font-bold text-blue-400">
+                ₹
+                {projectedTaxData.projectedAnnualSalary.toLocaleString(
+                  "en-IN",
+                  { maximumFractionDigits: 0 }
+                )}
+              </div>
+              <div className="text-xs text-green-400 mt-1">
+                +₹
+                {(
+                  projectedTaxData.projectedAnnualSalary - totalIncome
+                ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}{" "}
+                in next {projectedTaxData.monthsRemaining} month(s)
+              </div>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="text-xs text-gray-400 mb-1">
+                Projected Total Tax
+              </div>
+              <div className="text-lg font-bold text-orange-400">
+                ₹
+                {projectedTaxData.projectedTotalTax.toLocaleString("en-IN", {
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">
+                Current: ₹
+                {projectedTaxData.currentTax.toLocaleString("en-IN", {
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="text-xs text-gray-400 mb-1">
+                Additional Tax Liability
+              </div>
+              <div className="text-lg font-bold text-red-400">
+                ₹
+                {Math.max(
+                  0,
+                  projectedTaxData.additionalTaxLiability
+                ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-xs text-yellow-400 mt-1">
+                {projectedTaxData.monthsRemaining} months remaining
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle
+                className="text-yellow-400 flex-shrink-0 mt-0.5"
+                size={20}
+              />
+              <div className="text-sm text-yellow-200">
+                <strong>Note:</strong> This projection assumes your next{" "}
+                {projectedTaxData.monthsRemaining} month(s) salary will match
+                the last 3 months average. Current month's salary is already
+                included in your income. Actual tax may vary based on bonuses,
+                deductions, and other income sources.
+                {projectedTaxData.additionalTaxLiability > 0 && (
+                  <span className="block mt-2">
+                    💡 <strong>Tip:</strong> Consider setting aside ₹
+                    {Math.ceil(
+                      projectedTaxData.additionalTaxLiability /
+                        projectedTaxData.monthsRemaining
+                    ).toLocaleString("en-IN")}{" "}
+                    per month for the next {projectedTaxData.monthsRemaining}{" "}
+                    month(s) to cover the projected liability.
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -251,7 +568,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-300">RSU Income:</span>
+              <span className="text-gray-300">RSU Income (Received):</span>
               <span className="text-white font-medium">
                 ₹
                 {rsuIncome.toLocaleString("en-IN", {
@@ -259,6 +576,32 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
                 })}
               </span>
             </div>
+            {rsuGrossIncome > 0 && (
+              <>
+                <div className="flex justify-between text-sm border-t border-gray-600 pt-2 mt-2">
+                  <span className="text-gray-400 text-xs">
+                    RSU Gross (Pre-tax):
+                  </span>
+                  <span className="text-gray-400 text-xs font-medium">
+                    ₹
+                    {rsuGrossIncome.toLocaleString("en-IN", {
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-red-400 text-xs">
+                    RSU Tax Paid (31.2%):
+                  </span>
+                  <span className="text-red-400 text-xs font-medium">
+                    -₹
+                    {rsuTaxPaid.toLocaleString("en-IN", {
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-gray-300">Other Income:</span>
               <span className="text-white font-medium">
@@ -379,69 +722,82 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
             </thead>
             <tbody>
               <tr className="border-b border-gray-700/50">
-                <td className="py-3 px-4 text-gray-300">₹0 - ₹3,00,000</td>
+                <td className="py-3 px-4 text-gray-300">₹0 - ₹4,00,000</td>
                 <td className="py-3 px-4 text-center text-gray-300">0%</td>
                 <td className="py-3 px-4 text-right text-gray-300">₹0</td>
               </tr>
               <tr className="border-b border-gray-700/50">
                 <td className="py-3 px-4 text-gray-300">
-                  ₹3,00,001 - ₹6,00,000
+                  ₹4,00,001 - ₹8,00,000
                 </td>
                 <td className="py-3 px-4 text-center text-gray-300">5%</td>
                 <td className="py-3 px-4 text-right text-green-400">
                   ₹
-                  {(taxableIncome > 300000
-                    ? Math.min((taxableIncome - 300000) * 0.05, 15000)
+                  {(taxableIncome > 400000
+                    ? Math.min((taxableIncome - 400000) * 0.05, 20000)
                     : 0
                   ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </td>
               </tr>
               <tr className="border-b border-gray-700/50">
                 <td className="py-3 px-4 text-gray-300">
-                  ₹6,00,001 - ₹9,00,000
+                  ₹8,00,001 - ₹12,00,000
                 </td>
                 <td className="py-3 px-4 text-center text-gray-300">10%</td>
                 <td className="py-3 px-4 text-right text-yellow-400">
                   ₹
-                  {(taxableIncome > 600000
-                    ? Math.min((taxableIncome - 600000) * 0.1, 30000)
+                  {(taxableIncome > 800000
+                    ? Math.min((taxableIncome - 800000) * 0.1, 40000)
                     : 0
                   ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </td>
               </tr>
               <tr className="border-b border-gray-700/50">
                 <td className="py-3 px-4 text-gray-300">
-                  ₹9,00,001 - ₹12,00,000
+                  ₹12,00,001 - ₹16,00,000
                 </td>
                 <td className="py-3 px-4 text-center text-gray-300">15%</td>
                 <td className="py-3 px-4 text-right text-orange-400">
                   ₹
-                  {(taxableIncome > 900000
-                    ? Math.min((taxableIncome - 900000) * 0.15, 45000)
+                  {(taxableIncome > 1200000
+                    ? Math.min((taxableIncome - 1200000) * 0.15, 60000)
                     : 0
                   ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </td>
               </tr>
               <tr className="border-b border-gray-700/50">
                 <td className="py-3 px-4 text-gray-300">
-                  ₹12,00,001 - ₹15,00,000
+                  ₹16,00,001 - ₹20,00,000
                 </td>
                 <td className="py-3 px-4 text-center text-gray-300">20%</td>
                 <td className="py-3 px-4 text-right text-red-400">
                   ₹
-                  {(taxableIncome > 1200000
-                    ? Math.min((taxableIncome - 1200000) * 0.2, 60000)
+                  {(taxableIncome > 1600000
+                    ? Math.min((taxableIncome - 1600000) * 0.2, 80000)
+                    : 0
+                  ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                </td>
+              </tr>
+              <tr className="border-b border-gray-700/50">
+                <td className="py-3 px-4 text-gray-300">
+                  ₹20,00,001 - ₹24,00,000
+                </td>
+                <td className="py-3 px-4 text-center text-gray-300">25%</td>
+                <td className="py-3 px-4 text-right text-red-400">
+                  ₹
+                  {(taxableIncome > 2000000
+                    ? Math.min((taxableIncome - 2000000) * 0.25, 100000)
                     : 0
                   ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </td>
               </tr>
               <tr>
-                <td className="py-3 px-4 text-gray-300">Above ₹15,00,000</td>
+                <td className="py-3 px-4 text-gray-300">Above ₹24,00,000</td>
                 <td className="py-3 px-4 text-center text-gray-300">30%</td>
                 <td className="py-3 px-4 text-right text-red-500">
                   ₹
-                  {(taxableIncome > 1500000
-                    ? (taxableIncome - 1500000) * 0.3
+                  {(taxableIncome > 2400000
+                    ? (taxableIncome - 2400000) * 0.3
                     : 0
                   ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </td>
@@ -532,7 +888,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
           <li className="flex items-start gap-2">
             <span className="text-blue-400 mt-1">•</span>
             <span>
-              Standard deduction of ₹50,000 is automatically applied for
+              Standard deduction of ₹75,000 is automatically applied for
               salaried individuals
             </span>
           </li>

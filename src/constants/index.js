@@ -171,11 +171,25 @@ export const EPSILON = 1e-9;
 // ============================================================================
 
 /**
- * New Tax Regime Slabs (FY 2025-26 - Updated as per Budget 2025)
+ * Old Tax Regime Slabs (FY 2024-25 - April 2024 to March 2025)
  * Each slab: { min, max, rate }
  * Amounts in INR
  */
-export const TAX_SLABS_NEW_REGIME = [
+export const TAX_SLABS_FY_2024_25 = [
+  { min: 0, max: 300000, rate: 0 },
+  { min: 300000, max: 700000, rate: 0.05 },
+  { min: 700000, max: 1000000, rate: 0.1 },
+  { min: 1000000, max: 1200000, rate: 0.15 },
+  { min: 1200000, max: 1500000, rate: 0.2 },
+  { min: 1500000, max: Infinity, rate: 0.3 },
+];
+
+/**
+ * New Tax Regime Slabs (FY 2025-26 - April 2025 onwards - Updated as per Budget 2025)
+ * Each slab: { min, max, rate }
+ * Amounts in INR
+ */
+export const TAX_SLABS_FY_2025_26 = [
   { min: 0, max: 400000, rate: 0 },
   { min: 400000, max: 800000, rate: 0.05 },
   { min: 800000, max: 1200000, rate: 0.1 },
@@ -184,6 +198,12 @@ export const TAX_SLABS_NEW_REGIME = [
   { min: 2000000, max: 2400000, rate: 0.25 },
   { min: 2400000, max: Infinity, rate: 0.3 },
 ];
+
+/**
+ * Default to FY 2025-26 slabs (most current)
+ * Legacy constant for backward compatibility
+ */
+export const TAX_SLABS_NEW_REGIME = TAX_SLABS_FY_2025_26;
 
 /**
  * Health and Education Cess rate (4% of tax)

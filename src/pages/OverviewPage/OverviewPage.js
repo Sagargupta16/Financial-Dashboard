@@ -23,6 +23,7 @@ import { formatCurrency } from "../../lib/data";
 import { useEnhancedKPIData } from "../../features/kpi/hooks/useCalculations";
 import { useAdvancedAnalytics } from "../../features/analytics/hooks/useAdvancedAnalytics";
 import { generateSmartInsights } from "../../lib/analytics/insights";
+import { calculateNetBalanceBreakdownFromAccounts } from "../../lib/calculations/financial";
 import {
   getSavingsRateColor,
   getSavingsRateIconColor,
@@ -428,6 +429,12 @@ export const OverviewPage = ({
     [insightsFilteredData]
   );
 
+  // Calculate net balance breakdown from actual account balances
+  const balanceBreakdown = useMemo(
+    () => calculateNetBalanceBreakdownFromAccounts(accountBalances),
+    [accountBalances]
+  );
+
   // Handle year/month change and reset month when year changes to 'all'
   const handleYearChange = useCallback((year) => {
     setInsightsYear(year);
@@ -445,13 +452,19 @@ export const OverviewPage = ({
   return (
     <div>
       {/* Main KPI Cards */}
-      <MainKPISection income={kpiData.income} expense={kpiData.expense} />
+      <MainKPISection
+        income={kpiData.income}
+        expense={kpiData.expense}
+        balanceBreakdown={balanceBreakdown}
+      />
 
       {/* Secondary KPI Cards */}
       <SecondaryKPISection
         totalTransactions={validatedAdditionalKPI.totalTransactions}
         highestExpense={validatedAdditionalKPI.highestExpense}
         averageExpense={validatedAdditionalKPI.averageExpense}
+        cashbackData={validatedAdditionalKPI.cashbackData}
+        reimbursementData={validatedAdditionalKPI.reimbursementData}
       />
 
       {/* Advanced Analytics KPI Cards */}

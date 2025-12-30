@@ -108,6 +108,14 @@ export const DEFAULT_ADDITIONAL_KPI = {
     transferIn: 0,
     transferOut: 0,
   },
+  cashbackData: {
+    totalCashbackEarned: 0,
+    cashbackShared: 0,
+    actualCashback: 0,
+  },
+  reimbursementData: {
+    totalReimbursements: 0,
+  },
 };
 
 /**

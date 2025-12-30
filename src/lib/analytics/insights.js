@@ -53,26 +53,35 @@ const analyzeDeliverySpending = (transactions, dateRange) => {
 const analyzeWeekendPattern = (transactions) => {
   const weekdaySpending = [];
   const weekendSpending = [];
+  const weekdayDays = new Set();
+  const weekendDays = new Set();
 
   transactions.forEach((t) => {
     if (t.type === "Expense" && t.date) {
+      const amount = Math.abs(Number(t.amount) || 0);
       const day = t.date.getDay();
+      const dateKey = t.date.toISOString().split("T")[0]; // "2025-12-30"
+
       if (day === 0 || day === 6) {
-        weekendSpending.push(t.amount);
+        weekendSpending.push(amount);
+        weekendDays.add(dateKey);
       } else {
-        weekdaySpending.push(t.amount);
+        weekdaySpending.push(amount);
+        weekdayDays.add(dateKey);
       }
     }
   });
 
-  if (weekendSpending.length === 0 || weekdaySpending.length === 0) {
+  if (weekendDays.size === 0 || weekdayDays.size === 0) {
     return null;
   }
 
-  const avgWeekend =
-    weekendSpending.reduce((a, b) => a + b, 0) / weekendSpending.length;
-  const avgWeekday =
-    weekdaySpending.reduce((a, b) => a + b, 0) / weekdaySpending.length;
+  // Calculate per-DAY average (not per-transaction)
+  const totalWeekendSpending = weekendSpending.reduce((a, b) => a + b, 0);
+  const totalWeekdaySpending = weekdaySpending.reduce((a, b) => a + b, 0);
+
+  const avgWeekend = totalWeekendSpending / weekendDays.size;
+  const avgWeekday = totalWeekdaySpending / weekdayDays.size;
 
   if (avgWeekend <= avgWeekday * 1.5) {
     return null;
@@ -83,7 +92,7 @@ const analyzeWeekendPattern = (transactions) => {
     priority: "medium",
     icon: "📊",
     title: "Weekend Spending Pattern",
-    message: `You spend ${((avgWeekend / avgWeekday - 1) * 100).toFixed(0)}% more on weekends (₹${avgWeekend.toFixed(0)} per day) compared to weekdays (₹${avgWeekday.toFixed(0)} per day)`,
+    message: `You spend ${((avgWeekend / avgWeekday - 1) * 100).toFixed(0)}% more on weekends (₹${avgWeekend.toFixed(0)}/day) compared to weekdays (₹${avgWeekday.toFixed(0)}/day)`,
     actionable: false,
   };
 };

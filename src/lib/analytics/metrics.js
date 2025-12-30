@@ -187,21 +187,21 @@ export const getMetricIconColor = (value, thresholds, inverse = false) => {
 };
 
 /**
- * Format monthly trend display
+ * Format monthly trend display - Shows Month-over-Month spending trend
  * @param {Object} monthlyComparison - Monthly comparison data
- * @returns {string} Formatted trend display
+ * @returns {string} Formatted trend message
  */
 export const getMonthlyTrendDisplay = (monthlyComparison) => {
   if (!monthlyComparison?.trend || monthlyComparison.avgGrowth === undefined) {
-    return "N/A";
+    return "No trend data";
   }
   if (monthlyComparison.trend === "increasing") {
-    return `↗️ +${monthlyComparison.avgGrowth.toFixed(1)}%`;
+    return `↗️ +${monthlyComparison.avgGrowth.toFixed(1)}% MoM`;
   }
   if (monthlyComparison.trend === "decreasing") {
-    return `↘️ ${monthlyComparison.avgGrowth.toFixed(1)}%`;
+    return `↘️ ${monthlyComparison.avgGrowth.toFixed(1)}% MoM`;
   }
-  return "→ Stable";
+  return `➡️ Stable (${monthlyComparison.avgGrowth.toFixed(1)}% MoM)`;
 };
 
 /**

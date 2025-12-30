@@ -25,6 +25,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
     totalCapitalDeployed,
     totalWithdrawals,
     currentHoldings,
+    rsuHoldings = 0,
     realizedProfits,
     realizedLosses,
     netProfitLoss,
@@ -305,9 +306,11 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
             })}
           </div>
           <div className="text-xs font-semibold text-gray-400">
-            {totalWithdrawals > 0
-              ? "Net amount in market"
-              : "All capital still invested"}
+            {rsuHoldings > 0
+              ? `Includes ₹${rsuHoldings.toLocaleString("en-IN", { maximumFractionDigits: 0 })} RSU`
+              : totalWithdrawals > 0
+                ? "Net amount in market"
+                : "All capital still invested"}
           </div>
         </div>
 

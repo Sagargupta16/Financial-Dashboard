@@ -232,7 +232,9 @@ src/
 
 1. **Credit Card Analytics**
    - Card-wise spending breakdown
-   - Total cashback earned
+   - **Total Cashback Earned**: Sum of all cashback income
+   - **Cashback Shared**: Expenses and transfers from "Cashback Shared" account
+   - **Actual Cashback**: Total Earned - Shared (what you actually kept)
    - Cashback rate calculation
    - Category-wise card usage
    - Card optimization tips
@@ -249,6 +251,12 @@ src/
    - Intercity travel expenses
    - Per-trip averages
    - Alternative suggestions (bike, monthly pass)
+
+4. **Reimbursements**
+   - **Total Reimbursements**: Sum of all expense reimbursement income
+   - Average reimbursement amount
+   - Monthly reimbursement trends
+   - Recent reimbursement activity
 
 ### Financial Health Metrics
 
@@ -477,6 +485,385 @@ export const formatCurrency = (value) => {
 ### Custom Themes
 
 Modify the color scheme in `tailwind.config.js` or update the CSS classes in components.
+
+## 📐 Formulas & Calculations Reference
+
+This dashboard uses a comprehensive set of financial calculations. All formulas are centralized in `src/lib/calculations/` for consistency and maintainability.
+
+### Core Financial Metrics
+
+#### 1. **Total Income**
+
+```
+Total Income = Sum of all transactions where type = "Income"
+```
+
+_Location:_ `src/lib/calculations/aggregations/totals.js`
+
+#### 2. **Total Expense**
+
+```
+Total Expense = Sum of all transactions where type = "Expense"
+```
+
+_Location:_ `src/lib/calculations/aggregations/totals.js`
+
+#### 3. **Net Balance (Savings)**
+
+```
+Net Balance = Total Income - Total Expense
+```
+
+_Location:_ `src/lib/calculations/financial/savings.js`
+
+#### 4. **Savings Rate**
+
+```
+Savings Rate = ((Total Income - Total Expense) / Total Income) × 100
+```
+
+_Interpretation:_
+
+- ≥20%: Excellent 🎉 (Green)
+- ≥10%: Good 👍 (Yellow)
+- <10%: Needs Improvement ⚠️ (Red)
+
+_Location:_ `src/lib/calculations/financial/savings.js`
+
+### Spending Analysis
+
+#### 5. **Daily Average Spending**
+
+```
+Daily Average = Total Expense / Number of Days in Period
+```
+
+_Location:_ `src/lib/calculations/aggregations/averages.js`
+
+#### 6. **Monthly Average Spending**
+
+```
+Monthly Average = (Total Expense / Number of Days) × 30.44
+```
+
+_Note:_ 30.44 is the average number of days per month (365.25 / 12)
+
+_Location:_ `src/lib/calculations/aggregations/averages.js`
+
+#### 7. **Average Transaction Value**
+
+```
+Average Transaction = Total Transaction Amount / Number of Transactions
+```
+
+_Location:_ `src/lib/calculations/aggregations/averages.js`
+
+#### 8. **Spending Velocity (30-day)**
+
+```
+Spending Velocity = (Last 30 Days Daily Average / All-Time Daily Average) × 100
+```
+
+_Interpretation:_
+
+- <80%: Spending less than usual (Green)
+- 80-120%: Normal spending range (Yellow)
+- > 120%: Spending more than usual (Red)
+
+_Location:_ `src/features/kpi/hooks/useCalculations.js`
+
+### Cashback Calculations
+
+#### 9. **Total Cashback Earned**
+
+```
+Total Cashback Earned = Sum of all transactions where:
+  - Category = "Refund & Cashbacks"
+  - Type = "Income"
+```
+
+_Location:_ `src/lib/calculations/financial/cashback.js`
+
+#### 10. **Cashback Shared**
+
+```
+Cashback Shared = Sum of all transactions where:
+  - Account = "Cashback Shared"
+  - Type = "Expense" OR "Transfer-Out"
+```
+
+_Location:_ `src/lib/calculations/financial/cashback.js`
+
+#### 11. **Actual Cashback**
+
+```
+Actual Cashback = Total Cashback Earned - Cashback Shared
+```
+
+_This represents the cashback you actually kept for yourself after sharing with others_
+
+_Location:_ `src/lib/calculations/financial/cashback.js`
+
+#### 12. **Cashback Rate**
+
+```
+Cashback Rate = (Total Cashback Earned / Total Credit Card Spending) × 100
+```
+
+_Location:_ `src/lib/calculations/financial/cashback.js`
+
+#### 13. **Per-Card Cashback**
+
+```
+For each credit card:
+  Card Cashback = Sum of cashback transactions for that card
+  Card Cashback Rate = (Card Cashback / Card Spending) × 100
+```
+
+_Location:_ `src/lib/calculations/financial/cashback.js`
+
+### Reimbursement Calculations
+
+#### 14. **Total Reimbursements**
+
+```
+Total Reimbursements = Sum of all transactions where:
+  - Subcategory = "Expense Reimbursement"
+  - Type = "Income"
+```
+
+_Location:_ `src/lib/calculations/financial/reimbursement.js`
+
+#### 15. **Average Reimbursement**
+
+```
+Average Reimbursement = Total Reimbursements / Number of Reimbursement Transactions
+```
+
+_Location:_ `src/lib/calculations/financial/reimbursement.js`
+
+### Investment Metrics
+
+#### 16. **Total Capital Deployed**
+
+```
+Total Capital Deployed = Sum of all Transfer-Out to investment accounts
+```
+
+#### 17. **Investment Returns**
+
+```
+Net Return = (Current Holdings + Withdrawals - Capital Deployed + Realized Profits - Realized Losses - Brokerage Fees)
+Return Percentage = (Net Return / Capital Deployed) × 100
+```
+
+_Location:_ `src/lib/calculations/financial/index.js`
+
+### Tax Calculations
+
+#### 18. **Taxable Income**
+
+```
+Taxable Income = Total Income - Standard Deduction - Section 80C Deductions - HRA Exemption
+```
+
+#### 19. **Income Tax (New Regime)**
+
+```
+Tax = Sum of (Slab Amount × Slab Rate) for all applicable slabs
+Total Tax = Income Tax + 4% Cess on Income Tax
+```
+
+_Tax Slabs (New Regime FY 2025-26):_
+
+- ₹0 - ₹4L: 0%
+- ₹4L - ₹8L: 5%
+- ₹8L - ₹12L: 10%
+- ₹12L - ₹16L: 15%
+- ₹16L - ₹20L: 20%
+- ₹20L - ₹24L: 25%
+- Above ₹24L: 30%
+
+_Location:_ `src/lib/calculations/financial/index.js`
+
+#### 20. **HRA Exemption**
+
+```
+HRA Exemption = Minimum of:
+  1. Actual HRA Received
+  2. 50% of Basic Salary (Metro) or 40% (Non-Metro)
+  3. Rent Paid - 10% of Basic Salary
+```
+
+_Location:_ `src/lib/calculations/financial/index.js`
+
+### Food & Lifestyle Metrics
+
+#### 21. **Food Spending Breakdown**
+
+```
+Total Food = Sum of all "Food & Dining" expenses
+Delivery Apps = Swiggy + Zomato + Other delivery services
+Groceries = Supermarket + Grocery store purchases
+Dining Out = Restaurant + Café expenses
+Office Cafeteria = Office food expenses
+
+Daily Average = Total Food / Number of Days
+Monthly Average = (Total Food / Number of Days) × 30.44
+```
+
+_Location:_ `src/lib/calculations/financial/index.js`
+
+#### 22. **Transportation Metrics**
+
+```
+Total Transportation = Sum of all "Transportation" expenses
+Daily Commute = Local transport (metro, bus, auto, bike)
+Intercity Travel = Long-distance travel expenses
+
+Daily Average = Total Transportation / Number of Days
+Per Trip Average = Total Transportation / Number of Transport Transactions
+```
+
+_Location:_ `src/lib/calculations/financial/index.js`
+
+### Advanced Metrics
+
+#### 23. **Net Worth Change**
+
+```
+Net Worth = Total Income - Total Expense
+Net Worth Per Month = (Net Worth / Number of Days) × 30.44
+```
+
+#### 24. **Category Concentration**
+
+```
+For each expense category:
+  Category Total = Sum of expenses in that category
+  Category Percentage = (Category Total / Total Expense) × 100
+
+Top Category Concentration = Highest category percentage
+```
+
+_Warning threshold: >50% indicates over-concentration_
+
+_Location:_ `src/features/kpi/hooks/useCalculations.js`
+
+#### 25. **Account Balance Tracking**
+
+```
+For each account:
+  Balance = Sum of:
+    + Income to account
+    + Transfers In
+    - Expenses from account
+    - Transfers Out
+```
+
+_Location:_ `src/features/kpi/hooks/useCalculations.js`
+
+### Time Period Calculations
+
+#### 26. **Date Range Analysis**
+
+```
+Total Days = (End Date - Start Date) in days
+Total Months = Total Days / 30.44
+Total Years = Total Days / 365.25
+```
+
+_Location:_ `src/lib/calculations/time/dateRange.js`
+
+### Data Aggregation
+
+#### 27. **Category Grouping**
+
+```
+For each category:
+  Total = Sum of all transaction amounts in category
+  Count = Number of transactions in category
+  Average = Total / Count
+```
+
+_Location:_ `src/lib/calculations/aggregations/category.js`
+
+#### 28. **Monthly Trends**
+
+```
+For each month:
+  Income = Sum of income transactions in month
+  Expense = Sum of expense transactions in month
+  Net = Income - Expense
+  Growth Rate = ((Current Month - Previous Month) / Previous Month) × 100
+```
+
+### Running Balance
+
+#### 29. **Cumulative Balance**
+
+```
+For each transaction (chronologically):
+  Running Balance = Previous Balance + Transaction Amount
+  (where Income/Transfer-In adds, Expense/Transfer-Out subtracts)
+```
+
+## 📊 Calculation Module Structure
+
+All calculations are organized in a clean, modular structure:
+
+```
+src/lib/calculations/
+├── index.js                    # Main exports
+├── aggregations/
+│   ├── averages.js            # Daily, monthly, per-transaction averages
+│   ├── category.js            # Category grouping and top categories
+│   └── totals.js              # Total income and expense
+├── financial/
+│   ├── cashback.js            # All cashback calculations
+│   ├── reimbursement.js       # Reimbursement calculations
+│   ├── savings.js             # Savings and savings rate
+│   └── index.js               # Investment, tax, food, transport
+├── time/
+│   └── dateRange.js           # Date range and period calculations
+└── legacy.js                  # Legacy calculations (for compatibility)
+```
+
+### Using Calculations in Your Code
+
+```javascript
+// Import what you need
+import {
+  calculateTotalIncome,
+  calculateTotalExpense,
+  calculateSavingsRate,
+  calculateTotalCashbackEarned,
+  calculateCashbackShared,
+  calculateActualCashback,
+  calculateTotalReimbursements,
+} from "src/lib/calculations";
+
+// Use in components
+const totalIncome = calculateTotalIncome(transactions);
+const totalExpense = calculateTotalExpense(transactions);
+const savingsRate = calculateSavingsRate(totalIncome, totalExpense);
+
+// Cashback metrics
+const cashbackEarned = calculateTotalCashbackEarned(transactions);
+const cashbackShared = calculateCashbackShared(transactions);
+const actualCashback = calculateActualCashback(transactions);
+
+// Reimbursements
+const reimbursements = calculateTotalReimbursements(transactions);
+```
+
+**Benefits:**
+
+- ✅ Single source of truth - no duplicate logic
+- ✅ Easy to test and maintain
+- ✅ Consistent calculations across all pages
+- ✅ Well-documented with JSDoc comments
+- ✅ Type-safe with PropTypes validation
 
 ## 📊 Dashboard Overview
 

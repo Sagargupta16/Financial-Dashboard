@@ -35,6 +35,24 @@ export {
 // Category Analysis
 export { groupByCategory, getTopCategories } from "./aggregations/category";
 
+// Cashback Calculations
+export {
+  calculateTotalCashbackEarned,
+  calculateCashbackShared,
+  calculateActualCashback,
+  calculateCashbackByCard,
+  calculateCashbackMetrics,
+} from "./financial/cashback";
+
+// Reimbursement Calculations
+export {
+  calculateTotalReimbursements,
+  getReimbursementTransactions,
+  calculateAverageReimbursement,
+  calculateReimbursementByPeriod,
+  calculateReimbursementMetrics,
+} from "./financial/reimbursement";
+
 // Re-export all legacy functions for backwards compatibility
 export {
   calculatePerDayFrequency,

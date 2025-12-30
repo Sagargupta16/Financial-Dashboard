@@ -203,6 +203,10 @@ export const validateDataCompleteness = (transactions) => {
  * 1. Calculate Month-over-Month Comparison
  * Track spending trends across months
  */
+/**
+ * Calculate monthly comparison - Month-over-Month trend analysis
+ * Shows how spending changes from one month to the next
+ */
 export const calculateMonthlyComparison = (transactions) => {
   if (!transactions || transactions.length === 0) {
     return { byMonth: {}, growthRates: [], avgGrowth: 0, trend: "stable" };
@@ -223,26 +227,29 @@ export const calculateMonthlyComparison = (transactions) => {
 
   const months = Object.keys(byMonth).sort((a, b) => a.localeCompare(b));
 
-  // Calculate Year-over-Year growth rates (compare same month across years)
-  const growthRates = months
-    .map((month) => {
-      const [year, monthNum] = month.split("-");
-      const previousYear = String(Number.parseInt(year, 10) - 1);
-      const sameMonthLastYear = `${previousYear}-${monthNum}`;
+  // Calculate Month-over-Month growth rates (compare each month to previous month)
+  const growthRates = [];
+  for (let i = 1; i < months.length; i++) {
+    const currentMonth = months[i];
+    const previousMonth = months[i - 1];
 
-      if (byMonth[sameMonthLastYear]) {
-        return calculateGrowthRate(
-          byMonth[month].total,
-          byMonth[sameMonthLastYear].total
-        );
-      }
-      return null;
-    })
-    .filter((rate) => rate !== null);
+    if (byMonth[previousMonth] && byMonth[currentMonth]) {
+      const growth = calculateGrowthRate(
+        byMonth[currentMonth].total,
+        byMonth[previousMonth].total
+      );
+      growthRates.push(growth);
+    }
+  }
+
+  // Calculate average of last 3-6 months for more relevant trend
+  const recentMonthsCount = Math.min(6, growthRates.length);
+  const recentGrowthRates =
+    recentMonthsCount > 0 ? growthRates.slice(-recentMonthsCount) : growthRates;
 
   const avgGrowth =
-    growthRates.length > 0
-      ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length
+    recentGrowthRates.length > 0
+      ? recentGrowthRates.reduce((a, b) => a + b, 0) / recentGrowthRates.length
       : 0;
 
   let trend = "stable";
@@ -258,6 +265,7 @@ export const calculateMonthlyComparison = (transactions) => {
     growthRates,
     avgGrowth,
     trend,
+    comparison: "month-over-month", // Indicate this is MoM not YoY
   };
 };
 

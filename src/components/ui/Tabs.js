@@ -30,11 +30,12 @@ export const Tabs = ({ tabs, activeTab, onChange }) => {
                 {activeTab === tab.id && (
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
                 )}
-                {typeof tab.icon === "string" ? (
-                  <span className="text-xl relative z-10">{tab.icon}</span>
-                ) : (
-                  <tab.icon className="w-5 h-5 flex-shrink-0 relative z-10 group-hover:scale-110 transition-transform duration-300" />
-                )}
+                {tab.icon &&
+                  (typeof tab.icon === "string" ? (
+                    <span className="text-xl relative z-10">{tab.icon}</span>
+                  ) : (
+                    <tab.icon className="w-5 h-5 flex-shrink-0 relative z-10 group-hover:scale-110 transition-transform duration-300" />
+                  ))}
                 <span className="font-bold text-sm truncate relative z-10">
                   {tab.label}
                 </span>
@@ -91,7 +92,7 @@ Tabs.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      icon: PropTypes.string.isRequired,
+      icon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
       badge: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       description: PropTypes.string,
     })

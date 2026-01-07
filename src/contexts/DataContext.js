@@ -4,10 +4,14 @@ import {
   useState,
   useCallback,
   useMemo,
+  useEffect,
 } from "react";
 import PropTypes from "prop-types";
+import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
 
 const DataContext = createContext();
+
+const STORAGE_KEY_PREFERENCES = "financial_dashboard_budget_preferences";
 
 export const DataProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
@@ -17,6 +21,44 @@ export const DataProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Budget preferences state
+  const [budgetPreferences, setBudgetPreferences] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            allocation: BUDGET_ALLOCATION_DEFAULTS,
+            customCategories: {
+              needs: [],
+              wants: [],
+              savings: [],
+            },
+          };
+    } catch {
+      return {
+        allocation: BUDGET_ALLOCATION_DEFAULTS,
+        customCategories: {
+          needs: [],
+          wants: [],
+          savings: [],
+        },
+      };
+    }
+  });
+
+  // Save preferences to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY_PREFERENCES,
+        JSON.stringify(budgetPreferences)
+      );
+    } catch (error) {
+      console.error("Failed to save budget preferences:", error);
+    }
+  }, [budgetPreferences]);
 
   const updateTransactions = useCallback((newTransactions) => {
     setTransactions(newTransactions);
@@ -28,6 +70,23 @@ export const DataProvider = ({ children }) => {
 
   const clearError = useCallback(() => {
     setError(null);
+  }, []);
+
+  const updateBudgetAllocation = useCallback((allocation) => {
+    setBudgetPreferences((prev) => ({
+      ...prev,
+      allocation,
+    }));
+  }, []);
+
+  const updateCustomCategories = useCallback((type, categories) => {
+    setBudgetPreferences((prev) => ({
+      ...prev,
+      customCategories: {
+        ...prev.customCategories,
+        [type]: categories,
+      },
+    }));
   }, []);
 
   // Memoize context value to prevent unnecessary re-renders
@@ -42,6 +101,9 @@ export const DataProvider = ({ children }) => {
       error,
       setError,
       clearError,
+      budgetPreferences,
+      updateBudgetAllocation,
+      updateCustomCategories,
     }),
     [
       transactions,
@@ -51,6 +113,9 @@ export const DataProvider = ({ children }) => {
       loading,
       error,
       clearError,
+      budgetPreferences,
+      updateBudgetAllocation,
+      updateCustomCategories,
     ]
   );
 

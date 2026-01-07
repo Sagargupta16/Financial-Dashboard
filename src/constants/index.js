@@ -414,3 +414,116 @@ export const PERCENTAGE_DECIMAL_PLACES = 1;
  * Rounding base for recurring amount grouping (₹100)
  */
 export const RECURRING_AMOUNT_ROUNDING_BASE = 100;
+
+// ============================================================================
+// NEEDS, WANTS & SAVINGS CLASSIFICATION
+// ============================================================================
+
+/**
+ * Category classifications for the 50/30/20 budgeting rule
+ * Categories that are considered essential needs (50% of income)
+ */
+export const NEEDS_CATEGORIES = new Set([
+  "Groceries",
+  "Food & Dining",
+  "Health & Fitness",
+  "Healthcare",
+  "Medical",
+  "Utilities",
+  "Electricity",
+  "Water",
+  "Gas",
+  "Rent",
+  "Housing",
+  "Insurance",
+  "Bills & Utilities",
+  "Transportation",
+  "Fuel",
+  "Petrol",
+  "Auto & Transport",
+  "Public Transport",
+  "Essential Shopping",
+  "Education",
+  "Child Care",
+  "Pet Care",
+  "Loan Repayment",
+  "Debt Payment",
+  "Credit Card Payment",
+]);
+
+/**
+ * Categories that are considered wants/discretionary spending (30% of income)
+ */
+export const WANTS_CATEGORIES = new Set([
+  "Entertainment",
+  "Movies",
+  "Dining Out",
+  "Restaurants",
+  "Travel",
+  "Vacation",
+  "Shopping",
+  "Clothing",
+  "Fashion",
+  "Electronics",
+  "Gadgets",
+  "Hobbies",
+  "Sports",
+  "Gym",
+  "Subscriptions",
+  "Streaming",
+  "Gaming",
+  "Beauty & Spa",
+  "Personal Care",
+  "Gifts",
+  "Donations",
+  "Alcohol & Bars",
+  "Luxury",
+  "Home Decor",
+  "Books",
+  "Music",
+]);
+
+/**
+ * Categories that are considered savings/investments (20% of income)
+ */
+export const SAVINGS_CATEGORIES = new Set([
+  "Investment",
+  "Investment Charges & Loss",
+  "Investment Income",
+  "Invest",
+  "Grow Stocks",
+  "Savings",
+  "Fixed Deposit",
+  "Recurring Deposit",
+  "Mutual Funds",
+  "Stocks",
+  "Emergency Fund",
+  "Retirement",
+  "PPF",
+  "EPF",
+  "NPS",
+  "Gold",
+  "Crypto",
+  "SIP",
+]);
+
+/**
+ * Default budget allocation percentages (50/30/20 rule)
+ */
+export const BUDGET_ALLOCATION_DEFAULTS = {
+  needs: 50,
+  wants: 30,
+  savings: 20,
+};
+
+/**
+ * Colors for Needs/Wants/Savings visualizations
+ */
+export const NWS_COLORS = {
+  needs: "#3b82f6", // Blue
+  wants: "#f59e0b", // Amber
+  savings: "#10b981", // Green
+  needsGradient: "from-blue-500 to-blue-600",
+  wantsGradient: "from-amber-500 to-amber-600",
+  savingsGradient: "from-green-500 to-green-600",
+};

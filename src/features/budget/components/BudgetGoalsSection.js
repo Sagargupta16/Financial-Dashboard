@@ -1,13 +1,18 @@
 /* eslint-disable max-lines-per-function */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { BudgetPlanner } from "./BudgetPlanner";
+import { NeedsWantsSavings } from "./NeedsWantsSavings";
+import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
 import { FinancialHealthScore } from "../../../components/data-display/FinancialHealthScore";
 import { SpendingCalendar } from "../../../components/data-display/SpendingCalendar";
+import { Tabs } from "../../../components/ui/Tabs";
 
 /**
  * Budget & Planning Section - Redesigned for Perfect Calculations
  * - BudgetPlanner: Simplified budget tracking with 3-month trends
+ * - NeedsWantsSavings: 50/30/20 budget breakdown
+ * - MonthlyYearlyNWS: Period-based analysis
  * - FinancialHealthScore: Comprehensive health metrics
  * - SpendingCalendar: Visual spending patterns
  */
@@ -16,6 +21,7 @@ export const BudgetGoalsSection = ({
   kpiData,
   accountBalances,
 }) => {
+  const [activeTab, setActiveTab] = useState("overview");
   // Extract investments and deposits from accountBalances (uploaded Excel data)
   const { investments, deposits, bankAccounts } = useMemo(() => {
     const investmentAccounts = {};
@@ -71,6 +77,15 @@ export const BudgetGoalsSection = ({
     };
   }, [accountBalances]);
 
+  // Tab configuration
+  const tabs = [
+    { id: "overview", label: "Overview", icon: "📊" },
+    { id: "budgets", label: "Category Budgets", icon: "💰" },
+    { id: "nws", label: "Needs/Wants/Savings", icon: "🎯" },
+    { id: "timeline", label: "Monthly & Yearly", icon: "📈" },
+    { id: "calendar", label: "Spending Calendar", icon: "📅" },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Section Header */}
@@ -79,31 +94,61 @@ export const BudgetGoalsSection = ({
           🎯 Budget & Planning
         </h1>
         <p className="text-gray-400">
-          Track your financial health and plan your spending
+          Track your financial health and plan your spending with
+          Needs/Wants/Savings breakdown
         </p>
       </div>
 
-      {/* Financial Health Score */}
-      <div>
-        <FinancialHealthScore
-          filteredData={filteredData}
-          kpiData={kpiData}
-          accountBalances={bankAccounts}
-          allAccountBalances={accountBalances}
-          investments={investments}
-          deposits={deposits}
-        />
+      {/* Tabs */}
+      <div className="flex justify-center">
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
       </div>
 
-      {/* Budget Planner - Replaces SpendingSimulator */}
-      <div className="bg-gray-800/50 rounded-2xl p-6">
-        <BudgetPlanner filteredData={filteredData} />
-      </div>
+      {/* Tab Content */}
+      {activeTab === "overview" && (
+        <div className="space-y-8">
+          {/* Financial Health Score */}
+          <div>
+            <FinancialHealthScore
+              filteredData={filteredData}
+              kpiData={kpiData}
+              accountBalances={bankAccounts}
+              allAccountBalances={accountBalances}
+              investments={investments}
+              deposits={deposits}
+            />
+          </div>
 
-      {/* Spending Calendar Heatmap */}
-      <div className="bg-gray-800/50 rounded-2xl p-6">
-        <SpendingCalendar filteredData={filteredData} />
-      </div>
+          {/* Needs/Wants/Savings Summary */}
+          <div className="bg-gray-800/50 rounded-2xl p-6">
+            <NeedsWantsSavings transactions={filteredData} />
+          </div>
+        </div>
+      )}
+
+      {activeTab === "budgets" && (
+        <div className="bg-gray-800/50 rounded-2xl p-6">
+          <BudgetPlanner filteredData={filteredData} />
+        </div>
+      )}
+
+      {activeTab === "nws" && (
+        <div className="bg-gray-800/50 rounded-2xl p-6">
+          <NeedsWantsSavings transactions={filteredData} />
+        </div>
+      )}
+
+      {activeTab === "timeline" && (
+        <div className="bg-gray-800/50 rounded-2xl p-6">
+          <MonthlyYearlyNWS transactions={filteredData} />
+        </div>
+      )}
+
+      {activeTab === "calendar" && (
+        <div className="bg-gray-800/50 rounded-2xl p-6">
+          <SpendingCalendar filteredData={filteredData} />
+        </div>
+      )}
     </div>
   );
 };

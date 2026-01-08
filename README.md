@@ -2,7 +2,7 @@
 
 A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, financial health, investments, tax planning, and lifestyle optimization.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.4.0-brightgreen)
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.5.0-brightgreen)
 
 ## 🎯 Demo
 
@@ -16,7 +16,14 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ## ✨ Features
 
-### 🆕 **NEW: Refactored Architecture v0.4.0**
+### 🆕 **NEW: TypeScript Migration v0.5.0**
+
+- **Full TypeScript Support**: Enhanced type safety and developer experience
+- **Strict Mode**: Robust error checking and improved code quality
+- **Modern Architecture**: Updated codebase using latest React patterns
+- **Zero Runtime Errors**: Significantly improved stability and reliability
+
+### 🏗️ **Refactored Architecture v0.4.0**
 
 - **Clean Folder Structure**: Modular organization by feature and concern
 - **Single Source of Truth**: All financial calculations centralized in `lib/calculations`

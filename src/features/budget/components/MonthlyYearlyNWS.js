@@ -179,7 +179,7 @@ const formatMonthKey = (monthKey) => {
     return "";
   }
   const [year, month] = monthKey.split("-");
-  const monthIndex = parseInt(month, 10) - 1;
+  const monthIndex = Number.parseInt(month, 10) - 1;
   return `${SHORT_MONTH_NAMES[monthIndex]} ${year}`;
 };
 

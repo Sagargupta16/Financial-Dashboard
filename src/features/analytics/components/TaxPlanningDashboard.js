@@ -13,6 +13,125 @@ import { Doughnut } from "react-chartjs-2";
 import { calculateTaxPlanning } from "../../../lib/calculations/financial";
 
 /**
+ * Helper function to create chart options
+ */
+const createChartOptions = () => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: "bottom",
+      labels: { color: "#fff", padding: 15 },
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          const label = context.label || "";
+          const value = context.parsed;
+          return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+        },
+      },
+    },
+  },
+});
+
+/**
+ * Helper function to calculate projected tax for the year
+ */
+const calculateProjectedTax = (
+  filteredData,
+  totalIncome,
+  standardDeduction,
+  totalTaxLiability
+) => {
+  if (!filteredData || filteredData.length === 0) {
+    return null;
+  }
+
+  // Get current date and financial year info
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-11 (0 = January)
+
+  // Calculate which month of FY we're in (0-11, where 0 = April)
+  const fyMonth = currentMonth >= 3 ? currentMonth - 3 : currentMonth + 9;
+
+  // Months remaining AFTER current month
+  const monthsRemaining = Math.max(0, 11 - fyMonth);
+
+  if (monthsRemaining === 0) {
+    return null; // Last month of FY, no projection needed
+  }
+
+  // Get salary transactions from last 3-4 months
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+  const recentSalaryTransactions = filteredData.filter((t) => {
+    const txDate = new Date(t.date);
+    return (
+      t.type === "Income" &&
+      t.category === "Employment Income" &&
+      (t.subcategory === "Salary" || t.subcategory === "Base Salary") &&
+      txDate >= threeMonthsAgo &&
+      txDate <= now
+    );
+  });
+
+  if (recentSalaryTransactions.length === 0) {
+    return null;
+  }
+
+  // Calculate average monthly salary from recent months
+  const totalRecentSalary = recentSalaryTransactions.reduce(
+    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
+    0
+  );
+  const avgMonthlySalary = totalRecentSalary / recentSalaryTransactions.length;
+
+  // Project total annual income
+  const projectedAnnualSalary =
+    totalIncome + avgMonthlySalary * monthsRemaining;
+
+  // Calculate projected tax (simplified - using new regime calculation)
+  const projectedTaxableIncome = Math.max(
+    0,
+    projectedAnnualSalary - standardDeduction - 2400 // Professional tax estimate
+  );
+
+  // Calculate tax using FY 2025-26 slabs
+  let projectedTax = 0;
+  if (projectedTaxableIncome > 400000) {
+    if (projectedTaxableIncome <= 800000) {
+      projectedTax = (projectedTaxableIncome - 400000) * 0.05;
+    } else if (projectedTaxableIncome <= 1200000) {
+      projectedTax = 20000 + (projectedTaxableIncome - 800000) * 0.1;
+    } else if (projectedTaxableIncome <= 1600000) {
+      projectedTax = 60000 + (projectedTaxableIncome - 1200000) * 0.15;
+    } else if (projectedTaxableIncome <= 2000000) {
+      projectedTax = 120000 + (projectedTaxableIncome - 1600000) * 0.2;
+    } else if (projectedTaxableIncome <= 2400000) {
+      projectedTax = 200000 + (projectedTaxableIncome - 2000000) * 0.25;
+    } else {
+      projectedTax = 300000 + (projectedTaxableIncome - 2400000) * 0.3;
+    }
+  }
+
+  const projectedCess = projectedTax * 0.04;
+  const projectedTotalTax = projectedTax + projectedCess;
+  const additionalTaxLiability = projectedTotalTax - totalTaxLiability;
+
+  return {
+    avgMonthlySalary,
+    monthsRemaining,
+    projectedAnnualSalary,
+    projectedTaxableIncome,
+    projectedTotalTax,
+    additionalTaxLiability,
+    currentTax: totalTaxLiability,
+  };
+};
+
+/**
  * Tax Planning Dashboard
  * Income tax calculations, deductions, and planning
  */
@@ -79,123 +198,19 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
     ],
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: { color: "#fff", padding: 15 },
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const label = context.label || "";
-            const value = context.parsed;
-            return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-          },
-        },
-      },
-    },
-  };
+  const chartOptions = createChartOptions();
 
   // Calculate projected annual tax based on recent salary trends
-  const projectedTaxData = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) {
-      return null;
-    }
-
-    // Get current date and financial year info
-    const now = new Date();
-    const currentMonth = now.getMonth(); // 0-11 (0 = January)
-
-    // Calculate which month of FY we're in (0-11, where 0 = April)
-    let fyMonth;
-    if (currentMonth >= 3) {
-      // Apr to Dec: months 0-8
-      fyMonth = currentMonth - 3;
-    } else {
-      // Jan to Mar: months 9-11
-      fyMonth = currentMonth + 9;
-    }
-
-    // Months remaining AFTER current month (since current month salary is already received)
-    // If we're in December (fyMonth = 8), remaining = 3 (Jan, Feb, Mar)
-    const monthsRemaining = Math.max(0, 11 - fyMonth);
-
-    if (monthsRemaining === 0) {
-      return null; // Last month of FY, no projection needed
-    }
-
-    // Get salary transactions from last 3-4 months
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-    const recentSalaryTransactions = filteredData.filter((t) => {
-      const txDate = new Date(t.date);
-      return (
-        t.type === "Income" &&
-        t.category === "Employment Income" &&
-        (t.subcategory === "Salary" || t.subcategory === "Base Salary") &&
-        txDate >= threeMonthsAgo &&
-        txDate <= now
-      );
-    });
-
-    if (recentSalaryTransactions.length === 0) {
-      return null;
-    }
-
-    // Calculate average monthly salary from recent months
-    const totalRecentSalary = recentSalaryTransactions.reduce(
-      (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-      0
-    );
-    const avgMonthlySalary =
-      totalRecentSalary / recentSalaryTransactions.length;
-
-    // Project total annual income
-    const projectedAnnualSalary =
-      totalIncome + avgMonthlySalary * monthsRemaining;
-
-    // Calculate projected tax (simplified - using new regime calculation)
-    const projectedTaxableIncome = Math.max(
-      0,
-      projectedAnnualSalary - standardDeduction - 2400 // Professional tax estimate
-    );
-
-    // Calculate tax using FY 2025-26 slabs
-    let projectedTax = 0;
-    if (projectedTaxableIncome > 400000) {
-      if (projectedTaxableIncome <= 800000) {
-        projectedTax = (projectedTaxableIncome - 400000) * 0.05;
-      } else if (projectedTaxableIncome <= 1200000) {
-        projectedTax = 20000 + (projectedTaxableIncome - 800000) * 0.1;
-      } else if (projectedTaxableIncome <= 1600000) {
-        projectedTax = 60000 + (projectedTaxableIncome - 1200000) * 0.15;
-      } else if (projectedTaxableIncome <= 2000000) {
-        projectedTax = 120000 + (projectedTaxableIncome - 1600000) * 0.2;
-      } else if (projectedTaxableIncome <= 2400000) {
-        projectedTax = 200000 + (projectedTaxableIncome - 2000000) * 0.25;
-      } else {
-        projectedTax = 300000 + (projectedTaxableIncome - 2400000) * 0.3;
-      }
-    }
-
-    const projectedCess = projectedTax * 0.04;
-    const projectedTotalTax = projectedTax + projectedCess;
-    const additionalTaxLiability = projectedTotalTax - totalTaxLiability;
-
-    return {
-      avgMonthlySalary,
-      monthsRemaining,
-      projectedAnnualSalary,
-      projectedTaxableIncome,
-      projectedTotalTax,
-      additionalTaxLiability,
-      currentTax: totalTaxLiability,
-    };
-  }, [filteredData, totalIncome, standardDeduction, totalTaxLiability]);
+  const projectedTaxData = useMemo(
+    () =>
+      calculateProjectedTax(
+        filteredData,
+        totalIncome,
+        standardDeduction,
+        totalTaxLiability
+      ),
+    [filteredData, totalIncome, standardDeduction, totalTaxLiability]
+  );
 
   return (
     <div className="space-y-6">

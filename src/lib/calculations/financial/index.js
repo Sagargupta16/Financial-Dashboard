@@ -287,11 +287,10 @@ const calculateTaxFromSlabs = (taxableIncome, taxSlabs) => {
         estimatedTax += (taxableIncome - slab.min) * slab.rate;
       }
       break;
-    } else {
-      // Add tax for this complete slab and move to next
-      if (slab.rate > 0) {
-        estimatedTax += (slab.max - slab.min) * slab.rate;
-      }
+    }
+    // Add tax for this complete slab and move to next
+    if (slab.rate > 0) {
+      estimatedTax += (slab.max - slab.min) * slab.rate;
     }
   }
 
@@ -308,7 +307,6 @@ const calculateTaxFromSlabs = (taxableIncome, taxSlabs) => {
  * @param {number} mealVoucherExemption - Annual meal voucher exemption (default: ₹18,250)
  * @returns {object} - { grossIncome, taxableIncome, estimatedTax, cess, totalTaxLiability }
  */
-// eslint-disable-next-line complexity
 export const calculateGrossFromNet = (
   netIncome,
   professionalTax = DEFAULT_PROFESSIONAL_TAX,
@@ -328,40 +326,11 @@ export const calculateGrossFromNet = (
       grossIncome - STANDARD_DEDUCTION - professionalTax - mealVoucherExemption
     );
 
-    // Calculate tax on this taxable income
-    let estimatedTax;
-    if (taxableIncome <= TAX_SLABS_NEW_REGIME[0].max) {
-      estimatedTax = 0;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
-      estimatedTax =
-        (taxableIncome - TAX_SLABS_NEW_REGIME[0].max) *
-        TAX_SLABS_NEW_REGIME[1].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[2].max) {
-      estimatedTax =
-        20000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[1].max) *
-          TAX_SLABS_NEW_REGIME[2].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[3].max) {
-      estimatedTax =
-        60000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[2].max) *
-          TAX_SLABS_NEW_REGIME[3].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[4].max) {
-      estimatedTax =
-        120000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[3].max) *
-          TAX_SLABS_NEW_REGIME[4].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[5].max) {
-      estimatedTax =
-        200000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[4].max) *
-          TAX_SLABS_NEW_REGIME[5].rate;
-    } else {
-      estimatedTax =
-        300000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[5].max) *
-          TAX_SLABS_NEW_REGIME[6].rate;
-    }
+    // Calculate tax on this taxable income using the standard function
+    const estimatedTax = calculateTaxFromSlabs(
+      taxableIncome,
+      TAX_SLABS_NEW_REGIME
+    );
 
     const cess = estimatedTax * CESS_RATE;
     const totalTaxLiability = estimatedTax + cess + professionalTax;
@@ -398,39 +367,10 @@ export const calculateGrossFromNet = (
     0,
     grossIncome - STANDARD_DEDUCTION - professionalTax - mealVoucherExemption
   );
-  let estimatedTax = 0;
-  if (taxableIncome > TAX_SLABS_NEW_REGIME[0].max) {
-    if (taxableIncome <= TAX_SLABS_NEW_REGIME[1].max) {
-      estimatedTax =
-        (taxableIncome - TAX_SLABS_NEW_REGIME[0].max) *
-        TAX_SLABS_NEW_REGIME[1].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[2].max) {
-      estimatedTax =
-        20000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[1].max) *
-          TAX_SLABS_NEW_REGIME[2].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[3].max) {
-      estimatedTax =
-        60000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[2].max) *
-          TAX_SLABS_NEW_REGIME[3].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[4].max) {
-      estimatedTax =
-        120000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[3].max) *
-          TAX_SLABS_NEW_REGIME[4].rate;
-    } else if (taxableIncome <= TAX_SLABS_NEW_REGIME[5].max) {
-      estimatedTax =
-        200000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[4].max) *
-          TAX_SLABS_NEW_REGIME[5].rate;
-    } else {
-      estimatedTax =
-        300000 +
-        (taxableIncome - TAX_SLABS_NEW_REGIME[5].max) *
-          TAX_SLABS_NEW_REGIME[6].rate;
-    }
-  }
+  const estimatedTax = calculateTaxFromSlabs(
+    taxableIncome,
+    TAX_SLABS_NEW_REGIME
+  );
   const cess = estimatedTax * CESS_RATE;
 
   return {

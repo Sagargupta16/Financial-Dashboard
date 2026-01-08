@@ -16,6 +16,7 @@ import { calculateInvestmentPerformance } from "../../../lib/calculations/financ
  * Investment Performance Tracker
  * Track stock market performance, P&L, brokerage fees
  */
+// eslint-disable-next-line complexity
 export const InvestmentPerformanceTracker = ({ filteredData }) => {
   const investmentData = useMemo(() => {
     return calculateInvestmentPerformance(filteredData);
@@ -306,11 +307,14 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
             })}
           </div>
           <div className="text-xs font-semibold text-gray-400">
-            {rsuHoldings > 0
-              ? `Includes ₹${rsuHoldings.toLocaleString("en-IN", { maximumFractionDigits: 0 })} RSU`
-              : totalWithdrawals > 0
-                ? "Net amount in market"
-                : "All capital still invested"}
+            {rsuHoldings > 0 &&
+              `Includes ₹${rsuHoldings.toLocaleString("en-IN", { maximumFractionDigits: 0 })} RSU`}
+            {rsuHoldings === 0 &&
+              totalWithdrawals > 0 &&
+              "Net amount in market"}
+            {rsuHoldings === 0 &&
+              totalWithdrawals === 0 &&
+              "All capital still invested"}
           </div>
         </div>
 

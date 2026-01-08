@@ -709,41 +709,12 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
    * - r = 0.312 (marginal rate: 30% × 1.04)
    * - k = 0.688 (net retention: 1 - r)
    */
-  const calculateGrossFromNetFY2425 = (netSalary) => {
-    const B = 1500000; // Upper limit of 20% slab
-    const TB = 156000; // Tax up to ₹15L with cess
-    const r = 0.3 * 1.04; // 0.312 (30% + 4% cess)
-    const k = 1 - r; // 0.688
-    const netAtB = B - TB; // ₹13,44,000 (net at ₹15L)
-
-    // For income below ₹15L threshold, use simplified calculation
-    if (netSalary <= netAtB) {
-      // Estimate using average effective rate for lower slabs
-      const estimatedGross = netSalary * 1.15;
-      return {
-        gross: Math.round(estimatedGross),
-        tds: Math.round(estimatedGross - netSalary),
-      };
-    }
-
-    // For income above ₹15L (in 30% bracket)
-    const gross = B + (netSalary - netAtB) / k;
-    const tds = gross - netSalary;
-
-    return {
-      gross: Math.round(gross),
-      tds: Math.round(tds),
-    };
-  };
 
   // ============================================================================
   // IMPORTANT: Income entries are POST-TDS (net salary received)
   // This means actual gross income and TDS paid are HIGHER than calculated here
   // For accurate tracking, users should add TDS as expense transactions
   // ============================================================================
-
-  // Use recorded income (post-TDS) for calculations
-  const totalNetIncome = totalIncome; // What's actually recorded/received
 
   // Calculate taxable income using recorded income
   const grossSalaryAfterEPF = totalIncome - epfDeduction;

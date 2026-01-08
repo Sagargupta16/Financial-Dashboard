@@ -16,6 +16,7 @@ import { calculateTaxPlanning } from "../../../lib/calculations/financial";
  * Tax Planning Dashboard
  * Income tax calculations, deductions, and planning
  */
+// eslint-disable-next-line complexity
 export const TaxPlanningDashboard = ({ filteredData }) => {
   const taxPlanningData = useMemo(() => {
     return calculateTaxPlanning(filteredData);
@@ -34,7 +35,6 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
 
   const {
     totalIncome = 0,
-    grossSalaryTotal = 0,
     actualTdsPaid = 0,
     calculatedGrossIncome = 0,
     salaryIncome = 0,

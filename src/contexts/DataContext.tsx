@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
+import type { Transaction } from "../types";
 
 interface DateRange {
   start: Date | null;
@@ -32,8 +33,8 @@ interface BudgetPreferences {
 }
 
 interface DataContextType {
-  transactions: any[];
-  updateTransactions: (newTransactions: any[]) => void;
+  transactions: Transaction[];
+  updateTransactions: (newTransactions: Transaction[]) => void;
   dateRange: DateRange;
   updateDateRange: (start: Date | null, end: Date | null) => void;
   loading: boolean;
@@ -58,7 +59,7 @@ interface DataProviderProps {
 }
 
 export const DataProvider = ({ children }: DataProviderProps) => {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [dateRange, setDateRange] = useState<DateRange>({
     start: null,
     end: null,
@@ -106,7 +107,7 @@ export const DataProvider = ({ children }: DataProviderProps) => {
     }
   }, [budgetPreferences]);
 
-  const updateTransactions = useCallback((newTransactions: any[]) => {
+  const updateTransactions = useCallback((newTransactions: Transaction[]) => {
     setTransactions(newTransactions);
   }, []);
 

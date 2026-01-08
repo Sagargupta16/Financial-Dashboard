@@ -1,11 +1,12 @@
 import React from "react";
+import type { Chart as ChartJS } from "chart.js";
 import { Download } from "lucide-react";
 import { downloadChart } from "../../../lib/data";
 
 interface ChartCardProps {
   title: string;
   children: React.ReactNode;
-  chartRef?: any;
+  chartRef?: React.RefObject<ChartJS | null>;
   fileName?: string;
   className?: string;
 }

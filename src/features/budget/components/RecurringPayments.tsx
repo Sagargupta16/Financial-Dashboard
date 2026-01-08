@@ -39,7 +39,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
     return detectRecurringTransactions(filteredData) as RecurringPayment[];
   }, [filteredData]);
 
-  const getFrequencyBadge = (frequency?: string) => {
+  const getFrequencyBadge = (frequency: string = "monthly") => {
     const colors: Record<string, string> = {
       weekly: "bg-blue-900/30 text-blue-400 border-blue-500/30",
       "bi-weekly": "bg-cyan-900/30 text-cyan-400 border-cyan-500/30",
@@ -49,8 +49,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
       "semi-annually": "bg-yellow-900/30 text-yellow-400 border-yellow-500/30",
       annually: "bg-green-900/30 text-green-400 border-green-500/30",
     };
-    const key = frequency ?? "monthly";
-    return colors[key] || colors.monthly;
+    return colors[frequency] || colors.monthly;
   };
 
   const formatDate = (date?: string | Date) => {

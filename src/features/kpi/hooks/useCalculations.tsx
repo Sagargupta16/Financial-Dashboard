@@ -11,9 +11,49 @@ import {
   calculateActualCashback,
   calculateTotalReimbursements,
 } from "../../../lib/calculations";
+import type { DateRangeResult } from "../../../lib/calculations/time/dateRange";
 import type { Transaction } from "../../../types";
 
-export const useKPIData = (filteredData: Transaction[]) => {
+type TransferData = { transferIn: number; transferOut: number };
+type CashbackData = {
+  totalCashbackEarned: number;
+  cashbackShared: number;
+  actualCashback: number;
+};
+type ReimbursementData = { totalReimbursements: number };
+export type AdditionalKpiData = {
+  highestExpense: number;
+  averageExpense: number;
+  totalTransactions: number;
+  transferData: TransferData;
+  cashbackData: CashbackData;
+  reimbursementData: ReimbursementData;
+};
+
+type KPIData = { income: number; expense: number };
+type KeyInsights = {
+  busiestDay: string;
+  mostFrequentCategory: string;
+  avgTransactionValue: number;
+};
+type EnhancedKpiData = {
+  savingsRate: number;
+  dailySpendingRate: number;
+  monthlyBurnRate: number;
+  netWorth: number;
+  netWorthPerMonth: number;
+  spendingVelocity: number;
+  categoryConcentration: {
+    category: string;
+    amount: number;
+    percentage: number;
+  } | null;
+  dateRange: DateRangeResult;
+};
+
+export const useKPIData = (
+  filteredData: Transaction[]
+): { kpiData: KPIData; additionalKpiData: AdditionalKpiData } => {
   return useMemo(() => {
     if (!filteredData || filteredData.length === 0) {
       return {
@@ -95,9 +135,9 @@ export const useKPIData = (filteredData: Transaction[]) => {
 
 export const useKeyInsights = (
   filteredData: Transaction[],
-  _kpiData: any,
-  additionalKpiData: any
-) => {
+  _kpiData: KPIData,
+  additionalKpiData: AdditionalKpiData
+): KeyInsights => {
   return useMemo(() => {
     // Validate input
     if (!filteredData || filteredData.length === 0) {
@@ -120,11 +160,13 @@ export const useKeyInsights = (
     const daySpending = new Array(7).fill(0);
     const categoryCounts: Record<string, number> = {};
 
-    const toDate = (value: unknown): Date | null => {
+    const toDate = (
+      value: string | number | Date | null | undefined
+    ): Date | null => {
       if (!value) {
         return null;
       }
-      const date = new Date(value as any);
+      const date = new Date(value);
       if (Number.isNaN(date.getTime())) {
         return null;
       }
@@ -151,9 +193,8 @@ export const useKeyInsights = (
     const busiestDay =
       maxSpending > 0 ? days[daySpending.indexOf(maxSpending)] : "N/A";
     const mostFrequentCategory =
-      (Object.entries(categoryCounts) as Array<[string, number]>).sort(
-        ([, a], [, b]) => b - a
-      )[0]?.[0] || "N/A";
+      Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+      "N/A";
 
     // Calculate more meaningful averages - absolute value of all transactions
     const totalAbsoluteValue = filteredData.reduce(
@@ -208,8 +249,8 @@ export const useAccountBalances = (data: Transaction[]) => {
 
 export const useEnhancedKPIData = (
   filteredData: Transaction[],
-  kpiData: { income: number; expense: number }
-) => {
+  kpiData: KPIData
+): EnhancedKpiData => {
   return useMemo(() => {
     if (!filteredData || filteredData.length === 0 || !kpiData) {
       return {
@@ -224,7 +265,7 @@ export const useEnhancedKPIData = (
       };
     }
 
-    const dateRange = calculateDateRange(filteredData) as any;
+    const dateRange = calculateDateRange(filteredData);
     const { income, expense } = kpiData;
     const totalDays = Number(dateRange?.totalDays ?? dateRange?.days ?? 1) || 1;
 
@@ -243,7 +284,7 @@ export const useEnhancedKPIData = (
       if (t.type !== "Expense") {
         return false;
       }
-      const date = new Date(t.date as any);
+      const date = new Date(t.date);
       if (Number.isNaN(date.getTime())) {
         return false;
       }
@@ -273,9 +314,9 @@ export const useEnhancedKPIData = (
       }
     });
 
-    const topCategory = (
-      Object.entries(categoryTotals) as Array<[string, number]>
-    ).sort(([, a], [, b]) => b - a)[0];
+    const topCategory = Object.entries(categoryTotals).sort(
+      ([, a], [, b]) => b - a
+    )[0];
 
     const categoryConcentration =
       topCategory && expense > 0

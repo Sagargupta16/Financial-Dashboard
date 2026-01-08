@@ -1,4 +1,5 @@
 import React from "react";
+import type { Chart as ChartJS } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { truncateLabel } from "../../../lib/charts";
 import { commonChartOptions } from "./ChartConfig";
@@ -8,10 +9,11 @@ import {
   TimeNavigationControls,
 } from "../../../components/data-display/ChartUIComponents";
 import { useTimeNavigation } from "../hooks/useChartHooks";
+import type { Transaction } from "../../../types";
 
 interface EnhancedChartProps {
-  filteredData: any[];
-  chartRef?: any;
+  filteredData: Transaction[];
+  chartRef?: React.RefObject<ChartJS<"bar">>;
 }
 
 const monthNames = [
@@ -61,7 +63,7 @@ export const EnhancedTopExpenseCategoriesChart = ({
       {}
     );
 
-    const sorted = (Object.entries(expenses) as Array<[string, number]>)
+    const sorted = Object.entries(expenses)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10);
 
@@ -151,7 +153,7 @@ export const EnhancedTopIncomeSourcesChart = ({
       {}
     );
 
-    const sorted = (Object.entries(income) as Array<[string, number]>)
+    const sorted = Object.entries(income)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10);
 

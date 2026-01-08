@@ -333,13 +333,15 @@ export const FinancialHealthScore = ({
             💡 Recommendations
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendations.map((rec: any, index: number) => (
-              <RecommendationCard
-                key={`${rec.type}-${rec.category}-${index}`}
-                rec={rec}
-                index={index}
-              />
-            ))}
+            {recommendations.map(
+              (rec: RecommendationCardProps["rec"], index: number) => (
+                <RecommendationCard
+                  key={`${rec.type}-${rec.category}-${index}`}
+                  rec={rec}
+                  index={index}
+                />
+              )
+            )}
           </div>
         </div>
       )}

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
 import logger from "../../utils/logger";
 
@@ -12,7 +11,10 @@ interface SpendingCalendarProps {
  */
 export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
   const calendarData = useMemo(() => {
-    const dailySpending: Record<string, {total: number; transactions: any[]}> = {};
+    const dailySpending: Record<
+      string,
+      { total: number; transactions: any[] }
+    > = {};
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 29);

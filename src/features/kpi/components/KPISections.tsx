@@ -35,7 +35,7 @@ interface SecondaryKPISectionProps {
 
 interface AdvancedAnalyticsKPISectionProps {
   analytics?: any;
-  formatCurrency: (_value: number) => string;
+  formatCurrency: (value: number) => string;
 }
 
 /**
@@ -104,14 +104,15 @@ export const SecondaryKPISection = ({
           )}
 
           {/* Total Reimbursements */}
-          {reimbursementData && (reimbursementData.totalReimbursements ?? 0) > 0 && (
-            <SmallKPICard
-              title="Reimbursements"
-              value={reimbursementData.totalReimbursements || 0}
-              icon={<Receipt size={22} />}
-              color="blue"
-            />
-          )}
+          {reimbursementData &&
+            (reimbursementData.totalReimbursements ?? 0) > 0 && (
+              <SmallKPICard
+                title="Reimbursements"
+                value={reimbursementData.totalReimbursements || 0}
+                icon={<Receipt size={22} />}
+                color="blue"
+              />
+            )}
         </div>
       )}
     </>
@@ -122,7 +123,10 @@ export const SecondaryKPISection = ({
  * Advanced Analytics KPI Cards Section
  * Displays: Monthly Trend, Active Subscriptions, Anomaly Alerts
  */
-export const AdvancedAnalyticsKPISection = ({ analytics, formatCurrency }: AdvancedAnalyticsKPISectionProps) => {
+export const AdvancedAnalyticsKPISection = ({
+  analytics,
+  formatCurrency,
+}: AdvancedAnalyticsKPISectionProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <SmallKPICard

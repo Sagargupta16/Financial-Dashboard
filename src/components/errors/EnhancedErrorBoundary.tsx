@@ -3,10 +3,10 @@ import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 interface EnhancedErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: (_props: { 
-    error: Error | null; 
-    errorInfo: React.ErrorInfo | null; 
-    reset: () => void 
+  fallback?: (_props: {
+    error: Error | null;
+    errorInfo: React.ErrorInfo | null;
+    reset: () => void;
   }) => React.ReactNode;
   onError?: (_error: Error, _errorInfo: React.ErrorInfo) => void;
 }
@@ -22,7 +22,10 @@ interface EnhancedErrorBoundaryState {
  * Enhanced Error Boundary with better UX and error reporting
  * Catches JavaScript errors anywhere in the child component tree
  */
-class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, EnhancedErrorBoundaryState> {
+class EnhancedErrorBoundary extends React.Component<
+  EnhancedErrorBoundaryProps,
+  EnhancedErrorBoundaryState
+> {
   constructor(props: EnhancedErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -40,7 +43,7 @@ class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, 
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to console in development
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.MODE === "development") {
       console.error("Error caught by boundary:", error, errorInfo);
     }
 
@@ -68,12 +71,12 @@ class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, 
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      // eslint-disable-next-line no-undef
+
       url: globalThis.location.href,
     };
 
     // In production, send to monitoring service
-    if (process.env.NODE_ENV === "production") {
+    if (import.meta.env.PROD) {
       // Example: fetch('/api/log-error', { method: 'POST', body: JSON.stringify(errorDetails) })
       console.error("Error logged:", errorDetails);
     }
@@ -88,12 +91,10 @@ class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, 
   };
 
   handleReload = () => {
-    // eslint-disable-next-line no-undef
     globalThis.location.reload();
   };
 
   handleGoHome = () => {
-    // eslint-disable-next-line no-undef
     globalThis.location.href = "/";
   };
 
@@ -126,7 +127,7 @@ class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, 
               </div>
             </div>
 
-            {process.env.NODE_ENV === "development" && error && (
+            {import.meta.env.MODE === "development" && error && (
               <div className="mb-6 bg-gray-900/50 border border-gray-700 rounded-lg p-4 overflow-auto max-h-60">
                 <p className="text-red-400 font-mono text-sm mb-2">
                   {error.toString()}

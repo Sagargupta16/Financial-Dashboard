@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { Upload, Download, AlertCircle, CheckCircle } from "lucide-react";
 import {
   parseCSV,
@@ -16,13 +16,23 @@ interface CSVImportExportProps {
 /**
  * Component for importing and exporting CSV files
  */
-// eslint-disable-next-line max-lines-per-function
-export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExportProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [importStatus, setImportStatus] = useState<{ type: string; message: string } | null>(null);
-  const [exportStatus, setExportStatus] = useState<{ type: string; message: string } | null>(null);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+export const CSVImportExport = ({
+  data,
+  onImport,
+  filteredData,
+}: CSVImportExportProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importStatus, setImportStatus] = useState<{
+    type: string;
+    message: string;
+  } | null>(null);
+  const [exportStatus, setExportStatus] = useState<{
+    type: string;
+    message: string;
+  } | null>(null);
+
+  const handleFileSelect = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;

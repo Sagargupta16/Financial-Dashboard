@@ -19,8 +19,10 @@ interface InvestmentPerformanceTrackerProps {
  * Investment Performance Tracker
  * Track stock market performance, P&L, brokerage fees
  */
-// eslint-disable-next-line complexity
-export const InvestmentPerformanceTracker = ({ filteredData }: InvestmentPerformanceTrackerProps) => {
+
+export const InvestmentPerformanceTracker = ({
+  filteredData,
+}: InvestmentPerformanceTrackerProps) => {
   const investmentData = useMemo(() => {
     return calculateInvestmentPerformance(filteredData);
   }, [filteredData]);

@@ -1,27 +1,35 @@
-// @ts-nocheck
 /* eslint-disable no-console */
 // Centralized logging utility with environment-aware logging
-const isDevelopment = process.env.NODE_ENV === "development";
-const isDebugMode = process.env.REACT_APP_DEBUG === "true";
+const isDevelopment = import.meta.env.MODE === "development";
+const isDebugMode = import.meta.env.VITE_DEBUG === "true";
 
-const logger = {
-  info: (...args) => {
+type LoggerFunction = (...args: unknown[]) => void;
+
+interface Logger {
+  info: LoggerFunction;
+  warning: LoggerFunction;
+  error: LoggerFunction;
+  debug: LoggerFunction;
+}
+
+const logger: Logger = {
+  info: (...args: unknown[]) => {
     if (isDevelopment) {
       console.log("[INFO]", ...args);
     }
   },
 
-  warning: (...args) => {
+  warning: (...args: unknown[]) => {
     if (isDevelopment) {
       console.warn("[WARNING]", ...args);
     }
   },
 
-  error: (...args) => {
+  error: (...args: unknown[]) => {
     console.error("[ERROR]", ...args);
   },
 
-  debug: (...args) => {
+  debug: (...args: unknown[]) => {
     if (isDevelopment && isDebugMode) {
       console.log("[DEBUG]", ...args);
     }

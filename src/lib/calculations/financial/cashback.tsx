@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Cashback Calculations Module
  *
@@ -9,12 +8,16 @@
  * 4. Cashback Rate = (Total Cashback Earned / Total Credit Card Spending) * 100
  */
 
+import type { Transaction } from "../../../types";
+
 /**
  * Calculate total cashback earned from all sources
- * @param {Array} transactions - All transactions
- * @returns {number} Total cashback earned
+ * @param transactions - All transactions
+ * @returns Total cashback earned
  */
-export const calculateTotalCashbackEarned = (transactions) => {
+export const calculateTotalCashbackEarned = (
+  transactions: Transaction[]
+): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -34,10 +37,12 @@ export const calculateTotalCashbackEarned = (transactions) => {
 
 /**
  * Calculate cashback shared with others
- * @param {Array} transactions - All transactions
- * @returns {number} Total cashback shared
+ * @param transactions - All transactions
+ * @returns Total cashback shared
  */
-export const calculateCashbackShared = (transactions) => {
+export const calculateCashbackShared = (
+  transactions: Transaction[]
+): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -61,21 +66,31 @@ export const calculateCashbackShared = (transactions) => {
 
 /**
  * Calculate actual cashback (earned minus shared)
- * @param {Array} transactions - All transactions
- * @returns {number} Actual cashback retained
+ * @param transactions - All transactions
+ * @returns Actual cashback retained
  */
-export const calculateActualCashback = (transactions) => {
+export const calculateActualCashback = (
+  transactions: Transaction[]
+): number => {
   const totalEarned = calculateTotalCashbackEarned(transactions);
   const totalShared = calculateCashbackShared(transactions);
   return totalEarned - totalShared;
 };
 
+interface CardCashbackData {
+  cashback: number;
+  spending: number;
+  rate: number;
+}
+
 /**
  * Calculate cashback by credit card
- * @param {Array} transactions - All transactions
- * @returns {Object} Cashback breakdown by card
+ * @param transactions - All transactions
+ * @returns Cashback breakdown by card
  */
-export const calculateCashbackByCard = (transactions) => {
+export const calculateCashbackByCard = (
+  transactions: Transaction[]
+): Record<string, CardCashbackData> => {
   if (!transactions || transactions.length === 0) {
     return {};
   }
@@ -84,11 +99,19 @@ export const calculateCashbackByCard = (transactions) => {
     t.account?.toLowerCase().includes("credit")
   );
 
-  const cardAccounts = [
-    ...new Set(creditCardTransactions.map((t) => t.account)),
-  ];
+  const cardAccounts = Array.from(
+    new Set(creditCardTransactions.map((t) => t.account))
+  );
 
-  const byCard = {};
+  const byCard: Record<
+    string,
+    {
+      cashback: number;
+      spending: number;
+      rate: number;
+      transactionCount: number;
+    }
+  > = {};
 
   cardAccounts.forEach((card) => {
     const cardTransactions = transactions.filter((t) => t.account === card);
@@ -110,7 +133,7 @@ export const calculateCashbackByCard = (transactions) => {
     byCard[card] = {
       cashback,
       spending,
-      cashbackRate,
+      rate: cashbackRate,
       transactionCount: cardTransactions.length,
     };
   });
@@ -123,7 +146,7 @@ export const calculateCashbackByCard = (transactions) => {
  * @param {Array} transactions - All transactions
  * @returns {Object} Complete cashback analysis
  */
-export const calculateCashbackMetrics = (transactions) => {
+export const calculateCashbackMetrics = (transactions: Transaction[]) => {
   if (!transactions || transactions.length === 0) {
     return {
       totalCashbackEarned: 0,

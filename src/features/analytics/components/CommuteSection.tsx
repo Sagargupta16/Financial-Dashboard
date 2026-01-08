@@ -32,7 +32,10 @@ interface CommuteSectionProps {
 /**
  * Commute Analytics Section Component
  */
-export const CommuteSection = ({ commuteData, chartOptions }: CommuteSectionProps) => {
+export const CommuteSection = ({
+  commuteData,
+  chartOptions,
+}: CommuteSectionProps) => {
   const commuteChartData = {
     labels: commuteData.breakdown.map((b: CommuteBreakdown) => b.name),
     datasets: [

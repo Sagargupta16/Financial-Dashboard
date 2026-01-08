@@ -1,7 +1,8 @@
 # Financial Dashboard - Complete Data Flow Diagram
 
 **Created:** December 30, 2025  
-**Purpose:** Visual representation of how data flows through the entire application
+**Last Updated:** January 8, 2026  
+**Purpose:** Visual representation of how data flows through the entire application (now on Vite + TypeScript; file paths are `.tsx` equivalents of the names shown)
 
 ---
 

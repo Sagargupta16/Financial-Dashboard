@@ -51,11 +51,14 @@ export const EnhancedTopExpenseCategoriesChart = ({
 
   const chartData = React.useMemo(() => {
     const rows = timeFilteredData as any[];
-    const expenses = rows.reduce((acc: Record<string, number>, item: any) => {
-      const key = String(item.category ?? "Uncategorized");
-      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
-      return acc;
-    }, {} as Record<string, number>);
+    const expenses = rows.reduce(
+      (acc: Record<string, number>, item: any) => {
+        const key = String(item.category ?? "Uncategorized");
+        acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const sorted = (Object.entries(expenses) as Array<[string, number]>)
       .sort(([, a], [, b]) => b - a)
@@ -113,7 +116,10 @@ export const EnhancedTopExpenseCategoriesChart = ({
 };
 
 // Enhanced Top Income Sources Chart with time navigation
-export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }: EnhancedChartProps) => {
+export const EnhancedTopIncomeSourcesChart = ({
+  filteredData,
+  chartRef,
+}: EnhancedChartProps) => {
   const {
     currentYear,
     currentMonth,
@@ -134,11 +140,14 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }: Enhanc
 
   const chartData = React.useMemo(() => {
     const rows = timeFilteredData as any[];
-    const income = rows.reduce((acc: Record<string, number>, item: any) => {
-      const key = String(item.category ?? "Uncategorized");
-      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
-      return acc;
-    }, {} as Record<string, number>);
+    const income = rows.reduce(
+      (acc: Record<string, number>, item: any) => {
+        const key = String(item.category ?? "Uncategorized");
+        acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const sorted = (Object.entries(income) as Array<[string, number]>)
       .sort(([, a], [, b]) => b - a)

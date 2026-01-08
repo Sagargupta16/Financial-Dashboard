@@ -1,19 +1,18 @@
-// @ts-nocheck
-/* eslint-disable max-lines-per-function */
 /**
  * Trend Insights Generator
  * Automatically detects patterns and generates actionable insights
  */
 
+import type { Transaction } from "../../types";
 import { getMonthKey } from "../data";
 import { detectSeasonality, detectOutliers } from "./forecasts";
 
 /**
  * Analyze spending patterns by day of week
- * @param {Array} transactions - Transaction data
- * @returns {Object} Day of week analysis
+ * @param transactions - Transaction data
+ * @returns Day of week analysis
  */
-export const analyzeDayOfWeekPatterns = (transactions) => {
+export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
@@ -99,18 +98,21 @@ export const analyzeDayOfWeekPatterns = (transactions) => {
  * @param {Array} transactions - Transaction data
  * @returns {Array} Anomaly insights
  */
-export const detectSpendingAnomalies = (transactions) => {
+export const detectSpendingAnomalies = (transactions: Transaction[]): any[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
 
-  const insights = [];
+  const insights: any[] = [];
   const expenses = transactions.filter(
     (t) => t.type === "Expense" && t.category !== "In-pocket"
   );
 
   // Group by month
-  const monthlyData = {};
+  const monthlyData: Record<
+    string,
+    { total: number; byCategory: Record<string, number> }
+  > = {};
   expenses.forEach((t) => {
     const month = getMonthKey(t.date);
     if (!monthlyData[month]) {
@@ -158,10 +160,10 @@ export const detectSpendingAnomalies = (transactions) => {
 
   // Check category-level anomalies in recent months
   const recentMonths = months.slice(-3);
-  const allCategories = new Set();
+  const allCategories = new Set<string>();
   expenses.forEach((t) => allCategories.add(t.category));
 
-  allCategories.forEach((category) => {
+  allCategories.forEach((category: string) => {
     const categoryData = months.map(
       (m) => monthlyData[m].byCategory[category] || 0
     );
@@ -200,18 +202,18 @@ export const detectSpendingAnomalies = (transactions) => {
  * @param {Array} transactions - Transaction data
  * @returns {Object} Seasonal analysis
  */
-export const analyzeSeasonalPatterns = (transactions) => {
+export const analyzeSeasonalPatterns = (transactions: Transaction[]): any => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
 
-  const insights = [];
+  const insights: any[] = [];
   const expenses = transactions.filter(
     (t) => t.type === "Expense" && t.category !== "In-pocket"
   );
 
   // Group by month
-  const monthlyData = {};
+  const monthlyData: Record<string, number> = {};
   expenses.forEach((t) => {
     const month = getMonthKey(t.date);
     monthlyData[month] = (monthlyData[month] || 0) + Math.abs(t.amount || 0);
@@ -252,7 +254,7 @@ export const analyzeSeasonalPatterns = (transactions) => {
         priority: "high",
         title: `${topPeak.month} is Historically High Spending`,
         message: `Spending is typically ${topPeak.percent}% above average in ${topPeak.month}`,
-        action: `Budget ₹${(seasonalAnalysis.overallAverage * topPeak.index).toLocaleString()} for ${topPeak.month}`,
+        action: `Budget ₹${((seasonalAnalysis.overallAverage || 0) * topPeak.index).toLocaleString()} for ${topPeak.month}`,
       });
     }
 
@@ -290,7 +292,10 @@ export const analyzeSeasonalPatterns = (transactions) => {
  * @param {Object} budgets - User budgets by category
  * @returns {Array} Budget forecast alerts
  */
-export const generateBudgetForecastAlerts = (transactions, budgets) => {
+export const generateBudgetForecastAlerts = (
+  transactions: Transaction[],
+  budgets: Record<string, number>
+): any[] => {
   if (
     !transactions ||
     transactions.length === 0 ||
@@ -300,7 +305,7 @@ export const generateBudgetForecastAlerts = (transactions, budgets) => {
     return [];
   }
 
-  const insights = [];
+  const insights: any[] = [];
   const currentMonth = getMonthKey(new Date());
   const currentMonthExpenses = transactions.filter(
     (t) =>
@@ -310,7 +315,7 @@ export const generateBudgetForecastAlerts = (transactions, budgets) => {
   );
 
   // Group current month by category
-  const categorySpending = {};
+  const categorySpending: Record<string, number> = {};
   currentMonthExpenses.forEach((t) => {
     categorySpending[t.category] =
       (categorySpending[t.category] || 0) + Math.abs(t.amount || 0);
@@ -362,14 +367,17 @@ export const generateBudgetForecastAlerts = (transactions, budgets) => {
  * @param {Object} budgets - User budgets
  * @returns {Object} All insights categorized
  */
-export const generateComprehensiveInsights = (transactions, budgets = {}) => {
+export const generateComprehensiveInsights = (
+  transactions: Transaction[],
+  budgets: Record<string, number> = {}
+): any => {
   const dayPatterns = analyzeDayOfWeekPatterns(transactions);
   const anomalies = detectSpendingAnomalies(transactions);
   const seasonal = analyzeSeasonalPatterns(transactions);
   const budgetAlerts = generateBudgetForecastAlerts(transactions, budgets);
 
   // Combine all insights
-  const allInsights = [
+  const allInsights: any[] = [
     ...(dayPatterns?.insights || []),
     ...anomalies,
     ...(seasonal?.insights || []),
@@ -377,7 +385,7 @@ export const generateComprehensiveInsights = (transactions, budgets = {}) => {
   ];
 
   // Sort by priority
-  const priorityOrder = { high: 1, medium: 2, low: 3 };
+  const priorityOrder: Record<string, number> = { high: 1, medium: 2, low: 3 };
   allInsights.sort(
     (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
   );

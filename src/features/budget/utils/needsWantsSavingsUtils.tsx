@@ -368,7 +368,9 @@ export const compareWithIdealAllocation = (
   };
 
   const comparison: Record<string, any> = {};
-  for (const [key, idealPercent] of Object.entries(allocation as Record<string, number>)) {
+  for (const [key, idealPercent] of Object.entries(
+    allocation as Record<string, number>
+  )) {
     const actualPercent = (actualPercentages as any)[key] ?? 0;
     const difference = actualPercent - idealPercent;
 

@@ -1,9 +1,9 @@
 # Financial Dashboard - Comprehensive Architecture Documentation
 
 **Created:** December 30, 2025  
-**Last Updated:** December 30, 2025  
-**Version:** 2.0  
-**Status:** ✅ Production Ready
+**Last Updated:** January 8, 2026  
+**Version:** 2.1  
+**Status:** ✅ Production Ready (Vite + TypeScript)
 
 ---
 
@@ -38,11 +38,13 @@ The Financial Dashboard is a comprehensive React-based personal finance manageme
 
 ```
 Frontend: React 19.1.1
-Build Tool: react-scripts
+Build Tool: Vite 6 (replaced react-scripts)
 Charts: Chart.js
-State: Context API + Custom Hooks
+State: Context API + Custom Hooks + React Router v7
 Styling: Tailwind CSS + Custom CSS
 Data Processing: XLSX.js for Excel parsing
+
+> Note: All core files were migrated to TypeScript `.tsx`/`.ts` along with Vite; older `.js` mentions map directly to their typed counterparts.
 ```
 
 ### Key Features

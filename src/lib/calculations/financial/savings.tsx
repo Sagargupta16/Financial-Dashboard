@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Savings Calculations
  * Canonical implementation for savings and savings rate calculations
@@ -9,9 +8,9 @@ import { PERCENT } from "../../../constants";
 /**
  * Calculate savings (income minus expense)
  *
- * @param {number} income - Total income
- * @param {number} expense - Total expense
- * @returns {number} Savings amount (can be negative if expenses exceed income)
+ * @param income - Total income
+ * @param expense - Total expense
+ * @returns Savings amount (can be negative if expenses exceed income)
  *
  * @example
  * calculateSavings(100000, 70000) // 30000
@@ -21,7 +20,7 @@ import { PERCENT } from "../../../constants";
  * - Negative income/expense: calculated as-is (unusual but allowed)
  * - NaN inputs: treated as 0
  */
-export const calculateSavings = (income, expense) => {
+export const calculateSavings = (income: number, expense: number): number => {
   const validIncome = Number(income) || 0;
   const validExpense = Number(expense) || 0;
   return validIncome - validExpense;
@@ -30,9 +29,9 @@ export const calculateSavings = (income, expense) => {
 /**
  * Calculate savings rate percentage
  *
- * @param {number} income - Total income
- * @param {number} expense - Total expense
- * @returns {number} Savings rate as percentage (0-100+)
+ * @param income - Total income
+ * @param expense - Total expense
+ * @returns Savings rate as percentage (0-100+)
  *
  * @example
  * calculateSavingsRate(100000, 70000) // 30 (30% savings)
@@ -47,7 +46,10 @@ export const calculateSavings = (income, expense) => {
  * - expense > income: returns negative percentage (deficit)
  * - NaN inputs: treated as 0
  */
-export const calculateSavingsRate = (income, expense) => {
+export const calculateSavingsRate = (
+  income: number,
+  expense: number
+): number => {
   const validIncome = Number(income) || 0;
   const validExpense = Number(expense) || 0;
 
@@ -61,9 +63,9 @@ export const calculateSavingsRate = (income, expense) => {
 /**
  * Calculate percentage (generic utility)
  *
- * @param {number} part - Part value
- * @param {number} total - Total value
- * @returns {number} Percentage (0-100+)
+ * @param part - Part value
+ * @param total - Total value
+ * @returns Percentage (0-100+)
  *
  * @example
  * calculatePercentage(25, 100) // 25
@@ -77,7 +79,7 @@ export const calculateSavingsRate = (income, expense) => {
  * - part > total: returns > 100
  * - NaN inputs: treated as 0
  */
-export const calculatePercentage = (part, total) => {
+export const calculatePercentage = (part: number, total: number): number => {
   const validPart = Number(part) || 0;
   const validTotal = Number(total) || 0;
 

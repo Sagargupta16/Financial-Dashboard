@@ -172,27 +172,33 @@ export const useChartDataProcessor = (
     // Group data
     let groupedData: Record<string, number> | undefined;
     if (groupBy === "category") {
-      groupedData = groupDataByCategory(processedData) as Record<string, number>;
+      groupedData = groupDataByCategory(processedData) as Record<
+        string,
+        number
+      >;
     } else if (groupBy === "month") {
       groupedData = groupDataByMonth(processedData) as Record<string, number>;
     } else if (groupBy === "account") {
-      groupedData = processedData.reduce((acc: Record<string, number>, item) => {
-        const key = String(item.account ?? "Unknown");
-        if (!acc[key]) {
-          acc[key] = 0;
-        }
-        acc[key] += Number(item.amount) || 0;
-        return acc;
-      }, {} as Record<string, number>);
+      groupedData = processedData.reduce(
+        (acc: Record<string, number>, item) => {
+          const key = String(item.account ?? "Unknown");
+          if (!acc[key]) {
+            acc[key] = 0;
+          }
+          acc[key] += Number(item.amount) || 0;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
     }
 
     // Convert to array and sort
-    let sortedData = Object.entries(groupedData || {}) as Array<[string, number]>;
+    let sortedData = Object.entries(groupedData || {}) as Array<
+      [string, number]
+    >;
 
     if (sortBy === "amount") {
-      sortedData.sort(([, a], [, b]) =>
-        sortOrder === "desc" ? b - a : a - b
-      );
+      sortedData.sort(([, a], [, b]) => (sortOrder === "desc" ? b - a : a - b));
     } else if (sortBy === "name") {
       sortedData.sort(([a], [b]) =>
         sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b)
@@ -256,9 +262,12 @@ export const useMultipleFilters = (initialFilters = {}) => {
 };
 
 // Custom hook for trend analysis
-export const useTrendAnalysis = (data: GenericDataItem[], _period = "month") => {
+export const useTrendAnalysis = (data: GenericDataItem[]) => {
   return useMemo(() => {
-    const groupedData = groupDataByMonth(data) as Record<string, { net: number }>;
+    const groupedData = groupDataByMonth(data) as Record<
+      string,
+      { net: number }
+    >;
     const sortedMonths = Object.keys(groupedData).sort((a, b) =>
       a.localeCompare(b)
     );
@@ -311,7 +320,10 @@ export const useForecastData = (
   method = "linear"
 ) => {
   return useMemo(() => {
-    const monthlyData = groupDataByMonth(historicalData) as Record<string, { net: number }>;
+    const monthlyData = groupDataByMonth(historicalData) as Record<
+      string,
+      { net: number }
+    >;
     const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
       a.localeCompare(b)
     );

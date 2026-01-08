@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-import PropTypes from "prop-types";
 import {
   ArrowUpDown,
   ChevronLeft,
@@ -76,7 +75,7 @@ const addRunningBalance = (
   });
 };
 
-// eslint-disable-next-line max-lines-per-function, complexity
+// eslint-disable-next-line max-lines-per-function
 export const EnhancedTransactionTable = ({
   data,
   onSort,
@@ -85,7 +84,7 @@ export const EnhancedTransactionTable = ({
   initialFilters = {},
 }: {
   data: Transaction[];
-  onSort?: (_key: string) => void;
+  onSort?: (key: string) => void;
   currentPage?: number;
   transactionsPerPage?: number;
   initialFilters?: Record<string, any>;
@@ -936,14 +935,6 @@ export const EnhancedTransactionTable = ({
       )}
     </div>
   );
-};
-
-EnhancedTransactionTable.propTypes = {
-  data: PropTypes.array.isRequired,
-  onSort: PropTypes.func.isRequired,
-  currentPage: PropTypes.number,
-  transactionsPerPage: PropTypes.number,
-  initialFilters: PropTypes.object,
 };
 
 export default EnhancedTransactionTable;

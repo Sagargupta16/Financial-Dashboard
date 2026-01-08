@@ -3,7 +3,12 @@ import { useState, useEffect, useMemo } from "react";
 import { parseCurrency, parseDate } from "../lib/data";
 import logger from "../utils/logger";
 import * as XLSX from "xlsx";
-import type { Transaction, UniqueValues, DataFilters, SortConfig } from "../types";
+import type {
+  Transaction,
+  UniqueValues,
+  DataFilters,
+  SortConfig,
+} from "../types";
 
 // Helper function: Parse CSV/TSV row handling quoted fields
 const parseCsvRow = (row) => {

@@ -9,8 +9,11 @@ interface EnhancedMonthlyTrendsChartProps {
 }
 
 // Enhanced Monthly Trends Chart with time navigation
-// eslint-disable-next-line max-lines-per-function
-export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }: EnhancedMonthlyTrendsChartProps) => {
+
+export const EnhancedMonthlyTrendsChart = ({
+  filteredData,
+  chartRef,
+}: EnhancedMonthlyTrendsChartProps) => {
   const [currentYear, setCurrentYear] = React.useState(
     new Date().getFullYear()
   );

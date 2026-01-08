@@ -106,7 +106,10 @@ export const exportToCSV = (data: any[]): string => {
  * @param {string} csvString - CSV formatted string
  * @param {string} filename - Desired filename (without extension)
  */
-export const downloadCSV = (csvString: string, filename: string = "transactions"): void => {
+export const downloadCSV = (
+  csvString: string,
+  filename: string = "transactions"
+): void => {
   const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
 

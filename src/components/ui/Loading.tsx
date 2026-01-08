@@ -8,7 +8,10 @@ interface LoadingSpinnerProps {
 /**
  * Loading Spinner Component
  */
-export const LoadingSpinner = ({ size = "md", message = "" }: LoadingSpinnerProps) => {
+export const LoadingSpinner = ({
+  size = "md",
+  message = "",
+}: LoadingSpinnerProps) => {
   const getSizeClass = () => {
     switch (size) {
       case "sm":
@@ -41,7 +44,9 @@ interface LoadingOverlayProps {
 /**
  * Full Page Loading Overlay
  */
-export const LoadingOverlay = ({ message = "Loading..." }: LoadingOverlayProps) => {
+export const LoadingOverlay = ({
+  message = "Loading...",
+}: LoadingOverlayProps) => {
   return (
     <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl">

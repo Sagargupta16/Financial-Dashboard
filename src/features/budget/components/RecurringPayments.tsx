@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import { detectRecurringTransactions } from "../../../lib/calculations";
 import {
   Clock,
@@ -198,9 +197,12 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                       </span>
                       <span className="text-purple-400 font-medium text-sm">
                         ₹
-                        {(payment.monthlyEquivalent ?? 0).toLocaleString("en-IN", {
-                          maximumFractionDigits: 0,
-                        })}
+                        {(payment.monthlyEquivalent ?? 0).toLocaleString(
+                          "en-IN",
+                          {
+                            maximumFractionDigits: 0,
+                          }
+                        )}
                         /mo
                       </span>
                     </div>
@@ -229,8 +231,8 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
 
                     <div className="flex justify-between items-center pt-2 border-t border-gray-700">
                       <span className="text-gray-400 text-xs">
-                        {(payment.count ?? 0).toString()} payments • {(payment.consistency ?? 0).toString()}%
-                        consistent
+                        {(payment.count ?? 0).toString()} payments •{" "}
+                        {(payment.consistency ?? 0).toString()}% consistent
                       </span>
                     </div>
                   </div>
@@ -286,7 +288,8 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 text-sm">Last seen</span>
                     <span className="text-gray-500 text-xs">
-                      {(payment.daysSinceLastOccurrence ?? 0).toString()} days ago
+                      {(payment.daysSinceLastOccurrence ?? 0).toString()} days
+                      ago
                     </span>
                   </div>
 
@@ -303,8 +306,4 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
       )}
     </div>
   );
-};
-
-RecurringPayments.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

@@ -1,6 +1,4 @@
-/* eslint-disable max-lines-per-function */
 import { useMemo, useState } from "react";
-import PropTypes from "prop-types";
 import { BudgetPlanner } from "./BudgetPlanner";
 import { NeedsWantsSavings } from "./NeedsWantsSavings";
 import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
@@ -168,10 +166,4 @@ export const BudgetGoalsSection = ({
       )}
     </div>
   );
-};
-
-BudgetGoalsSection.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  kpiData: PropTypes.object.isRequired,
-  accountBalances: PropTypes.object.isRequired,
 };

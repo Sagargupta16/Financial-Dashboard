@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
 import {
   AlertCircle,
@@ -20,7 +19,10 @@ interface SmartInsightsPanelProps {
  * Smart Insights Panel
  * Shows automatically detected patterns, anomalies, and recommendations
  */
-export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsightsPanelProps) => {
+export const SmartInsightsPanel = ({
+  filteredData,
+  budgets = {},
+}: SmartInsightsPanelProps) => {
   const insights = useMemo(() => {
     return generateComprehensiveInsights(filteredData, budgets);
   }, [filteredData, budgets]);
@@ -106,7 +108,7 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsights
             <h4 className="text-sm font-semibold text-red-400 mb-2 uppercase tracking-wide">
               ⚠️ Urgent Attention
             </h4>
-            {highPriorityInsights.map((insight) => (
+            {highPriorityInsights.map((insight: any) => (
               <div
                 key={`high-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
@@ -143,7 +145,7 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsights
             <h4 className="text-sm font-semibold text-yellow-400 mb-2 uppercase tracking-wide">
               📊 Worth Monitoring
             </h4>
-            {mediumPriorityInsights.map((insight) => (
+            {mediumPriorityInsights.map((insight: any) => (
               <div
                 key={`medium-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
@@ -180,7 +182,7 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsights
             <h4 className="text-sm font-semibold text-blue-400 mb-2 uppercase tracking-wide">
               💡 Good to Know
             </h4>
-            {lowPriorityInsights.map((insight) => (
+            {lowPriorityInsights.map((insight: any) => (
               <div
                 key={`low-${insight.type}-${insight.title}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}

@@ -43,7 +43,10 @@ interface DataContextType {
   clearError: () => void;
   budgetPreferences: BudgetPreferences;
   updateBudgetAllocation: (allocation: BudgetAllocation) => void;
-  updateCustomCategories: (type: keyof CustomCategories, categories: string[]) => void;
+  updateCustomCategories: (
+    type: keyof CustomCategories,
+    categories: string[]
+  ) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -64,30 +67,32 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   const [error, setError] = useState<string | null>(null);
 
   // Budget preferences state
-  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
-      return saved
-        ? JSON.parse(saved)
-        : {
-            allocation: BUDGET_ALLOCATION_DEFAULTS,
-            customCategories: {
-              needs: [],
-              wants: [],
-              savings: [],
-            },
-          };
-    } catch {
-      return {
-        allocation: BUDGET_ALLOCATION_DEFAULTS,
-        customCategories: {
-          needs: [],
-          wants: [],
-          savings: [],
-        },
-      };
+  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(
+    () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
+        return saved
+          ? JSON.parse(saved)
+          : {
+              allocation: BUDGET_ALLOCATION_DEFAULTS,
+              customCategories: {
+                needs: [],
+                wants: [],
+                savings: [],
+              },
+            };
+      } catch {
+        return {
+          allocation: BUDGET_ALLOCATION_DEFAULTS,
+          customCategories: {
+            needs: [],
+            wants: [],
+            savings: [],
+          },
+        };
+      }
     }
-  });
+  );
 
   // Save preferences to localStorage whenever they change
   useEffect(() => {
@@ -105,9 +110,12 @@ export const DataProvider = ({ children }: DataProviderProps) => {
     setTransactions(newTransactions);
   }, []);
 
-  const updateDateRange = useCallback((start: Date | null, end: Date | null) => {
-    setDateRange({ start, end });
-  }, []);
+  const updateDateRange = useCallback(
+    (start: Date | null, end: Date | null) => {
+      setDateRange({ start, end });
+    },
+    []
+  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -120,15 +128,18 @@ export const DataProvider = ({ children }: DataProviderProps) => {
     }));
   }, []);
 
-  const updateCustomCategories = useCallback((type: keyof CustomCategories, categories: string[]) => {
-    setBudgetPreferences((prev) => ({
-      ...prev,
-      customCategories: {
-        ...prev.customCategories,
-        [type]: categories,
-      },
-    }));
-  }, []);
+  const updateCustomCategories = useCallback(
+    (type: keyof CustomCategories, categories: string[]) => {
+      setBudgetPreferences((prev) => ({
+        ...prev,
+        customCategories: {
+          ...prev.customCategories,
+          [type]: categories,
+        },
+      }));
+    },
+    []
+  );
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(

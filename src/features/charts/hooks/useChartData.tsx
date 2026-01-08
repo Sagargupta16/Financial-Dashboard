@@ -8,7 +8,7 @@ import type { Transaction } from "../../../types";
  * @param {string} drilldownCategory - Selected category for subcategory breakdown
  * @returns {Object} Object containing all chart data configurations
  */
-// eslint-disable-next-line max-lines-per-function
+
 export const useChartData = (
   filteredData: Transaction[],
   kpiData: { income: number; expense: number },
@@ -215,7 +215,9 @@ export const useChartData = (
       return { labels: [], datasets: [] };
     }
     const spending = filteredData
-      .filter((item) => item.type === "Expense" && item.category === drilldownCategory)
+      .filter(
+        (item) => item.type === "Expense" && item.category === drilldownCategory
+      )
       .reduce<Record<string, number>>((acc, item) => {
         const sub = String(item.subcategory ?? "Uncategorized");
         acc[sub] = (acc[sub] || 0) + (Number(item.amount) || 0);

@@ -231,7 +231,10 @@ export const FinancialHealthScore = ({
             <div className="space-y-3">
               {score?.metrics &&
                 Object.entries(score.metrics).map(([key, value]) => {
-                  const metricInfo: Record<string, {max: number; label: string; detail: string}> = {
+                  const metricInfo: Record<
+                    string,
+                    { max: number; label: string; detail: string }
+                  > = {
                     savingsRate: {
                       max: 25,
                       label: "Savings Rate",

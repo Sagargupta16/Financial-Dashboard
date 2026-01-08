@@ -15,7 +15,9 @@ interface FamilyHousingManagerProps {
  * Family & Housing Expense Manager
  * Track family expenses, rent, and housing costs
  */
-export const FamilyHousingManager = ({ filteredData }: FamilyHousingManagerProps) => {
+export const FamilyHousingManager = ({
+  filteredData,
+}: FamilyHousingManagerProps) => {
   const familyData = useMemo(() => {
     return calculateFamilyExpenses(filteredData);
   }, [filteredData]);

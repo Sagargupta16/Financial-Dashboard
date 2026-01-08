@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useState, useMemo } from "react";
-import PropTypes from "prop-types";
 import {
   calculateMonthlyNWSBreakdown,
   calculateYearlyNWSBreakdown,
@@ -54,7 +53,12 @@ interface MonthlyYearlyNWSProps {
 /**
  * Category Bar Component - displays category spending with percentage
  */
-const CategoryBar = ({ category, amount, percentage, color }: CategoryBarProps) => (
+const CategoryBar = ({
+  category,
+  amount,
+  percentage,
+  color,
+}: CategoryBarProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
       <span className="text-sm text-gray-400 capitalize">{category}</span>
@@ -79,19 +83,19 @@ const CategoryBar = ({ category, amount, percentage, color }: CategoryBarProps) 
   </div>
 );
 
-CategoryBar.propTypes = {
-  category: PropTypes.string.isRequired,
-  amount: PropTypes.number.isRequired,
-  percentage: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-};
-
 /**
  * Period Card Component - displays summary for a month or year
  */
-const PeriodCard = ({ item, isSelected, onSelect, viewMode }: PeriodCardProps) => {
+const PeriodCard = ({
+  item,
+  isSelected,
+  onSelect,
+  viewMode,
+}: PeriodCardProps) => {
   const periodLabel =
-    viewMode === "monthly" ? formatMonthKey(item.monthKey || "") : (item.year ?? "");
+    viewMode === "monthly"
+      ? formatMonthKey(item.monthKey || "")
+      : (item.year ?? "");
   const periodKey =
     viewMode === "monthly" ? (item.monthKey ?? "") : (item.year ?? 0);
 
@@ -204,13 +208,6 @@ const PeriodCard = ({ item, isSelected, onSelect, viewMode }: PeriodCardProps) =
   );
 };
 
-PeriodCard.propTypes = {
-  item: PropTypes.object.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  viewMode: PropTypes.string.isRequired,
-};
-
 /**
  * Helper function to format month key
  */
@@ -228,11 +225,16 @@ const formatMonthKey = (monthKey: string) => {
  */
 export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>("monthly"); // 'monthly' or 'yearly'
-  const [selectedPeriod, setSelectedPeriod] = useState<string | number | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<string | number | null>(
+    null
+  );
 
   // Calculate monthly breakdown
   const monthlyData = useMemo(() => {
-    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<string, any>;
+    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<
+      string,
+      any
+    >;
     const income = getMonthlyIncome(transactions) as Record<string, number>;
 
     const data = (Object.entries(breakdown) as Array<[string, any]>)
@@ -249,7 +251,10 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
   // Calculate yearly breakdown
   const yearlyData = useMemo(() => {
-    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<string, any>;
+    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<
+      string,
+      any
+    >;
     const income = getYearlyIncome(transactions) as Record<string, number>;
 
     const data = (Object.entries(breakdown) as Array<[string, any]>)
@@ -522,14 +527,4 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
       </div>
     </div>
   );
-};
-
-MonthlyYearlyNWS.propTypes = {
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string,
-      category: PropTypes.string,
-      "income/expense": PropTypes.string,
-    })
-  ).isRequired,
 };

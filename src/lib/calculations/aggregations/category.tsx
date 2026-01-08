@@ -1,14 +1,21 @@
-// @ts-nocheck
 /**
  * Category Analysis Calculations
  * Canonical implementation for grouping and analyzing transactions by category
  */
 
+import type { Transaction } from "../../../types";
+
+interface CategoryData {
+  total: number;
+  count: number;
+  transactions: Transaction[];
+}
+
 /**
  * Group transactions by category with totals
  *
- * @param {Array<Object>} transactions - Array of transaction objects
- * @returns {Object} Category-grouped data: { [category]: { total, count, transactions } }
+ * @param transactions - Array of transaction objects
+ * @returns Category-grouped data: { [category]: { total, count, transactions } }
  *
  * @example
  * groupByCategory(transactions)
@@ -24,12 +31,14 @@
  * - Missing category: uses "Uncategorized"
  * - Invalid amounts: treated as 0
  */
-export const groupByCategory = (transactions) => {
+export const groupByCategory = (
+  transactions: Transaction[]
+): Record<string, CategoryData> => {
   if (!transactions || transactions.length === 0) {
     return {};
   }
 
-  return transactions.reduce((acc, t) => {
+  return transactions.reduce((acc: Record<string, CategoryData>, t) => {
     const category = t.category || "Uncategorized";
     if (!acc[category]) {
       acc[category] = {
@@ -67,9 +76,9 @@ export const groupByCategory = (transactions) => {
  * - limit > available categories: returns all categories
  * - limit = 0: returns []
  */
-export const getTopCategories = (transactions, limit = 10) => {
+export const getTopCategories = (transactions: Transaction[], limit = 10) => {
   const grouped = groupByCategory(
-    transactions.filter((t) => t.type === "Expense")
+    transactions.filter((t: Transaction) => t.type === "Expense")
   );
 
   return Object.entries(grouped)

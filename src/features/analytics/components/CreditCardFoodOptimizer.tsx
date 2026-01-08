@@ -5,6 +5,7 @@ import {
   calculateFoodMetrics,
   calculateCommuteMetrics,
 } from "../../../lib/calculations/financial";
+import type { CardBreakdown } from "../../../types";
 import { CashbackSection } from "./CashbackSection";
 import { FoodSpendingSection } from "./FoodSpendingSection";
 import { CommuteSection } from "./CommuteSection";
@@ -17,23 +18,40 @@ interface CreditCardFoodOptimizerProps {
  * Credit Card & Lifestyle Optimizer
  * Main coordinator component - delegates to sub-components
  */
-const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps) => {
+const CreditCardFoodOptimizer = ({
+  filteredData,
+}: CreditCardFoodOptimizerProps) => {
   // Calculate metrics using useMemo for performance
   const creditCardData = useMemo(() => {
-    const data = calculateCashbackMetrics(filteredData);
-    const totalCreditCardSpending = data.breakdown?.reduce(
-      (sum: number, item: any) => sum + (item.spending || 0),
+    const raw = calculateCashbackMetrics(filteredData) as any;
+    const normalizedBreakdown: CardBreakdown[] = (
+      raw.cardBreakdown ||
+      raw.breakdown ||
+      []
+    ).map((item: any) => {
+      const spending = item.spending ?? item.total ?? 0;
+      const cashback = item.cashback ?? 0;
+      const computedRate = spending > 0 ? (cashback / spending) * 100 : 0;
+      return {
+        card: item.card || item.name || "Card",
+        spending,
+        cashback,
+        cashbackRate: item.cashbackRate ?? item.rate ?? computedRate,
+      };
+    });
+    const totalCreditCardSpending = normalizedBreakdown.reduce(
+      (sum, item) => sum + (item.spending || 0),
       0
-    ) || 0;
+    );
     return {
       totalCreditCardSpending,
-      totalCashbackEarned: data.totalCashbackEarned || 0,
-      cashbackShared: data.cashbackShared || 0,
-      actualCashback: data.actualCashback || 0,
-      cashbackRate: data.cashbackRate || 0,
-      byCard: data.byCard || {},
-      cardBreakdown: data.breakdown || [],
-      insights: data.insights || [],
+      totalCashbackEarned: raw.totalCashbackEarned || 0,
+      cashbackShared: raw.cashbackShared || 0,
+      actualCashback: raw.actualCashback || 0,
+      cashbackRate: raw.cashbackRate || 0,
+      byCard: raw.byCard || {},
+      cardBreakdown: normalizedBreakdown,
+      insights: raw.insights || [],
     };
   }, [filteredData]);
 
@@ -78,7 +96,7 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
       ),
       datasets: [
         {
-          data: creditCardData.cardBreakdown.map((c: any) => c.total),
+          data: creditCardData.cardBreakdown.map((c: any) => c.spending),
           backgroundColor: [
             "#3b82f6",
             "#8b5cf6",
@@ -249,7 +267,11 @@ interface OptimizationTipsProps {
 /**
  * Optimization Tips Component
  */
-const OptimizationTips = ({ foodData, creditCardData, commuteData }: OptimizationTipsProps) => (
+const OptimizationTips = ({
+  foodData,
+  creditCardData,
+  commuteData,
+}: OptimizationTipsProps) => (
   <div className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-xl p-6 shadow-lg border border-purple-700/50">
     <h3 className="text-xl font-bold text-white mb-4">💡 Optimization Tips</h3>
     <div className="space-y-3">

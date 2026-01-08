@@ -138,22 +138,30 @@ const calculateProjectedTax = (
  * Tax Planning Dashboard
  * Income tax calculations, deductions, and planning
  */
-// eslint-disable-next-line complexity
-export const TaxPlanningDashboard = ({ filteredData }: TaxPlanningDashboardProps) => {
-  const taxPlanningData = useMemo(() => {
-    return calculateTaxPlanning(filteredData);
+
+export const TaxPlanningDashboard = ({
+  filteredData,
+}: TaxPlanningDashboardProps) => {
+  type TaxPlanningResult = {
+    overall: any;
+    byFinancialYear: Record<string, any>;
+    availableYears: string[];
+  };
+
+  const taxPlanningData = useMemo<TaxPlanningResult>(() => {
+    return calculateTaxPlanning(filteredData) as TaxPlanningResult;
   }, [filteredData]);
 
   const { overall, byFinancialYear, availableYears } = taxPlanningData;
 
   // State for selected financial year
-  const [selectedFY, setSelectedFY] = useState(
+  const [selectedFY, setSelectedFY] = useState<string>(
     availableYears.length > 0 ? availableYears[0] : "overall"
   );
 
   // Get data for selected FY or overall
   const taxData =
-    selectedFY === "overall" ? overall : (byFinancialYear as any)[selectedFY] || overall;
+    selectedFY === "overall" ? overall : byFinancialYear[selectedFY] || overall;
 
   const {
     totalIncome = 0,

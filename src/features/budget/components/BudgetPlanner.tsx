@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import {
   calculateCategorySpending,
   calculateAverageSpending,
@@ -44,7 +43,9 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
   const [averageSpending, setAverageSpending] = useState<BudgetMap>({});
   const [budgets, setBudgets] = useState<BudgetMap>({});
   const [comparison, setComparison] = useState<ComparisonMap>({});
-  const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
+  const [recurringPayments, setRecurringPayments] = useState<
+    RecurringPayment[]
+  >([]);
   const [editMode, setEditMode] = useState(false);
   const [tempBudgets, setTempBudgets] = useState<BudgetMap>({});
 
@@ -367,8 +368,4 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
       )}
     </div>
   );
-};
-
-BudgetPlanner.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

@@ -1,17 +1,31 @@
-// @ts-nocheck
 /**
  * Smart Insights Generator
  * Generates AI-style personalized financial insights and recommendations
  */
 
+import type { Transaction } from "../../types";
+import type { DateRangeResult } from "../calculations/time/dateRange";
 import {
   calculateDateRange,
   calculatePerDayFrequency,
   calculateSavingsPotential,
 } from "../calculations";
 
+interface InsightItem {
+  type: string;
+  priority: string;
+  icon: string;
+  title: string;
+  message: string;
+  actionable: boolean;
+  category?: string;
+}
+
 // Helper functions to reduce complexity
-const analyzeDeliverySpending = (transactions, dateRange) => {
+const analyzeDeliverySpending = (
+  transactions: Transaction[],
+  dateRange: DateRangeResult
+): InsightItem | null => {
   const deliveryTransactions = transactions.filter(
     (t) =>
       t.type === "Expense" &&
@@ -36,7 +50,7 @@ const analyzeDeliverySpending = (transactions, dateRange) => {
 
   const savings = calculateSavingsPotential(total, totalDays, 0.3);
 
-  if (!savings?.monthlySavings || !savings?.yearlySavings) {
+  if (!savings?.monthlySavings || !savings?.annualSavings) {
     return null;
   }
 
@@ -45,23 +59,26 @@ const analyzeDeliverySpending = (transactions, dateRange) => {
     priority: "high",
     icon: "💰",
     title: "Delivery App Savings Potential",
-    message: `You order food ${ordersPerWeek.toFixed(1)} times per week (avg ₹${avgPerOrder.toFixed(0)} per order). Reducing by 30% could save ₹${savings.monthlySavings.toFixed(0)} per month (₹${savings.yearlySavings.toFixed(0)} per year)`,
+    message: `You order food ${ordersPerWeek.toFixed(1)} times per week (avg ₹${avgPerOrder.toFixed(0)} per order). Reducing by 30% could save ₹${savings.monthlySavings.toFixed(0)} per month (₹${savings.annualSavings.toFixed(0)} per year)`,
     actionable: true,
     category: "Food",
   };
 };
 
-const analyzeWeekendPattern = (transactions) => {
-  const weekdaySpending = [];
-  const weekendSpending = [];
-  const weekdayDays = new Set();
-  const weekendDays = new Set();
+const analyzeWeekendPattern = (
+  transactions: Transaction[]
+): InsightItem | null => {
+  const weekdaySpending: number[] = [];
+  const weekendSpending: number[] = [];
+  const weekdayDays = new Set<string>();
+  const weekendDays = new Set<string>();
 
   transactions.forEach((t) => {
     if (t.type === "Expense" && t.date) {
       const amount = Math.abs(Number(t.amount) || 0);
-      const day = t.date.getDay();
-      const dateKey = t.date.toISOString().split("T")[0]; // "2025-12-30"
+      const date = typeof t.date === "string" ? new Date(t.date) : t.date;
+      const day = date.getDay();
+      const dateKey = date.toISOString().split("T")[0]; // "2025-12-30"
 
       if (day === 0 || day === 6) {
         weekendSpending.push(amount);
@@ -98,7 +115,10 @@ const analyzeWeekendPattern = (transactions) => {
   };
 };
 
-const analyzeSavingsRate = (expenseTransactions, incomeTransactions) => {
+const analyzeSavingsRate = (
+  expenseTransactions: Transaction[],
+  incomeTransactions: Transaction[]
+): InsightItem | null => {
   const totalExpense = expenseTransactions.reduce(
     (sum, t) => sum + t.amount,
     0
@@ -132,8 +152,11 @@ const analyzeSavingsRate = (expenseTransactions, incomeTransactions) => {
   return null;
 };
 
-const analyzeHighFrequencyCategory = (expenseTransactions, dateRange) => {
-  const categoryCounts = {};
+const analyzeHighFrequencyCategory = (
+  expenseTransactions: Transaction[],
+  dateRange: DateRangeResult
+): InsightItem | null => {
+  const categoryCounts: Record<string, number> = {};
   expenseTransactions.forEach((t) => {
     categoryCounts[t.category] = (categoryCounts[t.category] || 0) + 1;
   });
@@ -165,7 +188,10 @@ const analyzeHighFrequencyCategory = (expenseTransactions, dateRange) => {
   };
 };
 
-const analyzeCafeteriaSpending = (transactions, dateRange) => {
+const analyzeCafeteriaSpending = (
+  transactions: Transaction[],
+  dateRange: DateRangeResult
+): InsightItem | null => {
   const cafeteriaTransactions = transactions.filter(
     (t) => t.type === "Expense" && t.subcategory?.includes("Office Cafeteria")
   );
@@ -190,6 +216,11 @@ const analyzeCafeteriaSpending = (transactions, dateRange) => {
     dateRange.totalDays || 1,
     0.5
   );
+
+  if (!packLunchSavings?.monthlySavings) {
+    return null;
+  }
+
   return {
     type: "saving-opportunity",
     priority: "medium",
@@ -201,7 +232,10 @@ const analyzeCafeteriaSpending = (transactions, dateRange) => {
   };
 };
 
-const analyzeLargeTransactions = (expenseTransactions, totalExpense) => {
+const analyzeLargeTransactions = (
+  expenseTransactions: Transaction[],
+  totalExpense: number
+): InsightItem | null => {
   const avgExpense = totalExpense / expenseTransactions.length;
   const largeTransactions = expenseTransactions.filter(
     (t) => t.amount > avgExpense * 3
@@ -224,8 +258,10 @@ const analyzeLargeTransactions = (expenseTransactions, totalExpense) => {
   };
 };
 
-export const generateSmartInsights = (transactions) => {
-  const insights = [];
+export const generateSmartInsights = (
+  transactions: Transaction[]
+): InsightItem[] => {
+  const insights: InsightItem[] = [];
   const dateRange = calculateDateRange(transactions);
 
   if ((dateRange.totalDays || 0) === 0 || transactions.length === 0) {
@@ -257,7 +293,12 @@ export const generateSmartInsights = (transactions) => {
   });
 
   // Sort by priority
-  const priorityOrder = { high: 1, medium: 2, positive: 3, low: 4 };
+  const priorityOrder: Record<string, number> = {
+    high: 1,
+    medium: 2,
+    positive: 3,
+    low: 4,
+  };
   return insights.sort(
     (a, b) =>
       (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99)

@@ -1,15 +1,16 @@
-// @ts-nocheck
 /**
  * Net Balance Breakdown Calculations
  * Categorizes accounts into Cash, Investments, Deposits, and Debt
  */
 
+type AccountCategory = "cash" | "investments" | "deposit" | "debt" | "other";
+
 /**
  * Categorize account types based on account names
- * @param {string} accountName - Name of the account
- * @returns {string} Category: 'cash', 'investment', 'deposit', 'debt', 'other'
+ * @param accountName - Name of the account
+ * @returns Category: 'cash', 'investment', 'deposit', 'debt', 'other'
  */
-export const categorizeAccount = (accountName) => {
+export const categorizeAccount = (accountName: string): AccountCategory => {
   if (!accountName) {
     return "other";
   }
@@ -54,7 +55,7 @@ export const categorizeAccount = (accountName) => {
     !name.includes("fam") &&
     !name.includes("friend")
   ) {
-    return "investment";
+    return "investments" as AccountCategory;
   }
 
   // Debt: Credit Cards
@@ -85,12 +86,37 @@ export const categorizeAccount = (accountName) => {
   return "other";
 };
 
+import type { Transaction } from "../../../types";
+
+interface AccountDetail {
+  account: string;
+  balance: number;
+}
+
+export interface NetBalanceBreakdown {
+  cash: number;
+  investments: number;
+  deposits: number;
+  debt: number;
+  other: number;
+  total: number;
+  byAccount: {
+    cash?: AccountDetail[];
+    investments?: AccountDetail[];
+    deposits?: AccountDetail[];
+    debt?: AccountDetail[];
+    other?: AccountDetail[];
+  };
+}
+
 /**
  * Calculate net balance breakdown by category
- * @param {Array} transactions - All transactions
- * @returns {Object} Breakdown of balances by category
+ * @param transactions - All transactions
+ * @returns Breakdown of balances by category
  */
-export const calculateNetBalanceBreakdown = (transactions) => {
+export const calculateNetBalanceBreakdown = (
+  transactions: Transaction[]
+): NetBalanceBreakdown => {
   if (!transactions || transactions.length === 0) {
     return {
       cash: 0,
@@ -104,7 +130,7 @@ export const calculateNetBalanceBreakdown = (transactions) => {
   }
 
   // First calculate balance per account
-  const accountBalances = {};
+  const accountBalances: Record<string, number> = {};
 
   transactions.forEach(({ account, type, amount }) => {
     if (!account) {
@@ -127,17 +153,26 @@ export const calculateNetBalanceBreakdown = (transactions) => {
   });
 
   // Categorize accounts and sum by category
-  const breakdown = {
+  const breakdown: {
+    cash: number;
+    investments: number;
+    deposits: number;
+    debt: number;
+    other: number;
+    total: number;
+    byAccount: Record<string, Array<{ name: string; balance: number }>>;
+  } = {
     cash: 0,
     investments: 0,
     deposits: 0,
     debt: 0,
     other: 0,
+    total: 0,
     byAccount: {},
   };
 
   Object.entries(accountBalances).forEach(([account, balance]) => {
-    const category = categorizeAccount(account);
+    const category = categorizeAccount(account) as string;
 
     // Special handling for debt: negative balances in any account are debt
     // Positive balances in credit card accounts are also debt (money owed)
@@ -152,16 +187,30 @@ export const calculateNetBalanceBreakdown = (transactions) => {
       });
     } else {
       // Positive balances in other categories
-      breakdown[category] += balance;
+      // Map "investment" and "deposit" to correct property names
+      const propName =
+        category === "investment"
+          ? "investments"
+          : category === "deposit"
+            ? "deposits"
+            : category;
+      if (
+        propName === "investments" ||
+        propName === "deposits" ||
+        propName === "cash" ||
+        propName === "other"
+      ) {
+        breakdown[propName] += balance;
 
-      // Store individual account info
-      if (!breakdown.byAccount[category]) {
-        breakdown.byAccount[category] = [];
+        // Store individual account info
+        if (!breakdown.byAccount[category]) {
+          breakdown.byAccount[category] = [];
+        }
+        breakdown.byAccount[category].push({
+          name: account,
+          balance,
+        });
       }
-      breakdown.byAccount[category].push({
-        name: account,
-        balance: balance,
-      });
     }
   });
 
@@ -181,7 +230,7 @@ export const calculateNetBalanceBreakdown = (transactions) => {
  * @param {Object} breakdown - Balance breakdown
  * @returns {Array} Array of insights
  */
-export const getBalanceBreakdownInsights = (breakdown) => {
+export const getBalanceBreakdownInsights = (breakdown: NetBalanceBreakdown) => {
   const insights = [];
 
   // Cash concentration
@@ -226,8 +275,18 @@ export const getBalanceBreakdownInsights = (breakdown) => {
  * @param {Array|Object} accountBalances - Account balances from uploaded file
  * @returns {Object} Breakdown of balances by category
  */
-export const calculateNetBalanceBreakdownFromAccounts = (accountBalances) => {
-  const breakdown = {
+export const calculateNetBalanceBreakdownFromAccounts = (
+  accountBalances: any
+) => {
+  const breakdown: {
+    cash: number;
+    investments: number;
+    deposits: number;
+    debt: number;
+    other: number;
+    total: number;
+    byAccount: Record<string, Array<{ name: string; balance: number }>>;
+  } = {
     cash: 0,
     investments: 0,
     deposits: 0,
@@ -248,7 +307,7 @@ export const calculateNetBalanceBreakdownFromAccounts = (accountBalances) => {
 
   entries.forEach(([name, balance]) => {
     const balanceNum = Number.parseFloat(balance) || 0;
-    const category = categorizeAccount(name);
+    const category = categorizeAccount(name) as string;
 
     // Credit card or negative balance = debt
     if (balanceNum < 0 || category === "debt") {
@@ -264,15 +323,29 @@ export const calculateNetBalanceBreakdownFromAccounts = (accountBalances) => {
       });
     } else if (balanceNum > 0) {
       // Positive balance - categorize
-      breakdown[category] += balanceNum;
+      // Map "investment" and "deposit" to correct property names
+      const propName =
+        category === "investment"
+          ? "investments"
+          : category === "deposit"
+            ? "deposits"
+            : category;
+      if (
+        propName === "investments" ||
+        propName === "deposits" ||
+        propName === "cash" ||
+        propName === "other"
+      ) {
+        breakdown[propName] += balanceNum;
 
-      if (!breakdown.byAccount[category]) {
-        breakdown.byAccount[category] = [];
+        if (!breakdown.byAccount[category]) {
+          breakdown.byAccount[category] = [];
+        }
+        breakdown.byAccount[category].push({
+          name: name,
+          balance: balanceNum,
+        });
       }
-      breakdown.byAccount[category].push({
-        name: name,
-        balance: balanceNum,
-      });
     }
   });
 

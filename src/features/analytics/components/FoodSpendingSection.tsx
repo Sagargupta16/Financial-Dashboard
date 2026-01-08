@@ -6,7 +6,7 @@ interface FoodData {
   monthlyAverage: number;
   dailyAverage: number;
   deliveryApps: number;
-  insights: { title: string; message: string; priority: string; }[];
+  insights: { title: string; message: string; priority: string }[];
 }
 
 interface FoodSpendingSectionProps {

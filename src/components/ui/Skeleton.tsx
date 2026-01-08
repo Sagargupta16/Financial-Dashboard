@@ -8,7 +8,11 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * Skeleton Component - Loading placeholder with shimmer animation
  */
-export const Skeleton = ({ className = "", variant = "default", ...props }: SkeletonProps) => {
+export const Skeleton = ({
+  className = "",
+  variant = "default",
+  ...props
+}: SkeletonProps) => {
   const baseClasses =
     "animate-pulse bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] rounded";
 

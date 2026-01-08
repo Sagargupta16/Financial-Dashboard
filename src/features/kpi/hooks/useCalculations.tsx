@@ -153,8 +153,7 @@ export const useKeyInsights = (
     const mostFrequentCategory =
       (Object.entries(categoryCounts) as Array<[string, number]>).sort(
         ([, a], [, b]) => b - a
-      )[0]?.[0] ||
-      "N/A";
+      )[0]?.[0] || "N/A";
 
     // Calculate more meaningful averages - absolute value of all transactions
     const totalAbsoluteValue = filteredData.reduce(
@@ -179,24 +178,24 @@ export const useAccountBalances = (data: Transaction[]) => {
 
     const balances = data.reduce(
       (acc: Record<string, number>, { account, type, amount }) => {
-      if (!account) {
+        if (!account) {
+          return acc;
+        }
+        if (!acc[account]) {
+          acc[account] = 0;
+        }
+
+        const validAmount = Math.abs(Number(amount) || 0);
+
+        // Handle all transaction types - transfers show movement between accounts
+        // This gives a clear picture of where money is currently located
+        if (type === "Income" || type === "Transfer-In") {
+          acc[account] += validAmount;
+        } else if (type === "Expense" || type === "Transfer-Out") {
+          acc[account] -= validAmount;
+        }
+
         return acc;
-      }
-      if (!acc[account]) {
-        acc[account] = 0;
-      }
-
-      const validAmount = Math.abs(Number(amount) || 0);
-
-      // Handle all transaction types - transfers show movement between accounts
-      // This gives a clear picture of where money is currently located
-      if (type === "Income" || type === "Transfer-In") {
-        acc[account] += validAmount;
-      } else if (type === "Expense" || type === "Transfer-Out") {
-        acc[account] -= validAmount;
-      }
-
-      return acc;
       },
       {} as Record<string, number>
     );
@@ -274,9 +273,9 @@ export const useEnhancedKPIData = (
       }
     });
 
-    const topCategory = (Object.entries(categoryTotals) as Array<
-      [string, number]
-    >).sort(([, a], [, b]) => b - a)[0];
+    const topCategory = (
+      Object.entries(categoryTotals) as Array<[string, number]>
+    ).sort(([, a], [, b]) => b - a)[0];
 
     const categoryConcentration =
       topCategory && expense > 0

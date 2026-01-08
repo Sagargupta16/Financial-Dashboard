@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps, react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
 import PropTypes from "prop-types";
 import React from "react";
@@ -93,7 +93,10 @@ const createDatasets = (
 };
 
 // eslint-disable-next-line max-lines-per-function
-export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }: ChartComponentProps) => {
+export const EnhancedSpendingByAccountChart = ({
+  filteredData,
+  chartRef,
+}: ChartComponentProps) => {
   const {
     currentYear,
     currentMonth,
@@ -538,10 +541,8 @@ export const EnhancedSubcategoryBreakdownChart = ({
         );
       }
     });
-    // eslint-disable-next-line max-lines-per-function
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
-  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     if (!selectedCategory) {
       return { labels: [], datasets: [] };
@@ -989,11 +990,9 @@ export const MultiCategoryTimeAnalysisChart = ({
           date.getMonth() + 1 === currentMonth
         );
       }
-      // eslint-disable-next-line max-lines-per-function
     });
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
-  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const colors = [
       "#ef4444",
@@ -1327,7 +1326,7 @@ export const MultiCategoryTimeAnalysisChart = ({
 MultiCategoryTimeAnalysisChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
   chartRef: PropTypes.object,
-  // eslint-disable-next-line max-lines-per-function
+
   categories: PropTypes.array,
 };
 
@@ -1859,7 +1858,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
 
 NetWorthTrendChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
@@ -2420,11 +2419,10 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
 
 CumulativeCategoryTrendChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("All");
 
@@ -2661,11 +2659,10 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
 
 SeasonalSpendingHeatmap.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   const [comparisonType, setComparisonType] = React.useState("monthly");
   const [selectedYears, setSelectedYears] = React.useState(new Set());
@@ -2899,18 +2896,16 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
 
 YearOverYearComparisonChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const SpendingForecastChart = ({ filteredData, chartRef }) => {
-  // eslint-disable-next-line max-lines-per-function
   const [forecastMonths, setForecastMonths] = React.useState(6);
   const [forecastType, setForecastType] = React.useState("best");
   const [showConfidence, setShowConfidence] = React.useState(true);
 
-  // eslint-disable-next-line max-lines-per-function
   const { chartData, forecastInfo } = React.useMemo(() => {
     const monthlyData = {};
     filteredData.forEach((item) => {
@@ -3201,18 +3196,17 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
 
 SpendingForecastChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const [selectedAccount, setSelectedAccount] = React.useState("all");
-  // eslint-disable-next-line max-lines-per-function
+
   const [viewMode, setViewMode] = React.useState("cumulative");
   const [showAverage, setShowAverage] = React.useState(true);
 
-  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const accounts = [
       ...new Set(filteredData.map((item) => item.account)),
@@ -3560,17 +3554,15 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
 
 AccountBalanceProgressionChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
 export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
-  // eslint-disable-next-line max-lines-per-function
   const [patternType, setPatternType] = React.useState("dayOfWeek");
   const [metricType, setMetricType] = React.useState("expense");
 
-  // eslint-disable-next-line max-lines-per-function
   const chartData = React.useMemo(() => {
     const expenseData = filteredData.filter(
       (item) => item.type === "Expense" && item.category !== "In-pocket"
@@ -3850,7 +3842,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
 
 DayWeekSpendingPatternsChart.propTypes = {
   filteredData: PropTypes.array.isRequired,
-  // eslint-disable-next-line max-lines-per-function
+
   chartRef: PropTypes.object,
 };
 
@@ -4077,7 +4069,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       .map((row) => Object.values(row).join(","))
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
-    // eslint-disable-next-line no-undef
+
     const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

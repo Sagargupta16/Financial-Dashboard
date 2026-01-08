@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable max-lines-per-function */
 /**
  * Advanced Forecasting Utilities
  * Provides sophisticated forecasting methods for financial data
@@ -7,11 +5,14 @@
 
 /**
  * Calculate moving average
- * @param {Array} data - Array of numbers
- * @param {number} window - Window size
- * @returns {Array} Moving averages
+ * @param data - Array of numbers
+ * @param window - Window size
+ * @returns Moving averages
  */
-export const calculateMovingAverage = (data, window = 3) => {
+export const calculateMovingAverage = (
+  data: number[],
+  window = 3
+): number[] => {
   if (!data || data.length < window) {
     return [];
   }
@@ -24,14 +25,23 @@ export const calculateMovingAverage = (data, window = 3) => {
   return result;
 };
 
+interface SmoothingResult {
+  smoothed: number[];
+  forecast: number[];
+}
+
 /**
  * Calculate exponential smoothing forecast
- * @param {Array} data - Historical data points
- * @param {number} alpha - Smoothing factor (0-1, higher = more weight to recent)
- * @param {number} periods - Number of periods to forecast
- * @returns {Object} Forecast data with smoothed values
+ * @param data - Historical data points
+ * @param alpha - Smoothing factor (0-1, higher = more weight to recent)
+ * @param periods - Number of periods to forecast
+ * @returns Forecast data with smoothed values
  */
-export const exponentialSmoothing = (data, alpha = 0.3, periods = 6) => {
+export const exponentialSmoothing = (
+  data: number[],
+  alpha = 0.3,
+  periods = 6
+): SmoothingResult => {
   if (!data || data.length === 0) {
     return { smoothed: [], forecast: [] };
   }
@@ -51,23 +61,30 @@ export const exponentialSmoothing = (data, alpha = 0.3, periods = 6) => {
   return { smoothed, forecast };
 };
 
+interface DoubleExponentialResult {
+  smoothed: number[];
+  forecast: number[];
+  level: number[];
+  trend: number[];
+}
+
 /**
  * Calculate double exponential smoothing (Holt's method)
  * Better for data with trends
- * @param {Array} data - Historical data points
- * @param {number} alpha - Level smoothing factor
- * @param {number} beta - Trend smoothing factor
- * @param {number} periods - Number of periods to forecast
- * @returns {Object} Forecast with trend
+ * @param data - Historical data points
+ * @param alpha - Level smoothing factor
+ * @param beta - Trend smoothing factor
+ * @param periods - Number of periods to forecast
+ * @returns Forecast with trend
  */
 export const doubleExponentialSmoothing = (
-  data,
+  data: number[],
   alpha = 0.3,
   beta = 0.1,
   periods = 6
-) => {
+): DoubleExponentialResult => {
   if (!data || data.length < 2) {
-    return { smoothed: [], forecast: [] };
+    return { smoothed: [], forecast: [], level: [], trend: [] };
   }
 
   const level = [data[0]];
@@ -86,8 +103,8 @@ export const doubleExponentialSmoothing = (
   }
 
   // Forecast with trend
-  const lastLevel = level.at(-1);
-  const lastTrend = trend.at(-1);
+  const lastLevel = level.at(-1) ?? 0;
+  const lastTrend = trend.at(-1) ?? 0;
   const forecast = [];
 
   for (let i = 1; i <= periods; i++) {
@@ -97,12 +114,18 @@ export const doubleExponentialSmoothing = (
   return { smoothed, forecast, level, trend };
 };
 
+interface LinearRegressionResult {
+  slope: number;
+  intercept: number;
+  r2: number;
+}
+
 /**
  * Calculate linear regression
- * @param {Array} data - Array of numbers
- * @returns {Object} Slope and intercept
+ * @param data - Array of numbers
+ * @returns Slope and intercept
  */
-export const linearRegression = (data) => {
+export const linearRegression = (data: number[]): LinearRegressionResult => {
   if (!data || data.length < 2) {
     return { slope: 0, intercept: 0, r2: 0 };
   }
@@ -130,18 +153,28 @@ export const linearRegression = (data) => {
   return { slope, intercept, r2: Math.max(0, Math.min(1, r2)) };
 };
 
+interface SeasonalityResult {
+  hasSeasonality: boolean;
+  indices: Record<string, number>;
+  strength: number;
+  monthlyAverages?: Record<string, number>;
+  overallAverage?: number;
+}
+
 /**
  * Detect seasonal patterns
- * @param {Object} monthlyData - Data grouped by month (e.g., "2024-01": value)
- * @returns {Object} Seasonal indices and analysis
+ * @param monthlyData - Data grouped by month (e.g., "2024-01": value)
+ * @returns Seasonal indices and analysis
  */
-export const detectSeasonality = (monthlyData) => {
+export const detectSeasonality = (
+  monthlyData: Record<string, number>
+): SeasonalityResult => {
   if (!monthlyData || Object.keys(monthlyData).length < 12) {
     return { hasSeasonality: false, indices: {}, strength: 0 };
   }
 
   // Group by month (1-12) across all years
-  const monthGroups = {};
+  const monthGroups: Record<number, number[]> = {};
   Object.entries(monthlyData).forEach(([key, value]) => {
     const month = Number.parseInt(key.split("-")[1], 10);
     if (!monthGroups[month]) {
@@ -151,9 +184,10 @@ export const detectSeasonality = (monthlyData) => {
   });
 
   // Calculate average for each month
-  const monthlyAverages = {};
+  const monthlyAverages: Record<number, number> = {};
   Object.entries(monthGroups).forEach(([month, values]) => {
-    monthlyAverages[month] = values.reduce((a, b) => a + b, 0) / values.length;
+    monthlyAverages[Number(month)] =
+      values.reduce((a, b) => a + b, 0) / values.length;
   });
 
   // Calculate overall average
@@ -161,7 +195,7 @@ export const detectSeasonality = (monthlyData) => {
     Object.values(monthlyAverages).reduce((a, b) => a + b, 0) / 12;
 
   // Calculate seasonal indices (month average / overall average)
-  const indices = {};
+  const indices: Record<string, number> = {};
   Object.entries(monthlyAverages).forEach(([month, avg]) => {
     indices[month] = overallAverage > 0 ? avg / overallAverage : 1;
   });
@@ -184,14 +218,29 @@ export const detectSeasonality = (monthlyData) => {
   };
 };
 
+interface OutlierItem {
+  index: number;
+  value: number;
+}
+
+interface OutliersResult {
+  outliers: OutlierItem[];
+  cleanData: number[];
+  lowerBound?: number;
+  upperBound?: number;
+  q1?: number;
+  q3?: number;
+  iqr?: number;
+}
+
 /**
  * Detect outliers using IQR method
- * @param {Array} data - Array of numbers
- * @returns {Object} Outlier analysis
+ * @param data - Array of numbers
+ * @returns Outlier analysis
  */
-export const detectOutliers = (data) => {
+export const detectOutliers = (data: number[]): OutliersResult => {
   if (!data || data.length < 4) {
-    return { outliers: [], cleanData: data, threshold: null };
+    return { outliers: [], cleanData: data || [] };
   }
 
   const sorted = [...data].sort((a, b) => a - b);
@@ -205,8 +254,8 @@ export const detectOutliers = (data) => {
   const lowerBound = q1 - 1.5 * iqr;
   const upperBound = q3 + 1.5 * iqr;
 
-  const outliers = [];
-  const cleanData = [];
+  const outliers: OutlierItem[] = [];
+  const cleanData: number[] = [];
 
   data.forEach((value, index) => {
     if (value < lowerBound || value > upperBound) {
@@ -227,18 +276,25 @@ export const detectOutliers = (data) => {
   };
 };
 
+interface ConfidenceIntervalsResult {
+  upper: number[];
+  lower: number[];
+  stdDev?: number;
+  margin?: number;
+}
+
 /**
  * Calculate confidence intervals for forecast
- * @param {Array} historicalData - Historical data points
- * @param {Array} forecastData - Forecasted values
- * @param {number} confidence - Confidence level (0.95 for 95%)
- * @returns {Object} Upper and lower bounds
+ * @param historicalData - Historical data points
+ * @param forecastData - Forecasted values
+ * @param confidence - Confidence level (0.95 for 95%)
+ * @returns Upper and lower bounds
  */
 export const calculateConfidenceIntervals = (
-  historicalData,
-  forecastData,
+  historicalData: number[],
+  forecastData: number[],
   confidence = 0.95
-) => {
+): ConfidenceIntervalsResult => {
   if (!historicalData || !forecastData || historicalData.length < 2) {
     return { upper: forecastData, lower: forecastData };
   }
@@ -275,12 +331,19 @@ export const calculateConfidenceIntervals = (
   return { upper, lower, stdDev, margin: stdDev * zScore };
 };
 
+interface VolatilityResult {
+  volatility: number;
+  level: string;
+  stdDev?: number;
+  mean?: number;
+}
+
 /**
  * Calculate volatility index
- * @param {Array} data - Historical data
- * @returns {Object} Volatility metrics
+ * @param data - Historical data
+ * @returns Volatility metrics
  */
-export const calculateVolatility = (data) => {
+export const calculateVolatility = (data: number[]): VolatilityResult => {
   if (!data || data.length < 2) {
     return { volatility: 0, level: "stable" };
   }
@@ -309,13 +372,35 @@ export const calculateVolatility = (data) => {
   return { volatility, level, stdDev, mean };
 };
 
+interface ComprehensiveForecastResult {
+  simple: { forecast: number[] };
+  exponential: SmoothingResult;
+  doubleExponential: DoubleExponentialResult;
+  regression: LinearRegressionResult & { forecast: number[] };
+  best: {
+    method: string;
+    forecast: number[];
+    confidence: ConfidenceIntervalsResult;
+  };
+  volatility: VolatilityResult;
+  outliers: number;
+  dataQuality: {
+    r2: number;
+    volatility: number;
+    outlierCount: number;
+  };
+}
+
 /**
  * Comprehensive forecast with multiple methods
- * @param {Array} historicalData - Historical data points
- * @param {number} periods - Periods to forecast
- * @returns {Object} All forecast methods and analysis
+ * @param historicalData - Historical data points
+ * @param periods - Periods to forecast
+ * @returns All forecast methods and analysis
  */
-export const comprehensiveForecast = (historicalData, periods = 6) => {
+export const comprehensiveForecast = (
+  historicalData: number[],
+  periods = 6
+): ComprehensiveForecastResult | null => {
   if (!historicalData || historicalData.length < 3) {
     return null;
   }

@@ -26,6 +26,7 @@ import {
   calculateDailyAverage,
   calculateMonthlyAverage,
 } from "../index";
+import { getAllFinancialYears, getFinancialYear } from "../../data";
 
 // ============================================================================
 // BASIC CALCULATIONS
@@ -400,7 +401,6 @@ export const calculateTaxPlanning = (transactions) => {
     };
   }
 
-  const { getAllFinancialYears, getFinancialYear } = require("../../data");
   const availableYears = getAllFinancialYears(transactions);
 
   // Group transactions by financial year
@@ -1122,11 +1122,9 @@ export const calculateCreditCardMetrics = (transactions) => {
   // Create breakdown array for charts
   const cardBreakdown = Object.entries(byCard).map(([card, data]) => ({
     card,
-    total: data.spending || 0,
+    spending: data.spending || 0,
     cashback: data.cashback || 0,
-    count: data.transactionCount || 0,
-    average: data.average || 0,
-    topCategory: data.topCategory || ["Other", 0],
+    cashbackRate: data.spending > 0 ? (data.cashback / data.spending) * 100 : 0,
   }));
 
   const totalSpending = Object.values(byCard).reduce(

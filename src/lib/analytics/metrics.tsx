@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Metric Helper Utilities
  * Reusable helper functions for KPI metrics, colors, and formatting
@@ -6,10 +5,10 @@
 
 /**
  * Get color class for savings rate metric
- * @param {number} rate - Savings rate percentage
- * @returns {string} Tailwind CSS class
+ * @param rate - Savings rate percentage
+ * @returns Tailwind CSS class
  */
-export const getSavingsRateColor = (rate) => {
+export const getSavingsRateColor = (rate: number): string => {
   if (rate >= 20) {
     return "bg-green-900/20 border-green-500/30";
   }
@@ -21,10 +20,10 @@ export const getSavingsRateColor = (rate) => {
 
 /**
  * Get icon color for savings rate metric
- * @param {number} rate - Savings rate percentage
- * @returns {string} Tailwind CSS class
+ * @param rate - Savings rate percentage
+ * @returns Tailwind CSS class
  */
-export const getSavingsRateIconColor = (rate) => {
+export const getSavingsRateIconColor = (rate: number): string => {
   if (rate >= 20) {
     return "text-green-400";
   }
@@ -36,10 +35,10 @@ export const getSavingsRateIconColor = (rate) => {
 
 /**
  * Get message for savings rate metric
- * @param {number} rate - Savings rate percentage
- * @returns {string} Message text
+ * @param rate - Savings rate percentage
+ * @returns Message text
  */
-export const getSavingsRateMessage = (rate) => {
+export const getSavingsRateMessage = (rate: number): string => {
   if (rate >= 20) {
     return "Excellent! 🎉";
   }
@@ -51,10 +50,10 @@ export const getSavingsRateMessage = (rate) => {
 
 /**
  * Get color class for spending velocity metric
- * @param {number} velocity - Spending velocity percentage
- * @returns {string} Tailwind CSS class
+ * @param velocity - Spending velocity percentage
+ * @returns Tailwind CSS class
  */
-export const getSpendingVelocityColor = (velocity) => {
+export const getSpendingVelocityColor = (velocity: number): string => {
   if (velocity > 120) {
     return "bg-red-900/20 border-red-500/30";
   }
@@ -69,7 +68,7 @@ export const getSpendingVelocityColor = (velocity) => {
  * @param {number} velocity - Spending velocity percentage
  * @returns {string} Tailwind CSS class
  */
-export const getSpendingVelocityIconColor = (velocity) => {
+export const getSpendingVelocityIconColor = (velocity: number) => {
   if (velocity > 120) {
     return "text-red-400";
   }
@@ -84,7 +83,7 @@ export const getSpendingVelocityIconColor = (velocity) => {
  * @param {number} netWorth - Net worth value
  * @returns {string} Tailwind CSS class
  */
-export const getNetWorthColor = (netWorth) => {
+export const getNetWorthColor = (netWorth: number) => {
   return netWorth >= 0
     ? "bg-green-900/20 border-green-500/30"
     : "bg-red-900/20 border-red-500/30";
@@ -95,7 +94,7 @@ export const getNetWorthColor = (netWorth) => {
  * @param {number} netWorth - Net worth value
  * @returns {string} Tailwind CSS class
  */
-export const getNetWorthIconColor = (netWorth) => {
+export const getNetWorthIconColor = (netWorth: number) => {
   return netWorth >= 0 ? "text-green-400" : "text-red-400";
 };
 
@@ -105,7 +104,10 @@ export const getNetWorthIconColor = (netWorth) => {
  * @param {number} threshold - Warning threshold (default 50)
  * @returns {string} Tailwind CSS class
  */
-export const getCategoryConcentrationColor = (percentage, threshold = 50) => {
+export const getCategoryConcentrationColor = (
+  percentage: number,
+  threshold: number = 50
+) => {
   return percentage > threshold
     ? "bg-orange-900/20 border-orange-500/30"
     : "bg-blue-900/20 border-blue-500/30";
@@ -116,7 +118,7 @@ export const getCategoryConcentrationColor = (percentage, threshold = 50) => {
  * @param {string} priority - Priority level (high, positive, medium, low)
  * @returns {string} Tailwind CSS class
  */
-export const getInsightPriorityColor = (priority) => {
+export const getInsightPriorityColor = (priority: string) => {
   if (priority === "high") {
     return "bg-red-900/20 border-red-500/30";
   }
@@ -136,7 +138,11 @@ export const getInsightPriorityColor = (priority) => {
  * @param {boolean} inverse - If true, lower is better
  * @returns {string} Tailwind CSS class
  */
-export const getMetricColor = (value, thresholds, inverse = false) => {
+export const getMetricColor = (
+  value: number,
+  thresholds: { good: number; warning: number },
+  inverse: boolean = false
+) => {
   const { good, warning } = thresholds;
 
   if (inverse) {
@@ -165,7 +171,11 @@ export const getMetricColor = (value, thresholds, inverse = false) => {
  * @param {boolean} inverse - If true, lower is better
  * @returns {string} Tailwind CSS class
  */
-export const getMetricIconColor = (value, thresholds, inverse = false) => {
+export const getMetricIconColor = (
+  value: number,
+  thresholds: { good: number; warning: number },
+  inverse: boolean = false
+) => {
   const { good, warning } = thresholds;
 
   if (inverse) {
@@ -192,7 +202,10 @@ export const getMetricIconColor = (value, thresholds, inverse = false) => {
  * @param {Object} monthlyComparison - Monthly comparison data
  * @returns {string} Formatted trend message
  */
-export const getMonthlyTrendDisplay = (monthlyComparison) => {
+export const getMonthlyTrendDisplay = (monthlyComparison: {
+  trend?: string;
+  avgGrowth?: number;
+}) => {
   if (!monthlyComparison?.trend || monthlyComparison.avgGrowth === undefined) {
     return "No trend data";
   }
@@ -210,7 +223,7 @@ export const getMonthlyTrendDisplay = (monthlyComparison) => {
  * @param {number} anomaliesCount - Number of anomalies
  * @returns {string} Formatted alert display
  */
-export const getAnomalyAlertDisplay = (anomaliesCount) => {
+export const getAnomalyAlertDisplay = (anomaliesCount: number) => {
   if (anomaliesCount > 0) {
     const plural = anomaliesCount > 1 ? "s" : "";
     return `⚠️ ${anomaliesCount} unusual transaction${plural}`;
@@ -225,8 +238,8 @@ export const getAnomalyAlertDisplay = (anomaliesCount) => {
  * @returns {string} Formatted subscriptions display
  */
 export const getSubscriptionsDisplay = (
-  recurringTransactions,
-  formatCurrency
+  recurringTransactions: any[],
+  formatCurrency: (amount: number) => string
 ) => {
   if (!recurringTransactions || recurringTransactions.length === 0) {
     return "None detected";
@@ -256,8 +269,8 @@ export const getSubscriptionsDisplay = (
  * @param {string} sectionType - Type of section (financial-health, insights, key-insights, transfer-info)
  * @returns {Object} Object with gradient and border classes
  */
-export const getSectionStyles = (sectionType) => {
-  const styles = {
+export const getSectionStyles = (sectionType: string) => {
+  const styles: Record<string, { gradient: string; border: string }> = {
     "financial-health": {
       gradient: "from-blue-900/20 to-purple-900/20",
       border: "border-blue-500/30",
@@ -289,7 +302,7 @@ export const getSectionStyles = (sectionType) => {
  * @param {Object} defaults - Default values
  * @returns {Object} Validated KPI data with defaults
  */
-export const validateKPIData = (kpiData, defaults) => {
+export const validateKPIData = (kpiData: any, defaults: any) => {
   if (!kpiData || typeof kpiData !== "object") {
     return defaults;
   }
@@ -304,7 +317,7 @@ export const validateKPIData = (kpiData, defaults) => {
  * @param {Array} transactions - Array of transaction objects
  * @returns {Object} Object containing years and month labels
  */
-export const getYearsAndMonths = (transactions) => {
+export const getYearsAndMonths = (transactions: any[]) => {
   const yearSet = new Set();
 
   transactions.forEach((transaction) => {
@@ -312,7 +325,9 @@ export const getYearsAndMonths = (transactions) => {
     yearSet.add(date.getFullYear());
   });
 
-  const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
+  const sortedYears = Array.from(yearSet).sort(
+    (a, b) => (b as number) - (a as number)
+  );
   const monthLabels = [
     { value: "0", label: "January" },
     { value: "1", label: "February" },

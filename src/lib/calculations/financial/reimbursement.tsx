@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Reimbursement Calculations Module
  *
@@ -8,12 +7,16 @@
  * 3. Average Reimbursement = Total Reimbursements / Number of Reimbursement transactions
  */
 
+import type { Transaction } from "../../../types";
+
 /**
  * Calculate total reimbursements received
- * @param {Array} transactions - All transactions
- * @returns {number} Total reimbursements
+ * @param transactions - All transactions
+ * @returns Total reimbursements
  */
-export const calculateTotalReimbursements = (transactions) => {
+export const calculateTotalReimbursements = (
+  transactions: Transaction[]
+): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -34,10 +37,12 @@ export const calculateTotalReimbursements = (transactions) => {
 
 /**
  * Calculate reimbursement transactions details
- * @param {Array} transactions - All transactions
- * @returns {Array} Reimbursement transaction details
+ * @param transactions - All transactions
+ * @returns Reimbursement transaction details
  */
-export const getReimbursementTransactions = (transactions) => {
+export const getReimbursementTransactions = (
+  transactions: Transaction[]
+): any[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
@@ -57,7 +62,7 @@ export const getReimbursementTransactions = (transactions) => {
       category: t.category || t.Category,
       subcategory: t.subcategory || t.Subcategory,
     }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
 /**
@@ -65,7 +70,7 @@ export const getReimbursementTransactions = (transactions) => {
  * @param {Array} transactions - All transactions
  * @returns {number} Average reimbursement amount
  */
-export const calculateAverageReimbursement = (transactions) => {
+export const calculateAverageReimbursement = (transactions: Transaction[]) => {
   const reimbTransactions = getReimbursementTransactions(transactions);
 
   if (reimbTransactions.length === 0) {
@@ -81,14 +86,17 @@ export const calculateAverageReimbursement = (transactions) => {
  * @param {Array} transactions - All transactions
  * @returns {Object} Reimbursement breakdown by month
  */
-export const calculateReimbursementByPeriod = (transactions) => {
+export const calculateReimbursementByPeriod = (transactions: Transaction[]) => {
   const reimbTransactions = getReimbursementTransactions(transactions);
 
   if (reimbTransactions.length === 0) {
     return {};
   }
 
-  const byPeriod = {};
+  const byPeriod: Record<
+    string,
+    { total: number; count: number; transactions: any[] }
+  > = {};
 
   reimbTransactions.forEach((t) => {
     const date = new Date(t.date);
@@ -115,7 +123,7 @@ export const calculateReimbursementByPeriod = (transactions) => {
  * @param {Array} transactions - All transactions
  * @returns {Object} Complete reimbursement analysis
  */
-export const calculateReimbursementMetrics = (transactions) => {
+export const calculateReimbursementMetrics = (transactions: Transaction[]) => {
   if (!transactions || transactions.length === 0) {
     return {
       totalReimbursements: 0,

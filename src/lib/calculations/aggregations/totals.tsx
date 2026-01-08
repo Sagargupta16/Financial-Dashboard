@@ -1,14 +1,15 @@
-// @ts-nocheck
 /**
  * Aggregation Calculations
  * Canonical implementation for income, expense, and total calculations
  */
 
+import type { Transaction } from "../../../types";
+
 /**
  * Calculate total income from transactions
  *
- * @param {Array<Object>} transactions - Array of transaction objects
- * @returns {number} Total income amount
+ * @param transactions - Array of transaction objects
+ * @returns Total income amount
  *
  * @example
  * calculateTotalIncome(transactions) // 500000
@@ -22,7 +23,7 @@
  * - Invalid amounts: treated as 0
  * - Negative amounts: converted to absolute (positive)
  */
-export const calculateTotalIncome = (transactions) => {
+export const calculateTotalIncome = (transactions: Transaction[]): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -34,8 +35,8 @@ export const calculateTotalIncome = (transactions) => {
 /**
  * Calculate total expense from transactions
  *
- * @param {Array<Object>} transactions - Array of transaction objects
- * @returns {number} Total expense amount
+ * @param transactions - Array of transaction objects
+ * @returns Total expense amount
  *
  * @example
  * calculateTotalExpense(transactions) // 350000
@@ -49,7 +50,7 @@ export const calculateTotalIncome = (transactions) => {
  * - Invalid amounts: treated as 0
  * - Negative amounts: converted to absolute (positive)
  */
-export const calculateTotalExpense = (transactions) => {
+export const calculateTotalExpense = (transactions: Transaction[]): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }

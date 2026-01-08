@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useState, useEffect, useMemo } from "react";
-import PropTypes from "prop-types";
 import {
   calculateNWSBreakdown,
   calculateNWSPercentages,
@@ -45,7 +44,10 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
   // Calculate total income
   const totalIncome = useMemo(() => {
     const incomeTransactions = filterByType(transactions, "Income");
-    return incomeTransactions.reduce((sum: number, t: any) => sum + parseAmount(t), 0);
+    return incomeTransactions.reduce(
+      (sum: number, t: any) => sum + parseAmount(t),
+      0
+    );
   }, [transactions]);
 
   // Calculate breakdown
@@ -388,8 +390,10 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map(({ key, label, icon }) => {
-            const details =
-              (breakdown?.categoryDetails?.[key] ?? {}) as Record<string, number>;
+            const details = (breakdown?.categoryDetails?.[key] ?? {}) as Record<
+              string,
+              number
+            >;
             const sortedCategories = Object.entries(details).sort(
               ([, a], [, b]) => b - a
             );
@@ -431,14 +435,4 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
       </div>
     </div>
   );
-};
-
-NeedsWantsSavings.propTypes = {
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.string,
-      category: PropTypes.string,
-      "income/expense": PropTypes.string,
-    })
-  ).isRequired,
 };

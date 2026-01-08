@@ -1,11 +1,16 @@
 /* eslint-disable max-lines-per-function */
-import PropTypes from "prop-types";
+import React from "react";
 import { Line } from "react-chartjs-2";
 import { commonChartOptions } from "./ChartConfig";
 
+interface EnhancedMonthlyTrendsChartProps {
+  filteredData: any[];
+  chartRef?: any;
+}
+
 // Enhanced Monthly Trends Chart with time navigation
 // eslint-disable-next-line max-lines-per-function
-export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
+export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }: EnhancedMonthlyTrendsChartProps) => {
   const [currentYear, setCurrentYear] = React.useState(
     new Date().getFullYear()
   );
@@ -13,7 +18,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   const [dataMode, setDataMode] = React.useState("regular");
 
   const availableYears = React.useMemo(() => {
-    const years = new Set();
+    const years = new Set<number>();
     filteredData.forEach((item) => {
       if (item.date) {
         const date = new Date(item.date);
@@ -54,7 +59,9 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
   }, [filteredData, currentYear, viewMode]);
 
   const chartData = React.useMemo(() => {
-    const monthly = timeFilteredData.reduce((acc, item) => {
+    const monthly = timeFilteredData.reduce<
+      Record<string, { income: number; expense: number }>
+    >((acc, item) => {
       if (!item.date) {
         return acc;
       }
@@ -81,7 +88,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       a.localeCompare(b)
     );
 
-    const formatMonthLabel = (monthString) => {
+    const formatMonthLabel = (monthString: string) => {
       const [year, month] = monthString.split("-");
       const monthNames = [
         "Jan",
@@ -136,7 +143,7 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
           },
           {
             label: "Cumulative Net",
-            data: sortedMonths.map((m, index) => {
+            data: sortedMonths.map((_, index) => {
               const totalIncome = sortedMonths
                 .slice(0, index + 1)
                 .reduce((sum, month) => sum + monthly[month].income, 0);
@@ -367,9 +374,4 @@ export const EnhancedMonthlyTrendsChart = ({ filteredData, chartRef }) => {
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
     </div>
   );
-};
-
-EnhancedMonthlyTrendsChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object,
 };

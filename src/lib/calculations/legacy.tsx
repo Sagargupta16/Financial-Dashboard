@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Extended Calculation Utilities
  * Additional financial calculations used across the application

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Financial Health Score Helper Functions
  * Extracted to reduce component complexity

@@ -1,24 +1,29 @@
 import { useRef, useState } from "react";
-import PropTypes from "prop-types";
 import { Upload, Download, AlertCircle, CheckCircle } from "lucide-react";
 import {
   parseCSV,
   exportToCSV,
   downloadCSV,
   readFileAsText,
-} from "../../../features/transactions/utils/csvUtils";
+} from "../../utils/csvUtils";
+
+interface CSVImportExportProps {
+  data: any[];
+  onImport: (data: any[]) => void;
+  filteredData: any[];
+}
 
 /**
  * Component for importing and exporting CSV files
  */
 // eslint-disable-next-line max-lines-per-function
-export const CSVImportExport = ({ data, onImport, filteredData }) => {
-  const fileInputRef = useRef(null);
-  const [importStatus, setImportStatus] = useState(null);
-  const [exportStatus, setExportStatus] = useState(null);
+export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExportProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importStatus, setImportStatus] = useState<{ type: string; message: string } | null>(null);
+  const [exportStatus, setExportStatus] = useState<{ type: string; message: string } | null>(null);
 
-  const handleFileSelect = async (event) => {
-    const file = event.target.files[0];
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) {
       return;
     }
@@ -36,7 +41,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }) => {
     } catch (error) {
       setImportStatus({
         type: "error",
-        message: error.message || "Failed to import CSV",
+        message: (error as Error).message || "Failed to import CSV",
       });
       setTimeout(() => setImportStatus(null), 5000);
     }
@@ -45,7 +50,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }) => {
     event.target.value = "";
   };
 
-  const handleExport = (useFiltered = false) => {
+  const handleExport = (useFiltered: boolean = false) => {
     try {
       const dataToExport = useFiltered ? filteredData : data;
       if (!dataToExport || dataToExport.length === 0) {
@@ -71,7 +76,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }) => {
     } catch (error) {
       setExportStatus({
         type: "error",
-        message: error.message || "Failed to export CSV",
+        message: (error as Error).message || "Failed to export CSV",
       });
       setTimeout(() => setExportStatus(null), 3000);
     }
@@ -182,10 +187,4 @@ export const CSVImportExport = ({ data, onImport, filteredData }) => {
       </div>
     </div>
   );
-};
-
-CSVImportExport.propTypes = {
-  data: PropTypes.array.isRequired,
-  onImport: PropTypes.func.isRequired,
-  filteredData: PropTypes.array.isRequired,
 };

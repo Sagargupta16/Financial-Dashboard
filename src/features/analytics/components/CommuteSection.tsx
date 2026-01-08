@@ -1,17 +1,44 @@
-import PropTypes from "prop-types";
 import { TrendingUp } from "lucide-react";
 import { Bar } from "react-chartjs-2";
+
+interface CommuteBreakdown {
+  name: string;
+  total: number;
+  amount: number;
+  count: number;
+  average: number;
+  percentage: number;
+}
+
+interface CommuteInsight {
+  title: string;
+  message: string;
+  priority: string;
+}
+
+interface CommuteData {
+  totalCommute: number;
+  monthlyAverage: number;
+  dailyAverage: number;
+  breakdown: CommuteBreakdown[];
+  insights: CommuteInsight[];
+}
+
+interface CommuteSectionProps {
+  commuteData: CommuteData;
+  chartOptions: any;
+}
 
 /**
  * Commute Analytics Section Component
  */
-export const CommuteSection = ({ commuteData, chartOptions }) => {
+export const CommuteSection = ({ commuteData, chartOptions }: CommuteSectionProps) => {
   const commuteChartData = {
-    labels: commuteData.breakdown.map((b) => b.category),
+    labels: commuteData.breakdown.map((b: CommuteBreakdown) => b.name),
     datasets: [
       {
         label: "Commute Spending",
-        data: commuteData.breakdown.map((b) => b.total),
+        data: commuteData.breakdown.map((b: CommuteBreakdown) => b.total),
         backgroundColor: "rgba(168, 85, 247, 0.7)",
         borderColor: "rgb(168, 85, 247)",
         borderWidth: 2,
@@ -113,26 +140,4 @@ export const CommuteSection = ({ commuteData, chartOptions }) => {
       )}
     </div>
   );
-};
-
-CommuteSection.propTypes = {
-  commuteData: PropTypes.shape({
-    totalCommute: PropTypes.number,
-    monthlyAverage: PropTypes.number,
-    dailyAverage: PropTypes.number,
-    breakdown: PropTypes.arrayOf(
-      PropTypes.shape({
-        category: PropTypes.string,
-        total: PropTypes.number,
-      })
-    ),
-    insights: PropTypes.arrayOf(
-      PropTypes.shape({
-        title: PropTypes.string,
-        message: PropTypes.string,
-        priority: PropTypes.string,
-      })
-    ),
-  }).isRequired,
-  chartOptions: PropTypes.object.isRequired,
 };

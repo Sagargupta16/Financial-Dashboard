@@ -11,11 +11,50 @@ import {
   getYearlyIncome,
 } from "../utils/needsWantsSavingsUtils";
 import { NWS_COLORS, SHORT_MONTH_NAMES } from "../../../constants";
+import type { Transaction } from "../../../types";
+
+type ViewMode = "monthly" | "yearly";
+type NWSKey = "needs" | "wants" | "savings";
+
+type NWSPercentages = {
+  needs: { percentage: number; percentageOfIncome?: number | null };
+  wants: { percentage: number; percentageOfIncome?: number | null };
+  savings: { percentage: number; percentageOfIncome?: number | null };
+};
+
+type PeriodItem = {
+  monthKey?: string;
+  year?: number;
+  needs: number;
+  wants: number;
+  savings: number;
+  income: number;
+  percentages: NWSPercentages;
+  categoryDetails?: Record<NWSKey, Record<string, number>>;
+};
+
+interface CategoryBarProps {
+  category: string;
+  amount: number;
+  percentage: number;
+  color: string;
+}
+
+interface PeriodCardProps {
+  item: PeriodItem;
+  isSelected: boolean;
+  onSelect: (_period: string | number | null) => void;
+  viewMode: ViewMode;
+}
+
+interface MonthlyYearlyNWSProps {
+  transactions: Transaction[];
+}
 
 /**
  * Category Bar Component - displays category spending with percentage
  */
-const CategoryBar = ({ category, amount, percentage, color }) => (
+const CategoryBar = ({ category, amount, percentage, color }: CategoryBarProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
       <span className="text-sm text-gray-400 capitalize">{category}</span>
@@ -50,16 +89,17 @@ CategoryBar.propTypes = {
 /**
  * Period Card Component - displays summary for a month or year
  */
-const PeriodCard = ({ item, isSelected, onSelect, viewMode }) => {
+const PeriodCard = ({ item, isSelected, onSelect, viewMode }: PeriodCardProps) => {
   const periodLabel =
-    viewMode === "monthly" ? formatMonthKey(item.monthKey) : item.year;
-  const periodKey = viewMode === "monthly" ? item.monthKey : item.year;
+    viewMode === "monthly" ? formatMonthKey(item.monthKey || "") : (item.year ?? "");
+  const periodKey =
+    viewMode === "monthly" ? (item.monthKey ?? "") : (item.year ?? 0);
 
   const total = item.needs + item.wants + item.savings;
   const savingsRate = item.income > 0 ? (item.savings / item.income) * 100 : 0;
 
   // Helper function to get color class based on savings rate
-  const getSavingsRateColor = (rate) => {
+  const getSavingsRateColor = (rate: number) => {
     if (rate >= 20) {
       return "text-green-400";
     }
@@ -174,7 +214,7 @@ PeriodCard.propTypes = {
 /**
  * Helper function to format month key
  */
-const formatMonthKey = (monthKey) => {
+const formatMonthKey = (monthKey: string) => {
   if (!monthKey) {
     return "";
   }
@@ -186,16 +226,16 @@ const formatMonthKey = (monthKey) => {
 /**
  * Monthly and Yearly Needs/Wants/Savings Analysis Component
  */
-export const MonthlyYearlyNWS = ({ transactions }) => {
-  const [viewMode, setViewMode] = useState("monthly"); // 'monthly' or 'yearly'
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
+export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
+  const [viewMode, setViewMode] = useState<ViewMode>("monthly"); // 'monthly' or 'yearly'
+  const [selectedPeriod, setSelectedPeriod] = useState<string | number | null>(null);
 
   // Calculate monthly breakdown
   const monthlyData = useMemo(() => {
-    const breakdown = calculateMonthlyNWSBreakdown(transactions);
-    const income = getMonthlyIncome(transactions);
+    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<string, any>;
+    const income = getMonthlyIncome(transactions) as Record<string, number>;
 
-    const data = Object.entries(breakdown)
+    const data = (Object.entries(breakdown) as Array<[string, any]>)
       .map(([monthKey, values]) => ({
         monthKey,
         ...values,
@@ -209,10 +249,10 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
 
   // Calculate yearly breakdown
   const yearlyData = useMemo(() => {
-    const breakdown = calculateYearlyNWSBreakdown(transactions);
-    const income = getYearlyIncome(transactions);
+    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<string, any>;
+    const income = getYearlyIncome(transactions) as Record<string, number>;
 
-    const data = Object.entries(breakdown)
+    const data = (Object.entries(breakdown) as Array<[string, any]>)
       .map(([year, values]) => ({
         year: Number.parseInt(year),
         ...values,
@@ -225,7 +265,7 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
   }, [transactions]);
 
   // Format month key for display
-  const formatMonthKey = (monthKey) => {
+  const formatMonthKeyLocal = (monthKey: string) => {
     const [year, month] = monthKey.split("-");
     return `${SHORT_MONTH_NAMES[Number.parseInt(month) - 1]} ${year}`;
   };
@@ -234,12 +274,12 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
   const currentData = viewMode === "monthly" ? monthlyData : yearlyData;
 
   // Get selected period details
-  const selectedData = selectedPeriod
-    ? currentData.find((item) =>
+  const selectedData: PeriodItem | null = selectedPeriod
+    ? ((currentData as PeriodItem[]).find((item) =>
         viewMode === "monthly"
           ? item.monthKey === selectedPeriod
           : item.year === selectedPeriod
-      )
+      ) ?? null)
     : null;
 
   if (!transactions || transactions.length === 0) {
@@ -324,7 +364,7 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
                 <div>
                   <h4 className="text-2xl font-bold text-white">
                     {viewMode === "monthly"
-                      ? formatMonthKey(selectedData.monthKey)
+                      ? formatMonthKeyLocal(selectedData.monthKey || "")
                       : selectedData.year}
                   </h4>
                   <p className="text-gray-400 mt-1">Detailed Breakdown</p>
@@ -420,12 +460,12 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
               <div className="space-y-4">
                 <h5 className="font-semibold text-white">Top Categories</h5>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {["needs", "wants", "savings"].map((type) => {
+                  {(["needs", "wants", "savings"] as NWSKey[]).map((type) => {
                     const categories = Object.entries(
-                      selectedData.categoryDetails[type]
-                    ).sort(([, a], [, b]) => b - a);
+                      selectedData.categoryDetails?.[type] ?? {}
+                    ).sort(([, a], [, b]) => Number(b) - Number(a));
 
-                    const icons = {
+                    const icons: Record<NWSKey, string> = {
                       needs: "🏠",
                       wants: "🎉",
                       savings: "💰",
@@ -448,7 +488,7 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
                                   {cat}
                                 </span>
                                 <span className="text-white font-medium">
-                                  {formatCurrency(amount, false)}
+                                  {formatCurrency(Number(amount), false)}
                                 </span>
                               </div>
                             ))

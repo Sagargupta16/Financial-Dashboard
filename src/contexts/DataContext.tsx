@@ -5,25 +5,66 @@ import {
   useCallback,
   useMemo,
   useEffect,
+  ReactNode,
 } from "react";
-import PropTypes from "prop-types";
 import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
 
-const DataContext = createContext();
+interface DateRange {
+  start: Date | null;
+  end: Date | null;
+}
+
+interface BudgetAllocation {
+  needs: number;
+  wants: number;
+  savings: number;
+}
+
+interface CustomCategories {
+  needs: string[];
+  wants: string[];
+  savings: string[];
+}
+
+interface BudgetPreferences {
+  allocation: BudgetAllocation;
+  customCategories: CustomCategories;
+}
+
+interface DataContextType {
+  transactions: any[];
+  updateTransactions: (newTransactions: any[]) => void;
+  dateRange: DateRange;
+  updateDateRange: (start: Date | null, end: Date | null) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  error: string | null;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+  budgetPreferences: BudgetPreferences;
+  updateBudgetAllocation: (allocation: BudgetAllocation) => void;
+  updateCustomCategories: (type: keyof CustomCategories, categories: string[]) => void;
+}
+
+const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const STORAGE_KEY_PREFERENCES = "financial_dashboard_budget_preferences";
 
-export const DataProvider = ({ children }) => {
-  const [transactions, setTransactions] = useState([]);
-  const [dateRange, setDateRange] = useState({
+interface DataProviderProps {
+  children: ReactNode;
+}
+
+export const DataProvider = ({ children }: DataProviderProps) => {
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange>({
     start: null,
     end: null,
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Budget preferences state
-  const [budgetPreferences, setBudgetPreferences] = useState(() => {
+  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
       return saved
@@ -60,11 +101,11 @@ export const DataProvider = ({ children }) => {
     }
   }, [budgetPreferences]);
 
-  const updateTransactions = useCallback((newTransactions) => {
+  const updateTransactions = useCallback((newTransactions: any[]) => {
     setTransactions(newTransactions);
   }, []);
 
-  const updateDateRange = useCallback((start, end) => {
+  const updateDateRange = useCallback((start: Date | null, end: Date | null) => {
     setDateRange({ start, end });
   }, []);
 
@@ -72,14 +113,14 @@ export const DataProvider = ({ children }) => {
     setError(null);
   }, []);
 
-  const updateBudgetAllocation = useCallback((allocation) => {
+  const updateBudgetAllocation = useCallback((allocation: BudgetAllocation) => {
     setBudgetPreferences((prev) => ({
       ...prev,
       allocation,
     }));
   }, []);
 
-  const updateCustomCategories = useCallback((type, categories) => {
+  const updateCustomCategories = useCallback((type: keyof CustomCategories, categories: string[]) => {
     setBudgetPreferences((prev) => ({
       ...prev,
       customCategories: {
@@ -128,8 +169,4 @@ export const useData = () => {
     throw new Error("useData must be used within DataProvider");
   }
   return context;
-};
-
-DataProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Metric Helper Utilities
  * Reusable helper functions for KPI metrics, colors, and formatting

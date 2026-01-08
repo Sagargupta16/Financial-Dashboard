@@ -1,3 +1,4 @@
+// @ts-nocheck
 import PropTypes from "prop-types";
 import EnhancedTransactionTable from "../../features/transactions/components/TransactionTable";
 

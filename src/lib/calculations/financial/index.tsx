@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Unified Financial Calculations
  * Single source of truth for all financial calculations

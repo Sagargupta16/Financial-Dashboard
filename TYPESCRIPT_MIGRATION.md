@@ -7,6 +7,7 @@ Branch: `typescript-migration`
 ### What's Been Done
 
 #### ✅ Phase 1: Infrastructure Setup (COMPLETED)
+
 - [x] Installed TypeScript 5.9.3 and type definitions
 - [x] Created `tsconfig.json` with strict mode enabled
 - [x] Created comprehensive type definitions in `src/types/index.ts`
@@ -16,6 +17,7 @@ Branch: `typescript-migration`
 - [x] Project compiles with TypeScript (with some type errors to fix)
 
 #### 📦 Packages Added
+
 ```json
 {
   "typescript": "^5.9.3",
@@ -29,13 +31,16 @@ Branch: `typescript-migration`
 ### 📝 Remaining Work
 
 #### 🔧 Phase 2: Fix Type Errors (IN PROGRESS)
+
 Current type errors to fix:
+
 1. **App.tsx** - Line 159: `setDrilldownCategory` needs proper typing
 2. Various components need explicit type annotations
 3. PropTypes can be converted to TypeScript interfaces
 4. Event handlers need proper typing
 
 #### 🎨 Phase 3: Add Explicit Types (TODO)
+
 - [ ] Add types to all function parameters
 - [ ] Add return types to functions
 - [ ] Convert PropTypes to TypeScript interfaces
@@ -43,6 +48,7 @@ Current type errors to fix:
 - [ ] Type all event handlers properly
 
 #### 🧹 Phase 4: Cleanup (TODO)
+
 - [ ] Remove all PropTypes (replaced by TypeScript)
 - [ ] Remove `// eslint-disable` comments where types now prevent errors
 - [ ] Enable stricter TypeScript rules
@@ -66,6 +72,7 @@ src/
 ### 📚 Type Definitions Created
 
 All core types are defined in `src/types/index.ts`:
+
 - `Transaction` - Transaction data structure
 - `TaxPlanningData` - Tax calculation results
 - `NWSBreakdown` - Needs/Wants/Savings breakdown
@@ -77,12 +84,15 @@ All core types are defined in `src/types/index.ts`:
 ### 🔨 How to Continue Migration
 
 #### Step 1: Fix Current Type Errors
+
 ```bash
 pnpm run build
 ```
+
 Fix errors one by one, starting with the most critical files.
 
 #### Step 2: Add Types Incrementally
+
 Start with utility functions and work up to components:
 
 ```typescript
@@ -98,6 +108,7 @@ export const calculateTax = (income: number): number => {
 ```
 
 #### Step 3: Convert PropTypes to Interfaces
+
 ```typescript
 // Before (JavaScript with PropTypes)
 Component.propTypes = {
@@ -142,7 +153,7 @@ pnpm start
 
 ### ⚠️ Known Issues
 
-1. **TypeScript Version Warning** 
+1. **TypeScript Version Warning**
    - Current: 5.9.3
    - React Scripts supports: <5.2.0
    - Status: Works fine, just shows warning

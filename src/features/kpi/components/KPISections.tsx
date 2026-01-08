@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import {
   Hash,
   Target,
@@ -16,6 +15,29 @@ import {
   getSubscriptionsDisplay,
 } from "../../../lib/analytics/metrics";
 
+interface CashbackData {
+  totalCashbackEarned?: number;
+  cashbackShared?: number;
+  actualCashback?: number;
+}
+
+interface ReimbursementData {
+  totalReimbursements?: number;
+}
+
+interface SecondaryKPISectionProps {
+  totalTransactions?: number;
+  highestExpense?: number;
+  averageExpense?: number;
+  cashbackData?: CashbackData | null;
+  reimbursementData?: ReimbursementData | null;
+}
+
+interface AdvancedAnalyticsKPISectionProps {
+  analytics?: any;
+  formatCurrency: (_value: number) => string;
+}
+
 /**
  * Secondary KPI Cards Section
  * Displays additional metrics: Total Transactions, Highest Expense, Average Expense
@@ -26,7 +48,7 @@ export const SecondaryKPISection = ({
   averageExpense = 0,
   cashbackData = null,
   reimbursementData = null,
-}) => {
+}: SecondaryKPISectionProps) => {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
@@ -62,7 +84,7 @@ export const SecondaryKPISection = ({
           )}
 
           {/* Cashback Shared */}
-          {cashbackData && cashbackData.cashbackShared > 0 && (
+          {cashbackData && (cashbackData.cashbackShared ?? 0) > 0 && (
             <SmallKPICard
               title="Cashback Shared"
               value={cashbackData.cashbackShared || 0}
@@ -82,7 +104,7 @@ export const SecondaryKPISection = ({
           )}
 
           {/* Total Reimbursements */}
-          {reimbursementData && reimbursementData.totalReimbursements > 0 && (
+          {reimbursementData && (reimbursementData.totalReimbursements ?? 0) > 0 && (
             <SmallKPICard
               title="Reimbursements"
               value={reimbursementData.totalReimbursements || 0}
@@ -96,25 +118,11 @@ export const SecondaryKPISection = ({
   );
 };
 
-SecondaryKPISection.propTypes = {
-  totalTransactions: PropTypes.number,
-  highestExpense: PropTypes.number,
-  averageExpense: PropTypes.number,
-  cashbackData: PropTypes.shape({
-    totalCashbackEarned: PropTypes.number,
-    cashbackShared: PropTypes.number,
-    actualCashback: PropTypes.number,
-  }),
-  reimbursementData: PropTypes.shape({
-    totalReimbursements: PropTypes.number,
-  }),
-};
-
 /**
  * Advanced Analytics KPI Cards Section
  * Displays: Monthly Trend, Active Subscriptions, Anomaly Alerts
  */
-export const AdvancedAnalyticsKPISection = ({ analytics, formatCurrency }) => {
+export const AdvancedAnalyticsKPISection = ({ analytics, formatCurrency }: AdvancedAnalyticsKPISectionProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <SmallKPICard
@@ -140,13 +148,4 @@ export const AdvancedAnalyticsKPISection = ({ analytics, formatCurrency }) => {
       />
     </div>
   );
-};
-
-AdvancedAnalyticsKPISection.propTypes = {
-  analytics: PropTypes.shape({
-    monthlyComparison: PropTypes.object,
-    recurringTransactions: PropTypes.array,
-    anomalies: PropTypes.array,
-  }),
-  formatCurrency: PropTypes.func.isRequired,
 };

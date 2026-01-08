@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Date Range Calculations
  * Canonical implementation for date-related financial calculations

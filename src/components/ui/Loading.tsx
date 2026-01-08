@@ -1,10 +1,14 @@
-import PropTypes from "prop-types";
 import { Loader2 } from "lucide-react";
+
+interface LoadingSpinnerProps {
+  size?: "sm" | "md" | "lg" | "xl";
+  message?: string;
+}
 
 /**
  * Loading Spinner Component
  */
-export const LoadingSpinner = ({ size = "md", message = "" }) => {
+export const LoadingSpinner = ({ size = "md", message = "" }: LoadingSpinnerProps) => {
   const getSizeClass = () => {
     switch (size) {
       case "sm":
@@ -30,15 +34,14 @@ export const LoadingSpinner = ({ size = "md", message = "" }) => {
   );
 };
 
-LoadingSpinner.propTypes = {
-  size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
-  message: PropTypes.string,
-};
+interface LoadingOverlayProps {
+  message?: string;
+}
 
 /**
  * Full Page Loading Overlay
  */
-export const LoadingOverlay = ({ message = "Loading..." }) => {
+export const LoadingOverlay = ({ message = "Loading..." }: LoadingOverlayProps) => {
   return (
     <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl">
@@ -46,10 +49,6 @@ export const LoadingOverlay = ({ message = "Loading..." }) => {
       </div>
     </div>
   );
-};
-
-LoadingOverlay.propTypes = {
-  message: PropTypes.string,
 };
 
 /**

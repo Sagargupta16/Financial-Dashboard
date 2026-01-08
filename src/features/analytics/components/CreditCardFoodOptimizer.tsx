@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import { CreditCard, UtensilsCrossed, TrendingUp } from "lucide-react";
 import {
   calculateCashbackMetrics,
@@ -10,24 +9,30 @@ import { CashbackSection } from "./CashbackSection";
 import { FoodSpendingSection } from "./FoodSpendingSection";
 import { CommuteSection } from "./CommuteSection";
 
+interface CreditCardFoodOptimizerProps {
+  filteredData: any[];
+}
+
 /**
  * Credit Card & Lifestyle Optimizer
  * Main coordinator component - delegates to sub-components
  */
-const CreditCardFoodOptimizer = ({ filteredData }) => {
+const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps) => {
   // Calculate metrics using useMemo for performance
   const creditCardData = useMemo(() => {
     const data = calculateCashbackMetrics(filteredData);
+    const totalCreditCardSpending = data.breakdown?.reduce(
+      (sum: number, item: any) => sum + (item.spending || 0),
+      0
+    ) || 0;
     return {
-      totalSpending: data.totalSpending || 0,
-      totalCashback: data.totalCashback || 0,
+      totalCreditCardSpending,
       totalCashbackEarned: data.totalCashbackEarned || 0,
       cashbackShared: data.cashbackShared || 0,
       actualCashback: data.actualCashback || 0,
-      totalCreditCardSpending: data.totalCreditCardSpending || 0,
       cashbackRate: data.cashbackRate || 0,
       byCard: data.byCard || {},
-      cardBreakdown: data.cardBreakdown || [],
+      cardBreakdown: data.breakdown || [],
       insights: data.insights || [],
     };
   }, [filteredData]);
@@ -68,12 +73,12 @@ const CreditCardFoodOptimizer = ({ filteredData }) => {
   // Prepare chart data
   const cardChartData = useMemo(
     () => ({
-      labels: creditCardData.cardBreakdown.map((c) =>
+      labels: creditCardData.cardBreakdown.map((c: any) =>
         c.card.replace(" Credit Card", "")
       ),
       datasets: [
         {
-          data: creditCardData.cardBreakdown.map((c) => c.total),
+          data: creditCardData.cardBreakdown.map((c: any) => c.total),
           backgroundColor: [
             "#3b82f6",
             "#8b5cf6",
@@ -138,7 +143,7 @@ const CreditCardFoodOptimizer = ({ filteredData }) => {
         },
         tooltip: {
           callbacks: {
-            label: (context) => {
+            label: (context: any) => {
               const label = context.label || context.dataset.label || "";
               const value =
                 context.parsed.y === undefined
@@ -159,7 +164,7 @@ const CreditCardFoodOptimizer = ({ filteredData }) => {
         y: {
           ticks: {
             color: "#9ca3af",
-            callback: (value) => `₹${(value / 1000).toFixed(0)}k`,
+            callback: (value: any) => `₹${(value / 1000).toFixed(0)}k`,
           },
           grid: { color: "rgba(75, 85, 99, 0.3)" },
         },
@@ -174,12 +179,12 @@ const CreditCardFoodOptimizer = ({ filteredData }) => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: "bottom",
+          position: "bottom" as const,
           labels: { color: "#fff", padding: 15 },
         },
         tooltip: {
           callbacks: {
-            label: (context) => {
+            label: (context: any) => {
               const label = context.label || "";
               const value = context.parsed;
               return `${label}: ₹${value.toLocaleString("en-IN", {
@@ -235,10 +240,16 @@ const CreditCardFoodOptimizer = ({ filteredData }) => {
   );
 };
 
+interface OptimizationTipsProps {
+  foodData: any;
+  creditCardData: any;
+  commuteData: any;
+}
+
 /**
  * Optimization Tips Component
  */
-const OptimizationTips = ({ foodData, creditCardData, commuteData }) => (
+const OptimizationTips = ({ foodData, creditCardData, commuteData }: OptimizationTipsProps) => (
   <div className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-xl p-6 shadow-lg border border-purple-700/50">
     <h3 className="text-xl font-bold text-white mb-4">💡 Optimization Tips</h3>
     <div className="space-y-3">
@@ -307,15 +318,5 @@ const OptimizationTips = ({ foodData, creditCardData, commuteData }) => (
     </div>
   </div>
 );
-
-OptimizationTips.propTypes = {
-  foodData: PropTypes.object.isRequired,
-  creditCardData: PropTypes.object.isRequired,
-  commuteData: PropTypes.object.isRequired,
-};
-
-CreditCardFoodOptimizer.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-};
 
 export { CreditCardFoodOptimizer };

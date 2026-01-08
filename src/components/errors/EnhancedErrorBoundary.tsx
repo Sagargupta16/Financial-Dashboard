@@ -1,12 +1,29 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+
+interface EnhancedErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: (_props: { 
+    error: Error | null; 
+    errorInfo: React.ErrorInfo | null; 
+    reset: () => void 
+  }) => React.ReactNode;
+  onError?: (_error: Error, _errorInfo: React.ErrorInfo) => void;
+}
+
+interface EnhancedErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+  errorCount: number;
+}
 
 /**
  * Enhanced Error Boundary with better UX and error reporting
  * Catches JavaScript errors anywhere in the child component tree
  */
-class EnhancedErrorBoundary extends React.Component {
-  constructor(props) {
+class EnhancedErrorBoundary extends React.Component<EnhancedErrorBoundaryProps, EnhancedErrorBoundaryState> {
+  constructor(props: EnhancedErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
@@ -16,12 +33,12 @@ class EnhancedErrorBoundary extends React.Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error) {
     // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to console in development
     if (process.env.NODE_ENV === "development") {
       console.error("Error caught by boundary:", error, errorInfo);
@@ -42,7 +59,7 @@ class EnhancedErrorBoundary extends React.Component {
     this.logErrorToService(error, errorInfo);
   }
 
-  logErrorToService = (error, errorInfo) => {
+  logErrorToService = (error: Error, errorInfo: React.ErrorInfo) => {
     // Implement error logging service here
     // Example: Sentry, LogRocket, or custom endpoint
     const errorDetails = {
@@ -180,11 +197,5 @@ class EnhancedErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-
-EnhancedErrorBoundary.propTypes = {
-  children: PropTypes.node.isRequired,
-  fallback: PropTypes.func,
-  onError: PropTypes.func,
-};
 
 export default EnhancedErrorBoundary;

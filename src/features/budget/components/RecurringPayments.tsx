@@ -9,18 +9,39 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import type { Transaction } from "../../../types";
+
+type RecurringPayment = {
+  description: string;
+  category?: string;
+  isActive?: boolean;
+  frequency?: string;
+  nextExpected?: string | Date;
+  lastOccurrence?: string | Date;
+  averageAmount?: number;
+  monthlyEquivalent?: number;
+  count?: number;
+  consistency?: number;
+  daysSinceLastOccurrence?: number;
+  amount?: number;
+  confidence?: number;
+};
+
+interface RecurringPaymentsProps {
+  filteredData: Transaction[];
+}
 
 /**
  * Recurring Payments Detector
  * Auto-detects subscriptions and bills from transaction patterns
  */
-export const RecurringPayments = ({ filteredData }) => {
+export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
   const recurringPayments = useMemo(() => {
-    return detectRecurringTransactions(filteredData);
+    return detectRecurringTransactions(filteredData) as RecurringPayment[];
   }, [filteredData]);
 
-  const getFrequencyBadge = (frequency) => {
-    const colors = {
+  const getFrequencyBadge = (frequency?: string) => {
+    const colors: Record<string, string> = {
       weekly: "bg-blue-900/30 text-blue-400 border-blue-500/30",
       "bi-weekly": "bg-cyan-900/30 text-cyan-400 border-cyan-500/30",
       monthly: "bg-purple-900/30 text-purple-400 border-purple-500/30",
@@ -29,10 +50,14 @@ export const RecurringPayments = ({ filteredData }) => {
       "semi-annually": "bg-yellow-900/30 text-yellow-400 border-yellow-500/30",
       annually: "bg-green-900/30 text-green-400 border-green-500/30",
     };
-    return colors[frequency] || colors.monthly;
+    const key = frequency ?? "monthly";
+    return colors[key] || colors.monthly;
   };
 
-  const formatDate = (date) => {
+  const formatDate = (date?: string | Date) => {
+    if (!date) {
+      return "—";
+    }
     return new Date(date).toLocaleDateString("en-IN", {
       month: "short",
       day: "numeric",
@@ -40,9 +65,12 @@ export const RecurringPayments = ({ filteredData }) => {
     });
   };
 
-  const getDaysUntil = (nextDate) => {
+  const getDaysUntil = (nextDate?: string | Date) => {
+    if (!nextDate) {
+      return { text: "—", color: "text-gray-400" };
+    }
     const days = Math.ceil(
-      (new Date(nextDate) - Date.now()) / (1000 * 60 * 60 * 24)
+      (new Date(nextDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     );
     if (days < 0) {
       return { text: "Overdue", color: "text-red-400" };
@@ -126,6 +154,7 @@ export const RecurringPayments = ({ filteredData }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activePayments.map((payment, index) => {
               const daysUntil = getDaysUntil(payment.nextExpected);
+              const frequencyLabel = payment.frequency ?? "monthly";
               return (
                 <div
                   key={`active-${payment.description}-${index}`}
@@ -145,7 +174,7 @@ export const RecurringPayments = ({ filteredData }) => {
                         payment.frequency
                       )}`}
                     >
-                      {payment.frequency}
+                      {frequencyLabel}
                     </span>
                   </div>
 
@@ -157,7 +186,7 @@ export const RecurringPayments = ({ filteredData }) => {
                       </span>
                       <span className="text-white font-bold">
                         ₹
-                        {payment.averageAmount.toLocaleString("en-IN", {
+                        {(payment.averageAmount ?? 0).toLocaleString("en-IN", {
                           maximumFractionDigits: 0,
                         })}
                       </span>
@@ -169,7 +198,7 @@ export const RecurringPayments = ({ filteredData }) => {
                       </span>
                       <span className="text-purple-400 font-medium text-sm">
                         ₹
-                        {payment.monthlyEquivalent.toLocaleString("en-IN", {
+                        {(payment.monthlyEquivalent ?? 0).toLocaleString("en-IN", {
                           maximumFractionDigits: 0,
                         })}
                         /mo
@@ -200,7 +229,7 @@ export const RecurringPayments = ({ filteredData }) => {
 
                     <div className="flex justify-between items-center pt-2 border-t border-gray-700">
                       <span className="text-gray-400 text-xs">
-                        {payment.count} payments • {payment.consistency}%
+                        {(payment.count ?? 0).toString()} payments • {(payment.consistency ?? 0).toString()}%
                         consistent
                       </span>
                     </div>
@@ -239,7 +268,7 @@ export const RecurringPayments = ({ filteredData }) => {
                       payment.frequency
                     )}`}
                   >
-                    {payment.frequency}
+                    {payment.frequency ?? "monthly"}
                   </span>
                 </div>
 
@@ -248,7 +277,7 @@ export const RecurringPayments = ({ filteredData }) => {
                     <span className="text-gray-500 text-sm">Was</span>
                     <span className="text-gray-400 font-medium">
                       ₹
-                      {payment.averageAmount.toLocaleString("en-IN", {
+                      {(payment.averageAmount ?? 0).toLocaleString("en-IN", {
                         maximumFractionDigits: 0,
                       })}
                     </span>
@@ -257,13 +286,13 @@ export const RecurringPayments = ({ filteredData }) => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 text-sm">Last seen</span>
                     <span className="text-gray-500 text-xs">
-                      {payment.daysSinceLastOccurrence} days ago
+                      {(payment.daysSinceLastOccurrence ?? 0).toString()} days ago
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center pt-2 border-t border-gray-700">
                     <span className="text-gray-500 text-xs">
-                      {payment.count} payments total
+                      {(payment.count ?? 0).toString()} payments total
                     </span>
                   </div>
                 </div>

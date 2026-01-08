@@ -102,13 +102,16 @@ ChartJS.register(
 
 const App = () => {
   // State
-  const [activeTab, setActiveTab] = useState("overview");
-  const [sortConfig, setSortConfig] = useState({
+  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "asc" | "desc";
+  }>({
     key: "date",
     direction: "desc",
   });
-  const [drilldownCategory, setDrilldownCategory] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [drilldownCategory, setDrilldownCategory] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const transactionsPerPage = 25;
 
   // Chart refs for download functionality
@@ -161,7 +164,7 @@ const App = () => {
   }, [uniqueValues.expenseCategories, drilldownCategory]);
 
   // Handlers
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     setSortConfig((p) => ({
       key,
       direction: p.key === key && p.direction === "asc" ? "desc" : "asc",

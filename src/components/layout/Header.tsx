@@ -1,7 +1,11 @@
-import PropTypes from "prop-types";
 import { Upload, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
+import React from "react";
 
-export const Header = ({ onFileUpload }) => (
+interface HeaderProps {
+  onFileUpload: (_event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export const Header = ({ onFileUpload }: HeaderProps) => (
   <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center relative overflow-hidden animate-fade-in">
     {/* Animated background gradient */}
     <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl animate-pulse"></div>
@@ -72,7 +76,3 @@ export const Header = ({ onFileUpload }) => (
     </div>
   </header>
 );
-
-Header.propTypes = {
-  onFileUpload: PropTypes.func.isRequired,
-};

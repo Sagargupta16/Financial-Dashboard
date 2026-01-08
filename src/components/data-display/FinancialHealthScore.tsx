@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import {
   calculateCategorySpending,
   calculateHealthScore,
@@ -11,10 +10,28 @@ import {
   prepareHealthData,
 } from "../../lib/analytics/healthScore";
 
+interface ScoreDisplayProps {
+  score?: any;
+}
+
+interface RecommendationCardProps {
+  rec: any;
+  index: number;
+}
+
+interface FinancialHealthScoreProps {
+  filteredData: any[];
+  kpiData: any;
+  accountBalances?: any;
+  allAccountBalances?: any;
+  investments?: any;
+  deposits?: any;
+}
+
 /**
  * Main Score Display Component
  */
-const ScoreDisplay = ({ score }) => (
+const ScoreDisplay = ({ score }: ScoreDisplayProps) => (
   <div className="md:col-span-1">
     <div
       className={`bg-gradient-to-br ${getGradient(score?.score || 0)} rounded-xl p-6 text-center`}
@@ -33,14 +50,10 @@ const ScoreDisplay = ({ score }) => (
   </div>
 );
 
-ScoreDisplay.propTypes = {
-  score: PropTypes.object,
-};
-
 /**
  * Recommendation Card Component
  */
-const RecommendationCard = ({ rec, index }) => {
+const RecommendationCard = ({ rec, index }: RecommendationCardProps) => {
   let bgClass = "bg-blue-900/20 border-blue-500/30";
   let textClass = "text-blue-400";
 
@@ -66,11 +79,6 @@ const RecommendationCard = ({ rec, index }) => {
   );
 };
 
-RecommendationCard.propTypes = {
-  rec: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-};
-
 /**
  * Financial Health Score Dashboard
  * Calculates and displays overall financial health with recommendations
@@ -82,7 +90,7 @@ export const FinancialHealthScore = ({
   allAccountBalances,
   investments,
   deposits,
-}) => {
+}: FinancialHealthScoreProps) => {
   const healthData = useMemo(
     () =>
       prepareHealthData({
@@ -223,7 +231,7 @@ export const FinancialHealthScore = ({
             <div className="space-y-3">
               {score?.metrics &&
                 Object.entries(score.metrics).map(([key, value]) => {
-                  const metricInfo = {
+                  const metricInfo: Record<string, {max: number; label: string; detail: string}> = {
                     savingsRate: {
                       max: 25,
                       label: "Savings Rate",
@@ -261,7 +269,7 @@ export const FinancialHealthScore = ({
                     label: key,
                     detail: "",
                   };
-                  const percentage = (value / info.max) * 100;
+                  const percentage = ((value as number) / info.max) * 100;
 
                   // Dynamic color based on performance
                   let barColor = "from-red-600 to-red-700";
@@ -282,7 +290,7 @@ export const FinancialHealthScore = ({
                         <div className="flex items-center gap-2">
                           <p className="text-gray-400 text-xs">{info.detail}</p>
                           <p className="text-white text-sm font-semibold">
-                            {value}/{info.max}
+                            {value as number}/{info.max}
                           </p>
                         </div>
                       </div>
@@ -307,7 +315,7 @@ export const FinancialHealthScore = ({
             💡 Recommendations
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendations.map((rec, index) => (
+            {recommendations.map((rec: any, index: number) => (
               <RecommendationCard
                 key={`${rec.type}-${rec.category}-${index}`}
                 rec={rec}
@@ -319,13 +327,4 @@ export const FinancialHealthScore = ({
       )}
     </div>
   );
-};
-
-FinancialHealthScore.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  kpiData: PropTypes.object.isRequired,
-  accountBalances: PropTypes.object,
-  allAccountBalances: PropTypes.object,
-  investments: PropTypes.object,
-  deposits: PropTypes.object,
 };

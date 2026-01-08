@@ -11,8 +11,9 @@ import {
   calculateActualCashback,
   calculateTotalReimbursements,
 } from "../../../lib/calculations";
+import type { Transaction } from "../../../types";
 
-export const useKPIData = (filteredData) => {
+export const useKPIData = (filteredData: Transaction[]) => {
   return useMemo(() => {
     if (!filteredData || filteredData.length === 0) {
       return {
@@ -43,7 +44,7 @@ export const useKPIData = (filteredData) => {
     );
 
     const transferData = filteredData.reduce(
-      (acc, item) => {
+      (acc: { transferIn: number; transferOut: number }, item) => {
         const amount = Math.abs(Number(item.amount) || 0);
         if (item.type === "Transfer-In") {
           acc.transferIn += amount;
@@ -92,7 +93,11 @@ export const useKPIData = (filteredData) => {
   }, [filteredData]);
 };
 
-export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
+export const useKeyInsights = (
+  filteredData: Transaction[],
+  _kpiData: any,
+  additionalKpiData: any
+) => {
   return useMemo(() => {
     // Validate input
     if (!filteredData || filteredData.length === 0) {
@@ -113,14 +118,26 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
       "Saturday",
     ];
     const daySpending = new Array(7).fill(0);
-    const categoryCounts = {};
+    const categoryCounts: Record<string, number> = {};
+
+    const toDate = (value: unknown): Date | null => {
+      if (!value) {
+        return null;
+      }
+      const date = new Date(value as any);
+      if (Number.isNaN(date.getTime())) {
+        return null;
+      }
+      return date;
+    };
 
     filteredData.forEach((item) => {
       if (item.type === "Expense") {
         const amount = Math.abs(Number(item.amount) || 0);
 
-        if (item.date) {
-          const dayIndex = item.date.getDay();
+        const date = toDate(item.date);
+        if (date) {
+          const dayIndex = date.getDay();
           if (dayIndex >= 0 && dayIndex < 7) {
             daySpending[dayIndex] += amount;
           }
@@ -134,12 +151,14 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
     const busiestDay =
       maxSpending > 0 ? days[daySpending.indexOf(maxSpending)] : "N/A";
     const mostFrequentCategory =
-      Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+      (Object.entries(categoryCounts) as Array<[string, number]>).sort(
+        ([, a], [, b]) => b - a
+      )[0]?.[0] ||
       "N/A";
 
     // Calculate more meaningful averages - absolute value of all transactions
     const totalAbsoluteValue = filteredData.reduce(
-      (sum, t) => sum + Math.abs(t.amount || 0),
+      (sum: number, t) => sum + Math.abs(Number(t.amount) || 0),
       0
     );
     const avgTransactionValue =
@@ -151,14 +170,15 @@ export const useKeyInsights = (filteredData, kpiData, additionalKpiData) => {
   }, [filteredData, additionalKpiData]);
 };
 
-export const useAccountBalances = (data) => {
+export const useAccountBalances = (data: Transaction[]) => {
   return useMemo(() => {
     // Validate input
     if (!data || data.length === 0) {
       return [];
     }
 
-    const balances = data.reduce((acc, { account, type, amount }) => {
+    const balances = data.reduce(
+      (acc: Record<string, number>, { account, type, amount }) => {
       if (!account) {
         return acc;
       }
@@ -177,15 +197,20 @@ export const useAccountBalances = (data) => {
       }
 
       return acc;
-    }, {});
+      },
+      {} as Record<string, number>
+    );
 
     return Object.entries(balances)
-      .map(([name, balance]) => ({ name, balance }))
+      .map(([name, balance]) => ({ name, balance: Number(balance) || 0 }))
       .sort((a, b) => b.balance - a.balance);
   }, [data]);
 };
 
-export const useEnhancedKPIData = (filteredData, kpiData) => {
+export const useEnhancedKPIData = (
+  filteredData: Transaction[],
+  kpiData: { income: number; expense: number }
+) => {
   return useMemo(() => {
     if (!filteredData || filteredData.length === 0 || !kpiData) {
       return {
@@ -200,9 +225,9 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
       };
     }
 
-    const dateRange = calculateDateRange(filteredData);
+    const dateRange = calculateDateRange(filteredData) as any;
     const { income, expense } = kpiData;
-    const totalDays = dateRange.totalDays || dateRange.days || 1;
+    const totalDays = Number(dateRange?.totalDays ?? dateRange?.days ?? 1) || 1;
 
     // Use unified calculations
     const savingsRate = calculateSavingsRate(income, expense);
@@ -215,11 +240,18 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
     const last30DaysDate = new Date();
     last30DaysDate.setDate(last30DaysDate.getDate() - 30);
 
-    const last30DaysTransactions = filteredData.filter(
-      (t) => t.date >= last30DaysDate && t.type === "Expense"
-    );
+    const last30DaysTransactions = filteredData.filter((t) => {
+      if (t.type !== "Expense") {
+        return false;
+      }
+      const date = new Date(t.date as any);
+      if (Number.isNaN(date.getTime())) {
+        return false;
+      }
+      return date >= last30DaysDate;
+    });
     const spending30d = last30DaysTransactions.reduce(
-      (sum, t) => sum + t.amount,
+      (sum: number, t) => sum + (Number(t.amount) || 0),
       0
     );
 
@@ -233,7 +265,7 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
         : 100;
 
     // 6. Category Concentration
-    const categoryTotals = {};
+    const categoryTotals: Record<string, number> = {};
     filteredData.forEach((t) => {
       if (t.type === "Expense") {
         const amount = Math.abs(Number(t.amount) || 0);
@@ -242,9 +274,9 @@ export const useEnhancedKPIData = (filteredData, kpiData) => {
       }
     });
 
-    const topCategory = Object.entries(categoryTotals).sort(
-      ([, a], [, b]) => b - a
-    )[0];
+    const topCategory = (Object.entries(categoryTotals) as Array<
+      [string, number]
+    >).sort(([, a], [, b]) => b - a)[0];
 
     const categoryConcentration =
       topCategory && expense > 0

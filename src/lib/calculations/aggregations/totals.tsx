@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Aggregation Calculations
  * Canonical implementation for income, expense, and total calculations

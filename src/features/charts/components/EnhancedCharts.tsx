@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { Bar } from "react-chartjs-2";
 import { truncateLabel } from "../../../lib/charts";
 import { commonChartOptions } from "./ChartConfig";
@@ -8,6 +8,11 @@ import {
   TimeNavigationControls,
 } from "../../../components/data-display/ChartUIComponents";
 import { useTimeNavigation } from "../hooks/useChartHooks";
+
+interface EnhancedChartProps {
+  filteredData: any[];
+  chartRef?: any;
+}
 
 const monthNames = [
   "January",
@@ -27,7 +32,7 @@ const monthNames = [
 export const EnhancedTopExpenseCategoriesChart = ({
   filteredData,
   chartRef,
-}) => {
+}: EnhancedChartProps) => {
   const {
     currentYear,
     currentMonth,
@@ -45,12 +50,14 @@ export const EnhancedTopExpenseCategoriesChart = ({
   }, [getFilteredData]);
 
   const chartData = React.useMemo(() => {
-    const expenses = timeFilteredData.reduce((acc, item) => {
-      acc[item.category] = (acc[item.category] || 0) + item.amount;
+    const rows = timeFilteredData as any[];
+    const expenses = rows.reduce((acc: Record<string, number>, item: any) => {
+      const key = String(item.category ?? "Uncategorized");
+      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
-    const sorted = Object.entries(expenses)
+    const sorted = (Object.entries(expenses) as Array<[string, number]>)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10);
 
@@ -83,8 +90,8 @@ export const EnhancedTopExpenseCategoriesChart = ({
         })()}
         onPrevious={handlePrevious}
         onNext={handleNext}
-        canGoPrevious={canGoPrevious}
-        canGoNext={canGoNext}
+        canGoPrevious={canGoPrevious()}
+        canGoNext={canGoNext()}
       />
 
       <ExportButton
@@ -105,13 +112,8 @@ export const EnhancedTopExpenseCategoriesChart = ({
   );
 };
 
-EnhancedTopExpenseCategoriesChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object,
-};
-
 // Enhanced Top Income Sources Chart with time navigation
-export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
+export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }: EnhancedChartProps) => {
   const {
     currentYear,
     currentMonth,
@@ -131,12 +133,14 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
   }, [getFilteredData]);
 
   const chartData = React.useMemo(() => {
-    const income = timeFilteredData.reduce((acc, item) => {
-      acc[item.category] = (acc[item.category] || 0) + item.amount;
+    const rows = timeFilteredData as any[];
+    const income = rows.reduce((acc: Record<string, number>, item: any) => {
+      const key = String(item.category ?? "Uncategorized");
+      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
-    const sorted = Object.entries(income)
+    const sorted = (Object.entries(income) as Array<[string, number]>)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10);
 
@@ -169,8 +173,8 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
         })()}
         onPrevious={handlePrevious}
         onNext={handleNext}
-        canGoPrevious={canGoPrevious}
-        canGoNext={canGoNext}
+        canGoPrevious={canGoPrevious()}
+        canGoNext={canGoNext()}
       />
 
       <ExportButton
@@ -189,9 +193,4 @@ export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }) => {
       </div>
     </ChartContainer>
   );
-};
-
-EnhancedTopIncomeSourcesChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object,
 };

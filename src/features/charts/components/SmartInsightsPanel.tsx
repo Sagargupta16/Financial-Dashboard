@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import {
   AlertCircle,
   TrendingUp,
@@ -12,16 +11,21 @@ import {
 } from "lucide-react";
 import { generateComprehensiveInsights } from "../../../lib/analytics/trends";
 
+interface SmartInsightsPanelProps {
+  filteredData: any[];
+  budgets?: any;
+}
+
 /**
  * Smart Insights Panel
  * Shows automatically detected patterns, anomalies, and recommendations
  */
-export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
+export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsightsPanelProps) => {
   const insights = useMemo(() => {
     return generateComprehensiveInsights(filteredData, budgets);
   }, [filteredData, budgets]);
 
-  const getIcon = (type) => {
+  const getIcon = (type: string) => {
     const iconProps = { size: 20 };
 
     if (type === "budget-alert" || type === "budget-warning") {
@@ -42,7 +46,7 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
     return <CheckCircle {...iconProps} className="text-green-400" />;
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
         return "border-red-500 bg-red-500/10";
@@ -230,9 +234,4 @@ export const SmartInsightsPanel = ({ filteredData, budgets = {} }) => {
       )}
     </div>
   );
-};
-
-SmartInsightsPanel.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  budgets: PropTypes.object,
 };

@@ -1,9 +1,14 @@
-import PropTypes from "prop-types";
+import React from "react";
+
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+  variant?: "default" | "card" | "circle" | "button" | "text";
+}
 
 /**
  * Skeleton Component - Loading placeholder with shimmer animation
  */
-export const Skeleton = ({ className = "", variant = "default", ...props }) => {
+export const Skeleton = ({ className = "", variant = "default", ...props }: SkeletonProps) => {
   const baseClasses =
     "animate-pulse bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] rounded";
 
@@ -24,11 +29,6 @@ export const Skeleton = ({ className = "", variant = "default", ...props }) => {
       {...props}
     />
   );
-};
-
-Skeleton.propTypes = {
-  className: PropTypes.string,
-  variant: PropTypes.oneOf(["default", "card", "circle", "button", "text"]),
 };
 
 /**
@@ -57,10 +57,14 @@ export const SmallSkeletonCard = () => (
   </div>
 );
 
+interface TableRowSkeletonProps {
+  columns?: number;
+}
+
 /**
  * TableRowSkeleton - Transaction table row skeleton
  */
-export const TableRowSkeleton = ({ columns = 6 }) => {
+export const TableRowSkeleton = ({ columns = 6 }: TableRowSkeletonProps) => {
   const columnIds = Array.from(
     { length: columns },
     () => `col-${crypto.randomUUID()}`
@@ -77,15 +81,15 @@ export const TableRowSkeleton = ({ columns = 6 }) => {
   );
 };
 
-TableRowSkeleton.propTypes = {
-  columns: PropTypes.number,
-};
+interface ChartSkeletonProps {
+  height?: string;
+}
 
 /**
  * Chart Skeleton - Animated loading skeleton for charts
  * Using fixed heights for better visual consistency
  */
-export const ChartSkeleton = ({ height = "300px" }) => {
+export const ChartSkeleton = ({ height = "300px" }: ChartSkeletonProps) => {
   // Predefined heights for better visual consistency
   const barHeights = ["45%", "70%", "55%", "85%", "60%", "75%", "50%", "65%"];
   const barIds = barHeights.map(() => `bar-${crypto.randomUUID()}`);
@@ -104,10 +108,6 @@ export const ChartSkeleton = ({ height = "300px" }) => {
       </div>
     </div>
   );
-};
-
-ChartSkeleton.propTypes = {
-  height: PropTypes.string,
 };
 
 // Add shimmer animation to global styles

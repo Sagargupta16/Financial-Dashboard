@@ -6,6 +6,15 @@ import {
   groupDataByMonth,
 } from "../../../lib/charts";
 
+type GenericDataItem = {
+  date?: string | Date;
+  type?: string;
+  category?: string;
+  account?: string;
+  amount?: number;
+  [key: string]: any;
+};
+
 const monthNames = [
   "January",
   "February",
@@ -22,12 +31,18 @@ const monthNames = [
 ];
 
 // Custom hook for time navigation logic
-export const useTimeNavigation = (data, initialViewMode = "month") => {
+export const useTimeNavigation = (
+  data: GenericDataItem[],
+  initialViewMode: string = "month"
+) => {
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
 
-  const availableYears = useMemo(() => getAvailableYears(data), [data]);
+  const availableYears = useMemo(
+    () => getAvailableYears(data) as number[],
+    [data]
+  );
 
   const canGoPrevious = () => {
     if (viewMode === "month") {
@@ -126,7 +141,16 @@ export const useTimeNavigation = (data, initialViewMode = "month") => {
 };
 
 // Custom hook for chart data processing
-export const useChartDataProcessor = (data, options = {}) => {
+export const useChartDataProcessor = (
+  data: GenericDataItem[],
+  options: {
+    excludeInPocket?: boolean;
+    groupBy?: "category" | "month" | "account";
+    sortBy?: "amount" | "name";
+    sortOrder?: "asc" | "desc";
+    limit?: number | null;
+  } = {}
+) => {
   const {
     excludeInPocket = true,
     groupBy = "category",
@@ -136,7 +160,7 @@ export const useChartDataProcessor = (data, options = {}) => {
   } = options;
 
   return useMemo(() => {
-    let processedData = data;
+    let processedData: GenericDataItem[] = data;
 
     // Filter out in-pocket if needed
     if (excludeInPocket) {
@@ -146,26 +170,29 @@ export const useChartDataProcessor = (data, options = {}) => {
     }
 
     // Group data
-    let groupedData;
+    let groupedData: Record<string, number> | undefined;
     if (groupBy === "category") {
-      groupedData = groupDataByCategory(processedData);
+      groupedData = groupDataByCategory(processedData) as Record<string, number>;
     } else if (groupBy === "month") {
-      groupedData = groupDataByMonth(processedData);
+      groupedData = groupDataByMonth(processedData) as Record<string, number>;
     } else if (groupBy === "account") {
-      groupedData = processedData.reduce((acc, item) => {
-        if (!acc[item.account]) {
-          acc[item.account] = 0;
+      groupedData = processedData.reduce((acc: Record<string, number>, item) => {
+        const key = String(item.account ?? "Unknown");
+        if (!acc[key]) {
+          acc[key] = 0;
         }
-        acc[item.account] += item.amount;
+        acc[key] += Number(item.amount) || 0;
         return acc;
-      }, {});
+      }, {} as Record<string, number>);
     }
 
     // Convert to array and sort
-    let sortedData = Object.entries(groupedData || {});
+    let sortedData = Object.entries(groupedData || {}) as Array<[string, number]>;
 
     if (sortBy === "amount") {
-      sortedData.sort(([, a], [, b]) => (sortOrder === "desc" ? b - a : a - b));
+      sortedData.sort(([, a], [, b]) =>
+        sortOrder === "desc" ? b - a : a - b
+      );
     } else if (sortBy === "name") {
       sortedData.sort(([a], [b]) =>
         sortOrder === "desc" ? b.localeCompare(a) : a.localeCompare(b)
@@ -185,7 +212,7 @@ export const useChartDataProcessor = (data, options = {}) => {
 export const useMultipleFilters = (initialFilters = {}) => {
   const [filters, setFilters] = useState(initialFilters);
 
-  const updateFilter = (filterName, value) => {
+  const updateFilter = (filterName: string, value: any) => {
     setFilters((prev) => ({
       ...prev,
       [filterName]: value,
@@ -196,7 +223,7 @@ export const useMultipleFilters = (initialFilters = {}) => {
     setFilters(initialFilters);
   };
 
-  const applyFilters = (data) => {
+  const applyFilters = (data: GenericDataItem[]) => {
     return data.filter((item) => {
       return Object.entries(filters).every(([key, value]) => {
         if (!value || value === "all" || value === "All") {
@@ -229,9 +256,9 @@ export const useMultipleFilters = (initialFilters = {}) => {
 };
 
 // Custom hook for trend analysis
-export const useTrendAnalysis = (data, _period = "month") => {
+export const useTrendAnalysis = (data: GenericDataItem[], _period = "month") => {
   return useMemo(() => {
-    const groupedData = groupDataByMonth(data);
+    const groupedData = groupDataByMonth(data) as Record<string, { net: number }>;
     const sortedMonths = Object.keys(groupedData).sort((a, b) =>
       a.localeCompare(b)
     );
@@ -240,8 +267,10 @@ export const useTrendAnalysis = (data, _period = "month") => {
       return { trend: "insufficient-data", change: 0, direction: "neutral" };
     }
 
-    const latest = groupedData[sortedMonths.at(-1)];
-    const previous = groupedData[sortedMonths.at(-2)];
+    const latestKey = sortedMonths[sortedMonths.length - 1];
+    const previousKey = sortedMonths[sortedMonths.length - 2];
+    const latest = groupedData[latestKey];
+    const previous = groupedData[previousKey];
 
     const change = ((latest.net - previous.net) / Math.abs(previous.net)) * 100;
 
@@ -277,12 +306,12 @@ export const useTrendAnalysis = (data, _period = "month") => {
 
 // Custom hook for forecasting
 export const useForecastData = (
-  historicalData,
+  historicalData: GenericDataItem[],
   forecastPeriods = 6,
   method = "linear"
 ) => {
   return useMemo(() => {
-    const monthlyData = groupDataByMonth(historicalData);
+    const monthlyData = groupDataByMonth(historicalData) as Record<string, { net: number }>;
     const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
       a.localeCompare(b)
     );
@@ -294,7 +323,7 @@ export const useForecastData = (
     const recentData = sortedMonths
       .slice(-6)
       .map((month) => monthlyData[month].net);
-    let forecast = [];
+    let forecast: number[] = [];
 
     if (method === "linear") {
       // Simple moving average

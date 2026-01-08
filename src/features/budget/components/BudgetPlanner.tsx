@@ -10,19 +10,43 @@ import {
   saveBudgets,
   detectRecurringPayments,
 } from "../utils/budgetUtils";
+import type { Transaction } from "../../../types";
+
+type BudgetMap = Record<string, number>;
+type BudgetStatus = "good" | "warning" | "critical" | "over";
+type ComparisonEntry = {
+  budget: number;
+  actual: number;
+  remaining: number;
+  percentage: number;
+  status: BudgetStatus;
+};
+type ComparisonMap = Record<string, ComparisonEntry>;
+type RecurringPayment = {
+  category: string;
+  amount: number;
+  interval: number;
+  frequency: string;
+  nextDate: Date;
+  occurrences: number;
+};
+
+interface BudgetPlannerProps {
+  filteredData: Transaction[];
+}
 
 /**
  * Budget Planning Dashboard - Simplified and Accurate
  * Replaces over-engineered SpendingSimulator with practical budget tracking
  */
-export const BudgetPlanner = ({ filteredData }) => {
-  const [actualSpending, setActualSpending] = useState({});
-  const [averageSpending, setAverageSpending] = useState({});
-  const [budgets, setBudgets] = useState({});
-  const [comparison, setComparison] = useState({});
-  const [recurringPayments, setRecurringPayments] = useState([]);
+export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
+  const [actualSpending, setActualSpending] = useState<BudgetMap>({});
+  const [averageSpending, setAverageSpending] = useState<BudgetMap>({});
+  const [budgets, setBudgets] = useState<BudgetMap>({});
+  const [comparison, setComparison] = useState<ComparisonMap>({});
+  const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const [tempBudgets, setTempBudgets] = useState({});
+  const [tempBudgets, setTempBudgets] = useState<BudgetMap>({});
 
   // Calculate spending data
   useEffect(() => {
@@ -48,7 +72,7 @@ export const BudgetPlanner = ({ filteredData }) => {
     setComparison(comp);
   }, [actualSpending, budgets]);
 
-  const handleBudgetChange = (category, value) => {
+  const handleBudgetChange = (category: string, value: string) => {
     setTempBudgets((prev) => ({
       ...prev,
       [category]: Number.parseFloat(value) || 0,
@@ -71,7 +95,7 @@ export const BudgetPlanner = ({ filteredData }) => {
     setTempBudgets(suggested);
   };
 
-  const getOverallUsageColor = (percentage) => {
+  const getOverallUsageColor = (percentage: number) => {
     if (percentage >= 100) {
       return "bg-red-500";
     }
@@ -84,7 +108,7 @@ export const BudgetPlanner = ({ filteredData }) => {
     return "bg-green-500";
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "good":
         return "text-green-400 bg-green-900/20 border-green-500/30";
@@ -100,7 +124,7 @@ export const BudgetPlanner = ({ filteredData }) => {
   };
 
   const categories = Object.keys(actualSpending).sort(
-    (a, b) => actualSpending[b] - actualSpending[a]
+    (a, b) => (actualSpending[b] ?? 0) - (actualSpending[a] ?? 0)
   );
 
   if (categories.length === 0) {
@@ -239,7 +263,7 @@ export const BudgetPlanner = ({ filteredData }) => {
                         onChange={(e) =>
                           handleBudgetChange(category, e.target.value)
                         }
-                        placeholder={Math.round(average)}
+                        placeholder={`${Math.round(average)}`}
                         className="w-32 px-3 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                       />
                     ) : (

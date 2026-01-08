@@ -17,7 +17,7 @@ import {
  * Custom hook for advanced financial analytics
  * Provides sophisticated insights and predictions
  */
-export const useAdvancedAnalytics = (transactions) => {
+export const useAdvancedAnalytics = (transactions: any[]) => {
   // 1. Month-over-Month Spending Comparison
   const monthlyComparison = useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -123,7 +123,7 @@ export const useAdvancedAnalytics = (transactions) => {
   // Summary insights - Quick overview of key findings
   const insights = useMemo(() => {
     const summary = {
-      hasMonthlyGrowth: monthlyComparison?.avgGrowth > 0,
+      hasMonthlyGrowth: (monthlyComparison?.avgGrowth ?? 0) > 0,
       monthlyTrend: monthlyComparison?.trend || "unknown",
       recurringCount: recurringTransactions?.length || 0,
       anomalyCount: anomalies?.length || 0,

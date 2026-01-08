@@ -1,15 +1,18 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import logger from "../../utils/logger";
+
+interface SpendingCalendarProps {
+  filteredData: any[];
+}
 
 /**
  * Spending Calendar Heatmap
  * Shows daily spending patterns with color intensity
  */
-export const SpendingCalendar = ({ filteredData }) => {
+export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
   const calendarData = useMemo(() => {
-    const dailySpending = {};
+    const dailySpending: Record<string, {total: number; transactions: any[]}> = {};
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 29);
@@ -37,7 +40,7 @@ export const SpendingCalendar = ({ filteredData }) => {
         }
         dateStr = transDate.toISOString().split("T")[0];
       } catch (error) {
-        logger.warn("Failed to parse transaction date:", error);
+        logger.warning("Failed to parse transaction date:", error);
         return; // Skip if date parsing fails
       }
 
@@ -83,7 +86,7 @@ export const SpendingCalendar = ({ filteredData }) => {
 
   const { dailySpending, maxSpending, avgSpending } = calendarData;
 
-  const getIntensityClass = (amount) => {
+  const getIntensityClass = (amount: number): string => {
     if (amount === 0) {
       return "bg-gray-800 border-gray-700";
     }
@@ -100,12 +103,12 @@ export const SpendingCalendar = ({ filteredData }) => {
     return "bg-green-600 border-green-500";
   };
 
-  const getDayName = (dateStr) => {
+  const getDayName = (dateStr: string): string => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     return days[new Date(dateStr).getDay()];
   };
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr: string): string => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
   };
@@ -232,8 +235,4 @@ export const SpendingCalendar = ({ filteredData }) => {
       </div>
     </div>
   );
-};
-
-SpendingCalendar.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

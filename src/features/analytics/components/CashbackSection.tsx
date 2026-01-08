@@ -1,6 +1,27 @@
-import PropTypes from "prop-types";
 import { CreditCard, Gift, TrendingUp } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
+
+interface CardBreakdown {
+  card: string;
+  spending: number;
+  cashback: number;
+  cashbackRate: number;
+}
+
+interface CreditCardData {
+  totalCreditCardSpending: number;
+  totalCashbackEarned: number;
+  cashbackShared: number;
+  cashbackRate: number;
+  cardBreakdown: CardBreakdown[];
+}
+
+interface CashbackSectionProps {
+  creditCardData: CreditCardData;
+  cardChartData: any;
+  chartOptions: any;
+  doughnutOptions: any;
+}
 
 /**
  * Cashback Analytics Section Component
@@ -9,7 +30,7 @@ export const CashbackSection = ({
   creditCardData,
   cardChartData,
   doughnutOptions,
-}) => {
+}: CashbackSectionProps) => {
   return (
     <div>
       <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -116,23 +137,4 @@ export const CashbackSection = ({
       </div>
     </div>
   );
-};
-
-CashbackSection.propTypes = {
-  creditCardData: PropTypes.shape({
-    totalCreditCardSpending: PropTypes.number,
-    totalCashbackEarned: PropTypes.number,
-    cashbackShared: PropTypes.number,
-    cashbackRate: PropTypes.number,
-    cardBreakdown: PropTypes.arrayOf(
-      PropTypes.shape({
-        card: PropTypes.string,
-        spending: PropTypes.number,
-        cashback: PropTypes.number,
-        cashbackRate: PropTypes.number,
-      })
-    ),
-  }).isRequired,
-  cardChartData: PropTypes.object.isRequired,
-  doughnutOptions: PropTypes.object.isRequired,
 };

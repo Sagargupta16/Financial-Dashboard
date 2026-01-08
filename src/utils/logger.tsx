@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable no-console */
 // Centralized logging utility with environment-aware logging
 const isDevelopment = process.env.NODE_ENV === "development";

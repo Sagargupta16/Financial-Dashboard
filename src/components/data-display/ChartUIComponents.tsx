@@ -1,5 +1,78 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { exportChartAsPNG } from "../../lib/charts";
+
+interface ChartContainerProps {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+  height?: string;
+  colSpan?: string;
+  chartRef?: any;
+  filename?: string;
+  actions?: React.ReactNode;
+}
+
+interface ExportButtonProps {
+  chartRef: any;
+  filename: string;
+}
+
+interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+interface DropdownSelectProps {
+  value: string;
+  onChange: (_e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: DropdownOption[];
+  className?: string;
+}
+
+interface NavigationButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+  direction?: "left" | "right";
+  className?: string;
+}
+
+interface TimeNavigationControlsProps {
+  viewMode: string;
+  onViewModeChange: (_mode: string) => void;
+  currentPeriod: string;
+  onPrevious: () => void;
+  onNext: () => void;
+  canGoPrevious: boolean;
+  canGoNext: boolean;
+  viewModeOptions?: DropdownOption[];
+}
+
+interface ChartWrapperProps {
+  loading?: boolean;
+  error?: string | null;
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface FilterItem {
+  name: string;
+  value: string;
+  options: DropdownOption[];
+}
+
+interface FilterControlsProps {
+  filters: FilterItem[];
+  onFilterChange?: (_name: string, _value: string) => void;
+  className?: string;
+}
+
+interface InfoCardProps {
+  label: string;
+  value: string | number;
+  change?: number | null;
+  icon?: React.ReactNode;
+  className?: string;
+}
 
 // Common chart container component
 export const ChartContainer = ({
@@ -11,7 +84,7 @@ export const ChartContainer = ({
   chartRef,
   filename,
   actions = null,
-}) => {
+}: ChartContainerProps) => {
   return (
     <div
       className={`bg-gray-800 p-6 rounded-2xl shadow-lg ${height} flex flex-col ${colSpan} ${className}`}
@@ -31,7 +104,7 @@ export const ChartContainer = ({
 };
 
 // Export button component
-export const ExportButton = ({ chartRef, filename }) => (
+export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
   <button
     onClick={() => exportChartAsPNG(chartRef, filename)}
     className="text-gray-400 hover:text-white transition-colors"
@@ -58,7 +131,7 @@ export const DropdownSelect = ({
   onChange,
   options = [],
   className = "bg-gray-700 text-white px-3 py-1 rounded-lg text-sm",
-}) => (
+}: DropdownSelectProps) => (
   <select value={value} onChange={onChange} className={className}>
     {options.map((option) => (
       <option key={option.value} value={option.value}>
@@ -74,7 +147,7 @@ export const NavigationButton = ({
   disabled,
   direction = "left",
   className = "text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed",
-}) => (
+}: NavigationButtonProps) => (
   <button onClick={onClick} disabled={disabled} className={className}>
     <svg
       width="20"
@@ -107,7 +180,7 @@ export const TimeNavigationControls = ({
     { value: "year", label: "Yearly View" },
     { value: "all-time", label: "All Time" },
   ],
-}) => (
+}: TimeNavigationControlsProps) => (
   <div className="flex justify-between items-center mb-4 bg-gray-700/50 rounded-lg p-3">
     <div className="flex items-center gap-2">
       <DropdownSelect
@@ -144,7 +217,7 @@ export const ChartWrapper = ({
   error = null,
   children,
   className = "flex-1 relative",
-}) => {
+}: ChartWrapperProps) => {
   if (loading) {
     return (
       <div className={`${className} flex items-center justify-center`}>
@@ -169,13 +242,13 @@ export const FilterControls = ({
   filters,
   onFilterChange,
   className = "flex items-center space-x-4",
-}) => (
+}: FilterControlsProps) => (
   <div className={className}>
     {filters.map((filter) => (
       <DropdownSelect
         key={filter.name}
         value={filter.value}
-        onChange={(e) => onFilterChange(filter.name, e.target.value)}
+        onChange={(e) => onFilterChange?.(filter.name, e.target.value)}
         options={filter.options}
       />
     ))}
@@ -189,7 +262,7 @@ export const InfoCard = ({
   change = null,
   icon = null,
   className = "bg-gray-700/50 rounded-lg p-3",
-}) => (
+}: InfoCardProps) => (
   <div className={className}>
     <div className="flex items-center justify-between">
       <span className="text-gray-400 text-sm">{label}</span>
@@ -207,73 +280,3 @@ export const InfoCard = ({
     )}
   </div>
 );
-
-// PropTypes validations
-ChartContainer.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  height: PropTypes.string,
-  colSpan: PropTypes.string,
-  chartRef: PropTypes.object,
-  filename: PropTypes.string,
-  actions: PropTypes.node,
-};
-
-ExportButton.propTypes = {
-  chartRef: PropTypes.object.isRequired,
-  filename: PropTypes.string.isRequired,
-};
-
-DropdownSelect.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
-  className: PropTypes.string,
-};
-
-NavigationButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  disabled: PropTypes.bool,
-  direction: PropTypes.oneOf(["left", "right"]),
-  className: PropTypes.string,
-};
-
-TimeNavigationControls.propTypes = {
-  viewMode: PropTypes.string.isRequired,
-  onViewModeChange: PropTypes.func.isRequired,
-  currentPeriod: PropTypes.string.isRequired,
-  onPrevious: PropTypes.func.isRequired,
-  onNext: PropTypes.func.isRequired,
-  canGoPrevious: PropTypes.bool.isRequired,
-  canGoNext: PropTypes.bool.isRequired,
-  viewModeOptions: PropTypes.arrayOf(PropTypes.string),
-};
-
-ChartWrapper.propTypes = {
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-};
-
-FilterControls.propTypes = {
-  filters: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-      onChange: PropTypes.func.isRequired,
-      options: PropTypes.arrayOf(PropTypes.string).isRequired,
-    })
-  ).isRequired,
-  onFilterChange: PropTypes.func,
-  className: PropTypes.string,
-};
-
-InfoCard.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  change: PropTypes.number,
-  icon: PropTypes.node,
-  className: PropTypes.string,
-};

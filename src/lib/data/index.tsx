@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Helper Functions for Data Processing
 
 /**
@@ -11,7 +12,7 @@ export const parseCurrency = (value) => {
   if (typeof value !== "string") {
     return 0;
   }
-  return Number.parseFloat(value.replaceAll(/[₹,]/g, "")) || 0;
+  return Number.parseFloat(value.replace(/[₹,]/g, "")) || 0;
 };
 
 /**

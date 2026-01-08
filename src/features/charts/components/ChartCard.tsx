@@ -1,6 +1,14 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { Download } from "lucide-react";
 import { downloadChart } from "../../../lib/data";
+
+interface ChartCardProps {
+  title: string;
+  children: React.ReactNode;
+  chartRef?: any;
+  fileName?: string;
+  className?: string;
+}
 
 export const ChartCard = ({
   title,
@@ -8,7 +16,7 @@ export const ChartCard = ({
   chartRef,
   fileName,
   className = "glass border border-gray-700/30 p-6 rounded-2xl shadow-2xl h-[450px] flex flex-col card-hover animate-scale-in",
-}) => (
+}: ChartCardProps) => (
   <div className={className}>
     <div className="flex justify-between items-center mb-5">
       <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -31,11 +39,3 @@ export const ChartCard = ({
     </div>
   </div>
 );
-
-ChartCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-  chartRef: PropTypes.object,
-  fileName: PropTypes.string,
-  className: PropTypes.string,
-};

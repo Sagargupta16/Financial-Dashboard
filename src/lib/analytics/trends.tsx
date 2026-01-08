@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable max-lines-per-function */
 /**
  * Trend Insights Generator

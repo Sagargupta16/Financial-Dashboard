@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Financial Calculations - Canonical API
  * Single source of truth for all financial calculations

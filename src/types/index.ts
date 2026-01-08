@@ -7,14 +7,18 @@ export type TransactionType = "Income" | "Expense";
 
 export interface Transaction {
   id: string;
-  date: string;
+  date: string | Date;
+  time?: string;
   amount: number;
-  type: TransactionType;
+  type: TransactionType | string;
   category: string;
   subcategory: string;
+  account: string;
+  note?: string;
   description?: string;
   notes?: string;
   tags?: string[];
+  [key: string]: any; // Allow dynamic properties for sorting
 }
 
 // Category & Subcategory
@@ -204,4 +208,21 @@ export type ViewMode = "monthly" | "yearly" | "all-time";
 export interface SortConfig {
   key: string;
   direction: SortOrder;
+}
+
+// Hook Return Types
+export interface UniqueValues {
+  types: string[];
+  categories: string[];
+  expenseCategories: string[];
+  accounts: string[];
+}
+
+export interface DataFilters {
+  searchTerm: string;
+  type: string;
+  category: string;
+  account: string;
+  startDate: string;
+  endDate: string;
 }

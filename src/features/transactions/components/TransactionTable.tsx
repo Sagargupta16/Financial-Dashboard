@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "../../../lib/data";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
+import type { Transaction } from "../../../types";
 
 // Helper functions for styling
-const getTypeStyles = (type) => {
+const getTypeStyles = (type: string) => {
   switch (type) {
     case "Income":
       return "bg-green-900/50 text-green-300";
@@ -33,7 +34,7 @@ const getTypeStyles = (type) => {
   }
 };
 
-const getAmountTextColor = (type) => {
+const getAmountTextColor = (type: string) => {
   if (type === "Income") {
     return "text-green-400";
   }
@@ -47,12 +48,14 @@ const getAmountTextColor = (type) => {
 };
 
 // Add running balance to transactions
-const addRunningBalance = (transactions) => {
+const addRunningBalance = (
+  transactions: Transaction[]
+): Array<Transaction & { runningBalance: number }> => {
   // Sort by date ascending first
   const sorted = [...transactions].sort((a, b) => {
     const dateA = a.date instanceof Date ? a.date : new Date(a.date);
     const dateB = b.date instanceof Date ? b.date : new Date(b.date);
-    return dateA - dateB;
+    return dateA.getTime() - dateB.getTime();
   });
 
   let balance = 0;
@@ -80,6 +83,12 @@ export const EnhancedTransactionTable = ({
   currentPage: initialPage = 1,
   transactionsPerPage = 25,
   initialFilters = {},
+}: {
+  data: Transaction[];
+  onSort?: (_key: string) => void;
+  currentPage?: number;
+  transactionsPerPage?: number;
+  initialFilters?: Record<string, any>;
 }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -228,11 +237,13 @@ export const EnhancedTransactionTable = ({
 
   // Apply sorting to data with balance
   const sortedData = useMemo(() => {
-    const sorted = [...dataWithBalance];
+    const sorted = [...dataWithBalance] as Array<
+      Transaction & { runningBalance: number }
+    >;
     if (sortConfig.key) {
       sorted.sort((a, b) => {
-        let aVal = a[sortConfig.key];
-        let bVal = b[sortConfig.key];
+        let aVal = (a as any)[sortConfig.key];
+        let bVal = (b as any)[sortConfig.key];
 
         // Handle date sorting
         if (sortConfig.key === "date") {
@@ -281,7 +292,7 @@ export const EnhancedTransactionTable = ({
     setActiveFiltersCount(count);
   }, [filters]);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
@@ -303,14 +314,14 @@ export const EnhancedTransactionTable = ({
     setSearchTerm("");
   };
 
-  const clearFilter = (key) => {
+  const clearFilter = (key: string) => {
     setFilters((prev) => ({
       ...prev,
       [key]: "",
     }));
   };
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
@@ -767,7 +778,9 @@ export const EnhancedTransactionTable = ({
                 style={{ animationDelay: `${index * 30}ms` }}
               >
                 <td className="p-3 text-sm font-medium text-gray-100 group-hover:text-white transition-colors duration-300 truncate">
-                  {item.date?.toLocaleDateString()}
+                  {item.date
+                    ? new Date(item.date as any).toLocaleDateString()
+                    : ""}
                 </td>
                 <td className="p-3 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300 truncate">
                   {item.time}

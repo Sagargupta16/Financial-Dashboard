@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Net Balance Breakdown Calculations
  * Categorizes accounts into Cash, Investments, Deposits, and Debt

@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import { Users, Home, TrendingUp, Calendar, Zap } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
@@ -8,11 +7,15 @@ import {
   calculateHousingExpenses,
 } from "../../../lib/calculations/financial";
 
+interface FamilyHousingManagerProps {
+  filteredData: any[];
+}
+
 /**
  * Family & Housing Expense Manager
  * Track family expenses, rent, and housing costs
  */
-export const FamilyHousingManager = ({ filteredData }) => {
+export const FamilyHousingManager = ({ filteredData }: FamilyHousingManagerProps) => {
   const familyData = useMemo(() => {
     return calculateFamilyExpenses(filteredData);
   }, [filteredData]);
@@ -23,11 +26,11 @@ export const FamilyHousingManager = ({ filteredData }) => {
 
   // Family spending chart
   const familyChartData = {
-    labels: familyData.breakdown.map((b) => b.name),
+    labels: familyData.breakdown.map((b: any) => b.name),
     datasets: [
       {
         label: "Family Expense by Type",
-        data: familyData.breakdown.map((b) => b.amount),
+        data: familyData.breakdown.map((b: any) => b.amount),
         backgroundColor: "rgba(139, 92, 246, 0.7)",
         borderColor: "rgb(139, 92, 246)",
         borderWidth: 2,
@@ -37,11 +40,11 @@ export const FamilyHousingManager = ({ filteredData }) => {
 
   // Housing trends chart
   const housingTrendsData = {
-    labels: housingData.trends.map((t) => t.month),
+    labels: housingData.trends.map((t: any) => t.month),
     datasets: [
       {
         label: "Rent",
-        data: housingData.trends.map((t) => t.rent),
+        data: housingData.trends.map((t: any) => t.rent),
         borderColor: "rgb(59, 130, 246)",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
         tension: 0.4,
@@ -49,7 +52,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
       },
       {
         label: "Utilities",
-        data: housingData.trends.map((t) => t.utilities),
+        data: housingData.trends.map((t: any) => t.utilities),
         borderColor: "rgb(245, 158, 11)",
         backgroundColor: "rgba(245, 158, 11, 0.1)",
         tension: 0.4,
@@ -67,7 +70,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
       },
       tooltip: {
         callbacks: {
-          label: (context) => {
+          label: (context: any) => {
             const label = context.dataset.label || "";
             const value = context.parsed.y || context.parsed;
             return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -83,7 +86,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
       y: {
         ticks: {
           color: "#9ca3af",
-          callback: (value) => `₹${(value / 1000).toFixed(0)}k`,
+          callback: (value: any) => `₹${(value / 1000).toFixed(0)}k`,
         },
         grid: { color: "rgba(75, 85, 99, 0.3)" },
       },
@@ -179,7 +182,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
               Top Family Expenses
             </h4>
             <div className="space-y-3">
-              {familyData.topExpenses.map((expense) => (
+              {familyData.topExpenses.map((expense: any) => (
                 <div
                   key={`${expense.date}-${expense.amount}`}
                   className="flex items-center justify-between bg-gray-700/50 rounded-lg p-4"
@@ -298,7 +301,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
               Recent Rent Payments
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {housingData.rentPayments.slice(0, 6).map((payment) => (
+              {housingData.rentPayments.slice(0, 6).map((payment: any) => (
                 <div
                   key={`${payment.date}-${payment.amount}`}
                   className="flex items-center justify-between bg-gray-700/50 rounded-lg p-4"
@@ -333,7 +336,7 @@ export const FamilyHousingManager = ({ filteredData }) => {
               Recent Utility Bills
             </h4>
             <div className="space-y-2">
-              {housingData.utilities.slice(0, 8).map((utility) => (
+              {housingData.utilities.slice(0, 8).map((utility: any) => (
                 <div
                   key={`${utility.date}-${utility.amount}`}
                   className="flex items-center justify-between bg-gray-700/50 rounded-lg p-3"
@@ -390,8 +393,4 @@ export const FamilyHousingManager = ({ filteredData }) => {
       )}
     </div>
   );
-};
-
-FamilyHousingManager.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

@@ -1,7 +1,9 @@
+// @ts-nocheck
 import { useState, useEffect, useMemo } from "react";
 import { parseCurrency, parseDate } from "../lib/data";
 import logger from "../utils/logger";
 import * as XLSX from "xlsx";
+import type { Transaction, UniqueValues, DataFilters, SortConfig } from "../types";
 
 // Helper function: Parse CSV/TSV row handling quoted fields
 const parseCsvRow = (row) => {
@@ -373,11 +375,11 @@ export const useDataProcessor = (initialCsvData) => {
   return { data, loading, error, handleFileUpload };
 };
 
-export const useUniqueValues = (data) => {
+export const useUniqueValues = (data: Transaction[]): UniqueValues => {
   return useMemo(() => {
-    const categories = new Set();
-    const expenseCategories = new Set();
-    const accounts = new Set();
+    const categories = new Set<string>();
+    const expenseCategories = new Set<string>();
+    const accounts = new Set<string>();
     data.forEach((item) => {
       categories.add(item.category);
       accounts.add(item.account);
@@ -394,7 +396,11 @@ export const useUniqueValues = (data) => {
   }, [data]);
 };
 
-export const useFilteredData = (data, filters, sortConfig) => {
+export const useFilteredData = (
+  data: Transaction[],
+  filters: DataFilters,
+  sortConfig: SortConfig
+): Transaction[] => {
   return useMemo(() => {
     return data
       .filter((item) => {

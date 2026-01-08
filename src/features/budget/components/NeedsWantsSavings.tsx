@@ -13,18 +13,26 @@ import {
 } from "../utils/needsWantsSavingsUtils";
 import { NWS_COLORS, BUDGET_ALLOCATION_DEFAULTS } from "../../../constants";
 import { filterByType, parseAmount } from "../../../lib/data";
+import type { Transaction } from "../../../types";
+
+type AllocationKey = "needs" | "wants" | "savings";
+type Allocation = Record<AllocationKey, number>;
+
+interface NeedsWantsSavingsProps {
+  transactions: Transaction[];
+}
 
 /**
  * Needs, Wants & Savings Budget Breakdown Component
  * Shows spending breakdown based on 50/30/20 budgeting rule
  */
-export const NeedsWantsSavings = ({ transactions }) => {
+export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
   const [customAllocation, setCustomAllocation] = useState(
-    BUDGET_ALLOCATION_DEFAULTS
+    BUDGET_ALLOCATION_DEFAULTS as Allocation
   );
   const [editMode, setEditMode] = useState(false);
   const [tempAllocation, setTempAllocation] = useState(
-    BUDGET_ALLOCATION_DEFAULTS
+    BUDGET_ALLOCATION_DEFAULTS as Allocation
   );
 
   // Load saved allocation on mount
@@ -37,7 +45,7 @@ export const NeedsWantsSavings = ({ transactions }) => {
   // Calculate total income
   const totalIncome = useMemo(() => {
     const incomeTransactions = filterByType(transactions, "Income");
-    return incomeTransactions.reduce((sum, t) => sum + parseAmount(t), 0);
+    return incomeTransactions.reduce((sum: number, t: any) => sum + parseAmount(t), 0);
   }, [transactions]);
 
   // Calculate breakdown
@@ -60,7 +68,7 @@ export const NeedsWantsSavings = ({ transactions }) => {
     return generateNWSInsights(breakdown, totalIncome);
   }, [breakdown, totalIncome]);
 
-  const handleAllocationChange = (category, value) => {
+  const handleAllocationChange = (category: AllocationKey, value: string) => {
     const numValue = Number.parseFloat(value) || 0;
     setTempAllocation((prev) => ({
       ...prev,
@@ -92,8 +100,8 @@ export const NeedsWantsSavings = ({ transactions }) => {
     setEditMode(false);
   };
 
-  const getStatusBadge = (status) => {
-    const badges = {
+  const getStatusBadge = (status: string) => {
+    const badges: Record<string, string> = {
       good: "bg-green-900/30 text-green-400 border-green-500/30",
       warning: "bg-yellow-900/30 text-yellow-400 border-yellow-500/30",
       critical: "bg-red-900/30 text-red-400 border-red-500/30",
@@ -101,8 +109,8 @@ export const NeedsWantsSavings = ({ transactions }) => {
     return badges[status] || badges.good;
   };
 
-  const getProgressBarColor = (category) => {
-    const colors = {
+  const getProgressBarColor = (category: AllocationKey) => {
+    const colors: Record<AllocationKey, string> = {
       needs: "bg-blue-500",
       wants: "bg-amber-500",
       savings: "bg-green-500",
@@ -120,7 +128,12 @@ export const NeedsWantsSavings = ({ transactions }) => {
     );
   }
 
-  const categories = [
+  const categories: Array<{
+    key: AllocationKey;
+    label: string;
+    icon: string;
+    color: string;
+  }> = [
     { key: "needs", label: "Needs", icon: "🏠", color: NWS_COLORS.needs },
     { key: "wants", label: "Wants", icon: "🎉", color: NWS_COLORS.wants },
     { key: "savings", label: "Savings", icon: "💰", color: NWS_COLORS.savings },
@@ -335,6 +348,7 @@ export const NeedsWantsSavings = ({ transactions }) => {
           <h4 className="text-lg font-semibold text-white mb-4">💡 Insights</h4>
           <div className="space-y-3">
             {insights.map((insight) => {
+              type InsightLevel = "success" | "warning" | "critical";
               const iconMap = {
                 success: "✅",
                 warning: "⚠️",
@@ -348,13 +362,16 @@ export const NeedsWantsSavings = ({ transactions }) => {
                 critical: "text-red-400 bg-red-900/20 border-red-500/30",
               };
 
+              const insightType: InsightLevel =
+                (insight?.type as InsightLevel) ?? "success";
+
               return (
                 <div
                   key={`${insight.category}-${insight.type}`}
-                  className={`p-4 rounded-lg border ${colorMap[insight.type]}`}
+                  className={`p-4 rounded-lg border ${colorMap[insightType]}`}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-xl">{iconMap[insight.type]}</span>
+                    <span className="text-xl">{iconMap[insightType]}</span>
                     <p className="flex-1 text-sm">{insight.message}</p>
                   </div>
                 </div>
@@ -371,7 +388,8 @@ export const NeedsWantsSavings = ({ transactions }) => {
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map(({ key, label, icon }) => {
-            const details = breakdown?.categoryDetails?.[key] || {};
+            const details =
+              (breakdown?.categoryDetails?.[key] ?? {}) as Record<string, number>;
             const sortedCategories = Object.entries(details).sort(
               ([, a], [, b]) => b - a
             );

@@ -1,11 +1,25 @@
-import PropTypes from "prop-types";
 import { Sparkles } from "lucide-react";
+import React from "react";
+
+interface TabItem {
+  id: string;
+  label: string;
+  icon?: string | React.ComponentType<any>;
+  badge?: string | number;
+  description?: string;
+}
+
+interface TabsProps {
+  tabs: TabItem[];
+  activeTab: string;
+  onChange: (_tabId: string) => void;
+}
 
 /**
  * Tab Navigation Component
  * Provides a beautiful tabbed interface for switching between dashboard sections
  */
-export const Tabs = ({ tabs, activeTab, onChange }) => {
+export const Tabs = ({ tabs, activeTab, onChange }: TabsProps) => {
   return (
     <div className="mb-8">
       {/* Desktop Tabs - Grid Layout */}
@@ -78,7 +92,7 @@ export const Tabs = ({ tabs, activeTab, onChange }) => {
               <Sparkles size={16} className="text-blue-400" />
             </div>
             <p className="text-sm text-blue-200 font-medium leading-relaxed">
-              {tabs.find((t) => t.id === activeTab).description}
+              {tabs.find((t) => t.id === activeTab)?.description}
             </p>
           </div>
         </div>
@@ -87,33 +101,19 @@ export const Tabs = ({ tabs, activeTab, onChange }) => {
   );
 };
 
-Tabs.propTypes = {
-  tabs: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      icon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-      badge: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      description: PropTypes.string,
-    })
-  ).isRequired,
-  activeTab: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
+interface TabContentProps {
+  children: React.ReactNode;
+  isActive: boolean;
+}
 
 /**
  * Tab Content Wrapper
  * Provides consistent styling and animations for tab content
  */
-export const TabContent = ({ children, isActive }) => {
+export const TabContent = ({ children, isActive }: TabContentProps) => {
   if (!isActive) {
     return null;
   }
 
   return <div className="animate-fade-in">{children}</div>;
-};
-
-TabContent.propTypes = {
-  children: PropTypes.node.isRequired,
-  isActive: PropTypes.bool.isRequired,
 };

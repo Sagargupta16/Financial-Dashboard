@@ -1,9 +1,28 @@
-import PropTypes from "prop-types";
+import React from "react";
 import { formatCurrency } from "../../../lib/data";
 
+interface KPICardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  color: "green" | "red" | "blue" | "purple" | "orange";
+}
+
+interface SmallKPICardProps {
+  title: string;
+  value: number | string;
+  icon: React.ReactNode;
+  unit?: string;
+  isCount?: boolean;
+  color?: KPICardProps["color"];
+}
+
 // Helper function to get color classes based on color prop
-const getColorClasses = (color) => {
-  const colorMap = {
+const getColorClasses = (color: KPICardProps["color"]) => {
+  const colorMap: Record<
+    KPICardProps["color"],
+    { icon: string; bar: string; side: string }
+  > = {
     green: {
       icon: "from-green-600/20 to-green-800/20 text-green-400",
       bar: "from-green-600 via-green-500 to-emerald-400",
@@ -38,7 +57,7 @@ const getColorClasses = (color) => {
  * Only re-renders when value changes
  */
 export const KPICard = React.memo(
-  ({ title, value, icon, color }) => {
+  ({ title, value, icon, color }: KPICardProps) => {
     const colors = getColorClasses(color);
 
     return (
@@ -81,20 +100,12 @@ export const KPICard = React.memo(
     prevProps.value === nextProps.value && prevProps.title === nextProps.title
 );
 
-KPICard.propTypes = {
-  title: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-  icon: PropTypes.node.isRequired,
-  color: PropTypes.oneOf(["green", "red", "blue", "purple", "orange"])
-    .isRequired,
-};
-
 /**
  * SmallKPICard Component - Memoized for performance
  * Compact version of KPICard for grid layouts
  */
 export const SmallKPICard = React.memo(
-  ({ title, value, icon, unit, isCount = false }) => {
+  ({ title, value, icon, unit, isCount = false }: SmallKPICardProps) => {
     // Extract nested ternary for better readability
     const displayValue = () => {
       if (typeof value === "number" && !unit && !isCount) {
@@ -134,11 +145,3 @@ export const SmallKPICard = React.memo(
     );
   }
 );
-
-SmallKPICard.propTypes = {
-  title: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  icon: PropTypes.node.isRequired,
-  unit: PropTypes.string,
-  isCount: PropTypes.bool,
-};

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Import formatCurrency from dataUtils
 import { formatCurrency as formatCurrencyUtil } from "../data";
 

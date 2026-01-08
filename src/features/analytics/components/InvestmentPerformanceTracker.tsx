@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo } from "react";
-import PropTypes from "prop-types";
 import {
   TrendingUp,
   TrendingDown,
@@ -12,12 +11,16 @@ import {
 import { Line } from "react-chartjs-2";
 import { calculateInvestmentPerformance } from "../../../lib/calculations/financial";
 
+interface InvestmentPerformanceTrackerProps {
+  filteredData: any[];
+}
+
 /**
  * Investment Performance Tracker
  * Track stock market performance, P&L, brokerage fees
  */
 // eslint-disable-next-line complexity
-export const InvestmentPerformanceTracker = ({ filteredData }) => {
+export const InvestmentPerformanceTracker = ({ filteredData }: InvestmentPerformanceTrackerProps) => {
   const investmentData = useMemo(() => {
     return calculateInvestmentPerformance(filteredData);
   }, [filteredData]);
@@ -37,9 +40,9 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
 
   // Prepare chart data for P&L over time
   const chartData = useMemo(() => {
-    const monthlyPnL = {};
+    const monthlyPnL: Record<string, number> = {};
 
-    transactions.forEach((t) => {
+    transactions.forEach((t: any) => {
       if (t.date) {
         const month = new Date(t.date).toISOString().slice(0, 7);
         if (!monthlyPnL[month]) {
@@ -56,10 +59,10 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
     const sortedMonths = Object.keys(monthlyPnL).sort((a, b) =>
       a.localeCompare(b)
     );
-    const cumulativePnL = [];
+    const cumulativePnL: number[] = [];
     let cumulative = 0;
 
-    sortedMonths.forEach((month) => {
+    sortedMonths.forEach((month: string) => {
       cumulative += monthlyPnL[month];
       cumulativePnL.push(cumulative);
     });
@@ -92,7 +95,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
       },
       tooltip: {
         callbacks: {
-          label: (context) =>
+          label: (context: any) =>
             `P&L: ₹${context.parsed.y.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
         },
       },
@@ -105,7 +108,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
       y: {
         ticks: {
           color: "#9ca3af",
-          callback: (value) => `₹${(value / 1000).toFixed(0)}k`,
+          callback: (value: any) => `₹${(value / 1000).toFixed(0)}k`,
         },
         grid: { color: "rgba(75, 85, 99, 0.3)" },
       },
@@ -378,8 +381,8 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
               </tr>
             </thead>
             <tbody>
-              {transactions.slice(0, 10).map((t, index) => {
-                const getTypeBadgeClass = (type) => {
+              {transactions.slice(0, 10).map((t: any, index: number) => {
+                const getTypeBadgeClass = (type: string) => {
                   if (type === "Profit") {
                     return "bg-green-900/50 text-green-300 border-green-500/30";
                   }
@@ -392,7 +395,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
                   return "bg-blue-900/50 text-blue-300 border-blue-500/30";
                 };
 
-                const getAmountClass = (type) => {
+                const getAmountClass = (type: string) => {
                   if (type === "Profit") {
                     return "text-green-400";
                   }
@@ -402,7 +405,7 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
                   return "text-gray-300";
                 };
 
-                const getAmountPrefix = (type) => {
+                const getAmountPrefix = (type: string) => {
                   if (type === "Profit") {
                     return "+";
                   }
@@ -532,8 +535,4 @@ export const InvestmentPerformanceTracker = ({ filteredData }) => {
       </div>
     </div>
   );
-};
-
-InvestmentPerformanceTracker.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

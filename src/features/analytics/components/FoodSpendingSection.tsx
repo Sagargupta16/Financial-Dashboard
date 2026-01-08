@@ -1,6 +1,21 @@
-import PropTypes from "prop-types";
 import { UtensilsCrossed, ShoppingBag, Coffee } from "lucide-react";
 import { Doughnut, Line } from "react-chartjs-2";
+
+interface FoodData {
+  totalFoodSpending: number;
+  monthlyAverage: number;
+  dailyAverage: number;
+  deliveryApps: number;
+  insights: { title: string; message: string; priority: string; }[];
+}
+
+interface FoodSpendingSectionProps {
+  foodData: FoodData;
+  foodChartData: any;
+  foodTrendsData: any;
+  chartOptions: any;
+  doughnutOptions: any;
+}
 
 /**
  * Food Spending Analytics Section Component
@@ -11,7 +26,7 @@ export const FoodSpendingSection = ({
   foodTrendsData,
   chartOptions,
   doughnutOptions,
-}) => {
+}: FoodSpendingSectionProps) => {
   return (
     <div>
       <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -130,24 +145,4 @@ export const FoodSpendingSection = ({
       )}
     </div>
   );
-};
-
-FoodSpendingSection.propTypes = {
-  foodData: PropTypes.shape({
-    totalFoodSpending: PropTypes.number,
-    monthlyAverage: PropTypes.number,
-    dailyAverage: PropTypes.number,
-    deliveryApps: PropTypes.number,
-    insights: PropTypes.arrayOf(
-      PropTypes.shape({
-        title: PropTypes.string,
-        message: PropTypes.string,
-        priority: PropTypes.string,
-      })
-    ),
-  }).isRequired,
-  foodChartData: PropTypes.object.isRequired,
-  foodTrendsData: PropTypes.object.isRequired,
-  chartOptions: PropTypes.object.isRequired,
-  doughnutOptions: PropTypes.object.isRequired,
 };

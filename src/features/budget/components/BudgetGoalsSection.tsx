@@ -7,6 +7,20 @@ import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
 import { FinancialHealthScore } from "../../../components/data-display/FinancialHealthScore";
 import { SpendingCalendar } from "../../../components/data-display/SpendingCalendar";
 import { Tabs } from "../../../components/ui/Tabs";
+import type { Transaction } from "../../../types";
+
+type AccountBalanceEntry = {
+  name: string;
+  balance: number;
+};
+
+type AccountBalances = Record<string, number> | AccountBalanceEntry[];
+
+interface BudgetGoalsSectionProps {
+  filteredData: Transaction[];
+  kpiData: Record<string, unknown>;
+  accountBalances?: AccountBalances | null;
+}
 
 /**
  * Budget & Planning Section - Redesigned for Perfect Calculations
@@ -20,19 +34,22 @@ export const BudgetGoalsSection = ({
   filteredData,
   kpiData,
   accountBalances,
-}) => {
-  const [activeTab, setActiveTab] = useState("overview");
+}: BudgetGoalsSectionProps) => {
+  const [activeTab, setActiveTab] = useState<string>("overview");
   // Extract investments and deposits from accountBalances (uploaded Excel data)
   const { investments, deposits, bankAccounts } = useMemo(() => {
-    const investmentAccounts = {};
-    const depositAccounts = {};
-    const bankOnly = {};
+    const investmentAccounts: Record<string, number> = {};
+    const depositAccounts: Record<string, number> = {};
+    const bankOnly: Record<string, number> = {};
 
     if (accountBalances && typeof accountBalances === "object") {
       // Handle array format: [{name, balance}]
-      const entries = Array.isArray(accountBalances)
+      const entries: Array<[string, number]> = Array.isArray(accountBalances)
         ? accountBalances.map((acc) => [acc.name, acc.balance])
-        : Object.entries(accountBalances);
+        : Object.entries(accountBalances).map(([name, balance]) => [
+            name,
+            Number(balance),
+          ]);
 
       entries.forEach(([name, balance]) => {
         const nameLower = name.toLowerCase();

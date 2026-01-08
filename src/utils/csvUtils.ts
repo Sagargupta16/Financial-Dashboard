@@ -7,23 +7,23 @@
  * @param {string} csvString - Raw CSV string
  * @returns {Array} Array of transaction objects
  */
-export const parseCSV = (csvString) => {
+export const parseCSV = (csvString: string): any[] => {
   const lines = csvString.trim().split("\n");
   if (lines.length < 2) {
     throw new Error("CSV file is empty or invalid");
   }
 
-  const headers = lines[0].split(",").map((h) => h.trim());
+  const headers = lines[0].split(",").map((h: string) => h.trim());
   const data = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(",").map((v) => v.trim());
+    const values = lines[i].split(",").map((v: string) => v.trim());
     if (values.length !== headers.length) {
       continue; // Skip invalid rows
     }
 
-    const row = {};
-    headers.forEach((header, index) => {
+    const row: any = {};
+    headers.forEach((header: string, index: number) => {
       row[header] = values[index];
     });
 
@@ -61,7 +61,7 @@ export const parseCSV = (csvString) => {
  * @param {Array} data - Array of transaction objects
  * @returns {string} CSV formatted string
  */
-export const exportToCSV = (data) => {
+export const exportToCSV = (data: any[]): string => {
   if (!data || data.length === 0) {
     throw new Error("No data to export");
   }
@@ -77,7 +77,7 @@ export const exportToCSV = (data) => {
   ];
   const csvRows = [headers.join(",")];
 
-  data.forEach((transaction) => {
+  data.forEach((transaction: any) => {
     const row = [
       transaction.date.toISOString().split("T")[0], // Format: YYYY-MM-DD
       transaction.type,
@@ -88,10 +88,10 @@ export const exportToCSV = (data) => {
       transaction.description || "",
     ];
     // Escape commas in text fields
-    const escapedRow = row.map((field) => {
+    const escapedRow = row.map((field: any) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replaceAll('"', '""')}"`;
+        return `"${str.replace(/"/g, '""')}"`;
       }
       return str;
     });
@@ -106,7 +106,7 @@ export const exportToCSV = (data) => {
  * @param {string} csvString - CSV formatted string
  * @param {string} filename - Desired filename (without extension)
  */
-export const downloadCSV = (csvString, filename = "transactions") => {
+export const downloadCSV = (csvString: string, filename: string = "transactions"): void => {
   const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
 
@@ -127,6 +127,6 @@ export const downloadCSV = (csvString, filename = "transactions") => {
  * @param {File} file - File object from input
  * @returns {Promise<string>} Promise that resolves to file content
  */
-export const readFileAsText = (file) => {
+export const readFileAsText = (file: File): Promise<string> => {
   return file.text();
 };

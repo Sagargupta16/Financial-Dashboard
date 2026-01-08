@@ -1,9 +1,14 @@
+// @ts-nocheck
 import { useRef, useEffect, useMemo, useState } from "react";
-import PropTypes from "prop-types";
 import * as d3 from "d3-selection";
 import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
 import { formatCurrency } from "../../../lib/charts";
+
+interface TreemapChartProps {
+  filteredData: any[];
+  chartRef?: any;
+}
 
 // Helper function to add text line to treemap labels
 const appendTextLine = (textElement, line, index) => {
@@ -17,7 +22,7 @@ const appendTextLine = (textElement, line, index) => {
 };
 
 // eslint-disable-next-line max-lines-per-function
-export const TreemapChart = ({ filteredData, chartRef }) => {
+export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
   const svgRef = useRef(null);
   const [viewMode, setViewMode] = useState("all-time");
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -561,11 +566,6 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
       </div>
     </div>
   );
-};
-
-TreemapChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object,
 };
 
 export default TreemapChart;

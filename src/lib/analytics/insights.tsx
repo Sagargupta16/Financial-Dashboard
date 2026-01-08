@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Smart Insights Generator
  * Generates AI-style personalized financial insights and recommendations

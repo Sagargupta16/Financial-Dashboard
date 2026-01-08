@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { useMemo, useState } from "react";
-import PropTypes from "prop-types";
 import {
   FileText,
   DollarSign,
@@ -12,6 +11,10 @@ import {
 import { Doughnut } from "react-chartjs-2";
 import { calculateTaxPlanning } from "../../../lib/calculations/financial";
 
+interface TaxPlanningDashboardProps {
+  filteredData: any[];
+}
+
 /**
  * Helper function to create chart options
  */
@@ -20,12 +23,12 @@ const createChartOptions = () => ({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: "bottom",
+      position: "bottom" as const,
       labels: { color: "#fff", padding: 15 },
     },
     tooltip: {
       callbacks: {
-        label: (context) => {
+        label: (context: any) => {
           const label = context.label || "";
           const value = context.parsed;
           return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -39,10 +42,10 @@ const createChartOptions = () => ({
  * Helper function to calculate projected tax for the year
  */
 const calculateProjectedTax = (
-  filteredData,
-  totalIncome,
-  standardDeduction,
-  totalTaxLiability
+  filteredData: any[],
+  totalIncome: number,
+  standardDeduction: number,
+  totalTaxLiability: number
 ) => {
   if (!filteredData || filteredData.length === 0) {
     return null;
@@ -136,7 +139,7 @@ const calculateProjectedTax = (
  * Income tax calculations, deductions, and planning
  */
 // eslint-disable-next-line complexity
-export const TaxPlanningDashboard = ({ filteredData }) => {
+export const TaxPlanningDashboard = ({ filteredData }: TaxPlanningDashboardProps) => {
   const taxPlanningData = useMemo(() => {
     return calculateTaxPlanning(filteredData);
   }, [filteredData]);
@@ -150,7 +153,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
 
   // Get data for selected FY or overall
   const taxData =
-    selectedFY === "overall" ? overall : byFinancialYear[selectedFY] || overall;
+    selectedFY === "overall" ? overall : (byFinancialYear as any)[selectedFY] || overall;
 
   const {
     totalIncome = 0,
@@ -244,7 +247,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
                 <option value="overall" className="bg-gray-800">
                   Overall (All Years)
                 </option>
-                {availableYears.map((fy) => (
+                {availableYears.map((fy: string) => (
                   <option key={fy} value={fy} className="bg-gray-800">
                     {fy}
                   </option>
@@ -666,7 +669,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
           Tax Deductions Claimed
         </h3>
         <div className="space-y-4">
-          {deductions.map((deduction) => (
+          {deductions.map((deduction: any) => (
             <div key={deduction.name} className="bg-gray-700/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
@@ -829,7 +832,7 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
             💡 Tax Saving Recommendations
           </h3>
           <div className="space-y-3">
-            {recommendations.map((rec) => {
+            {recommendations.map((rec: any) => {
               const isHigh = rec.priority === "high";
               const isMedium = rec.priority === "medium";
 
@@ -931,8 +934,4 @@ export const TaxPlanningDashboard = ({ filteredData }) => {
       </div>
     </div>
   );
-};
-
-TaxPlanningDashboard.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

@@ -193,9 +193,8 @@ export const useChartDataProcessor = (
     }
 
     // Convert to array and sort
-    let sortedData = Object.entries(groupedData || {}) as Array<
-      [string, number]
-    >;
+    const grouped: Record<string, number> = groupedData ?? {};
+    let sortedData = Object.entries(grouped);
 
     if (sortBy === "amount") {
       sortedData.sort(([, a], [, b]) => (sortOrder === "desc" ? b - a : a - b));

@@ -1,4 +1,4 @@
-import { lazy, ComponentType, type LazyExoticComponent } from "react";
+import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 
 /**
  * Helper function to simplify lazy loading with better error handling
@@ -6,7 +6,7 @@ import { lazy, ComponentType, type LazyExoticComponent } from "react";
  * @param exportName - Named export (optional, defaults to 'default')
  * @returns LazyExoticComponent for React
  */
-export const lazyLoad = <T extends ComponentType<any>>(
+export const lazyLoad = <T extends ComponentType<unknown>>(
   importFn: () => Promise<{ default: T } | Record<string, T>>,
   exportName = "default"
 ): LazyExoticComponent<T> => {

@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useMemo, useState, useCallback } from "react";
-import PropTypes from "prop-types";
 import {
   TrendingUp,
   CalendarDays,
@@ -193,21 +192,6 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
   );
 };
 
-FinancialHealthMetrics.propTypes = {
-  enhancedKPI: PropTypes.shape({
-    savingsRate: PropTypes.number.isRequired,
-    dailySpendingRate: PropTypes.number.isRequired,
-    monthlyBurnRate: PropTypes.number.isRequired,
-    netWorth: PropTypes.number.isRequired,
-    netWorthPerMonth: PropTypes.number.isRequired,
-    spendingVelocity: PropTypes.number.isRequired,
-    categoryConcentration: PropTypes.shape({
-      category: PropTypes.string.isRequired,
-      percentage: PropTypes.number.isRequired,
-    }),
-  }).isRequired,
-};
-
 // Transfer Information Component
 const TransferInformationCard = ({ transferData }) => {
   const sectionStyles = getSectionStyles("transfer-info");
@@ -253,13 +237,6 @@ const TransferInformationCard = ({ transferData }) => {
       </p>
     </div>
   );
-};
-
-TransferInformationCard.propTypes = {
-  transferData: PropTypes.shape({
-    transferIn: PropTypes.number,
-    transferOut: PropTypes.number,
-  }),
 };
 
 // Smart Insights Component with Time Filters
@@ -356,30 +333,6 @@ const SmartInsightsSection = ({
       </div>
     </div>
   );
-};
-
-SmartInsightsSection.propTypes = {
-  insights: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-      priority: PropTypes.string.isRequired,
-      icon: PropTypes.string.isRequired,
-      category: PropTypes.string,
-    })
-  ).isRequired,
-  years: PropTypes.arrayOf(PropTypes.number).isRequired,
-  months: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  selectedYear: PropTypes.string.isRequired,
-  selectedMonth: PropTypes.string.isRequired,
-  onYearChange: PropTypes.func.isRequired,
-  onMonthChange: PropTypes.func.isRequired,
 };
 
 /**
@@ -526,27 +479,4 @@ export const OverviewPage = ({
       />
     </div>
   );
-};
-
-OverviewPage.propTypes = {
-  kpiData: PropTypes.shape({
-    income: PropTypes.number.isRequired,
-    expense: PropTypes.number.isRequired,
-  }).isRequired,
-  additionalKpiData: PropTypes.shape({
-    totalTransactions: PropTypes.number.isRequired,
-    highestExpense: PropTypes.number.isRequired,
-    averageExpense: PropTypes.number.isRequired,
-    transferData: PropTypes.shape({
-      transferIn: PropTypes.number,
-      transferOut: PropTypes.number,
-    }),
-  }).isRequired,
-  accountBalances: PropTypes.array.isRequired,
-  keyInsights: PropTypes.shape({
-    busiestDay: PropTypes.string.isRequired,
-    mostFrequentCategory: PropTypes.string.isRequired,
-    avgTransactionValue: PropTypes.number.isRequired,
-  }).isRequired,
-  filteredData: PropTypes.array.isRequired,
 };

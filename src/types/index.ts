@@ -3,14 +3,20 @@
  */
 
 // Transaction Types
-export type TransactionType = "Income" | "Expense";
+export type TransactionType =
+  | "Income"
+  | "Expense"
+  | "Transfer-In"
+  | "Transfer-Out"
+  | "Reimbursement"
+  | "Investment";
 
 export interface Transaction {
   id: string;
   date: string | Date;
   time?: string;
   amount: number;
-  type: TransactionType | string;
+  type: TransactionType;
   category: string;
   subcategory: string;
   account: string;

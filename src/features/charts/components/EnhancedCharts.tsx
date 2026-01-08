@@ -49,15 +49,16 @@ export const EnhancedTopExpenseCategoriesChart = ({
     return getFilteredData().filter((item) => item.type === "Expense");
   }, [getFilteredData]);
 
+  type ExpenseRow = { amount?: number; category?: string; type?: string };
+
   const chartData = React.useMemo(() => {
-    const rows = timeFilteredData as any[];
-    const expenses = rows.reduce(
-      (acc: Record<string, number>, item: any) => {
+    const expenses = timeFilteredData.reduce<Record<string, number>>(
+      (acc, item: ExpenseRow) => {
         const key = String(item.category ?? "Uncategorized");
         acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
         return acc;
       },
-      {} as Record<string, number>
+      {}
     );
 
     const sorted = (Object.entries(expenses) as Array<[string, number]>)
@@ -138,15 +139,16 @@ export const EnhancedTopIncomeSourcesChart = ({
     );
   }, [getFilteredData]);
 
+  type IncomeRow = { amount?: number; category?: string; type?: string };
+
   const chartData = React.useMemo(() => {
-    const rows = timeFilteredData as any[];
-    const income = rows.reduce(
-      (acc: Record<string, number>, item: any) => {
+    const income = timeFilteredData.reduce<Record<string, number>>(
+      (acc, item: IncomeRow) => {
         const key = String(item.category ?? "Uncategorized");
         acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
         return acc;
       },
-      {} as Record<string, number>
+      {}
     );
 
     const sorted = (Object.entries(income) as Array<[string, number]>)

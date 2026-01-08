@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // @ts-nocheck
-import PropTypes from "prop-types";
 import React from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import {
@@ -1323,13 +1322,6 @@ export const MultiCategoryTimeAnalysisChart = ({
   );
 };
 
-MultiCategoryTimeAnalysisChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  chartRef: PropTypes.object,
-
-  categories: PropTypes.array,
-};
-
 // eslint-disable-next-line max-lines-per-function
 export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   const [viewMode, setViewMode] = React.useState("all-time");
@@ -1854,12 +1846,6 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
       </div>
     </div>
   );
-};
-
-NetWorthTrendChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
@@ -2417,12 +2403,6 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   );
 };
 
-CumulativeCategoryTrendChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
-};
-
 export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("All");
 
@@ -2657,12 +2637,6 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   );
 };
 
-SeasonalSpendingHeatmap.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
-};
-
 export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   const [comparisonType, setComparisonType] = React.useState("monthly");
   const [selectedYears, setSelectedYears] = React.useState(new Set());
@@ -2892,12 +2866,6 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
       </div>
     </div>
   );
-};
-
-YearOverYearComparisonChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
@@ -3192,12 +3160,6 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
       </div>
     </div>
   );
-};
-
-SpendingForecastChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function
@@ -3552,12 +3514,6 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   );
 };
 
-AccountBalanceProgressionChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
-};
-
 // eslint-disable-next-line max-lines-per-function
 export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
   const [patternType, setPatternType] = React.useState("dayOfWeek");
@@ -3838,12 +3794,6 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
       </div>
     </div>
   );
-};
-
-DayWeekSpendingPatternsChart.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-
-  chartRef: PropTypes.object,
 };
 
 // eslint-disable-next-line max-lines-per-function

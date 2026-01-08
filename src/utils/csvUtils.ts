@@ -7,14 +7,26 @@
  * @param {string} csvString - Raw CSV string
  * @returns {Array} Array of transaction objects
  */
-export const parseCSV = (csvString: string): any[] => {
+export interface CsvTransaction {
+  date: Date;
+  type: string;
+  category: string;
+  subcategory?: string;
+  amount: number;
+  account?: string;
+  description?: string;
+}
+
+type CsvRow = Record<string, string>;
+
+export const parseCSV = (csvString: string): CsvTransaction[] => {
   const lines = csvString.trim().split("\n");
   if (lines.length < 2) {
     throw new Error("CSV file is empty or invalid");
   }
 
   const headers = lines[0].split(",").map((h: string) => h.trim());
-  const data = [];
+  const data: CsvTransaction[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(",").map((v: string) => v.trim());
@@ -22,13 +34,13 @@ export const parseCSV = (csvString: string): any[] => {
       continue; // Skip invalid rows
     }
 
-    const row: any = {};
+    const row: CsvRow = {};
     headers.forEach((header: string, index: number) => {
       row[header] = values[index];
     });
 
     // Convert to proper data types
-    const transaction = {
+    const transaction: CsvTransaction = {
       date: new Date(row.Date || row.date),
       type: row.Type || row.type,
       category: row.Category || row.category,
@@ -61,7 +73,7 @@ export const parseCSV = (csvString: string): any[] => {
  * @param {Array} data - Array of transaction objects
  * @returns {string} CSV formatted string
  */
-export const exportToCSV = (data: any[]): string => {
+export const exportToCSV = (data: CsvTransaction[]): string => {
   if (!data || data.length === 0) {
     throw new Error("No data to export");
   }
@@ -77,7 +89,7 @@ export const exportToCSV = (data: any[]): string => {
   ];
   const csvRows = [headers.join(",")];
 
-  data.forEach((transaction: any) => {
+  data.forEach((transaction) => {
     const row = [
       transaction.date.toISOString().split("T")[0], // Format: YYYY-MM-DD
       transaction.type,
@@ -88,10 +100,10 @@ export const exportToCSV = (data: any[]): string => {
       transaction.description || "",
     ];
     // Escape commas in text fields
-    const escapedRow = row.map((field: any) => {
+    const escapedRow = row.map((field) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
+        return `"${str.replaceAll('"', '""')}"`;
       }
       return str;
     });

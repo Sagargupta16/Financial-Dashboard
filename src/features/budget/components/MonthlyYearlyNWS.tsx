@@ -231,13 +231,10 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
   // Calculate monthly breakdown
   const monthlyData = useMemo(() => {
-    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<
-      string,
-      any
-    >;
-    const income = getMonthlyIncome(transactions) as Record<string, number>;
+    const breakdown = calculateMonthlyNWSBreakdown(transactions);
+    const income = getMonthlyIncome(transactions);
 
-    const data = (Object.entries(breakdown) as Array<[string, any]>)
+    const data = Object.entries(breakdown)
       .map(([monthKey, values]) => ({
         monthKey,
         ...values,
@@ -251,13 +248,10 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
   // Calculate yearly breakdown
   const yearlyData = useMemo(() => {
-    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<
-      string,
-      any
-    >;
-    const income = getYearlyIncome(transactions) as Record<string, number>;
+    const breakdown = calculateYearlyNWSBreakdown(transactions);
+    const income = getYearlyIncome(transactions);
 
-    const data = (Object.entries(breakdown) as Array<[string, any]>)
+    const data = Object.entries(breakdown)
       .map(([year, values]) => ({
         year: Number.parseInt(year),
         ...values,

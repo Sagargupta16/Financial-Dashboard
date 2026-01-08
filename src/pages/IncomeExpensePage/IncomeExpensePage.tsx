@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import {
   IncomeVsExpenseChart,
   EnhancedTopExpenseCategoriesChart,
@@ -72,13 +71,4 @@ export const IncomeExpensePage = ({
       </div>
     </div>
   );
-};
-
-IncomeExpensePage.propTypes = {
-  chartData: PropTypes.object.isRequired,
-  chartRefs: PropTypes.object.isRequired,
-  filteredData: PropTypes.array.isRequired,
-  uniqueValues: PropTypes.object.isRequired,
-  drilldownCategory: PropTypes.string.isRequired,
-  setDrilldownCategory: PropTypes.func.isRequired,
 };

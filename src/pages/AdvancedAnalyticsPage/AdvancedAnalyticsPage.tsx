@@ -1,6 +1,4 @@
 // @ts-nocheck
-/* eslint-disable no-nested-ternary */
-import PropTypes from "prop-types";
 import {
   Calendar,
   AlertTriangle,
@@ -440,10 +438,6 @@ export const AdvancedAnalyticsDashboard = ({ filteredData }) => {
       </div>
     </div>
   );
-};
-
-AdvancedAnalyticsDashboard.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };
 
 export default AdvancedAnalyticsDashboard;

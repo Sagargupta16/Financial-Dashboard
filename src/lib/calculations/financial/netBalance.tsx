@@ -188,12 +188,12 @@ export const calculateNetBalanceBreakdown = (
     } else {
       // Positive balances in other categories
       // Map "investment" and "deposit" to correct property names
-      const propName =
-        category === "investment"
-          ? "investments"
-          : category === "deposit"
-            ? "deposits"
-            : category;
+      let propName = category;
+      if (category === "investment") {
+        propName = "investments";
+      } else if (category === "deposit") {
+        propName = "deposits";
+      }
       if (
         propName === "investments" ||
         propName === "deposits" ||
@@ -324,12 +324,12 @@ export const calculateNetBalanceBreakdownFromAccounts = (
     } else if (balanceNum > 0) {
       // Positive balance - categorize
       // Map "investment" and "deposit" to correct property names
-      const propName =
-        category === "investment"
-          ? "investments"
-          : category === "deposit"
-            ? "deposits"
-            : category;
+      let propName = category;
+      if (category === "investment") {
+        propName = "investments";
+      } else if (category === "deposit") {
+        propName = "deposits";
+      }
       if (
         propName === "investments" ||
         propName === "deposits" ||

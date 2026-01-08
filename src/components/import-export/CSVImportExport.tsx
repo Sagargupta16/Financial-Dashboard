@@ -8,9 +8,9 @@ import {
 } from "../../utils/csvUtils";
 
 interface CSVImportExportProps {
-  data: any[];
-  onImport: (data: any[]) => void;
-  filteredData: any[];
+  data: unknown[];
+  onImport: (data: unknown[]) => void;
+  filteredData: unknown[];
 }
 
 /**

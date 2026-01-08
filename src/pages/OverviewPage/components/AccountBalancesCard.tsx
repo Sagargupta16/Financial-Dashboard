@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import { formatCurrency } from "../../../lib/data";
 
 export const AccountBalancesCard = ({ balances }) => (
@@ -27,12 +26,3 @@ export const AccountBalancesCard = ({ balances }) => (
     </div>
   </div>
 );
-
-AccountBalancesCard.propTypes = {
-  balances: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      balance: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-};

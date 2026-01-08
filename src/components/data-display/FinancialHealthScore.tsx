@@ -11,21 +11,36 @@ import {
 } from "../../lib/analytics/healthScore";
 
 interface ScoreDisplayProps {
-  score?: any;
+  score?: {
+    score?: number;
+    grade?: string;
+    savingsRate?: number;
+    incomeStability?: number;
+    debtToIncome?: number;
+    expenseConsistency?: number;
+    cashFlowHealth?: number;
+  };
 }
 
 interface RecommendationCardProps {
-  rec: any;
+  rec: {
+    type?: string;
+    category?: string;
+    message?: string;
+    action?: string;
+  };
   index: number;
 }
 
+type HealthDataInput = Record<string, unknown>;
+
 interface FinancialHealthScoreProps {
-  filteredData: any[];
-  kpiData: any;
-  accountBalances?: any;
-  allAccountBalances?: any;
-  investments?: any;
-  deposits?: any;
+  filteredData: HealthDataInput[];
+  kpiData: HealthDataInput;
+  accountBalances?: HealthDataInput;
+  allAccountBalances?: HealthDataInput;
+  investments?: HealthDataInput;
+  deposits?: HealthDataInput;
 }
 
 /**

@@ -398,7 +398,7 @@ export const compareWithIdealAllocation = (
       ideal: idealPercent,
       difference,
       status,
-      amount: (breakdown as any)[key],
+      amount: breakdown?.[key] ?? 0,
       idealAmount: (total * idealPercent) / 100,
     };
   }

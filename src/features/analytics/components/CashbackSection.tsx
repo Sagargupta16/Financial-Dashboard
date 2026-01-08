@@ -18,9 +18,8 @@ interface CreditCardData {
 
 interface CashbackSectionProps {
   creditCardData: CreditCardData;
-  cardChartData: any;
-  chartOptions: any;
-  doughnutOptions: any;
+  cardChartData: unknown;
+  doughnutOptions: unknown;
 }
 
 /**
@@ -31,6 +30,10 @@ export const CashbackSection = ({
   cardChartData,
   doughnutOptions,
 }: CashbackSectionProps) => {
+  const topCards = [...creditCardData.cardBreakdown]
+    .sort((a, b) => b.cashback - a.cashback)
+    .slice(0, 5);
+
   return (
     <div>
       <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -108,30 +111,27 @@ export const CashbackSection = ({
             Top Cards by Cashback
           </h4>
           <div className="space-y-3">
-            {creditCardData.cardBreakdown
-              .sort((a, b) => b.cashback - a.cashback)
-              .slice(0, 5)
-              .map((card) => (
-                <div
-                  key={card.card}
-                  className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
-                >
-                  <div>
-                    <div className="text-white font-medium">{card.card}</div>
-                    <div className="text-gray-400 text-sm">
-                      {card.cashbackRate.toFixed(2)}% cashback rate
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-green-400 font-semibold">
-                      ₹{card.cashback.toLocaleString("en-IN")}
-                    </div>
-                    <div className="text-gray-400 text-sm">
-                      ₹{card.spending.toLocaleString("en-IN")} spent
-                    </div>
+            {topCards.map((card) => (
+              <div
+                key={card.card}
+                className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
+              >
+                <div>
+                  <div className="text-white font-medium">{card.card}</div>
+                  <div className="text-gray-400 text-sm">
+                    {card.cashbackRate.toFixed(2)}% cashback rate
                   </div>
                 </div>
-              ))}
+                <div className="text-right">
+                  <div className="text-green-400 font-semibold">
+                    ₹{card.cashback.toLocaleString("en-IN")}
+                  </div>
+                  <div className="text-gray-400 text-sm">
+                    ₹{card.spending.toLocaleString("en-IN")} spent
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

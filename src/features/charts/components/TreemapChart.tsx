@@ -21,7 +21,6 @@ const appendTextLine = (textElement, line, index) => {
     .text(line);
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
   const svgRef = useRef(null);
   const [viewMode, setViewMode] = useState("all-time");
@@ -227,7 +226,6 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
     return false;
   };
 
-  // eslint-disable-next-line max-lines-per-function
   useEffect(() => {
     if (
       !svgRef.current ||

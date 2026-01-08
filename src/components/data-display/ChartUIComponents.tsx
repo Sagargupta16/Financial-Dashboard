@@ -7,13 +7,13 @@ interface ChartContainerProps {
   className?: string;
   height?: string;
   colSpan?: string;
-  chartRef?: any;
+  chartRef?: React.RefObject<unknown>;
   filename?: string;
   actions?: React.ReactNode;
 }
 
 interface ExportButtonProps {
-  chartRef: any;
+  chartRef: React.RefObject<unknown>;
   filename: string;
 }
 

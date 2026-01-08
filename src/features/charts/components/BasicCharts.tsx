@@ -1,19 +1,16 @@
-/* eslint-disable max-lines-per-function */
+import { type RefObject } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
 import { commonChartOptions, doughnutOptions } from "./ChartConfig";
 
 interface ChartProps {
-  data: any;
-  chartRef?: any;
+  data: unknown;
+  chartRef?: RefObject<unknown>;
 }
 
 interface SubcategoryBreakdownChartProps {
-  data: any;
-  _categories?: any[];
-  _selectedCategory?: string;
-  _onCategoryChange?: (_category: string) => void;
-  chartRef?: any;
+  data: unknown;
+  chartRef?: RefObject<unknown>;
 }
 
 export const IncomeVsExpenseChart = ({ data, chartRef }: ChartProps) => (

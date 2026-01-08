@@ -777,9 +777,7 @@ export const EnhancedTransactionTable = ({
                 style={{ animationDelay: `${index * 30}ms` }}
               >
                 <td className="p-3 text-sm font-medium text-gray-100 group-hover:text-white transition-colors duration-300 truncate">
-                  {item.date
-                    ? new Date(item.date as any).toLocaleDateString()
-                    : ""}
+                  {item.date ? new Date(item.date).toLocaleDateString() : ""}
                 </td>
                 <td className="p-3 text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300 truncate">
                   {item.time}

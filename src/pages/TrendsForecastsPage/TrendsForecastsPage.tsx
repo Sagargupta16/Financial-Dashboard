@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import {
   NetWorthTrendChart,
   CumulativeCategoryTrendChart,
@@ -71,9 +70,4 @@ export const TrendsForecastsPage = ({ chartRefs, filteredData }) => {
       </div>
     </div>
   );
-};
-
-TrendsForecastsPage.propTypes = {
-  chartRefs: PropTypes.object.isRequired,
-  filteredData: PropTypes.array.isRequired,
 };

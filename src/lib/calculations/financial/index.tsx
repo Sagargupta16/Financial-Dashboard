@@ -491,7 +491,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
       deductions: [],
       recommendations: [],
       taxRegime: "new",
-      financialYear: financialYear || "FY 2025-26",
+      financialYear: financialYear ?? "FY 2025-26",
     };
   }
 
@@ -833,7 +833,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
     // Other info
     recommendations,
     taxRegime: "new",
-    financialYear: financialYear || "FY 2025-26",
+    financialYear: financialYear ?? "FY 2025-26",
     taxSlabs,
     note:
       financialYear === "FY 2024-25"

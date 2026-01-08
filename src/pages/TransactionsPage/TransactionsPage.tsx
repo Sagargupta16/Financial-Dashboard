@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import EnhancedTransactionTable from "../../features/transactions/components/TransactionTable";
 
 /**
@@ -21,11 +20,4 @@ export const TransactionsPage = ({
       />
     </div>
   );
-};
-
-TransactionsPage.propTypes = {
-  filteredData: PropTypes.array.isRequired,
-  handleSort: PropTypes.func.isRequired,
-  currentPage: PropTypes.number.isRequired,
-  transactionsPerPage: PropTypes.number.isRequired,
 };

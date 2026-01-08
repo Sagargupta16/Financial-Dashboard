@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import {
   TreemapChart,
   EnhancedSubcategoryBreakdownChart,
@@ -46,12 +45,4 @@ export const CategoryAnalysisPage = ({
       </div>
     </div>
   );
-};
-
-CategoryAnalysisPage.propTypes = {
-  chartRefs: PropTypes.object.isRequired,
-  filteredData: PropTypes.array.isRequired,
-  uniqueValues: PropTypes.object.isRequired,
-  drilldownCategory: PropTypes.string.isRequired,
-  setDrilldownCategory: PropTypes.func.isRequired,
 };

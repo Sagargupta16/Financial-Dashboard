@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import {
   TrendingUp,
   TrendingDown,
@@ -79,16 +78,4 @@ export const MainKPISection = ({
       )}
     </>
   );
-};
-
-MainKPISection.propTypes = {
-  income: PropTypes.number,
-  expense: PropTypes.number,
-  balanceBreakdown: PropTypes.shape({
-    cash: PropTypes.number,
-    investments: PropTypes.number,
-    deposits: PropTypes.number,
-    debt: PropTypes.number,
-    total: PropTypes.number,
-  }),
 };

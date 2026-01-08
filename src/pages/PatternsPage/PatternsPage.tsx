@@ -1,5 +1,4 @@
 // @ts-nocheck
-import PropTypes from "prop-types";
 import { RecurringPayments } from "../../features/budget/components/RecurringPayments";
 import { AdvancedAnalyticsDashboard } from "../AdvancedAnalyticsPage/AdvancedAnalyticsPage";
 
@@ -41,8 +40,4 @@ export const PatternsPage = ({ filteredData }) => {
       </div>
     </div>
   );
-};
-
-PatternsPage.propTypes = {
-  filteredData: PropTypes.array.isRequired,
 };

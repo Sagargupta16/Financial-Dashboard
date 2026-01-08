@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import {
   FileText,

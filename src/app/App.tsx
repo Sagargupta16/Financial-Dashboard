@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useRef } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,

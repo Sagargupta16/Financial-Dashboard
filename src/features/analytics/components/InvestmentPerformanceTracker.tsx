@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import PropTypes from "prop-types";
 import {
   TrendingUp,

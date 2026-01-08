@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import {
   calculateNWSBreakdown,

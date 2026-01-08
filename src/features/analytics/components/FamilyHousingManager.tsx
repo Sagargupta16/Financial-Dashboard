@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Users, Home, TrendingUp, Calendar, Zap } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";

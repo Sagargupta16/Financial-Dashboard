@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { CreditCard, Gift, TrendingUp } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3-selection";
 import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";

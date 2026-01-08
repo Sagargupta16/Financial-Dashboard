@@ -2521,7 +2521,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
 
   // Get peak and low months
   const seasonalInfo = React.useMemo(() => {
-    if (!seasonalAnalysis || !seasonalAnalysis.hasSeasonality) {
+    if (!seasonalAnalysis?.hasSeasonality) {
       return null;
     }
 

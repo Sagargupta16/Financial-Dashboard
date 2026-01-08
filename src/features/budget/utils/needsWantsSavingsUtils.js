@@ -379,15 +379,13 @@ export const compareWithIdealAllocation = (
       } else {
         status = "good";
       }
-    } else {
+    } else if (difference > 20) {
       // For needs and wants, higher is worse
-      if (difference > 20) {
-        status = "critical";
-      } else if (difference > 10) {
-        status = "warning";
-      } else {
-        status = "good";
-      }
+      status = "critical";
+    } else if (difference > 10) {
+      status = "warning";
+    } else {
+      status = "good";
     }
 
     comparison[key] = {

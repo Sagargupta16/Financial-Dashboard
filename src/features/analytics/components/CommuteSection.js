@@ -88,7 +88,7 @@ export const CommuteSection = ({ commuteData, chartOptions }) => {
             Commute Insights
           </h4>
           <div className="space-y-3">
-            {commuteData.insights.map((insight, idx) => {
+            {commuteData.insights.map((insight) => {
               let bgClass;
               if (insight.priority === "high") {
                 bgClass = "bg-red-900/30 border border-red-700";
@@ -98,7 +98,10 @@ export const CommuteSection = ({ commuteData, chartOptions }) => {
                 bgClass = "bg-blue-900/30 border border-blue-700";
               }
               return (
-                <div key={idx} className={`p-4 rounded-lg ${bgClass}`}>
+                <div
+                  key={`${insight.title}-${insight.priority}`}
+                  className={`p-4 rounded-lg ${bgClass}`}
+                >
                   <div className="font-semibold text-white mb-1">
                     {insight.title}
                   </div>

@@ -232,6 +232,31 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
       return;
     }
 
+    // Helper function to format display name based on length
+    const getDisplayName = (name, maxLength) => {
+      return name.length > maxLength
+        ? `${name.substring(0, maxLength - 3)}...`
+        : name;
+    };
+
+    // Helper function to add text labels to rectangles
+    const addTextLabels = (text, d, rectWidth, rectHeight) => {
+      if (rectWidth < 50 || rectHeight < 30) {
+        return; // Don't add text for very small rectangles
+      }
+
+      const lines = [];
+      const maxLength = showSubcategories ? 15 : 20;
+      const displayName = getDisplayName(d.data.name, maxLength);
+      lines.push(displayName);
+
+      if (rectHeight > 50) {
+        lines.push(formatCurrency(d.data.value));
+      }
+
+      lines.forEach((line, i) => appendTextLine(text, line, i));
+    };
+
     const renderTreemap = () => {
       const svg = d3.select(svgRef.current);
       svg.selectAll("*").remove();
@@ -354,33 +379,7 @@ export const TreemapChart = ({ filteredData, chartRef }) => {
           const text = d3.select(this);
           const rectWidth = d.x1 - d.x0;
           const rectHeight = d.y1 - d.y0;
-
-          if (rectWidth < 50 || rectHeight < 30) {
-            return; // Don't add text for very small rectangles
-          }
-
-          const lines = [];
-
-          let displayName;
-          if (showSubcategories) {
-            displayName =
-              d.data.name.length > 15
-                ? `${d.data.name.substring(0, 12)}...`
-                : d.data.name;
-          } else {
-            displayName =
-              d.data.name.length > 20
-                ? `${d.data.name.substring(0, 17)}...`
-                : d.data.name;
-          }
-
-          lines.push(displayName);
-
-          if (rectHeight > 50) {
-            lines.push(formatCurrency(d.data.value));
-          }
-
-          lines.forEach((line, i) => appendTextLine(text, line, i));
+          addTextLabels(text, d, rectWidth, rectHeight);
         });
 
       // Cleanup tooltip on component unmount

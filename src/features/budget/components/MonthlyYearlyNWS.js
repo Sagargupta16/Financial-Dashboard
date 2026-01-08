@@ -13,6 +13,177 @@ import {
 import { NWS_COLORS, SHORT_MONTH_NAMES } from "../../../constants";
 
 /**
+ * Category Bar Component - displays category spending with percentage
+ */
+const CategoryBar = ({ category, amount, percentage, color }) => (
+  <div className="space-y-2">
+    <div className="flex justify-between items-center">
+      <span className="text-sm text-gray-400 capitalize">{category}</span>
+      <div className="text-right">
+        <div className="text-white font-semibold">
+          {formatCurrency(amount, false)}
+        </div>
+        <div className="text-xs text-gray-500">
+          {formatPercentage(percentage)}
+        </div>
+      </div>
+    </div>
+    <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+      <div
+        className="h-full transition-all duration-500"
+        style={{
+          width: `${Math.min(percentage, 100)}%`,
+          backgroundColor: color,
+        }}
+      />
+    </div>
+  </div>
+);
+
+CategoryBar.propTypes = {
+  category: PropTypes.string.isRequired,
+  amount: PropTypes.number.isRequired,
+  percentage: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
+};
+
+/**
+ * Period Card Component - displays summary for a month or year
+ */
+const PeriodCard = ({ item, isSelected, onSelect, viewMode }) => {
+  const periodLabel =
+    viewMode === "monthly" ? formatMonthKey(item.monthKey) : item.year;
+  const periodKey = viewMode === "monthly" ? item.monthKey : item.year;
+
+  const total = item.needs + item.wants + item.savings;
+  const savingsRate = item.income > 0 ? (item.savings / item.income) * 100 : 0;
+
+  // Helper function to get color class based on savings rate
+  const getSavingsRateColor = (rate) => {
+    if (rate >= 20) {
+      return "text-green-400";
+    }
+    if (rate >= 10) {
+      return "text-yellow-400";
+    }
+    return "text-red-400";
+  };
+
+  return (
+    <button
+      onClick={() => onSelect(isSelected ? null : periodKey)}
+      className={`w-full bg-gray-800/50 rounded-lg p-4 border transition-all text-left ${
+        isSelected
+          ? "border-blue-500 bg-gray-800"
+          : "border-gray-700 hover:border-gray-600"
+      }`}
+    >
+      {/* Period Header */}
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <h4 className="text-lg font-semibold text-white">{periodLabel}</h4>
+          <p className="text-sm text-gray-400">{formatCurrency(total)} spent</p>
+        </div>
+        {item.income > 0 && (
+          <div className="text-right">
+            <div className="text-sm text-green-400">
+              {formatCurrency(item.income)}
+            </div>
+            <div className="text-xs text-gray-500">income</div>
+          </div>
+        )}
+      </div>
+
+      {/* Mini Breakdown */}
+      <div className="space-y-2">
+        {/* Stacked Bar */}
+        <div className="h-3 bg-gray-700 rounded-full overflow-hidden flex">
+          <div
+            className="transition-all duration-500"
+            style={{
+              width: `${item.percentages.needs.percentage}%`,
+              backgroundColor: NWS_COLORS.needs,
+            }}
+            title="Needs"
+          />
+          <div
+            className="transition-all duration-500"
+            style={{
+              width: `${item.percentages.wants.percentage}%`,
+              backgroundColor: NWS_COLORS.wants,
+            }}
+            title="Wants"
+          />
+          <div
+            className="transition-all duration-500"
+            style={{
+              width: `${item.percentages.savings.percentage}%`,
+              backgroundColor: NWS_COLORS.savings,
+            }}
+            title="Savings"
+          />
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center">
+            <div className="text-gray-400">Needs</div>
+            <div className="text-white font-medium">
+              {formatPercentage(item.percentages.needs.percentage)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-gray-400">Wants</div>
+            <div className="text-white font-medium">
+              {formatPercentage(item.percentages.wants.percentage)}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-gray-400">Savings</div>
+            <div className="text-white font-medium">
+              {formatPercentage(item.percentages.savings.percentage)}
+            </div>
+          </div>
+        </div>
+
+        {/* Savings Rate */}
+        {item.income > 0 && (
+          <div className="pt-2 border-t border-gray-700">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">Savings Rate</span>
+              <span
+                className={`font-medium ${getSavingsRateColor(savingsRate)}`}
+              >
+                {formatPercentage(savingsRate)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
+
+PeriodCard.propTypes = {
+  item: PropTypes.object.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  viewMode: PropTypes.string.isRequired,
+};
+
+/**
+ * Helper function to format month key
+ */
+const formatMonthKey = (monthKey) => {
+  if (!monthKey) {
+    return "";
+  }
+  const [year, month] = monthKey.split("-");
+  const monthIndex = parseInt(month, 10) - 1;
+  return `${SHORT_MONTH_NAMES[monthIndex]} ${year}`;
+};
+
+/**
  * Monthly and Yearly Needs/Wants/Savings Analysis Component
  */
 export const MonthlyYearlyNWS = ({ transactions }) => {
@@ -71,152 +242,6 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
       )
     : null;
 
-  // Nested helper components for rendering (eslint warnings are expected for these)
-  // eslint-disable-next-line react/prop-types
-  const CategoryBar = ({ category, amount, percentage, color }) => (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-400 capitalize">{category}</span>
-        <div className="text-right">
-          <div className="text-white font-semibold">
-            {formatCurrency(amount, false)}
-          </div>
-          <div className="text-xs text-gray-500">
-            {formatPercentage(percentage)}
-          </div>
-        </div>
-      </div>
-      <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-        <div
-          className="h-full transition-all duration-500"
-          style={{
-            width: `${Math.min(percentage, 100)}%`,
-            backgroundColor: color,
-          }}
-        />
-      </div>
-    </div>
-  );
-
-  /* eslint-disable react/prop-types */
-  const PeriodCard = ({ item, isSelected }) => {
-    const periodLabel =
-      viewMode === "monthly" ? formatMonthKey(item.monthKey) : item.year;
-    const periodKey = viewMode === "monthly" ? item.monthKey : item.year;
-
-    const total = item.needs + item.wants + item.savings;
-    const savingsRate =
-      item.income > 0 ? (item.savings / item.income) * 100 : 0;
-
-    // Helper function to get color class based on savings rate
-    const getSavingsRateColor = (rate) => {
-      if (rate >= 20) {
-        return "text-green-400";
-      }
-      if (rate >= 10) {
-        return "text-yellow-400";
-      }
-      return "text-red-400";
-    };
-
-    return (
-      <button
-        onClick={() => setSelectedPeriod(isSelected ? null : periodKey)}
-        className={`w-full bg-gray-800/50 rounded-lg p-4 border transition-all text-left ${
-          isSelected
-            ? "border-blue-500 bg-gray-800"
-            : "border-gray-700 hover:border-gray-600"
-        }`}
-      >
-        {/* Period Header */}
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <h4 className="text-lg font-semibold text-white">{periodLabel}</h4>
-            <p className="text-sm text-gray-400">
-              {formatCurrency(total)} spent
-            </p>
-          </div>
-          {item.income > 0 && (
-            <div className="text-right">
-              <div className="text-sm text-green-400">
-                {formatCurrency(item.income)}
-              </div>
-              <div className="text-xs text-gray-500">income</div>
-            </div>
-          )}
-        </div>
-
-        {/* Mini Breakdown */}
-        <div className="space-y-2">
-          {/* Stacked Bar */}
-          <div className="h-3 bg-gray-700 rounded-full overflow-hidden flex">
-            <div
-              className="transition-all duration-500"
-              style={{
-                width: `${item.percentages.needs.percentage}%`,
-                backgroundColor: NWS_COLORS.needs,
-              }}
-              title="Needs"
-            />
-            <div
-              className="transition-all duration-500"
-              style={{
-                width: `${item.percentages.wants.percentage}%`,
-                backgroundColor: NWS_COLORS.wants,
-              }}
-              title="Wants"
-            />
-            <div
-              className="transition-all duration-500"
-              style={{
-                width: `${item.percentages.savings.percentage}%`,
-                backgroundColor: NWS_COLORS.savings,
-              }}
-              title="Savings"
-            />
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="text-center">
-              <div className="text-gray-400">Needs</div>
-              <div className="text-white font-medium">
-                {formatPercentage(item.percentages.needs.percentage)}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-gray-400">Wants</div>
-              <div className="text-white font-medium">
-                {formatPercentage(item.percentages.wants.percentage)}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-gray-400">Savings</div>
-              <div className="text-white font-medium">
-                {formatPercentage(item.percentages.savings.percentage)}
-              </div>
-            </div>
-          </div>
-
-          {/* Savings Rate */}
-          {item.income > 0 && (
-            <div className="pt-2 border-t border-gray-700">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-gray-400">Savings Rate</span>
-                <span
-                  className={`font-medium ${getSavingsRateColor(savingsRate)}`}
-                >
-                  {formatPercentage(savingsRate)}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      </button>
-    );
-  };
-  /* eslint-enable react/prop-types */
-
   if (!transactions || transactions.length === 0) {
     return (
       <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
@@ -273,14 +298,14 @@ export const MonthlyYearlyNWS = ({ transactions }) => {
           {currentData.length > 0 ? (
             currentData.map((item) => (
               <PeriodCard
-                // eslint-disable-next-line react/prop-types
                 key={viewMode === "monthly" ? item.monthKey : item.year}
                 item={item}
                 isSelected={
                   selectedPeriod ===
-                  // eslint-disable-next-line react/prop-types
                   (viewMode === "monthly" ? item.monthKey : item.year)
                 }
+                onSelect={setSelectedPeriod}
+                viewMode={viewMode}
               />
             ))
           ) : (

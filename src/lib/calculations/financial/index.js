@@ -264,7 +264,7 @@ export const calculateInvestmentPerformance = (transactions) => {
 const getTaxSlabsForFY = (financialYear) => {
   // FY 2024-25 uses old slabs (₹3L base)
   // FY 2025-26 onwards uses new slabs (₹4L base)
-  if (financialYear && financialYear.includes("2024-25")) {
+  if (financialYear?.includes("2024-25")) {
     return TAX_SLABS_FY_2024_25;
   }
   // Default to FY 2025-26 slabs for current and future years
@@ -280,9 +280,7 @@ const getTaxSlabsForFY = (financialYear) => {
 const calculateTaxFromSlabs = (taxableIncome, taxSlabs) => {
   let estimatedTax = 0;
 
-  for (let i = 0; i < taxSlabs.length; i++) {
-    const slab = taxSlabs[i];
-
+  for (const slab of taxSlabs) {
     if (taxableIncome <= slab.max) {
       // This is the final applicable slab
       if (slab.rate > 0) {
@@ -310,6 +308,7 @@ const calculateTaxFromSlabs = (taxableIncome, taxSlabs) => {
  * @param {number} mealVoucherExemption - Annual meal voucher exemption (default: ₹18,250)
  * @returns {object} - { grossIncome, taxableIncome, estimatedTax, cess, totalTaxLiability }
  */
+// eslint-disable-next-line complexity
 export const calculateGrossFromNet = (
   netIncome,
   professionalTax = DEFAULT_PROFESSIONAL_TAX,

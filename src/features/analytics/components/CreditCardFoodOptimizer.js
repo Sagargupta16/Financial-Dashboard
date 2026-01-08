@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { CreditCard, UtensilsCrossed, TrendingUp } from "lucide-react";
 import {
-  calculateCreditCardMetrics,
+  calculateCashbackMetrics,
   calculateFoodMetrics,
   calculateCommuteMetrics,
 } from "../../../lib/calculations/financial";
@@ -17,7 +17,7 @@ import { CommuteSection } from "./CommuteSection";
 const CreditCardFoodOptimizer = ({ filteredData }) => {
   // Calculate metrics using useMemo for performance
   const creditCardData = useMemo(() => {
-    const data = calculateCreditCardMetrics(filteredData);
+    const data = calculateCashbackMetrics(filteredData);
     return {
       totalSpending: data.totalSpending || 0,
       totalCashback: data.totalCashback || 0,

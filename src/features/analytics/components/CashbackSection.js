@@ -91,9 +91,9 @@ export const CashbackSection = ({
             {creditCardData.cardBreakdown
               .sort((a, b) => b.cashback - a.cashback)
               .slice(0, 5)
-              .map((card, idx) => (
+              .map((card) => (
                 <div
-                  key={idx}
+                  key={card.card}
                   className="flex items-center justify-between p-3 bg-gray-700 rounded-lg"
                 >
                   <div>
@@ -135,6 +135,5 @@ CashbackSection.propTypes = {
     ),
   }).isRequired,
   cardChartData: PropTypes.object.isRequired,
-  chartOptions: PropTypes.object.isRequired,
   doughnutOptions: PropTypes.object.isRequired,
 };

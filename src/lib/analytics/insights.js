@@ -35,7 +35,7 @@ const analyzeDeliverySpending = (transactions, dateRange) => {
 
   const savings = calculateSavingsPotential(total, totalDays, 0.3);
 
-  if (!savings || !savings.monthlySavings || !savings.yearlySavings) {
+  if (!savings?.monthlySavings || !savings?.yearlySavings) {
     return null;
   }
 

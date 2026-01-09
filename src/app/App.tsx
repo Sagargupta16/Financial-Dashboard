@@ -1,3 +1,5 @@
+import { useChartData } from "@features/charts";
+import { useAccountBalances, useKeyInsights, useKPIData } from "@features/kpi";
 import {
   ArcElement,
   BarElement,
@@ -23,12 +25,6 @@ import { SectionSkeleton } from "../components/ui/SectionSkeleton";
 import { TABS_CONFIG } from "../config/tabs";
 // Utils
 import { initialCsvData } from "../constants/index";
-import { useChartData } from "../features/charts/hooks/useChartData";
-import {
-  useAccountBalances,
-  useKeyInsights,
-  useKPIData,
-} from "../features/kpi/hooks/useCalculations";
 // Hooks
 import { useDataProcessor, useFilteredData, useUniqueValues } from "../hooks/useDataProcessor";
 import type { SortConfig, TransactionSortKey } from "../types";

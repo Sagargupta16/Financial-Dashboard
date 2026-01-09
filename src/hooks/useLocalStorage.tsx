@@ -12,7 +12,10 @@ import { useCallback, useEffect, useState } from "react";
  * setTheme('light'); // Updates state and localStorage
  * removeTheme(); // Removes from localStorage and resets to initialValue
  */
-export const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void, () => void] => {
+export const useLocalStorage = <T,>(
+  key: string,
+  initialValue: T
+): [T, (value: T | ((val: T) => T)) => void, () => void] => {
   // Get initial value from localStorage or use initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === "undefined") {

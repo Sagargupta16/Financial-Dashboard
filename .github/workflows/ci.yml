@@ -14,15 +14,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@b4ffde65f46336ab11d5ea33ade984223922a3fb
+              uses: actions/checkout@v4
 
             - name: Setup PNPM
-              uses: pnpm/action-setup@a361b17c4d2c14b1cc349b5b8b33b76d44b25992
+              uses: pnpm/action-setup@v4
               with:
                   version: 10.20.0
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4.0.2
+              uses: actions/setup-node@v4
               with:
                   node-version: 20
                   cache: pnpm

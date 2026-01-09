@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,7 +12,15 @@ export default defineConfig({
       // Use automatic JSX runtime
       jsxRuntime: 'automatic',
     }),
-  ],
+    // Bundle analyzer (only in analyze mode)
+    process.env.ANALYZE === 'true' &&
+      visualizer({
+        open: true,
+        filename: 'dist/stats.html',
+        gzipSize: true,
+        brotliSize: true,
+      }),
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -30,19 +39,58 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // Enable minification
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs in production
+        drop_debugger: true,
+      },
+    },
     // Optimize chunks
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'chart-vendor': ['chart.js', 'react-chartjs-2'],
-          'd3-vendor': ['d3-hierarchy', 'd3-scale', 'd3-selection'],
-          'icons': ['lucide-react'],
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react-vendor';
+          }
+          // Chart.js and related
+          if (id.includes('node_modules/chart.js') || id.includes('node_modules/react-chartjs-2')) {
+            return 'chart-vendor';
+          }
+          // D3 libraries
+          if (id.includes('node_modules/d3-')) {
+            return 'd3-vendor';
+          }
+          // Radix UI primitives (from shadcn/ui)
+          if (id.includes('node_modules/@radix-ui/')) {
+            return 'radix-vendor';
+          }
+          // Lucide icons
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons';
+          }
+          // Zustand state management
+          if (id.includes('node_modules/zustand')) {
+            return 'state-vendor';
+          }
+          // Feature-based splitting for large features
+          if (id.includes('src/features/analytics')) {
+            return 'analytics-feature';
+          }
+          if (id.includes('src/features/budget') || id.includes('src/lib/calculations')) {
+            // Combine budget and calculations to avoid circular dependency
+            return 'budget-feature';
+          }
+          if (id.includes('src/features/charts')) {
+            return 'charts-feature';
+          }
         },
       },
     },
-    // Increase chunk size warning limit for financial calculations
-    chunkSizeWarningLimit: 1000,
+    // Reduce chunk size warning limit after optimization
+    chunkSizeWarningLimit: 500,
   },
   server: {
     port: 3000,

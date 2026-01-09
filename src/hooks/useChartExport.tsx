@@ -1,5 +1,5 @@
-import type { RefObject } from "react";
 import type { Chart as ChartJS } from "chart.js";
+import type { RefObject } from "react";
 
 /**
  * Export a Chart.js chart as PNG image

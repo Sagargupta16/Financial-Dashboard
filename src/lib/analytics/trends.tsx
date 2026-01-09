@@ -127,7 +127,7 @@ export const detectSpendingAnomalies = (transactions: Transaction[]): Insight[] 
     const avg = monthlyTotals.reduce((a, b) => a + b, 0) / monthlyTotals.length;
     const percentDiff = (((amount - avg) / avg) * 100).toFixed(0);
 
-    const monthDate = new Date(month + "-01");
+    const monthDate = new Date(`${month}-01`);
     const monthName = monthDate.toLocaleDateString("en-US", {
       month: "long",
       year: "numeric",
@@ -147,7 +147,9 @@ export const detectSpendingAnomalies = (transactions: Transaction[]): Insight[] 
   // Check category-level anomalies in recent months
   const recentMonths = months.slice(-3);
   const allCategories = new Set<string>();
-  expenses.forEach((t) => allCategories.add(t.category));
+  expenses.forEach((t) => {
+    allCategories.add(t.category);
+  });
 
   allCategories.forEach((category: string) => {
     const categoryData = months.map((m) => monthlyData[m].byCategory[category] || 0);

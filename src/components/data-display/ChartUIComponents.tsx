@@ -1,3 +1,4 @@
+import type { Chart as ChartJS } from "chart.js";
 import type React from "react";
 import { exportChartAsPNG } from "../../hooks/useChartExport";
 
@@ -7,13 +8,13 @@ interface ChartContainerProps {
   className?: string;
   height?: string;
   colSpan?: string;
-  chartRef?: React.RefObject<any>;
+  chartRef?: React.RefObject<ChartJS>;
   filename?: string;
   actions?: React.ReactNode;
 }
 
 interface ExportButtonProps {
-  chartRef?: React.RefObject<any>;
+  chartRef?: React.RefObject<ChartJS>;
   filename: string;
 }
 

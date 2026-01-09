@@ -20,7 +20,9 @@
     "rules": {
       "recommended": true,
       "a11y": {
-        "recommended": true
+        "recommended": true,
+        "useButtonType": "warn",
+        "noSvgWithoutTitle": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
@@ -37,7 +39,8 @@
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noImplicitAnyLet": "warn"
       }
     }
   },

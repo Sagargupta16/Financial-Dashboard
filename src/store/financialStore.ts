@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import type { Transaction } from "../types";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
+import type { Transaction } from "../types";
 
 /**
  * Budget allocation interface

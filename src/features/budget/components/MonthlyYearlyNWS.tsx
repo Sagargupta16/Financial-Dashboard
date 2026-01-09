@@ -236,7 +236,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
       .map(([year, values]) => {
         const { needs = 0, wants = 0, savings = 0, ...rest } = (values as any) || {};
         return {
-          year: Number.parseInt(year),
+          year: Number.parseInt(year, 10),
           needs,
           wants,
           savings,
@@ -253,7 +253,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   // Format month key for display
   const formatMonthKeyLocal = (monthKey: string) => {
     const [year, month] = monthKey.split("-");
-    return `${SHORT_MONTH_NAMES[Number.parseInt(month) - 1]} ${year}`;
+    return `${SHORT_MONTH_NAMES[Number.parseInt(month, 10) - 1]} ${year}`;
   };
 
   // Get data based on view mode

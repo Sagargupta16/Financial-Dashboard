@@ -56,7 +56,7 @@ const createDatasets = (items, getData, labels, colors, dataMode, labelTruncate 
       label: labelTruncate ? truncateLabel(item, labelTruncate) : item,
       data: buildCumulativeDataPoints(labels, getData, item, cumulativeData),
       borderColor: colors[index % colors.length],
-      backgroundColor: colors[index % colors.length] + "20",
+      backgroundColor: `${colors[index % colors.length]}20`,
       tension: 0.4,
       fill: false,
     }));
@@ -66,7 +66,7 @@ const createDatasets = (items, getData, labels, colors, dataMode, labelTruncate 
     label: labelTruncate ? truncateLabel(item, labelTruncate) : item,
     data: buildRegularDataPoints(labels, getData, item),
     borderColor: colors[index % colors.length],
-    backgroundColor: colors[index % colors.length] + "20",
+    backgroundColor: `${colors[index % colors.length]}20`,
     tension: 0.4,
     fill: false,
   }));
@@ -640,7 +640,6 @@ export const EnhancedSubcategoryBreakdownChart = ({
     currentMonth,
     viewMode,
     dataMode,
-    monthNames,
     shortMonthNames,
   ]);
 
@@ -1053,7 +1052,7 @@ export const MultiCategoryTimeAnalysisChart = ({
         ),
       };
     }
-  }, [filteredData, currentYear, currentMonth, viewMode, dataMode, monthNames, shortMonthNames]);
+  }, [filteredData, currentYear, currentMonth, viewMode, dataMode, shortMonthNames]);
 
   const handlePrevious = () => {
     if (viewMode === "month") {
@@ -1284,7 +1283,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
       };
     });
 
-    const formatLabel = (dateString, index, total) => {
+    const formatLabel = (dateString, _index, total) => {
       const date = new Date(dateString);
 
       if (viewMode === "month") {
@@ -1822,7 +1821,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
       return result;
     });
 
-    const formatLabel = (dateString, index, total) => {
+    const formatLabel = (dateString, _index, total) => {
       const date = new Date(dateString);
 
       if (viewMode === "monthly") {
@@ -2722,7 +2721,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
 
     const futureMonths = [];
     if (lastMonth) {
-      const currentDate = new Date(lastMonth + "-01");
+      const currentDate = new Date(`${lastMonth}-01`);
       for (let i = 0; i < forecastMonths; i++) {
         currentDate.setMonth(currentDate.getMonth() + 1);
         const monthKey = `${currentDate.getFullYear()}-${String(
@@ -3040,7 +3039,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
           return viewMode === "cumulative" ? data.balance : data.income - data.expense;
         }),
         borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + "20",
+        backgroundColor: `${colors[index % colors.length]}20`,
         borderWidth: 2,
         fill: false,
         tension: 0.3,

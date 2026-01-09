@@ -175,7 +175,7 @@ export const useChartData = (
         },
       ],
     };
-  }, [filteredData]);
+  }, [filteredData, toDate]);
 
   const spendingByDayData = useMemo(() => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -200,7 +200,7 @@ export const useChartData = (
         },
       ],
     };
-  }, [filteredData]);
+  }, [filteredData, toDate]);
 
   const subcategoryBreakdownData = useMemo(() => {
     if (!drilldownCategory) {

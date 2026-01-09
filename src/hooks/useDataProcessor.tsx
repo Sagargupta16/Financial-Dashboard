@@ -307,7 +307,7 @@ export const useDataProcessor = (initialCsvData) => {
 
   useEffect(() => {
     parseData(initialCsvData);
-  }, [initialCsvData]);
+  }, [initialCsvData, parseData]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];

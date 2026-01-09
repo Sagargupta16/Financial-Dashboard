@@ -244,7 +244,9 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         lines.push(formatCurrency(d.data.value));
       }
 
-      lines.forEach((line, i) => appendTextLine(text, line, i));
+      lines.forEach((line, i) => {
+        appendTextLine(text, line, i);
+      });
     };
 
     const renderTreemap = () => {
@@ -335,7 +337,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
           `);
         })
         .on("mousemove", (event: any) => {
-          tooltip.style("top", event.pageY - 10 + "px").style("left", event.pageX + 10 + "px");
+          tooltip.style("top", `${event.pageY - 10}px`).style("left", `${event.pageX + 10}px`);
         })
         .on("mouseout", function (this: SVGRectElement) {
           select(this).attr("opacity", 0.8);
@@ -419,7 +421,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
               const link = document.createElement("a");
               const fileName = `expense-treemap-${viewMode}-${currentYear}`;
               const monthSuffix = viewMode === "month" ? `-${currentMonth}` : "";
-              link.download = fileName + monthSuffix + ".svg";
+              link.download = `${fileName + monthSuffix}.svg`;
               link.href = url;
               link.click();
               URL.revokeObjectURL(url);

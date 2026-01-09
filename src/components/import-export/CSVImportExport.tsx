@@ -1,11 +1,11 @@
-import { useRef, useState, type ChangeEvent } from "react";
-import { Upload, Download, AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Download, Upload } from "lucide-react";
+import { type ChangeEvent, useRef, useState } from "react";
 import {
-  parseCSV,
-  exportToCSV,
-  downloadCSV,
-  readFileAsText,
   type CsvTransaction,
+  downloadCSV,
+  exportToCSV,
+  parseCSV,
+  readFileAsText,
 } from "../../utils/csvUtils";
 
 interface CSVImportExportProps {
@@ -18,11 +18,7 @@ interface CSVImportExportProps {
  * Component for importing and exporting CSV files
  */
 
-export const CSVImportExport = ({
-  data,
-  onImport,
-  filteredData,
-}: CSVImportExportProps) => {
+export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExportProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<{
     type: string;
@@ -95,9 +91,7 @@ export const CSVImportExport = ({
 
   return (
     <div className="bg-gray-800 rounded-2xl shadow-lg p-6">
-      <h3 className="text-xl font-semibold text-white mb-4">
-        Import/Export Data
-      </h3>
+      <h3 className="text-xl font-semibold text-white mb-4">Import/Export Data</h3>
 
       <div className="flex flex-wrap gap-4">
         {/* Import Button */}
@@ -110,6 +104,7 @@ export const CSVImportExport = ({
             className="hidden"
           />
           <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Import CSV file"
@@ -122,6 +117,7 @@ export const CSVImportExport = ({
         {/* Export All Button */}
         <div className="flex-1 min-w-[200px]">
           <button
+            type="button"
             onClick={() => handleExport(false)}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Export all transactions as CSV"
@@ -134,6 +130,7 @@ export const CSVImportExport = ({
         {/* Export Filtered Button */}
         <div className="flex-1 min-w-[200px]">
           <button
+            type="button"
             onClick={() => handleExport(true)}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Export filtered transactions as CSV"
@@ -158,11 +155,7 @@ export const CSVImportExport = ({
           })()}`}
           role="alert"
         >
-          {importStatus.type === "success" ? (
-            <CheckCircle size={20} />
-          ) : (
-            <AlertCircle size={20} />
-          )}
+          {importStatus.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
           <span>{importStatus.message}</span>
         </div>
       )}
@@ -176,11 +169,7 @@ export const CSVImportExport = ({
           }`}
           role="alert"
         >
-          {exportStatus.type === "success" ? (
-            <CheckCircle size={20} />
-          ) : (
-            <AlertCircle size={20} />
-          )}
+          {exportStatus.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
           <span>{exportStatus.message}</span>
         </div>
       )}
@@ -188,12 +177,12 @@ export const CSVImportExport = ({
       {/* Help Text */}
       <div className="mt-4 text-sm text-gray-400">
         <p className="mb-2">
-          <strong>CSV Format:</strong> Date, Type, Category, Subcategory,
-          Amount, Account, Description
+          <strong>CSV Format:</strong> Date, Type, Category, Subcategory, Amount, Account,
+          Description
         </p>
         <p>
-          <strong>Note:</strong> Import will add to existing data. Export
-          &quot;Filtered&quot; exports only the currently visible transactions.
+          <strong>Note:</strong> Import will add to existing data. Export &quot;Filtered&quot;
+          exports only the currently visible transactions.
         </p>
       </div>
     </div>

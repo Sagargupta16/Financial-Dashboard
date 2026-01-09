@@ -1,50 +1,51 @@
 // @ts-nocheck
-import { useMemo, useState, useCallback } from "react";
+
 import {
-  TrendingUp,
-  CalendarDays,
-  LayoutGrid,
-  Calculator,
   ArrowLeftRight,
-  PiggyBank,
-  Flame,
+  Calculator,
   Calendar,
-  Lightbulb,
+  CalendarDays,
   Filter,
+  Flame,
+  LayoutGrid,
+  Lightbulb,
+  PiggyBank,
+  TrendingUp,
 } from "lucide-react";
-import { SmallKPICard } from "../../features/kpi/components/KPICards";
-import { AccountBalancesCard } from "./components/AccountBalancesCard";
-import { MainKPISection } from "./components/MainKPISection";
+import { useCallback, useMemo, useState } from "react";
 import {
-  SecondaryKPISection,
-  AdvancedAnalyticsKPISection,
-} from "../../features/kpi/components/KPISections";
-import { formatCurrency } from "../../lib/formatters";
-import { useEnhancedKPIData } from "../../features/kpi/hooks/useCalculations";
+  CATEGORY_CONCENTRATION_THRESHOLD,
+  DEFAULT_ADDITIONAL_KPI,
+  DEFAULT_KEY_INSIGHTS,
+  DEFAULT_KPI_VALUES,
+  MESSAGES,
+} from "../../config/overview";
 import { useAdvancedAnalytics } from "../../features/analytics/hooks/useAdvancedAnalytics";
-import { generateSmartInsights } from "../../lib/analytics/insights";
-import { calculateNetBalanceBreakdownFromAccounts } from "../../lib/calculations/financial";
+import { SmallKPICard } from "../../features/kpi/components/KPICards";
 import {
+  AdvancedAnalyticsKPISection,
+  SecondaryKPISection,
+} from "../../features/kpi/components/KPISections";
+import { useEnhancedKPIData } from "../../features/kpi/hooks/useCalculations";
+import { generateSmartInsights } from "../../lib/analytics/insights";
+import {
+  getCategoryConcentrationColor,
+  getInsightPriorityColor,
+  getNetWorthColor,
+  getNetWorthIconColor,
   getSavingsRateColor,
   getSavingsRateIconColor,
   getSavingsRateMessage,
+  getSectionStyles,
   getSpendingVelocityColor,
   getSpendingVelocityIconColor,
-  getInsightPriorityColor,
   getYearsAndMonths,
-  getNetWorthColor,
-  getNetWorthIconColor,
-  getCategoryConcentrationColor,
-  getSectionStyles,
   validateKPIData,
 } from "../../lib/analytics/metrics";
-import {
-  CATEGORY_CONCENTRATION_THRESHOLD,
-  DEFAULT_KPI_VALUES,
-  DEFAULT_ADDITIONAL_KPI,
-  DEFAULT_KEY_INSIGHTS,
-  MESSAGES,
-} from "../../config/overview";
+import { calculateNetBalanceBreakdownFromAccounts } from "../../lib/calculations/financial";
+import { formatCurrency } from "../../lib/formatters";
+import { AccountBalancesCard } from "./components/AccountBalancesCard";
+import { MainKPISection } from "./components/MainKPISection";
 
 // Filter transactions by year and month
 const filterTransactionsByTime = (transactions, year, month) => {
@@ -93,10 +94,7 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-300">Savings Rate</span>
-            <PiggyBank
-              size={22}
-              className={getSavingsRateIconColor(kpiData.savingsRate)}
-            />
+            <PiggyBank size={22} className={getSavingsRateIconColor(kpiData.savingsRate)} />
           </div>
           <div className="text-3xl font-bold text-white">
             {(kpiData.savingsRate ?? 0).toFixed(1)}%
@@ -121,19 +119,12 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
         />
 
         {/* Net Worth Change */}
-        <div
-          className={`p-4 rounded-xl border ${getNetWorthColor(kpiData.netWorth)}`}
-        >
+        <div className={`p-4 rounded-xl border ${getNetWorthColor(kpiData.netWorth)}`}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-300">Net Worth Change</span>
-            <TrendingUp
-              size={22}
-              className={getNetWorthIconColor(kpiData.netWorth)}
-            />
+            <TrendingUp size={22} className={getNetWorthIconColor(kpiData.netWorth)} />
           </div>
-          <div className="text-2xl font-bold text-white">
-            {formatCurrency(kpiData.netWorth)}
-          </div>
+          <div className="text-2xl font-bold text-white">{formatCurrency(kpiData.netWorth)}</div>
           <div className="text-xs text-gray-400 mt-1">
             {formatCurrency(Math.abs(kpiData.netWorthPerMonth))}/month{" "}
             {kpiData.netWorth >= 0 ? "↑" : "↓"}
@@ -142,14 +133,10 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
 
         {/* Spending Velocity */}
         <div
-          className={`p-4 rounded-xl border ${getSpendingVelocityColor(
-            kpiData.spendingVelocity
-          )}`}
+          className={`p-4 rounded-xl border ${getSpendingVelocityColor(kpiData.spendingVelocity)}`}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-300">
-              Spending Velocity (30d)
-            </span>
+            <span className="text-sm text-gray-300">Spending Velocity (30d)</span>
             <Calculator
               size={22}
               className={getSpendingVelocityIconColor(kpiData.spendingVelocity)}
@@ -180,8 +167,7 @@ const FinancialHealthMetrics = ({ enhancedKPI }) => {
               {kpiData.categoryConcentration.category}
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {(kpiData.categoryConcentration?.percentage ?? 0).toFixed(0)}% of
-              spending
+              {(kpiData.categoryConcentration?.percentage ?? 0).toFixed(0)}% of spending
               {(kpiData.categoryConcentration?.percentage ?? 0) >
                 CATEGORY_CONCENTRATION_THRESHOLD && " ⚠️"}
             </div>
@@ -213,9 +199,7 @@ const TransferInformationCard = ({ transferData }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-purple-900/30 p-4 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-purple-300">
-              Money Transferred In
-            </span>
+            <span className="text-sm text-purple-300">Money Transferred In</span>
             <span className="text-lg font-bold text-purple-400">
               ← {formatCurrency(transferData?.transferIn || 0)}
             </span>
@@ -223,18 +207,14 @@ const TransferInformationCard = ({ transferData }) => {
         </div>
         <div className="bg-purple-900/30 p-4 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-purple-300">
-              Money Transferred Out
-            </span>
+            <span className="text-sm text-purple-300">Money Transferred Out</span>
             <span className="text-lg font-bold text-purple-400">
               → {formatCurrency(transferData?.transferOut || 0)}
             </span>
           </div>
         </div>
       </div>
-      <p className="text-xs text-purple-300/70 mt-3">
-        * {MESSAGES.TRANSFER_DISCLAIMER}
-      </p>
+      <p className="text-xs text-purple-300/70 mt-3">* {MESSAGES.TRANSFER_DISCLAIMER}</p>
     </div>
   );
 };
@@ -304,16 +284,10 @@ const SmartInsightsSection = ({
             )}`}
           >
             <div className="flex items-start">
-              <span className="text-3xl mr-4 flex-shrink-0">
-                {insight.icon}
-              </span>
+              <span className="text-3xl mr-4 flex-shrink-0">{insight.icon}</span>
               <div className="flex-1 min-w-0">
-                <h4 className="text-lg font-semibold text-white mb-2">
-                  {insight.title}
-                </h4>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {insight.message}
-                </p>
+                <h4 className="text-lg font-semibold text-white mb-2">{insight.title}</h4>
+                <p className="text-gray-300 text-sm leading-relaxed">{insight.message}</p>
                 {insight.category && (
                   <span className="inline-block mt-2 px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">
                     {insight.category}
@@ -350,14 +324,8 @@ export const OverviewPage = ({
   const [insightsMonth, setInsightsMonth] = useState("all");
 
   // Validate input data with defaults
-  const validatedAdditionalKPI = validateKPIData(
-    additionalKpiData,
-    DEFAULT_ADDITIONAL_KPI
-  );
-  const validatedKeyInsights = validateKPIData(
-    keyInsights,
-    DEFAULT_KEY_INSIGHTS
-  );
+  const validatedAdditionalKPI = validateKPIData(additionalKpiData, DEFAULT_ADDITIONAL_KPI);
+  const validatedKeyInsights = validateKPIData(keyInsights, DEFAULT_KEY_INSIGHTS);
 
   // Generate enhanced KPI data
   const enhancedKPI = useEnhancedKPIData(filteredData, kpiData);
@@ -422,18 +390,13 @@ export const OverviewPage = ({
       />
 
       {/* Advanced Analytics KPI Cards */}
-      <AdvancedAnalyticsKPISection
-        analytics={analytics}
-        formatCurrency={formatCurrency}
-      />
+      <AdvancedAnalyticsKPISection analytics={analytics} formatCurrency={formatCurrency} />
 
       {/* Financial Health Metrics */}
       <FinancialHealthMetrics enhancedKPI={enhancedKPI} />
 
       {/* Transfer Information Cards */}
-      <TransferInformationCard
-        transferData={validatedAdditionalKPI.transferData}
-      />
+      <TransferInformationCard transferData={validatedAdditionalKPI.transferData} />
 
       {/* Account Balances */}
       <AccountBalancesCard balances={accountBalances} />

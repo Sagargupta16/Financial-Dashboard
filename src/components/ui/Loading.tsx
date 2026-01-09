@@ -8,10 +8,7 @@ interface LoadingSpinnerProps {
 /**
  * Loading Spinner Component
  */
-export const LoadingSpinner = ({
-  size = "md",
-  message = "",
-}: LoadingSpinnerProps) => {
+export const LoadingSpinner = ({ size = "md", message = "" }: LoadingSpinnerProps) => {
   const getSizeClass = () => {
     switch (size) {
       case "sm":
@@ -26,10 +23,7 @@ export const LoadingSpinner = ({
   };
 
   return (
-    <output
-      className="flex flex-col items-center justify-center gap-3"
-      aria-live="polite"
-    >
+    <output className="flex flex-col items-center justify-center gap-3" aria-live="polite">
       <Loader2 className={`${getSizeClass()} animate-spin text-blue-500`} />
       {message && <p className="text-gray-400 text-sm">{message}</p>}
       <span className="sr-only">Loading...</span>
@@ -44,9 +38,7 @@ interface LoadingOverlayProps {
 /**
  * Full Page Loading Overlay
  */
-export const LoadingOverlay = ({
-  message = "Loading...",
-}: LoadingOverlayProps) => {
+export const LoadingOverlay = ({ message = "Loading..." }: LoadingOverlayProps) => {
   return (
     <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl">

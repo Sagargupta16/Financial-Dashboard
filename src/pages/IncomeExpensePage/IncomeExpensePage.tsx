@@ -1,10 +1,10 @@
 // @ts-nocheck
 import {
-  IncomeVsExpenseChart,
+  EnhancedMonthlyTrendsChart,
+  EnhancedSpendingByAccountChart,
   EnhancedTopExpenseCategoriesChart,
   EnhancedTopIncomeSourcesChart,
-  EnhancedSpendingByAccountChart,
-  EnhancedMonthlyTrendsChart,
+  IncomeVsExpenseChart,
   SpendingByDayChart,
   SubcategoryBreakdownChart,
 } from "../../features/charts/components";
@@ -23,16 +23,10 @@ export const IncomeExpensePage = ({
   return (
     <div className="grid grid-cols-1 gap-6">
       {/* Income vs Expense Doughnut */}
-      <IncomeVsExpenseChart
-        data={chartData.doughnutChartData}
-        chartRef={chartRefs.doughnut}
-      />
+      <IncomeVsExpenseChart data={chartData.doughnutChartData} chartRef={chartRefs.doughnut} />
 
       {/* Top Expense Categories */}
-      <EnhancedTopExpenseCategoriesChart
-        filteredData={filteredData}
-        chartRef={chartRefs.bar}
-      />
+      <EnhancedTopExpenseCategoriesChart filteredData={filteredData} chartRef={chartRefs.bar} />
 
       {/* Top Income Sources */}
       <EnhancedTopIncomeSourcesChart
@@ -47,18 +41,12 @@ export const IncomeExpensePage = ({
       />
 
       {/* Monthly Trends */}
-      <EnhancedMonthlyTrendsChart
-        filteredData={filteredData}
-        chartRef={chartRefs.line}
-      />
+      <EnhancedMonthlyTrendsChart filteredData={filteredData} chartRef={chartRefs.line} />
 
       {/* Detailed Analysis Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Spending by Day */}
-        <SpendingByDayChart
-          data={chartData.spendingByDayData}
-          chartRef={chartRefs.spendingByDay}
-        />
+        <SpendingByDayChart data={chartData.spendingByDayData} chartRef={chartRefs.spendingByDay} />
 
         {/* Subcategory Breakdown */}
         <SubcategoryBreakdownChart

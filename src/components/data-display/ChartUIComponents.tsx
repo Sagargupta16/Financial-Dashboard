@@ -1,5 +1,6 @@
-import React from "react";
-import { exportChartAsPNG } from "../../lib/charts";
+import type { Chart as ChartJS } from "chart.js";
+import type React from "react";
+import { exportChartAsPNG } from "../../hooks/useChartExport";
 
 interface ChartContainerProps {
   title: string;
@@ -7,13 +8,13 @@ interface ChartContainerProps {
   className?: string;
   height?: string;
   colSpan?: string;
-  chartRef?: React.RefObject<any>;
+  chartRef?: React.RefObject<ChartJS>;
   filename?: string;
   actions?: React.ReactNode;
 }
 
 interface ExportButtonProps {
-  chartRef?: React.RefObject<any>;
+  chartRef?: React.RefObject<ChartJS>;
   filename: string;
 }
 
@@ -93,9 +94,7 @@ export const ChartContainer = ({
         <h3 className="text-xl font-semibold text-white">{title}</h3>
         <div className="flex items-center space-x-4">
           {actions}
-          {chartRef && filename && (
-            <ExportButton chartRef={chartRef} filename={filename} />
-          )}
+          {chartRef && filename && <ExportButton chartRef={chartRef} filename={filename} />}
         </div>
       </div>
       {children}
@@ -106,6 +105,7 @@ export const ChartContainer = ({
 // Export button component
 export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
   <button
+    type="button"
     onClick={() => chartRef && exportChartAsPNG(chartRef, filename)}
     className="text-gray-400 hover:text-white transition-colors"
     title="Export as PNG"
@@ -118,7 +118,10 @@ export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      role="img"
+      aria-label="Download chart as PNG"
     >
+      <title>Download Chart</title>
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7,10 12,15 17,10" />
       <line x1="12" y1="15" x2="12" y2="3" />
@@ -149,7 +152,7 @@ export const NavigationButton = ({
   direction = "left",
   className = "text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed",
 }: NavigationButtonProps) => (
-  <button onClick={onClick} disabled={disabled} className={className}>
+  <button type="button" onClick={onClick} disabled={disabled} className={className}>
     <svg
       width="20"
       height="20"
@@ -157,7 +160,10 @@ export const NavigationButton = ({
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      role="img"
+      aria-label={direction === "left" ? "Previous" : "Next"}
     >
+      <title>{direction === "left" ? "Previous" : "Next"}</title>
       {direction === "left" ? (
         <polyline points="15,18 9,12 15,6" />
       ) : (
@@ -193,21 +199,11 @@ export const TimeNavigationControls = ({
     </div>
 
     <div className="flex items-center gap-4">
-      <NavigationButton
-        onClick={onPrevious}
-        disabled={!canGoPrevious}
-        direction="left"
-      />
+      <NavigationButton onClick={onPrevious} disabled={!canGoPrevious} direction="left" />
 
-      <div className="text-white font-semibold min-w-[150px] text-center">
-        {currentPeriod}
-      </div>
+      <div className="text-white font-semibold min-w-[150px] text-center">{currentPeriod}</div>
 
-      <NavigationButton
-        onClick={onNext}
-        disabled={!canGoNext}
-        direction="right"
-      />
+      <NavigationButton onClick={onNext} disabled={!canGoNext} direction="right" />
     </div>
   </div>
 );
@@ -271,11 +267,7 @@ export const InfoCard = ({
     </div>
     <div className="text-white font-semibold text-lg mt-1">{value}</div>
     {change !== null && (
-      <div
-        className={`text-sm mt-1 ${
-          change >= 0 ? "text-green-400" : "text-red-400"
-        }`}
-      >
+      <div className={`text-sm mt-1 ${change >= 0 ? "text-green-400" : "text-red-400"}`}>
         {change >= 0 ? "↗" : "↘"} {Math.abs(change).toFixed(1)}%
       </div>
     )}

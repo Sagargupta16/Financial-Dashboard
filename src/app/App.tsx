@@ -1,52 +1,45 @@
-import { useState, useEffect, Suspense, useRef, type RefObject } from "react";
+import { useChartData } from "@features/charts";
+import { useAccountBalances, useKeyInsights, useKPIData } from "@features/kpi";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
+  ArcElement,
   BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  TimeScale,
   Title,
   Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement,
-  TimeScale,
-  Filler,
 } from "chart.js";
-
+import { type RefObject, Suspense, useEffect, useRef, useState } from "react";
+import { Footer } from "../components/layout/Footer";
 // Components
 import { Header } from "../components/layout/Header";
-import { Footer } from "../components/layout/Footer";
-import { Tabs, TabContent } from "../components/ui/Tabs";
+import { CustomTabs, TabContent } from "../components/ui/CustomTabs";
 import { LoadingSpinner } from "../components/ui/Loading";
 import { SectionSkeleton } from "../components/ui/SectionSkeleton";
-
-// Hooks
-import {
-  useDataProcessor,
-  useUniqueValues,
-  useFilteredData,
-} from "../hooks/useDataProcessor";
-import {
-  useKPIData,
-  useKeyInsights,
-  useAccountBalances,
-} from "../features/kpi/hooks/useCalculations";
-import { useChartData } from "../features/charts/hooks/useChartData";
-
-// Utils
-import { initialCsvData } from "../constants/index";
-import { lazyLoad } from "../utils/lazyLoad";
-
 // Config
 import { TABS_CONFIG } from "../config/tabs";
+// Utils
+import { initialCsvData } from "../constants/index";
+// Hooks
+import { useDataProcessor, useFilteredData, useUniqueValues } from "../hooks/useDataProcessor";
+import {
+  useError,
+  useLoading,
+  useSetError,
+  useSetLoading,
+  useSetTransactions,
+  useTransactions,
+} from "../store/financialStore";
 import type { SortConfig, TransactionSortKey } from "../types";
+import { lazyLoad } from "../utils/lazyLoad";
 
 // Lazy load page components for better performance
-const OverviewPage = lazyLoad(
-  () => import("../pages/OverviewPage/OverviewPage"),
-  "OverviewPage"
-);
+const OverviewPage = lazyLoad(() => import("../pages/OverviewPage/OverviewPage"), "OverviewPage");
 const IncomeExpensePage = lazyLoad(
   () => import("../pages/IncomeExpensePage/IncomeExpensePage"),
   "IncomeExpensePage"
@@ -75,10 +68,7 @@ const CreditCardFoodOptimizer = lazyLoad(
   () => import("../features/analytics/components/CreditCardFoodOptimizer"),
   "CreditCardFoodOptimizer"
 );
-const PatternsPage = lazyLoad(
-  () => import("../pages/PatternsPage/PatternsPage"),
-  "PatternsPage"
-);
+const PatternsPage = lazyLoad(() => import("../pages/PatternsPage/PatternsPage"), "PatternsPage");
 const TransactionsPage = lazyLoad(
   () => import("../pages/TransactionsPage/TransactionsPage"),
   "TransactionsPage"
@@ -156,10 +146,37 @@ const App = () => {
     dayWeekSpendingPatterns: useRef<ChartJS | null>(null),
   };
 
+  // Zustand store
+  const transactions = useTransactions();
+  const setTransactions = useSetTransactions();
+  const loading = useLoading();
+  const setLoading = useSetLoading();
+  const error = useError();
+  const setError = useSetError();
+
   // Custom hooks
-  const { data, loading, error, handleFileUpload } =
-    useDataProcessor(initialCsvData);
+  const {
+    data,
+    loading: processorLoading,
+    error: processorError,
+    handleFileUpload,
+  } = useDataProcessor(initialCsvData);
   const uniqueValues = useUniqueValues(data);
+
+  // Sync data processor with store
+  useEffect(() => {
+    if (data.length > 0) {
+      setTransactions(data);
+    }
+  }, [data, setTransactions]);
+
+  useEffect(() => {
+    setLoading(processorLoading);
+  }, [processorLoading, setLoading]);
+
+  useEffect(() => {
+    setError(processorError);
+  }, [processorError, setError]);
 
   // Default filters for data processing
   const defaultFilters = {
@@ -171,10 +188,10 @@ const App = () => {
     endDate: "",
   };
 
-  const filteredData = useFilteredData(data, defaultFilters, sortConfig);
+  const filteredData = useFilteredData(transactions, defaultFilters, sortConfig);
   const { kpiData, additionalKpiData } = useKPIData(filteredData);
   const keyInsights = useKeyInsights(filteredData, kpiData, additionalKpiData);
-  const accountBalances = useAccountBalances(data);
+  const accountBalances = useAccountBalances(transactions);
   const chartData = useChartData(filteredData, kpiData, drilldownCategory);
 
   // Effects
@@ -215,11 +232,7 @@ const App = () => {
         <Header onFileUpload={handleFileUpload} />
 
         {/* Tab Navigation */}
-        <Tabs
-          tabs={TABS_CONFIG}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-        />
+        <CustomTabs tabs={TABS_CONFIG} activeTab={activeTab} onChange={setActiveTab} />
 
         {/* Tab Content */}
         <TabContent isActive={activeTab === "overview"}>
@@ -261,10 +274,7 @@ const App = () => {
 
         <TabContent isActive={activeTab === "trends"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <TrendsForecastsPage
-              chartRefs={chartRefs}
-              filteredData={filteredData}
-            />
+            <TrendsForecastsPage chartRefs={chartRefs} filteredData={filteredData} />
           </Suspense>
         </TabContent>
 

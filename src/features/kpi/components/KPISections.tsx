@@ -1,19 +1,19 @@
 import {
-  Hash,
-  Target,
-  Sigma,
-  TrendingUp,
-  Repeat,
   AlertTriangle,
   Gift,
+  Hash,
   Receipt,
+  Repeat,
+  Sigma,
+  Target,
+  TrendingUp,
 } from "lucide-react";
-import { SmallKPICard } from "./KPICards";
 import {
-  getMonthlyTrendDisplay,
   getAnomalyAlertDisplay,
+  getMonthlyTrendDisplay,
   getSubscriptionsDisplay,
 } from "../../../lib/analytics/metrics";
+import { SmallKPICard } from "./KPICards";
 
 interface CashbackData {
   totalCashbackEarned?: number;
@@ -34,6 +34,7 @@ interface SecondaryKPISectionProps {
 }
 
 interface AdvancedAnalyticsKPISectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   analytics?: any;
   formatCurrency: (value: number) => string;
 }
@@ -58,16 +59,8 @@ export const SecondaryKPISection = ({
           icon={<Hash size={22} />}
           isCount={true}
         />
-        <SmallKPICard
-          title="Highest Expense"
-          value={highestExpense}
-          icon={<Target size={22} />}
-        />
-        <SmallKPICard
-          title="Average Expense"
-          value={averageExpense}
-          icon={<Sigma size={22} />}
-        />
+        <SmallKPICard title="Highest Expense" value={highestExpense} icon={<Target size={22} />} />
+        <SmallKPICard title="Average Expense" value={averageExpense} icon={<Sigma size={22} />} />
       </div>
 
       {/* Cashback & Reimbursement Section */}
@@ -104,15 +97,14 @@ export const SecondaryKPISection = ({
           )}
 
           {/* Total Reimbursements */}
-          {reimbursementData &&
-            (reimbursementData.totalReimbursements ?? 0) > 0 && (
-              <SmallKPICard
-                title="Reimbursements"
-                value={reimbursementData.totalReimbursements || 0}
-                icon={<Receipt size={22} />}
-                color="blue"
-              />
-            )}
+          {reimbursementData && (reimbursementData.totalReimbursements ?? 0) > 0 && (
+            <SmallKPICard
+              title="Reimbursements"
+              value={reimbursementData.totalReimbursements || 0}
+              icon={<Receipt size={22} />}
+              color="blue"
+            />
+          )}
         </div>
       )}
     </>
@@ -137,10 +129,7 @@ export const AdvancedAnalyticsKPISection = ({
       />
       <SmallKPICard
         title="Active Subscriptions"
-        value={getSubscriptionsDisplay(
-          analytics?.recurringTransactions,
-          formatCurrency
-        )}
+        value={getSubscriptionsDisplay(analytics?.recurringTransactions, formatCurrency)}
         icon={<Repeat size={22} />}
         isCount={false}
       />

@@ -26,10 +26,7 @@ export const truncateText = (text: string, maxLength: number = 12): string => {
  * @example
  * truncateLabel("Entertainment & Media", 12) // "Entertainment..."
  */
-export const truncateLabel = (
-  label: string | number,
-  maxLength: number = 12
-): string => {
+export const truncateLabel = (label: string | number, maxLength: number = 12): string => {
   if (typeof label !== "string") {
     return String(label);
   }
@@ -97,11 +94,7 @@ export const camelToReadable = (text: string): string => {
  * pluralize("item", 5) // "items"
  * pluralize("person", 5, "people") // "people"
  */
-export const pluralize = (
-  word: string,
-  count: number,
-  plural?: string
-): string => {
+export const pluralize = (word: string, count: number, plural?: string): string => {
   if (count === 1) {
     return word;
   }

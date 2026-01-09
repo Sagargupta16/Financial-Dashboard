@@ -114,9 +114,7 @@ export interface NetBalanceBreakdown {
  * @param transactions - All transactions
  * @returns Breakdown of balances by category
  */
-export const calculateNetBalanceBreakdown = (
-  transactions: Transaction[]
-): NetBalanceBreakdown => {
+export const calculateNetBalanceBreakdown = (transactions: Transaction[]): NetBalanceBreakdown => {
   if (!transactions || transactions.length === 0) {
     return {
       cash: 0,
@@ -216,11 +214,7 @@ export const calculateNetBalanceBreakdown = (
 
   // Calculate total (cash + investments + deposits - debt)
   // Note: breakdown.debt is already positive (absolute value)
-  breakdown.total =
-    breakdown.cash +
-    breakdown.investments +
-    breakdown.deposits -
-    breakdown.debt;
+  breakdown.total = breakdown.cash + breakdown.investments + breakdown.deposits - breakdown.debt;
 
   return breakdown;
 };
@@ -234,8 +228,7 @@ export const getBalanceBreakdownInsights = (breakdown: NetBalanceBreakdown) => {
   const insights = [];
 
   // Cash concentration
-  const cashPercentage =
-    breakdown.total > 0 ? (breakdown.cash / breakdown.total) * 100 : 0;
+  const cashPercentage = breakdown.total > 0 ? (breakdown.cash / breakdown.total) * 100 : 0;
 
   if (cashPercentage > 70) {
     insights.push({
@@ -275,9 +268,7 @@ export const getBalanceBreakdownInsights = (breakdown: NetBalanceBreakdown) => {
  * @param {Array|Object} accountBalances - Account balances from uploaded file
  * @returns {Object} Breakdown of balances by category
  */
-export const calculateNetBalanceBreakdownFromAccounts = (
-  accountBalances: any
-) => {
+export const calculateNetBalanceBreakdownFromAccounts = (accountBalances: any) => {
   const breakdown: {
     cash: number;
     investments: number;
@@ -350,11 +341,7 @@ export const calculateNetBalanceBreakdownFromAccounts = (
   });
 
   // Calculate total (cash + investments + deposits - debt)
-  breakdown.total =
-    breakdown.cash +
-    breakdown.investments +
-    breakdown.deposits -
-    breakdown.debt;
+  breakdown.total = breakdown.cash + breakdown.investments + breakdown.deposits - breakdown.debt;
 
   return breakdown;
 };

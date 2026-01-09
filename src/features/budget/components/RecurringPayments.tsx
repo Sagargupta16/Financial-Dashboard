@@ -1,13 +1,8 @@
 /* eslint-disable max-lines-per-function */
+
+import { Calendar, CheckCircle, Clock, TrendingUp, XCircle } from "lucide-react";
 import { useMemo } from "react";
 import { detectRecurringTransactions } from "../../../lib/calculations";
-import {
-  Clock,
-  TrendingUp,
-  Calendar,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
 import type { Transaction } from "../../../types";
 
 type RecurringPayment = {
@@ -67,9 +62,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
     if (!nextDate) {
       return { text: "—", color: "text-gray-400" };
     }
-    const days = Math.ceil(
-      (new Date(nextDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-    );
+    const days = Math.ceil((new Date(nextDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     if (days < 0) {
       return { text: "Overdue", color: "text-red-400" };
     }
@@ -118,22 +111,16 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
           </h2>
           <p className="text-gray-400 mt-1">
             Auto-detected from transaction patterns •{" "}
-            <span className="text-green-400">
-              {activePayments.length} active
-            </span>
+            <span className="text-green-400">{activePayments.length} active</span>
             {inactivePayments.length > 0 && (
-              <span className="text-gray-500">
-                {" "}
-                • {inactivePayments.length} inactive
-              </span>
+              <span className="text-gray-500"> • {inactivePayments.length} inactive</span>
             )}
           </p>
         </div>
         <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 rounded-xl p-4 border border-purple-500/30">
           <p className="text-gray-400 text-sm">Total Monthly Cost</p>
           <p className="text-3xl font-bold text-white">
-            ₹
-            {totalMonthly.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            ₹{totalMonthly.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
           </p>
           <p className="text-gray-400 text-xs mt-1">
             {activePayments.length} active subscription
@@ -163,9 +150,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                       <h3 className="text-white font-semibold mb-1 truncate">
                         {payment.description}
                       </h3>
-                      <p className="text-gray-400 text-xs truncate">
-                        {payment.category}
-                      </p>
+                      <p className="text-gray-400 text-xs truncate">{payment.category}</p>
                     </div>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium border shrink-0 ml-2 ${getFrequencyBadge(
@@ -191,17 +176,12 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">
-                        Monthly Cost
-                      </span>
+                      <span className="text-gray-400 text-sm">Monthly Cost</span>
                       <span className="text-purple-400 font-medium text-sm">
                         ₹
-                        {(payment.monthlyEquivalent ?? 0).toLocaleString(
-                          "en-IN",
-                          {
-                            maximumFractionDigits: 0,
-                          }
-                        )}
+                        {(payment.monthlyEquivalent ?? 0).toLocaleString("en-IN", {
+                          maximumFractionDigits: 0,
+                        })}
                         /mo
                       </span>
                     </div>
@@ -221,9 +201,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                         <Clock size={14} />
                         Next Due
                       </span>
-                      <span
-                        className={`text-xs font-medium ${daysUntil.color}`}
-                      >
+                      <span className={`text-xs font-medium ${daysUntil.color}`}>
                         {daysUntil.text}
                       </span>
                     </div>
@@ -260,9 +238,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                     <h3 className="text-gray-300 font-medium mb-1 truncate">
                       {payment.description}
                     </h3>
-                    <p className="text-gray-500 text-xs truncate">
-                      {payment.category}
-                    </p>
+                    <p className="text-gray-500 text-xs truncate">{payment.category}</p>
                   </div>
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium border shrink-0 ml-2 ${getFrequencyBadge(
@@ -287,8 +263,7 @@ export const RecurringPayments = ({ filteredData }: RecurringPaymentsProps) => {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 text-sm">Last seen</span>
                     <span className="text-gray-500 text-xs">
-                      {(payment.daysSinceLastOccurrence ?? 0).toString()} days
-                      ago
+                      {(payment.daysSinceLastOccurrence ?? 0).toString()} days ago
                     </span>
                   </div>
 

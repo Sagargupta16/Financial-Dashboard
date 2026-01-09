@@ -4,12 +4,12 @@
  */
 
 // Currency parsers
-export { parseCurrency, parseAmount, parseSignedAmount } from "./currency";
+export { parseAmount, parseCurrency, parseSignedAmount } from "./currency";
 
 // Date parsers
 export {
+  isValidDateString,
   parseDate,
   parseDateString,
   parseDateValue,
-  isValidDateString,
 } from "./date";

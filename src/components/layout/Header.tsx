@@ -1,5 +1,5 @@
-import { Upload, FileSpreadsheet, TrendingUp, Sparkles } from "lucide-react";
-import React from "react";
+import { FileSpreadsheet, Sparkles, TrendingUp, Upload } from "lucide-react";
+import type React from "react";
 
 interface HeaderProps {
   onFileUpload: (_event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -47,13 +47,7 @@ export const Header = ({ onFileUpload }: HeaderProps) => (
         />
         <span className="relative z-10">Upload CSV</span>
       </label>
-      <input
-        id="csv-upload"
-        type="file"
-        accept=".csv"
-        className="hidden"
-        onChange={onFileUpload}
-      />
+      <input id="csv-upload" type="file" accept=".csv" className="hidden" onChange={onFileUpload} />
 
       <label
         htmlFor="excel-upload"

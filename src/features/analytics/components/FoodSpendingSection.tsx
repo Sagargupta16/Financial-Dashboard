@@ -1,4 +1,4 @@
-import { UtensilsCrossed, ShoppingBag, Coffee } from "lucide-react";
+import { Coffee, ShoppingBag, UtensilsCrossed } from "lucide-react";
 import { Doughnut, Line } from "react-chartjs-2";
 
 interface FoodData {
@@ -11,9 +11,13 @@ interface FoodData {
 
 interface FoodSpendingSectionProps {
   foodData: FoodData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   foodChartData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   foodTrendsData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartOptions: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doughnutOptions: any;
 }
 
@@ -93,9 +97,7 @@ export const FoodSpendingSection = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Food Category Breakdown */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Food Category Breakdown
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Food Category Breakdown</h4>
           <div style={{ height: "300px" }}>
             <Doughnut data={foodChartData} options={doughnutOptions} />
           </div>
@@ -103,9 +105,7 @@ export const FoodSpendingSection = ({
 
         {/* Monthly Food Trends */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Monthly Food Spending Trend
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Monthly Food Spending Trend</h4>
           <div style={{ height: "300px" }}>
             <Line data={foodTrendsData} options={chartOptions} />
           </div>
@@ -115,12 +115,10 @@ export const FoodSpendingSection = ({
       {/* Food Insights */}
       {foodData.insights && foodData.insights.length > 0 && (
         <div className="mt-6 bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Food Spending Insights
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Food Spending Insights</h4>
           <div className="space-y-3">
             {foodData.insights.map((insight) => {
-              let bgClass;
+              let bgClass: string;
               if (insight.priority === "high") {
                 bgClass = "bg-red-900/30 border border-red-700";
               } else if (insight.priority === "medium") {
@@ -133,9 +131,7 @@ export const FoodSpendingSection = ({
                   key={`${insight.title}-${insight.priority}`}
                   className={`p-4 rounded-lg ${bgClass}`}
                 >
-                  <div className="font-semibold text-white mb-1">
-                    {insight.title}
-                  </div>
+                  <div className="font-semibold text-white mb-1">{insight.title}</div>
                   <div className="text-gray-300">{insight.message}</div>
                 </div>
               );

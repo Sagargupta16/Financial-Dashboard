@@ -3,7 +3,7 @@
  * Extracted from TaxPlanningDashboard component
  */
 
-import type { Transaction, TaxProjection } from "../../types";
+import type { TaxProjection, Transaction } from "../../types";
 
 /**
  * Calculate projected tax liability for the financial year
@@ -53,8 +53,7 @@ export const calculateProjectedTax = (
     0
   );
   const avgMonthlySalary = totalRecentSalary / recentSalaryTransactions.length;
-  const projectedAnnualSalary =
-    totalIncome + avgMonthlySalary * monthsRemaining;
+  const projectedAnnualSalary = totalIncome + avgMonthlySalary * monthsRemaining;
 
   // Calculate projected taxable income
   const projectedTaxableIncome = Math.max(
@@ -145,9 +144,6 @@ export const calculateTaxForSlab = (
   const previousSlabsTax = calculateTaxForIncome(slabMin);
 
   return (
-    Math.min(
-      effectiveIncome * rate,
-      previousSlabsTax + effectiveIncome * rate
-    ) - previousSlabsTax
+    Math.min(effectiveIncome * rate, previousSlabsTax + effectiveIncome * rate) - previousSlabsTax
   );
 };

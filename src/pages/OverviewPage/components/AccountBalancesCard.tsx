@@ -20,9 +20,7 @@ export const AccountBalancesCard = ({ balances }) => (
           </span>
         </div>
       ))}
-      {balances.length === 0 && (
-        <p className="text-gray-400 text-center py-4">No account data.</p>
-      )}
+      {balances.length === 0 && <p className="text-gray-400 text-center py-4">No account data.</p>}
     </div>
   </div>
 );

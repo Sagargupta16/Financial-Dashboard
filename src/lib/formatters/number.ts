@@ -23,10 +23,7 @@ export const formatNumber = (value: number): string => {
  * formatPercentage(0.2567) // "25.7%"
  * formatPercentage(0.2567, 2) // "25.67%"
  */
-export const formatPercentage = (
-  value: number,
-  decimals: number = 1
-): string => {
+export const formatPercentage = (value: number, decimals: number = 1): string => {
   // Handle edge cases
   if (!Number.isFinite(value) || Number.isNaN(value)) {
     return "0.0%";
@@ -47,7 +44,7 @@ export const formatPercentage = (
  * roundToDecimals(1.23456, 2) // 1.23
  */
 export const roundToDecimals = (value: number, decimals: number): number => {
-  const multiplier = Math.pow(10, decimals);
+  const multiplier = 10 ** decimals;
   return Math.round(value * multiplier) / multiplier;
 };
 

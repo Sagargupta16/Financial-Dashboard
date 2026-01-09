@@ -1,15 +1,15 @@
 /* eslint-disable max-lines-per-function */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { Transaction } from "../../../types";
 import {
-  calculateCategorySpending,
   calculateAverageSpending,
   calculateBudgetComparison,
-  suggestBudgets,
+  calculateCategorySpending,
+  detectRecurringPayments,
   loadBudgets,
   saveBudgets,
-  detectRecurringPayments,
+  suggestBudgets,
 } from "../utils/budgetUtils";
-import type { Transaction } from "../../../types";
 
 type BudgetMap = Record<string, number>;
 type BudgetStatus = "good" | "warning" | "critical" | "over";
@@ -43,9 +43,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
   const [averageSpending, setAverageSpending] = useState<BudgetMap>({});
   const [budgets, setBudgets] = useState<BudgetMap>({});
   const [comparison, setComparison] = useState<ComparisonMap>({});
-  const [recurringPayments, setRecurringPayments] = useState<
-    RecurringPayment[]
-  >([]);
+  const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [tempBudgets, setTempBudgets] = useState<BudgetMap>({});
 
@@ -136,14 +134,10 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
     );
   }
 
-  const totalActual = Object.values(actualSpending).reduce(
-    (sum, val) => sum + val,
-    0
-  );
+  const totalActual = Object.values(actualSpending).reduce((sum, val) => sum + val, 0);
   const totalBudget = Object.values(budgets).reduce((sum, val) => sum + val, 0);
   const totalRemaining = totalBudget - totalActual;
-  const overallPercentage =
-    totalBudget > 0 ? (totalActual / totalBudget) * 100 : 0;
+  const overallPercentage = totalBudget > 0 ? (totalActual / totalBudget) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -159,18 +153,21 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
           {editMode ? (
             <>
               <button
+                type="button"
                 onClick={applySuggestedBudgets}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
               >
                 Use Suggested
               </button>
               <button
+                type="button"
                 onClick={cancelEdit}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={saveBudgetChanges}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
               >
@@ -179,6 +176,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
             </>
           ) : (
             <button
+              type="button"
               onClick={() => setEditMode(true)}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
@@ -193,15 +191,11 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-gray-800/50 rounded-xl p-4">
             <p className="text-gray-400 text-sm">Total Budget</p>
-            <p className="text-2xl font-bold text-white mt-1">
-              ₹{totalBudget.toLocaleString()}
-            </p>
+            <p className="text-2xl font-bold text-white mt-1">₹{totalBudget.toLocaleString()}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4">
             <p className="text-gray-400 text-sm">Total Spent</p>
-            <p className="text-2xl font-bold text-white mt-1">
-              ₹{totalActual.toLocaleString()}
-            </p>
+            <p className="text-2xl font-bold text-white mt-1">₹{totalActual.toLocaleString()}</p>
           </div>
           <div
             className={`rounded-xl p-4 border ${
@@ -210,9 +204,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
                 : "bg-red-900/20 border-red-500/30"
             }`}
           >
-            <p
-              className={`text-sm ${totalRemaining >= 0 ? "text-green-400" : "text-red-400"}`}
-            >
+            <p className={`text-sm ${totalRemaining >= 0 ? "text-green-400" : "text-red-400"}`}>
               {totalRemaining >= 0 ? "Remaining" : "Over Budget"}
             </p>
             <p
@@ -225,9 +217,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4">
             <p className="text-gray-400 text-sm">Overall Usage</p>
-            <p className="text-2xl font-bold text-white mt-1">
-              {overallPercentage.toFixed(0)}%
-            </p>
+            <p className="text-2xl font-bold text-white mt-1">{overallPercentage.toFixed(0)}%</p>
             <div className="mt-2 h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={`h-full ${getOverallUsageColor(overallPercentage)}`}
@@ -240,16 +230,12 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
 
       {/* Category Budgets */}
       <div className="bg-gray-800/50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">
-          Category Budgets
-        </h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Category Budgets</h3>
         <div className="space-y-4">
           {categories.map((category) => {
             const actual = actualSpending[category];
             const average = averageSpending[category] || actual;
-            const budget = editMode
-              ? tempBudgets[category] || 0
-              : budgets[category] || 0;
+            const budget = editMode ? tempBudgets[category] || 0 : budgets[category] || 0;
             const comp = comparison[category];
 
             return (
@@ -261,9 +247,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
                       <input
                         type="number"
                         value={tempBudgets[category] || ""}
-                        onChange={(e) =>
-                          handleBudgetChange(category, e.target.value)
-                        }
+                        onChange={(e) => handleBudgetChange(category, e.target.value)}
                         placeholder={`${Math.round(average)}`}
                         className="w-32 px-3 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                       />
@@ -299,13 +283,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
                       <span className="text-gray-500">
                         3-Month Avg: ₹{Math.round(average).toLocaleString()}
                       </span>
-                      <span
-                        className={
-                          comp.remaining >= 0
-                            ? "text-green-400"
-                            : "text-red-400"
-                        }
-                      >
+                      <span className={comp.remaining >= 0 ? "text-green-400" : "text-red-400"}>
                         {comp.remaining >= 0 ? "Remaining" : "Over"}: ₹
                         {Math.abs(comp.remaining).toLocaleString()}
                       </span>
@@ -315,8 +293,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
 
                 {!budget && !editMode && (
                   <p className="text-xs text-gray-500">
-                    No budget set • 3-Month Avg: ₹
-                    {Math.round(average).toLocaleString()}
+                    No budget set • 3-Month Avg: ₹{Math.round(average).toLocaleString()}
                   </p>
                 )}
               </div>
@@ -328,9 +305,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
       {/* Recurring Payments */}
       {recurringPayments.length > 0 && (
         <div className="bg-gray-800/50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            🔄 Recurring Payments Detected
-          </h3>
+          <h3 className="text-lg font-semibold text-white mb-4">🔄 Recurring Payments Detected</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recurringPayments.slice(0, 6).map((payment) => (
               <div
@@ -339,9 +314,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
               >
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-white font-medium">{payment.category}</h4>
-                  <span className="text-xs text-gray-400 capitalize">
-                    {payment.frequency}
-                  </span>
+                  <span className="text-xs text-gray-400 capitalize">{payment.frequency}</span>
                 </div>
                 <p className="text-2xl font-bold text-blue-400 mb-2">
                   ₹{payment.amount.toLocaleString()}
@@ -360,9 +333,9 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
       {editMode && (
         <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4">
           <p className="text-blue-400 text-sm">
-            💡 <strong>Tip:</strong> Click "Use Suggested" to automatically set
-            budgets based on your 3-month average spending (with 10% buffer).
-            You can then adjust individual categories as needed.
+            💡 <strong>Tip:</strong> Click "Use Suggested" to automatically set budgets based on
+            your 3-month average spending (with 10% buffer). You can then adjust individual
+            categories as needed.
           </p>
         </div>
       )}

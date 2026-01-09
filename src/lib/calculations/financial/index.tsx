@@ -6,27 +6,22 @@
  */
 
 import {
-  PERCENT,
-  TAX_SLABS_NEW_REGIME,
-  TAX_SLABS_FY_2024_25,
-  TAX_SLABS_FY_2025_26,
   CESS_RATE,
-  STANDARD_DEDUCTION,
-  SECTION_80C_LIMIT,
+  DAYS_IN_YEAR,
   DEFAULT_PROFESSIONAL_TAX,
   HRA_METRO_PERCENT,
-  INVESTMENT_CATEGORIES,
   INVESTMENT_ACCOUNTS,
+  INVESTMENT_CATEGORIES,
   MEAL_VOUCHER_DAILY_LIMIT,
-  DAYS_IN_YEAR,
+  PERCENT,
+  SECTION_80C_LIMIT,
+  STANDARD_DEDUCTION,
+  TAX_SLABS_FY_2024_25,
+  TAX_SLABS_FY_2025_26,
+  TAX_SLABS_NEW_REGIME,
 } from "../../../constants";
-
-import {
-  calculateDateRange,
-  calculateDailyAverage,
-  calculateMonthlyAverage,
-} from "../index";
 import { getAllFinancialYears, getFinancialYear } from "../../data";
+import { calculateDailyAverage, calculateDateRange, calculateMonthlyAverage } from "../index";
 
 // ============================================================================
 // BASIC CALCULATIONS
@@ -34,17 +29,17 @@ import { getAllFinancialYears, getFinancialYear } from "../../data";
 
 // Re-export canonical implementations for external consumers
 export {
-  calculateDateRange,
-  calculateDailyAverage,
-  calculateMonthlyAverage,
   calculateAveragePerTransaction,
-  calculateTotalIncome,
-  calculateTotalExpense,
+  calculateDailyAverage,
+  calculateDateRange,
+  calculateMonthlyAverage,
+  calculatePercentage,
   calculateSavings,
   calculateSavingsRate,
-  calculatePercentage,
-  groupByCategory,
+  calculateTotalExpense,
+  calculateTotalIncome,
   getTopCategories,
+  groupByCategory,
 } from "../index";
 
 // ============================================================================
@@ -52,9 +47,9 @@ export {
 // ============================================================================
 
 export {
-  categorizeAccount,
   calculateNetBalanceBreakdown,
   calculateNetBalanceBreakdownFromAccounts,
+  categorizeAccount,
   getBalanceBreakdownInsights,
 } from "./netBalance";
 
@@ -63,11 +58,11 @@ export {
 // ============================================================================
 
 export {
-  calculateTotalCashbackEarned,
-  calculateCashbackShared,
   calculateActualCashback,
   calculateCashbackByCard,
   calculateCashbackMetrics,
+  calculateCashbackShared,
+  calculateTotalCashbackEarned,
 } from "./cashback";
 
 // ============================================================================
@@ -75,11 +70,11 @@ export {
 // ============================================================================
 
 export {
-  calculateTotalReimbursements,
-  getReimbursementTransactions,
   calculateAverageReimbursement,
   calculateReimbursementByPeriod,
   calculateReimbursementMetrics,
+  calculateTotalReimbursements,
+  getReimbursementTransactions,
 } from "./reimbursement";
 
 // ============================================================================
@@ -140,11 +135,8 @@ export const calculateInvestmentPerformance = (transactions) => {
       t.subcategory?.includes("Profit") ||
       t.category === "Investment Income" ||
       t.type === "Income";
-    const isLoss =
-      t.subcategory?.includes("Loss") ||
-      t.category === "Investment Charges & Loss";
-    const isFee =
-      t.subcategory?.includes("Brokerage") || t.subcategory?.includes("Fees");
+    const isLoss = t.subcategory?.includes("Loss") || t.category === "Investment Charges & Loss";
+    const isFee = t.subcategory?.includes("Brokerage") || t.subcategory?.includes("Fees");
 
     if (t.type === "Transfer-Out" && !isLoss && !isFee) {
       totalCapitalDeployed += amount;
@@ -248,9 +240,7 @@ export const calculateInvestmentPerformance = (transactions) => {
     brokerageFees,
     netReturn,
     returnPercentage,
-    transactions: transactionDetails.sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    ),
+    transactions: transactionDetails.sort((a, b) => new Date(b.date) - new Date(a.date)),
   };
 };
 
@@ -329,10 +319,7 @@ export const calculateGrossFromNet = (
     );
 
     // Calculate tax on this taxable income using the standard function
-    const estimatedTax = calculateTaxFromSlabs(
-      taxableIncome,
-      TAX_SLABS_NEW_REGIME
-    );
+    const estimatedTax = calculateTaxFromSlabs(taxableIncome, TAX_SLABS_NEW_REGIME);
 
     const cess = estimatedTax * CESS_RATE;
     const totalTaxLiability = estimatedTax + cess + professionalTax;
@@ -369,10 +356,7 @@ export const calculateGrossFromNet = (
     0,
     grossIncome - STANDARD_DEDUCTION - professionalTax - mealVoucherExemption
   );
-  const estimatedTax = calculateTaxFromSlabs(
-    taxableIncome,
-    TAX_SLABS_NEW_REGIME
-  );
+  const estimatedTax = calculateTaxFromSlabs(taxableIncome, TAX_SLABS_NEW_REGIME);
   const cess = estimatedTax * CESS_RATE;
 
   return {
@@ -406,9 +390,7 @@ export const calculateTaxPlanning = (transactions) => {
   // Group transactions by financial year
   const transactionsByFY = {};
   availableYears.forEach((fy) => {
-    transactionsByFY[fy] = transactions.filter(
-      (t) => getFinancialYear(t.date) === fy
-    );
+    transactionsByFY[fy] = transactions.filter((t) => getFinancialYear(t.date) === fy);
   });
 
   // Calculate tax planning for each FY
@@ -542,11 +524,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
 
   // Calculate HRA exemption (actual rent paid)
   const rentPaid = transactions
-    .filter(
-      (t) =>
-        t.type === "Expense" &&
-        (t.subcategory === "Rent" || t.category === "Rent")
-    )
+    .filter((t) => t.type === "Expense" && (t.subcategory === "Rent" || t.category === "Rent"))
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
   // Calculate actual HRA received from employer
@@ -593,8 +571,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
     .filter(
       (t) =>
         t.type === "Expense" &&
-        (t.subcategory?.includes("EPF") ||
-          t.note?.toLowerCase().includes("epf"))
+        (t.subcategory?.includes("EPF") || t.note?.toLowerCase().includes("epf"))
     )
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
@@ -617,8 +594,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
           t.subcategory?.includes("Professional Tax") ||
           t.note?.toLowerCase().includes("professional tax")
       )
-      .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0) ||
-    DEFAULT_PROFESSIONAL_TAX;
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0) || DEFAULT_PROFESSIONAL_TAX;
 
   // Meal Voucher exemption (₹50/day tax-free)
   const mealVoucherTransactions = transactions.filter(
@@ -629,10 +605,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
       t.note?.toLowerCase().includes("meal voucher")
   );
   const mealVoucherExemption = Math.min(
-    mealVoucherTransactions.reduce(
-      (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-      0
-    ),
+    mealVoucherTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0),
     MEAL_VOUCHER_DAILY_LIMIT * DAYS_IN_YEAR
   );
 
@@ -660,10 +633,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
   const grossSalaryAfterEPF = totalIncome - epfDeduction;
   const taxableIncome = Math.max(
     0,
-    grossSalaryAfterEPF -
-      standardDeduction -
-      professionalTax -
-      mealVoucherExemption
+    grossSalaryAfterEPF - standardDeduction - professionalTax - mealVoucherExemption
   );
 
   // Get appropriate tax slabs for this financial year
@@ -784,8 +754,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
   if (mealVoucherExemption === 0) {
     recommendations.push({
       priority: "low",
-      message:
-        "Consider opting for meal vouchers from employer (up to ₹50/day tax-free).",
+      message: "Consider opting for meal vouchers from employer (up to ₹50/day tax-free).",
       action: "Check with HR for meal voucher option",
     });
   }
@@ -801,8 +770,7 @@ const calculateTaxPlanningForYear = (transactions, financialYear = null) => {
       ? {
           grossSalaryTotal, // Calculated gross using reverse TDS formula
           actualTdsPaid, // Actual TDS paid (calculated)
-          calculatedGrossIncome:
-            grossSalaryTotal + rsuGrossIncome + otherIncome,
+          calculatedGrossIncome: grossSalaryTotal + rsuGrossIncome + otherIncome,
         }
       : {}),
 
@@ -871,10 +839,7 @@ export const calculateFamilyExpenses = (transactions) => {
   );
 
   const dateRange = calculateDateRange(familyTransactions);
-  const monthlyAverage = calculateMonthlyAverage(
-    totalFamilyExpense,
-    dateRange.days
-  );
+  const monthlyAverage = calculateMonthlyAverage(totalFamilyExpense, dateRange.days);
 
   // Group by subcategory
   const bySubcategory = familyTransactions.reduce((acc, t) => {
@@ -895,8 +860,7 @@ export const calculateFamilyExpenses = (transactions) => {
     amount: data.total,
     count: data.count,
     average: data.count > 0 ? data.total / data.count : 0,
-    percentage:
-      totalFamilyExpense > 0 ? (data.total / totalFamilyExpense) * PERCENT : 0,
+    percentage: totalFamilyExpense > 0 ? (data.total / totalFamilyExpense) * PERCENT : 0,
   }));
 
   // Get top expenses
@@ -950,9 +914,7 @@ export const calculateHousingExpenses = (transactions) => {
   }
 
   const housingTransactions = transactions.filter(
-    (t) =>
-      t.type === "Expense" &&
-      (t.category === "Housing" || t.subcategory === "Rent")
+    (t) => t.type === "Expense" && (t.category === "Housing" || t.subcategory === "Rent")
   );
 
   const totalHousing = housingTransactions.reduce(
@@ -960,14 +922,9 @@ export const calculateHousingExpenses = (transactions) => {
     0
   );
 
-  const rentTransactions = housingTransactions.filter(
-    (t) => t.subcategory === "Rent"
-  );
+  const rentTransactions = housingTransactions.filter((t) => t.subcategory === "Rent");
 
-  const totalRent = rentTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
+  const totalRent = rentTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
   const utilityTransactions = transactions.filter(
     (t) =>
@@ -983,8 +940,7 @@ export const calculateHousingExpenses = (transactions) => {
     0
   );
 
-  const monthlyRentAverage =
-    rentTransactions.length > 0 ? totalRent / rentTransactions.length : 0;
+  const monthlyRentAverage = rentTransactions.length > 0 ? totalRent / rentTransactions.length : 0;
 
   const rentPayments = rentTransactions
     .map((t) => ({
@@ -1100,9 +1056,7 @@ export const calculateCreditCardMetrics = (transactions) => {
       return cats;
     }, {});
 
-    const topCategoryEntry = Object.entries(categoryTotals).sort(
-      ([, a], [, b]) => b - a
-    )[0];
+    const topCategoryEntry = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a)[0];
 
     const topCategory = topCategoryEntry || ["Other", 0];
 
@@ -1110,10 +1064,7 @@ export const calculateCreditCardMetrics = (transactions) => {
       spending,
       cashback,
       transactionCount: expenseTransactions.length,
-      average:
-        expenseTransactions.length > 0
-          ? spending / expenseTransactions.length
-          : 0,
+      average: expenseTransactions.length > 0 ? spending / expenseTransactions.length : 0,
       topCategory,
     };
     return acc;
@@ -1127,10 +1078,7 @@ export const calculateCreditCardMetrics = (transactions) => {
     cashbackRate: data.spending > 0 ? (data.cashback / data.spending) * 100 : 0,
   }));
 
-  const totalSpending = Object.values(byCard).reduce(
-    (sum, card) => sum + card.spending,
-    0
-  );
+  const totalSpending = Object.values(byCard).reduce((sum, card) => sum + card.spending, 0);
 
   // Calculate comprehensive cashback metrics using centralized functions
   const totalCashbackEarned = transactions
@@ -1155,8 +1103,7 @@ export const calculateCreditCardMetrics = (transactions) => {
   const actualCashback = totalCashbackEarned - cashbackShared;
 
   const totalCreditCardSpending = totalSpending;
-  const cashbackRate =
-    totalSpending > 0 ? (totalCashbackEarned / totalSpending) * PERCENT : 0;
+  const cashbackRate = totalSpending > 0 ? (totalCashbackEarned / totalSpending) * PERCENT : 0;
 
   const insights = [];
   if (totalCashbackEarned > 0) {
@@ -1227,10 +1174,7 @@ export const calculateFoodMetrics = (transactions) => {
     return category.includes("food") || category.includes("drink");
   });
 
-  const totalFood = foodTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
+  const totalFood = foodTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
   const dateRange = calculateDateRange(foodTransactions);
   const monthlyAverage = calculateMonthlyAverage(totalFood, dateRange.days);
@@ -1351,9 +1295,7 @@ export const calculateCommuteMetrics = (transactions) => {
     }
     const category = (t.category || "").toLowerCase();
     return (
-      category.includes("transport") ||
-      category.includes("commute") ||
-      category.includes("travel")
+      category.includes("transport") || category.includes("commute") || category.includes("travel")
     );
   });
 

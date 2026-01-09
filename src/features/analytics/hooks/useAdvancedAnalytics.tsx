@@ -1,23 +1,24 @@
 import { useMemo } from "react";
 import {
-  calculateMonthlyComparison,
-  calculateCategoryBudgetStatus,
   calculateCashFlowForecast,
-  detectRecurringTransactions,
-  detectAnomalies,
-  calculateDayOfMonthPattern,
+  calculateCategoryBudgetStatus,
   calculateCategoryTrends,
-  calculateIncomeStability,
-  calculateMonthlyHealthRatio,
-  calculateGoalProgress,
   calculateDateRange,
+  calculateDayOfMonthPattern,
+  calculateGoalProgress,
+  calculateIncomeStability,
+  calculateMonthlyComparison,
+  calculateMonthlyHealthRatio,
+  detectAnomalies,
+  detectRecurringTransactions,
 } from "../../../lib/calculations";
+import type { Transaction } from "../../../types";
 
 /**
  * Custom hook for advanced financial analytics
  * Provides sophisticated insights and predictions
  */
-export const useAdvancedAnalytics = (transactions: any[]) => {
+export const useAdvancedAnalytics = (transactions: Transaction[]) => {
   // 1. Month-over-Month Spending Comparison
   const monthlyComparison = useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -131,8 +132,7 @@ export const useAdvancedAnalytics = (transactions: any[]) => {
       cashFlowStatus: cashFlowForecast?.status || "unknown",
       averageMonthlyHealth:
         monthlyHealthRatio && monthlyHealthRatio.length > 0
-          ? monthlyHealthRatio.reduce((sum, m) => sum + m.ratio, 0) /
-            monthlyHealthRatio.length
+          ? monthlyHealthRatio.reduce((sum, m) => sum + m.ratio, 0) / monthlyHealthRatio.length
           : 0,
     };
 

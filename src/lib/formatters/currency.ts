@@ -20,10 +20,7 @@ export interface CurrencyFormatOptions {
  * formatCurrency(1234.56) // "₹1,234.56"
  * formatCurrency(1234567, { compact: true }) // "₹12.35L"
  */
-export const formatCurrency = (
-  value: number,
-  options: CurrencyFormatOptions = {}
-): string => {
+export const formatCurrency = (value: number, options: CurrencyFormatOptions = {}): string => {
   const {
     minimumFractionDigits = 2,
     maximumFractionDigits = 2,
@@ -41,12 +38,8 @@ export const formatCurrency = (
   }
 
   // Ensure fraction digits are valid numbers, default to 2 if not
-  const safeMin = Number.isFinite(minimumFractionDigits)
-    ? minimumFractionDigits
-    : 2;
-  const safeMax = Number.isFinite(maximumFractionDigits)
-    ? maximumFractionDigits
-    : 2;
+  const safeMin = Number.isFinite(minimumFractionDigits) ? minimumFractionDigits : 2;
+  const safeMax = Number.isFinite(maximumFractionDigits) ? maximumFractionDigits : 2;
 
   // Clamp fraction digits to valid range (0-20 for Intl.NumberFormat)
   const clampedMin = Math.max(0, Math.min(20, safeMin));
@@ -71,10 +64,7 @@ export const formatCurrency = (
  * formatCompactCurrency(125000) // "₹1.25L"
  * formatCompactCurrency(10000000) // "₹1.00Cr"
  */
-export const formatCompactCurrency = (
-  value: number,
-  showSymbol: boolean = true
-): string => {
+export const formatCompactCurrency = (value: number, showSymbol: boolean = true): string => {
   const prefix = showSymbol ? "₹" : "";
   const absValue = Math.abs(value);
 
@@ -111,10 +101,7 @@ export const formatCurrencyNoSymbol = (value: number): string => {
  * @example
  * formatCurrencyWithDecimals(1234.5678, 0) // "₹1,235"
  */
-export const formatCurrencyWithDecimals = (
-  value: number,
-  decimals: number
-): string => {
+export const formatCurrencyWithDecimals = (value: number, decimals: number): string => {
   return formatCurrency(value, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,

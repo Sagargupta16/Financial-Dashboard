@@ -4,12 +4,12 @@
  */
 
 import type { Transaction } from "../../types";
-import type { DateRangeResult } from "../calculations/time/dateRange";
 import {
   calculateDateRange,
   calculatePerDayFrequency,
   calculateSavingsPotential,
 } from "../calculations";
+import type { DateRangeResult } from "../calculations/time/dateRange";
 
 interface InsightItem {
   type: string;
@@ -41,8 +41,7 @@ const analyzeDeliverySpending = (
   const total = deliveryTransactions.reduce((sum, t) => sum + t.amount, 0);
   const avgPerOrder = total / deliveryTransactions.length;
   const totalDays = dateRange.totalDays || 1;
-  const ordersPerWeek =
-    calculatePerDayFrequency(deliveryTransactions.length, totalDays) * 7;
+  const ordersPerWeek = calculatePerDayFrequency(deliveryTransactions.length, totalDays) * 7;
 
   if (ordersPerWeek <= 3) {
     return null;
@@ -65,9 +64,7 @@ const analyzeDeliverySpending = (
   };
 };
 
-const analyzeWeekendPattern = (
-  transactions: Transaction[]
-): InsightItem | null => {
+const analyzeWeekendPattern = (transactions: Transaction[]): InsightItem | null => {
   const weekdaySpending: number[] = [];
   const weekendSpending: number[] = [];
   const weekdayDays = new Set<string>();
@@ -119,13 +116,9 @@ const analyzeSavingsRate = (
   expenseTransactions: Transaction[],
   incomeTransactions: Transaction[]
 ): InsightItem | null => {
-  const totalExpense = expenseTransactions.reduce(
-    (sum, t) => sum + t.amount,
-    0
-  );
+  const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
   const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
-  const savingsRate =
-    totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
+  const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
 
   if (savingsRate >= 25) {
     return {
@@ -161,18 +154,13 @@ const analyzeHighFrequencyCategory = (
     categoryCounts[t.category] = (categoryCounts[t.category] || 0) + 1;
   });
 
-  const topCategory = Object.entries(categoryCounts).sort(
-    ([, a], [, b]) => b - a
-  )[0];
+  const topCategory = Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0];
 
   if (!topCategory) {
     return null;
   }
 
-  const frequency = calculatePerDayFrequency(
-    topCategory[1],
-    dateRange.totalDays || 1
-  );
+  const frequency = calculatePerDayFrequency(topCategory[1], dateRange.totalDays || 1);
   if (frequency <= 0.5) {
     return null;
   }
@@ -201,21 +189,14 @@ const analyzeCafeteriaSpending = (
   }
 
   const total = cafeteriaTransactions.reduce((sum, t) => sum + t.amount, 0);
-  const perDay = calculatePerDayFrequency(
-    cafeteriaTransactions.length,
-    dateRange.totalDays || 1
-  );
+  const perDay = calculatePerDayFrequency(cafeteriaTransactions.length, dateRange.totalDays || 1);
   const avgAmount = total / cafeteriaTransactions.length;
 
   if (perDay <= 0.3) {
     return null;
   }
 
-  const packLunchSavings = calculateSavingsPotential(
-    total,
-    dateRange.totalDays || 1,
-    0.5
-  );
+  const packLunchSavings = calculateSavingsPotential(total, dateRange.totalDays || 1, 0.5);
 
   if (!packLunchSavings?.monthlySavings) {
     return null;
@@ -237,9 +218,7 @@ const analyzeLargeTransactions = (
   totalExpense: number
 ): InsightItem | null => {
   const avgExpense = totalExpense / expenseTransactions.length;
-  const largeTransactions = expenseTransactions.filter(
-    (t) => t.amount > avgExpense * 3
-  );
+  const largeTransactions = expenseTransactions.filter((t) => t.amount > avgExpense * 3);
 
   if (largeTransactions.length === 0 || largeTransactions.length >= 10) {
     return null;
@@ -258,9 +237,7 @@ const analyzeLargeTransactions = (
   };
 };
 
-export const generateSmartInsights = (
-  transactions: Transaction[]
-): InsightItem[] => {
+export const generateSmartInsights = (transactions: Transaction[]): InsightItem[] => {
   const insights: InsightItem[] = [];
   const dateRange = calculateDateRange(transactions);
 
@@ -270,10 +247,7 @@ export const generateSmartInsights = (
 
   const expenseTransactions = transactions.filter((t) => t.type === "Expense");
   const incomeTransactions = transactions.filter((t) => t.type === "Income");
-  const totalExpense = expenseTransactions.reduce(
-    (sum, t) => sum + t.amount,
-    0
-  );
+  const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
 
   // Analyze different aspects and collect insights
   const analysisResults = [
@@ -300,7 +274,6 @@ export const generateSmartInsights = (
     low: 4,
   };
   return insights.sort(
-    (a, b) =>
-      (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99)
+    (a, b) => (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99)
   );
 };

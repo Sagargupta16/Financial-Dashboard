@@ -1,27 +1,20 @@
 // @ts-nocheck
 import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  Landmark,
-  TrendingUp as Investment,
-  Users,
   CreditCard,
+  TrendingUp as Investment,
+  Landmark,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Wallet,
 } from "lucide-react";
-import {
-  KPICard,
-  SmallKPICard,
-} from "../../../features/kpi/components/KPICards";
+import { KPICard, SmallKPICard } from "../../../features/kpi/components/KPICards";
 
 /**
  * Main KPI Cards Section
  * Displays primary financial metrics: Income, Expense, Net Balance with breakdown
  */
-export const MainKPISection = ({
-  income = 0,
-  expense = 0,
-  balanceBreakdown = null,
-}) => {
+export const MainKPISection = ({ income = 0, expense = 0, balanceBreakdown = null }) => {
   const netBalance = income - expense;
 
   return (
@@ -39,12 +32,7 @@ export const MainKPISection = ({
           icon={<TrendingDown size={24} />}
           color="red"
         />
-        <KPICard
-          title="Net Balance"
-          value={netBalance}
-          icon={<Wallet size={24} />}
-          color="blue"
-        />
+        <KPICard title="Net Balance" value={netBalance} icon={<Wallet size={24} />} color="blue" />
       </div>
 
       {/* Net Balance Breakdown */}

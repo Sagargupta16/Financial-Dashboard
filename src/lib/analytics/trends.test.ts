@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import type { Transaction } from "../../types";
 import {
   analyzeDayOfWeekPatterns,
   detectSpendingAnomalies,
   generateComprehensiveInsights,
 } from "./trends";
-import type { Transaction } from "../../types";
 
 describe("Analytics - Trends", () => {
   const createMockTransaction = (
@@ -55,9 +55,7 @@ describe("Analytics - Trends", () => {
       const result = analyzeDayOfWeekPatterns(transactions);
 
       expect(result?.insights).toBeDefined();
-      const weekendInsight = result?.insights.find((i) =>
-        i.title.includes("Weekend")
-      );
+      const weekendInsight = result?.insights.find((i) => i.title.includes("Weekend"));
       expect(weekendInsight).toBeDefined();
       expect(weekendInsight?.priority).toBe("high");
     });
@@ -65,9 +63,7 @@ describe("Analytics - Trends", () => {
 
   describe("detectSpendingAnomalies", () => {
     it("should return empty array for insufficient data", () => {
-      const transactions: Transaction[] = [
-        createMockTransaction("2024-01-01", 1000),
-      ];
+      const transactions: Transaction[] = [createMockTransaction("2024-01-01", 1000)];
 
       const result = detectSpendingAnomalies(transactions);
       expect(result).toEqual([]);

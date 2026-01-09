@@ -1,17 +1,11 @@
-import { SkeletonCard, ChartSkeleton } from "./Skeleton";
+import { ChartSkeleton, SkeletonCard } from "./Skeleton";
 
 /**
  * SectionSkeleton - Loading placeholder for dashboard sections
  */
 export const SectionSkeleton = () => {
-  const cardIds = Array.from(
-    { length: 4 },
-    (_, i) => `card-${Date.now()}-${i}`
-  );
-  const chartIds = Array.from(
-    { length: 2 },
-    (_, i) => `chart-${Date.now()}-${i}`
-  );
+  const cardIds = Array.from({ length: 4 }, (_, i) => `card-${Date.now()}-${i}`);
+  const chartIds = Array.from({ length: 2 }, (_, i) => `chart-${Date.now()}-${i}`);
 
   return (
     <div className="space-y-8 animate-pulse">

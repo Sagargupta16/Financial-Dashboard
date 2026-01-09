@@ -26,16 +26,14 @@ interface CommuteData {
 
 interface CommuteSectionProps {
   commuteData: CommuteData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartOptions: any;
 }
 
 /**
  * Commute Analytics Section Component
  */
-export const CommuteSection = ({
-  commuteData,
-  chartOptions,
-}: CommuteSectionProps) => {
+export const CommuteSection = ({ commuteData, chartOptions }: CommuteSectionProps) => {
   const commuteChartData = {
     labels: commuteData.breakdown.map((b: CommuteBreakdown) => b.name),
     datasets: [
@@ -101,9 +99,7 @@ export const CommuteSection = ({
       {/* Commute Charts */}
       <div className="grid grid-cols-1 gap-6">
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Commute Category Breakdown
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Commute Category Breakdown</h4>
           <div style={{ height: "300px" }}>
             <Bar data={commuteChartData} options={chartOptions} />
           </div>
@@ -113,12 +109,10 @@ export const CommuteSection = ({
       {/* Commute Insights */}
       {commuteData.insights && commuteData.insights.length > 0 && (
         <div className="mt-6 bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Commute Insights
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Commute Insights</h4>
           <div className="space-y-3">
             {commuteData.insights.map((insight) => {
-              let bgClass;
+              let bgClass: string;
               if (insight.priority === "high") {
                 bgClass = "bg-red-900/30 border border-red-700";
               } else if (insight.priority === "medium") {
@@ -131,9 +125,7 @@ export const CommuteSection = ({
                   key={`${insight.title}-${insight.priority}`}
                   className={`p-4 rounded-lg ${bgClass}`}
                 >
-                  <div className="font-semibold text-white mb-1">
-                    {insight.title}
-                  </div>
+                  <div className="font-semibold text-white mb-1">{insight.title}</div>
                   <div className="text-gray-300">{insight.message}</div>
                 </div>
               );

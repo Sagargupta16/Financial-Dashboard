@@ -3,7 +3,7 @@
  * Extracted from InvestmentPerformanceTracker component
  */
 
-import type { InvestmentTransaction, ChartData } from "../../types";
+import type { ChartData, InvestmentTransaction } from "../../types";
 
 /**
  * Monthly P&L aggregation result
@@ -18,9 +18,7 @@ export interface MonthlyPnL {
  * Aggregate investment transactions into monthly P&L
  * Calculates net profit/loss per month from dividends and brokerage fees
  */
-export const calculateMonthlyPnL = (
-  transactions: InvestmentTransaction[]
-): MonthlyPnL[] => {
+export const calculateMonthlyPnL = (transactions: InvestmentTransaction[]): MonthlyPnL[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
@@ -45,9 +43,7 @@ export const calculateMonthlyPnL = (
   });
 
   // Convert to sorted array with cumulative values
-  const sortedMonths = Object.keys(monthlyPnL).sort((a, b) =>
-    a.localeCompare(b)
-  );
+  const sortedMonths = Object.keys(monthlyPnL).sort((a, b) => a.localeCompare(b));
 
   let cumulative = 0;
   return sortedMonths.map((month) => {
@@ -65,9 +61,7 @@ export const calculateMonthlyPnL = (
  * Prepare chart data for cumulative P&L visualization
  * Returns chart-ready data structure for react-chartjs-2
  */
-export const preparePnLChartData = (
-  transactions: InvestmentTransaction[]
-): ChartData => {
+export const preparePnLChartData = (transactions: InvestmentTransaction[]): ChartData => {
   const monthlyData = calculateMonthlyPnL(transactions);
 
   if (monthlyData.length === 0) {
@@ -94,9 +88,7 @@ export const preparePnLChartData = (
         label: "Cumulative P&L",
         data: monthlyData.map((d) => d.cumulative),
         borderColor: isProfit ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)",
-        backgroundColor: isProfit
-          ? "rgba(34, 197, 94, 0.1)"
-          : "rgba(239, 68, 68, 0.1)",
+        backgroundColor: isProfit ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
       },
     ],
   };
@@ -120,14 +112,10 @@ export const calculateInvestmentMetrics = (
 ): InvestmentMetricsSummary => {
   const monthlyData = calculateMonthlyPnL(transactions);
 
-  const totalProfit = monthlyData
-    .filter((m) => m.amount > 0)
-    .reduce((sum, m) => sum + m.amount, 0);
+  const totalProfit = monthlyData.filter((m) => m.amount > 0).reduce((sum, m) => sum + m.amount, 0);
 
   const totalLoss = Math.abs(
-    monthlyData
-      .filter((m) => m.amount < 0)
-      .reduce((sum, m) => sum + m.amount, 0)
+    monthlyData.filter((m) => m.amount < 0).reduce((sum, m) => sum + m.amount, 0)
   );
 
   const netPnL = totalProfit - totalLoss;
@@ -159,10 +147,7 @@ export const calculateInvestmentMetrics = (
 
  * Calculate return percentage
  */
-export const calculateReturnPercentage = (
-  invested: number,
-  currentValue: number
-): number => {
+export const calculateReturnPercentage = (invested: number, currentValue: number): number => {
   if (invested === 0) {
     return 0;
   }

@@ -127,9 +127,7 @@ export const sumAmounts = (transactions) => {
  */
 export const filterByType = (transactions, type) => {
   const lowerType = type.toLowerCase();
-  return transactions.filter(
-    (t) => t.type && t.type.toLowerCase() === lowerType
-  );
+  return transactions.filter((t) => t.type && t.type.toLowerCase() === lowerType);
 };
 
 /**

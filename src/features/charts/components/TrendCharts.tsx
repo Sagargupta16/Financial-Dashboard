@@ -1,9 +1,10 @@
 /* eslint-disable max-lines-per-function */
+
+import type { Chart as ChartJS } from "chart.js";
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { commonChartOptions } from "./ChartConfig";
 import type { Transaction } from "../../../types";
-import type { Chart as ChartJS } from "chart.js";
+import { commonChartOptions } from "./ChartConfig";
 
 interface EnhancedMonthlyTrendsChartProps {
   filteredData: Transaction[];
@@ -16,9 +17,7 @@ export const EnhancedMonthlyTrendsChart = ({
   filteredData,
   chartRef,
 }: EnhancedMonthlyTrendsChartProps) => {
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
+  const [currentYear, setCurrentYear] = React.useState(new Date().getFullYear());
   const [viewMode, setViewMode] = React.useState("year");
   const [dataMode, setDataMode] = React.useState("regular");
 
@@ -52,11 +51,7 @@ export const EnhancedMonthlyTrendsChart = ({
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else if (viewMode === "last-12-months") {
-        const twelveMonthsAgo = new Date(
-          now.getFullYear(),
-          now.getMonth() - 12,
-          1
-        );
+        const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, 1);
         return date >= twelveMonthsAgo;
       }
       return false;
@@ -64,34 +59,33 @@ export const EnhancedMonthlyTrendsChart = ({
   }, [filteredData, currentYear, viewMode]);
 
   const chartData = React.useMemo(() => {
-    const monthly = timeFilteredData.reduce<
-      Record<string, { income: number; expense: number }>
-    >((acc, item) => {
-      if (!item.date) {
+    const monthly = timeFilteredData.reduce<Record<string, { income: number; expense: number }>>(
+      (acc, item) => {
+        if (!item.date) {
+          return acc;
+        }
+
+        const date = new Date(item.date);
+        if (Number.isNaN(date.getTime())) {
+          return acc;
+        }
+
+        const month = date.toISOString().slice(0, 7);
+        if (!acc[month]) {
+          acc[month] = { income: 0, expense: 0 };
+        }
+
+        if (item.type === "Income") {
+          acc[month].income += item.amount || 0;
+        } else if (item.type === "Expense") {
+          acc[month].expense += item.amount || 0;
+        }
         return acc;
-      }
-
-      const date = new Date(item.date);
-      if (Number.isNaN(date.getTime())) {
-        return acc;
-      }
-
-      const month = date.toISOString().slice(0, 7);
-      if (!acc[month]) {
-        acc[month] = { income: 0, expense: 0 };
-      }
-
-      if (item.type === "Income") {
-        acc[month].income += item.amount || 0;
-      } else if (item.type === "Expense") {
-        acc[month].expense += item.amount || 0;
-      }
-      return acc;
-    }, {});
-
-    const sortedMonths = Object.keys(monthly).sort((a, b) =>
-      a.localeCompare(b)
+      },
+      {}
     );
+
+    const sortedMonths = Object.keys(monthly).sort((a, b) => a.localeCompare(b));
 
     const formatMonthLabel = (monthString: string) => {
       const [year, month] = monthString.split("-");
@@ -352,11 +346,7 @@ export const EnhancedMonthlyTrendsChart = ({
         </div>
 
         <div className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300 px-3 py-1 bg-gradient-to-r from-gray-700/50 to-gray-800/50 rounded-lg">
-          {
-            timeFilteredData.filter(
-              (i) => i.type === "Income" || i.type === "Expense"
-            ).length
-          }{" "}
+          {timeFilteredData.filter((i) => i.type === "Income" || i.type === "Expense").length}{" "}
           transactions
         </div>
       </div>

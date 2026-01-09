@@ -46,10 +46,7 @@ export const calculateSavings = (income: number, expense: number): number => {
  * - expense > income: returns negative percentage (deficit)
  * - NaN inputs: treated as 0
  */
-export const calculateSavingsRate = (
-  income: number,
-  expense: number
-): number => {
+export const calculateSavingsRate = (income: number, expense: number): number => {
   const validIncome = Number(income) || 0;
   const validExpense = Number(expense) || 0;
 

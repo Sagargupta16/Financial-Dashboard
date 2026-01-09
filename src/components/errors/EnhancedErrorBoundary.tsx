@@ -1,5 +1,5 @@
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import React from "react";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 interface EnhancedErrorBoundaryProps {
   children: React.ReactNode;
@@ -117,21 +117,17 @@ class EnhancedErrorBoundary extends React.Component<
                 <AlertTriangle className="w-8 h-8 text-red-400" />
               </div>
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-white mb-2">
-                  Oops! Something went wrong
-                </h1>
+                <h1 className="text-2xl font-bold text-white mb-2">Oops! Something went wrong</h1>
                 <p className="text-gray-300">
-                  We encountered an unexpected error. Don&apos;t worry, your
-                  data is safe in your browser.
+                  We encountered an unexpected error. Don&apos;t worry, your data is safe in your
+                  browser.
                 </p>
               </div>
             </div>
 
             {import.meta.env.MODE === "development" && error && (
               <div className="mb-6 bg-gray-900/50 border border-gray-700 rounded-lg p-4 overflow-auto max-h-60">
-                <p className="text-red-400 font-mono text-sm mb-2">
-                  {error.toString()}
-                </p>
+                <p className="text-red-400 font-mono text-sm mb-2">{error.toString()}</p>
                 {errorInfo && (
                   <pre className="text-gray-400 text-xs overflow-auto">
                     {errorInfo.componentStack}
@@ -143,14 +139,15 @@ class EnhancedErrorBoundary extends React.Component<
             {errorCount > 2 && (
               <div className="mb-6 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
                 <p className="text-yellow-300 text-sm">
-                  ⚠️ Multiple errors detected ({errorCount}). You may need to
-                  reload the page or clear your browser data.
+                  ⚠️ Multiple errors detected ({errorCount}). You may need to reload the page or
+                  clear your browser data.
                 </p>
               </div>
             )}
 
             <div className="flex flex-wrap gap-3">
               <button
+                type="button"
                 onClick={this.handleReset}
                 className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                 aria-label="Try again"
@@ -159,6 +156,7 @@ class EnhancedErrorBoundary extends React.Component<
                 Try Again
               </button>
               <button
+                type="button"
                 onClick={this.handleReload}
                 className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
                 aria-label="Reload page"
@@ -167,6 +165,7 @@ class EnhancedErrorBoundary extends React.Component<
                 Reload Page
               </button>
               <button
+                type="button"
                 onClick={this.handleGoHome}
                 className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
                 aria-label="Go to home"
@@ -184,10 +183,7 @@ class EnhancedErrorBoundary extends React.Component<
                 <li>Try clicking &quot;Try Again&quot; to recover</li>
                 <li>Reload the page to start fresh</li>
                 <li>Check your browser console for more details</li>
-                <li>
-                  Clear your browser&apos;s local storage if the problem
-                  persists
-                </li>
+                <li>Clear your browser&apos;s local storage if the problem persists</li>
               </ul>
             </div>
           </div>

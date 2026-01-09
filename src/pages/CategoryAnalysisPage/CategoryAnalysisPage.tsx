@@ -1,8 +1,8 @@
 // @ts-nocheck
 import {
-  TreemapChart,
   EnhancedSubcategoryBreakdownChart,
   MultiCategoryTimeAnalysisChart,
+  TreemapChart,
 } from "../../features/charts/components";
 
 /**
@@ -22,9 +22,7 @@ export const CategoryAnalysisPage = ({
 
       {/* Time-based Category Analysis */}
       <div className="bg-gray-800/50 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Time-based Category Analysis
-        </h2>
+        <h2 className="text-2xl font-bold text-white mb-6">Time-based Category Analysis</h2>
         <div className="grid grid-cols-1 gap-6">
           {/* Enhanced Subcategory Breakdown */}
           <EnhancedSubcategoryBreakdownChart

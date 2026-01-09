@@ -106,8 +106,7 @@ export const STORAGE_KEYS = {
 
 // Error messages
 export const ERROR_MESSAGES = {
-  FILE_PARSE_ERROR:
-    "Could not parse the financial data. Please check the file format.",
+  FILE_PARSE_ERROR: "Could not parse the financial data. Please check the file format.",
   FILE_TOO_LARGE: "File size exceeds the maximum limit of 10MB.",
   INVALID_FILE_TYPE: "Please upload a valid CSV or Excel file.",
   NO_DATA: "No data found in the file. Please check the file format.",
@@ -271,11 +270,7 @@ export const INVESTMENT_CATEGORIES = new Set([
 /**
  * Accounts considered as investment accounts
  */
-export const INVESTMENT_ACCOUNTS = new Set([
-  "Grow Stocks",
-  "Zerodha",
-  "Upstox",
-]);
+export const INVESTMENT_ACCOUNTS = new Set(["Grow Stocks", "Zerodha", "Upstox"]);
 
 // Financial Health Score Constants
 // ============================================================================

@@ -12,10 +12,7 @@
  * parseDate("01/01/2024", "10:30:00") // Date object
  * parseDate("invalid", "10:30:00") // null
  */
-export const parseDate = (
-  dateString: string,
-  timeString: string
-): Date | null => {
+export const parseDate = (dateString: string, timeString: string): Date | null => {
   if (!dateString || !timeString) {
     return null;
   }

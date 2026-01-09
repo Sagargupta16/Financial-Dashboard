@@ -1,16 +1,16 @@
 /* eslint-disable max-lines-per-function */
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
+import { NWS_COLORS, SHORT_MONTH_NAMES } from "../../../constants";
+import type { Transaction } from "../../../types";
 import {
   calculateMonthlyNWSBreakdown,
-  calculateYearlyNWSBreakdown,
   calculateNWSPercentages,
+  calculateYearlyNWSBreakdown,
   formatCurrency,
   formatPercentage,
   getMonthlyIncome,
   getYearlyIncome,
 } from "../utils/needsWantsSavingsUtils";
-import { NWS_COLORS, SHORT_MONTH_NAMES } from "../../../constants";
-import type { Transaction } from "../../../types";
 
 type ViewMode = "monthly" | "yearly";
 type NWSKey = "needs" | "wants" | "savings";
@@ -53,22 +53,13 @@ interface MonthlyYearlyNWSProps {
 /**
  * Category Bar Component - displays category spending with percentage
  */
-const CategoryBar = ({
-  category,
-  amount,
-  percentage,
-  color,
-}: CategoryBarProps) => (
+const CategoryBar = ({ category, amount, percentage, color }: CategoryBarProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
       <span className="text-sm text-gray-400 capitalize">{category}</span>
       <div className="text-right">
-        <div className="text-white font-semibold">
-          {formatCurrency(amount, false)}
-        </div>
-        <div className="text-xs text-gray-500">
-          {formatPercentage(percentage / 100)}
-        </div>
+        <div className="text-white font-semibold">{formatCurrency(amount, false)}</div>
+        <div className="text-xs text-gray-500">{formatPercentage(percentage / 100)}</div>
       </div>
     </div>
     <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -86,18 +77,10 @@ const CategoryBar = ({
 /**
  * Period Card Component - displays summary for a month or year
  */
-const PeriodCard = ({
-  item,
-  isSelected,
-  onSelect,
-  viewMode,
-}: PeriodCardProps) => {
+const PeriodCard = ({ item, isSelected, onSelect, viewMode }: PeriodCardProps) => {
   const periodLabel =
-    viewMode === "monthly"
-      ? formatMonthKey(item.monthKey || "")
-      : (item.year ?? "");
-  const periodKey =
-    viewMode === "monthly" ? (item.monthKey ?? "") : (item.year ?? 0);
+    viewMode === "monthly" ? formatMonthKey(item.monthKey || "") : (item.year ?? "");
+  const periodKey = viewMode === "monthly" ? (item.monthKey ?? "") : (item.year ?? 0);
 
   const total = item.needs + item.wants + item.savings;
   const savingsRate = item.income > 0 ? (item.savings / item.income) * 100 : 0;
@@ -117,9 +100,7 @@ const PeriodCard = ({
     <button
       onClick={() => onSelect(isSelected ? null : periodKey)}
       className={`w-full bg-gray-800/50 rounded-lg p-4 border transition-all text-left ${
-        isSelected
-          ? "border-blue-500 bg-gray-800"
-          : "border-gray-700 hover:border-gray-600"
+        isSelected ? "border-blue-500 bg-gray-800" : "border-gray-700 hover:border-gray-600"
       }`}
     >
       {/* Period Header */}
@@ -130,9 +111,7 @@ const PeriodCard = ({
         </div>
         {item.income > 0 && (
           <div className="text-right">
-            <div className="text-sm text-green-400">
-              {formatCurrency(item.income)}
-            </div>
+            <div className="text-sm text-green-400">{formatCurrency(item.income)}</div>
             <div className="text-xs text-gray-500">income</div>
           </div>
         )}
@@ -195,9 +174,7 @@ const PeriodCard = ({
           <div className="pt-2 border-t border-gray-700">
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-400">Savings Rate</span>
-              <span
-                className={`font-medium ${getSavingsRateColor(savingsRate)}`}
-              >
+              <span className={`font-medium ${getSavingsRateColor(savingsRate)}`}>
                 {formatPercentage(savingsRate / 100)}
               </span>
             </div>
@@ -225,9 +202,7 @@ const formatMonthKey = (monthKey: string) => {
  */
 export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>("monthly"); // 'monthly' or 'yearly'
-  const [selectedPeriod, setSelectedPeriod] = useState<string | number | null>(
-    null
-  );
+  const [selectedPeriod, setSelectedPeriod] = useState<string | number | null>(null);
 
   // Calculate monthly breakdown
   const monthlyData = useMemo<PeriodItem[]>(() => {
@@ -236,12 +211,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
     const data = Object.entries(breakdown)
       .map(([monthKey, values]) => {
-        const {
-          needs = 0,
-          wants = 0,
-          savings = 0,
-          ...rest
-        } = (values as any) || {};
+        const { needs = 0, wants = 0, savings = 0, ...rest } = (values as any) || {};
         return {
           monthKey,
           needs,
@@ -264,14 +234,9 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
     const data = Object.entries(breakdown)
       .map(([year, values]) => {
-        const {
-          needs = 0,
-          wants = 0,
-          savings = 0,
-          ...rest
-        } = (values as any) || {};
+        const { needs = 0, wants = 0, savings = 0, ...rest } = (values as any) || {};
         return {
-          year: Number.parseInt(year),
+          year: Number.parseInt(year, 10),
           needs,
           wants,
           savings,
@@ -288,19 +253,16 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   // Format month key for display
   const formatMonthKeyLocal = (monthKey: string) => {
     const [year, month] = monthKey.split("-");
-    return `${SHORT_MONTH_NAMES[Number.parseInt(month) - 1]} ${year}`;
+    return `${SHORT_MONTH_NAMES[Number.parseInt(month, 10) - 1]} ${year}`;
   };
 
   // Get data based on view mode
-  const currentData: PeriodItem[] =
-    viewMode === "monthly" ? monthlyData : yearlyData;
+  const currentData: PeriodItem[] = viewMode === "monthly" ? monthlyData : yearlyData;
 
   // Get selected period details
   const selectedData: PeriodItem | null = selectedPeriod
     ? currentData.find((item) =>
-        viewMode === "monthly"
-          ? item.monthKey === selectedPeriod
-          : item.year === selectedPeriod
+        viewMode === "monthly" ? item.monthKey === selectedPeriod : item.year === selectedPeriod
       ) || null
     : null;
 
@@ -320,9 +282,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-2xl font-bold text-white">📊 Period Analysis</h3>
-          <p className="text-gray-400 mt-1">
-            Track your Needs/Wants/Savings over time
-          </p>
+          <p className="text-gray-400 mt-1">Track your Needs/Wants/Savings over time</p>
         </div>
         <div className="flex gap-2 bg-gray-800 rounded-lg p-1 border border-gray-700">
           <button
@@ -331,9 +291,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
               setSelectedPeriod(null);
             }}
             className={`px-4 py-2 rounded-md transition-colors ${
-              viewMode === "monthly"
-                ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:text-white"
+              viewMode === "monthly" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
             }`}
           >
             Monthly
@@ -344,9 +302,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
               setSelectedPeriod(null);
             }}
             className={`px-4 py-2 rounded-md transition-colors ${
-              viewMode === "yearly"
-                ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:text-white"
+              viewMode === "yearly" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
             }`}
           >
             Yearly
@@ -362,10 +318,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
               <PeriodCard
                 key={viewMode === "monthly" ? item.monthKey : item.year}
                 item={item}
-                isSelected={
-                  selectedPeriod ===
-                  (viewMode === "monthly" ? item.monthKey : item.year)
-                }
+                isSelected={selectedPeriod === (viewMode === "monthly" ? item.monthKey : item.year)}
                 onSelect={setSelectedPeriod}
                 viewMode={viewMode}
               />
@@ -410,11 +363,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Total Spending</p>
                   <p className="text-2xl font-bold text-white">
-                    {formatCurrency(
-                      selectedData.needs +
-                        selectedData.wants +
-                        selectedData.savings
-                    )}
+                    {formatCurrency(selectedData.needs + selectedData.wants + selectedData.savings)}
                   </p>
                 </div>
               </div>
@@ -451,8 +400,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Needs</div>
                       <div className="text-xl font-bold text-blue-400">
                         {formatPercentage(
-                          (selectedData.percentages.needs.percentageOfIncome ||
-                            0) / 100
+                          (selectedData.percentages.needs.percentageOfIncome || 0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 50%</div>
@@ -461,8 +409,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Wants</div>
                       <div className="text-xl font-bold text-amber-400">
                         {formatPercentage(
-                          (selectedData.percentages.wants.percentageOfIncome ||
-                            0) / 100
+                          (selectedData.percentages.wants.percentageOfIncome || 0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 30%</div>
@@ -471,8 +418,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Savings</div>
                       <div className="text-xl font-bold text-green-400">
                         {formatPercentage(
-                          (selectedData.percentages.savings
-                            .percentageOfIncome || 0) / 100
+                          (selectedData.percentages.savings.percentageOfIncome || 0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 20%</div>
@@ -505,22 +451,15 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                         <div className="space-y-2">
                           {categories.length > 0 ? (
                             categories.slice(0, 5).map(([cat, amount]) => (
-                              <div
-                                key={cat}
-                                className="flex justify-between items-center text-xs"
-                              >
-                                <span className="text-gray-400 truncate">
-                                  {cat}
-                                </span>
+                              <div key={cat} className="flex justify-between items-center text-xs">
+                                <span className="text-gray-400 truncate">{cat}</span>
                                 <span className="text-white font-medium">
                                   {formatCurrency(Number(amount), false)}
                                 </span>
                               </div>
                             ))
                           ) : (
-                            <p className="text-xs text-gray-500">
-                              No transactions
-                            </p>
+                            <p className="text-xs text-gray-500">No transactions</p>
                           )}
                         </div>
                       </div>
@@ -534,8 +473,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
               <div className="text-center text-gray-400">
                 <div className="text-4xl mb-4">📊</div>
                 <p className="text-lg">
-                  Select a {viewMode === "monthly" ? "month" : "year"} to view
-                  details
+                  Select a {viewMode === "monthly" ? "month" : "year"} to view details
                 </p>
                 <p className="text-sm mt-2">
                   Click on any period card to see the detailed breakdown

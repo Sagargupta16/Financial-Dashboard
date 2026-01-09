@@ -1,5 +1,5 @@
+import type { ChartData, ChartOptions } from "chart.js";
 import { CreditCard, Gift, TrendingUp } from "lucide-react";
-import { type ChartData, type ChartOptions } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 interface CardBreakdown {
@@ -98,9 +98,7 @@ export const CashbackSection = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Card Breakdown Chart */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Spending by Card
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Spending by Card</h4>
           <div style={{ height: "300px" }}>
             <Doughnut data={cardChartData} options={doughnutOptions} />
           </div>
@@ -108,9 +106,7 @@ export const CashbackSection = ({
 
         {/* Cashback by Card */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h4 className="text-lg font-semibold text-white mb-4">
-            Top Cards by Cashback
-          </h4>
+          <h4 className="text-lg font-semibold text-white mb-4">Top Cards by Cashback</h4>
           <div className="space-y-3">
             {topCards.map((card) => (
               <div

@@ -1,5 +1,5 @@
 import type React from "react";
-import { exportChartAsPNG } from "../../lib/charts";
+import { exportChartAsPNG } from "../../hooks/useChartExport";
 
 interface ChartContainerProps {
   title: string;
@@ -104,6 +104,7 @@ export const ChartContainer = ({
 // Export button component
 export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
   <button
+    type="button"
     onClick={() => chartRef && exportChartAsPNG(chartRef, filename)}
     className="text-gray-400 hover:text-white transition-colors"
     title="Export as PNG"
@@ -116,7 +117,10 @@ export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      role="img"
+      aria-label="Download chart as PNG"
     >
+      <title>Download Chart</title>
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7,10 12,15 17,10" />
       <line x1="12" y1="15" x2="12" y2="3" />

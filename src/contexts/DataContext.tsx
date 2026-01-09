@@ -3,11 +3,11 @@ import {
   type ReactNode,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import type { Transaction } from "../types";
 
 interface DateRange {
@@ -64,40 +64,18 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Budget preferences state
-  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
-      return saved
-        ? JSON.parse(saved)
-        : {
-            allocation: BUDGET_ALLOCATION_DEFAULTS,
-            customCategories: {
-              needs: [],
-              wants: [],
-              savings: [],
-            },
-          };
-    } catch {
-      return {
-        allocation: BUDGET_ALLOCATION_DEFAULTS,
-        customCategories: {
-          needs: [],
-          wants: [],
-          savings: [],
-        },
-      };
+  // Budget preferences state with localStorage persistence
+  const [budgetPreferences, setBudgetPreferences] = useLocalStorage<BudgetPreferences>(
+    STORAGE_KEY_PREFERENCES,
+    {
+      allocation: BUDGET_ALLOCATION_DEFAULTS,
+      customCategories: {
+        needs: [],
+        wants: [],
+        savings: [],
+      },
     }
-  });
-
-  // Save preferences to localStorage whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_PREFERENCES, JSON.stringify(budgetPreferences));
-    } catch (error) {
-      console.error("Failed to save budget preferences:", error);
-    }
-  }, [budgetPreferences]);
+  );
 
   const updateTransactions = useCallback((newTransactions: Transaction[]) => {
     setTransactions(newTransactions);

@@ -153,18 +153,21 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
           {editMode ? (
             <>
               <button
+                type="button"
                 onClick={applySuggestedBudgets}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
               >
                 Use Suggested
               </button>
               <button
+                type="button"
                 onClick={cancelEdit}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={saveBudgetChanges}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
               >
@@ -173,6 +176,7 @@ export const BudgetPlanner = ({ filteredData }: BudgetPlannerProps) => {
             </>
           ) : (
             <button
+              type="button"
               onClick={() => setEditMode(true)}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >

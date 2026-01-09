@@ -147,6 +147,7 @@ class EnhancedErrorBoundary extends React.Component<
 
             <div className="flex flex-wrap gap-3">
               <button
+                type="button"
                 onClick={this.handleReset}
                 className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                 aria-label="Try again"
@@ -155,6 +156,7 @@ class EnhancedErrorBoundary extends React.Component<
                 Try Again
               </button>
               <button
+                type="button"
                 onClick={this.handleReload}
                 className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
                 aria-label="Reload page"
@@ -163,6 +165,7 @@ class EnhancedErrorBoundary extends React.Component<
                 Reload Page
               </button>
               <button
+                type="button"
                 onClick={this.handleGoHome}
                 className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
                 aria-label="Go to home"

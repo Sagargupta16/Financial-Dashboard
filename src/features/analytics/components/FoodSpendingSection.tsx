@@ -11,9 +11,13 @@ interface FoodData {
 
 interface FoodSpendingSectionProps {
   foodData: FoodData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   foodChartData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   foodTrendsData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartOptions: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doughnutOptions: any;
 }
 
@@ -114,7 +118,7 @@ export const FoodSpendingSection = ({
           <h4 className="text-lg font-semibold text-white mb-4">Food Spending Insights</h4>
           <div className="space-y-3">
             {foodData.insights.map((insight) => {
-              let bgClass;
+              let bgClass: string;
               if (insight.priority === "high") {
                 bgClass = "bg-red-900/30 border border-red-700";
               } else if (insight.priority === "medium") {

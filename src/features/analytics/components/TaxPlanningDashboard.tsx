@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChartOptions as ChartJSOptions } from "chart.js";
 import {
   AlertCircle,
@@ -27,7 +28,7 @@ const createChartOptions = (): ChartJSOptions<"doughnut"> => ({
     },
     tooltip: {
       callbacks: {
-        label: (context: any) => {
+        label: (context: { label?: string; parsed: number }) => {
           const label = context.label || "";
           const value = context.parsed;
           return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;

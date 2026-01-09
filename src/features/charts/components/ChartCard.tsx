@@ -26,6 +26,7 @@ export const ChartCard = ({
       </h3>
       {chartRef && fileName && (
         <button
+          type="button"
           onClick={() => downloadChart(chartRef, fileName)}
           className="group p-2.5 rounded-xl bg-gray-700/50 text-gray-400 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transition-all duration-300 hover:scale-110 shadow-lg"
           title="Download chart"

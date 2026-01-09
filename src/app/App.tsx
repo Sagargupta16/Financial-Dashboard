@@ -27,6 +27,14 @@ import { TABS_CONFIG } from "../config/tabs";
 import { initialCsvData } from "../constants/index";
 // Hooks
 import { useDataProcessor, useFilteredData, useUniqueValues } from "../hooks/useDataProcessor";
+import {
+  useError,
+  useLoading,
+  useSetError,
+  useSetLoading,
+  useSetTransactions,
+  useTransactions,
+} from "../store/financialStore";
 import type { SortConfig, TransactionSortKey } from "../types";
 import { lazyLoad } from "../utils/lazyLoad";
 
@@ -138,9 +146,37 @@ const App = () => {
     dayWeekSpendingPatterns: useRef<ChartJS | null>(null),
   };
 
+  // Zustand store
+  const transactions = useTransactions();
+  const setTransactions = useSetTransactions();
+  const loading = useLoading();
+  const setLoading = useSetLoading();
+  const error = useError();
+  const setError = useSetError();
+
   // Custom hooks
-  const { data, loading, error, handleFileUpload } = useDataProcessor(initialCsvData);
+  const {
+    data,
+    loading: processorLoading,
+    error: processorError,
+    handleFileUpload,
+  } = useDataProcessor(initialCsvData);
   const uniqueValues = useUniqueValues(data);
+
+  // Sync data processor with store
+  useEffect(() => {
+    if (data.length > 0) {
+      setTransactions(data);
+    }
+  }, [data, setTransactions]);
+
+  useEffect(() => {
+    setLoading(processorLoading);
+  }, [processorLoading, setLoading]);
+
+  useEffect(() => {
+    setError(processorError);
+  }, [processorError, setError]);
 
   // Default filters for data processing
   const defaultFilters = {
@@ -152,10 +188,10 @@ const App = () => {
     endDate: "",
   };
 
-  const filteredData = useFilteredData(data, defaultFilters, sortConfig);
+  const filteredData = useFilteredData(transactions, defaultFilters, sortConfig);
   const { kpiData, additionalKpiData } = useKPIData(filteredData);
   const keyInsights = useKeyInsights(filteredData, kpiData, additionalKpiData);
-  const accountBalances = useAccountBalances(data);
+  const accountBalances = useAccountBalances(transactions);
   const chartData = useChartData(filteredData, kpiData, drilldownCategory);
 
   // Effects

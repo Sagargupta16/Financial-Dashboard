@@ -41,7 +41,7 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
       }
 
       // Normalize the date to YYYY-MM-DD format
-      let dateStr;
+      let dateStr: string;
       try {
         const transDate = new Date(transaction.date);
         if (Number.isNaN(transDate.getTime())) {

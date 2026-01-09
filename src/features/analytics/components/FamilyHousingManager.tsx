@@ -1,4 +1,5 @@
 /* eslint-disable max-lines-per-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Calendar, Home, TrendingUp, Users, Zap } from "lucide-react";
 import { useMemo } from "react";
@@ -7,9 +8,10 @@ import {
   calculateFamilyExpenses,
   calculateHousingExpenses,
 } from "../../../lib/calculations/financial";
+import type { Transaction } from "../../../types";
 
 interface FamilyHousingManagerProps {
-  filteredData: any[];
+  filteredData: Transaction[];
 }
 
 /**
@@ -71,8 +73,9 @@ export const FamilyHousingManager = ({ filteredData }: FamilyHousingManagerProps
       },
       tooltip: {
         callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           label: (context: any) => {
-            const label = context.dataset.label || "";
+            const label = context.dataset?.label || "";
             const value = context.parsed.y || context.parsed;
             return `${label}: ₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
           },
@@ -87,7 +90,7 @@ export const FamilyHousingManager = ({ filteredData }: FamilyHousingManagerProps
       y: {
         ticks: {
           color: "#9ca3af",
-          callback: (value: any) => `₹${(value / 1000).toFixed(0)}k`,
+          callback: (value: string | number) => `₹${(Number(value) / 1000).toFixed(0)}k`,
         },
         grid: { color: "rgba(75, 85, 99, 0.3)" },
       },

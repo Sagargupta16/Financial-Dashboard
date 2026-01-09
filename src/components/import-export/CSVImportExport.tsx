@@ -104,6 +104,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExpor
             className="hidden"
           />
           <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Import CSV file"
@@ -116,6 +117,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExpor
         {/* Export All Button */}
         <div className="flex-1 min-w-[200px]">
           <button
+            type="button"
             onClick={() => handleExport(false)}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Export all transactions as CSV"
@@ -128,6 +130,7 @@ export const CSVImportExport = ({ data, onImport, filteredData }: CSVImportExpor
         {/* Export Filtered Button */}
         <div className="flex-1 min-w-[200px]">
           <button
+            type="button"
             onClick={() => handleExport(true)}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             aria-label="Export filtered transactions as CSV"

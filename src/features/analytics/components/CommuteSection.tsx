@@ -26,6 +26,7 @@ interface CommuteData {
 
 interface CommuteSectionProps {
   commuteData: CommuteData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartOptions: any;
 }
 
@@ -111,7 +112,7 @@ export const CommuteSection = ({ commuteData, chartOptions }: CommuteSectionProp
           <h4 className="text-lg font-semibold text-white mb-4">Commute Insights</h4>
           <div className="space-y-3">
             {commuteData.insights.map((insight) => {
-              let bgClass;
+              let bgClass: string;
               if (insight.priority === "high") {
                 bgClass = "bg-red-900/30 border border-red-700";
               } else if (insight.priority === "medium") {

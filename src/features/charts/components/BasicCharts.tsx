@@ -4,6 +4,8 @@ import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
 import { commonChartOptions, doughnutOptions } from "./ChartConfig";
 
+// Chart.js ref type is complex and varies by chart type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ChartRef = React.RefObject<any>;
 type DoughnutData = ChartData<"doughnut", number[], unknown>;
 type BarData = ChartData<"bar", (number | [number, number] | BubbleDataPoint | null)[], unknown>;

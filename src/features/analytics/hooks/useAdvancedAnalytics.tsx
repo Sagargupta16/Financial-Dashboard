@@ -12,12 +12,13 @@ import {
   detectAnomalies,
   detectRecurringTransactions,
 } from "../../../lib/calculations";
+import type { Transaction } from "../../../types";
 
 /**
  * Custom hook for advanced financial analytics
  * Provides sophisticated insights and predictions
  */
-export const useAdvancedAnalytics = (transactions: any[]) => {
+export const useAdvancedAnalytics = (transactions: Transaction[]) => {
   // 1. Month-over-Month Spending Comparison
   const monthlyComparison = useMemo(() => {
     if (!transactions || transactions.length === 0) {

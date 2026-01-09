@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CreditCard, TrendingUp, UtensilsCrossed } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -5,13 +6,13 @@ import {
   calculateCommuteMetrics,
   calculateFoodMetrics,
 } from "../../../lib/calculations/financial";
-import type { CardBreakdown } from "../../../types";
+import type { CardBreakdown, Transaction } from "../../../types";
 import { CashbackSection } from "./CashbackSection";
 import { CommuteSection } from "./CommuteSection";
 import { FoodSpendingSection } from "./FoodSpendingSection";
 
 interface CreditCardFoodOptimizerProps {
-  filteredData: any[];
+  filteredData: Transaction[];
 }
 
 /**
@@ -21,8 +22,10 @@ interface CreditCardFoodOptimizerProps {
 const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps) => {
   // Calculate metrics using useMemo for performance
   const creditCardData = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw = calculateCashbackMetrics(filteredData) as any;
     const normalizedBreakdown: CardBreakdown[] = (raw.cardBreakdown || raw.breakdown || []).map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (item: any) => {
         const spending = item.spending ?? item.total ?? 0;
         const cashback = item.cashback ?? 0;
@@ -87,10 +90,12 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
   // Prepare chart data
   const cardChartData = useMemo(
     () => ({
-      labels: creditCardData.cardBreakdown.map((c: any) => c.card.replace(" Credit Card", "")),
+      labels: creditCardData.cardBreakdown.map((c: CardBreakdown) =>
+        c.card.replace(" Credit Card", "")
+      ),
       datasets: [
         {
-          data: creditCardData.cardBreakdown.map((c: any) => c.spending),
+          data: creditCardData.cardBreakdown.map((c: CardBreakdown) => c.spending),
           backgroundColor: ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"],
           borderColor: "#1f2937",
           borderWidth: 3,
@@ -144,7 +149,7 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
         tooltip: {
           callbacks: {
             label: (context: any) => {
-              const label = context.label || context.dataset.label || "";
+              const label = context.label || context.dataset?.label || "";
               const value = context.parsed.y === undefined ? context.parsed : context.parsed.y;
               return `${label}: ₹${value.toLocaleString("en-IN", {
                 maximumFractionDigits: 0,
@@ -161,7 +166,7 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
         y: {
           ticks: {
             color: "#9ca3af",
-            callback: (value: any) => `₹${(value / 1000).toFixed(0)}k`,
+            callback: (value: string | number) => `₹${(Number(value) / 1000).toFixed(0)}k`,
           },
           grid: { color: "rgba(75, 85, 99, 0.3)" },
         },
@@ -181,7 +186,7 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
         },
         tooltip: {
           callbacks: {
-            label: (context: any) => {
+            label: (context: { label?: string; parsed: number }) => {
               const label = context.label || "";
               const value = context.parsed;
               return `${label}: ₹${value.toLocaleString("en-IN", {
@@ -233,8 +238,11 @@ const CreditCardFoodOptimizer = ({ filteredData }: CreditCardFoodOptimizerProps)
 };
 
 interface OptimizationTipsProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   foodData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   creditCardData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   commuteData: any;
 }
 

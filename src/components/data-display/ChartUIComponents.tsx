@@ -152,7 +152,7 @@ export const NavigationButton = ({
   direction = "left",
   className = "text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed",
 }: NavigationButtonProps) => (
-  <button onClick={onClick} disabled={disabled} className={className}>
+  <button type="button" onClick={onClick} disabled={disabled} className={className}>
     <svg
       width="20"
       height="20"
@@ -160,7 +160,10 @@ export const NavigationButton = ({
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      role="img"
+      aria-label={direction === "left" ? "Previous" : "Next"}
     >
+      <title>{direction === "left" ? "Previous" : "Next"}</title>
       {direction === "left" ? (
         <polyline points="15,18 9,12 15,6" />
       ) : (

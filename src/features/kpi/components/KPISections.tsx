@@ -34,6 +34,7 @@ interface SecondaryKPISectionProps {
 }
 
 interface AdvancedAnalyticsKPISectionProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   analytics?: any;
   formatCurrency: (value: number) => string;
 }

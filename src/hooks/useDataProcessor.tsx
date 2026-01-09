@@ -307,7 +307,8 @@ export const useDataProcessor = (initialCsvData) => {
 
   useEffect(() => {
     parseData(initialCsvData);
-  }, [initialCsvData, parseData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialCsvData]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];

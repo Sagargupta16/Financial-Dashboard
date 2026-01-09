@@ -13,14 +13,17 @@ export default defineConfig({
       jsxRuntime: 'automatic',
     }),
     // Bundle analyzer (only in analyze mode)
-    process.env.ANALYZE === 'true' &&
-      visualizer({
-        open: true,
-        filename: 'dist/stats.html',
-        gzipSize: true,
-        brotliSize: true,
-      }),
-  ].filter(Boolean),
+    ...(process.env.ANALYZE === 'true'
+      ? [
+          visualizer({
+            open: true,
+            filename: 'dist/stats.html',
+            gzipSize: true,
+            brotliSize: true,
+          }),
+        ]
+      : []),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -39,10 +42,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
-    // Enable minification
-    minify: 'terser',
+    // Minification is enabled by default in production builds (Vite default)
     terserOptions: {
       compress: {
+        // Remove non-critical console logs in production but keep error/warn for observability
+        pure_funcs: ['console.log', 'console.debug', 'console.info', 'console.trace'],
         drop_console: true, // Remove console logs in production
         drop_debugger: true,
       },
@@ -107,6 +111,7 @@ export default defineConfig({
     include: [
       'react',
       'react-dom',
+      'react-router-dom',
       'chart.js',
       'react-chartjs-2',
       'd3-hierarchy',

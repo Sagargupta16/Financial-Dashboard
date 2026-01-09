@@ -1,0 +1,13 @@
+# Enforce LF line endings for text files
+* text=auto eol=lf
+
+# Preserve binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

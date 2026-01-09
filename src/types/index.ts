@@ -211,8 +211,19 @@ export interface TransactionFilter extends DateFilter, CategoryFilter {
 export type SortOrder = "asc" | "desc";
 export type ViewMode = "monthly" | "yearly" | "all-time";
 
-export interface SortConfig {
-  key: string;
+export type TransactionSortKey =
+  | "date"
+  | "time"
+  | "account"
+  | "category"
+  | "subcategory"
+  | "note"
+  | "amount"
+  | "type"
+  | "runningBalance";
+
+export interface SortConfig<TKey extends string = string> {
+  key: TKey;
   direction: SortOrder;
 }
 

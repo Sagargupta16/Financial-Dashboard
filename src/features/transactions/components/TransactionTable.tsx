@@ -15,7 +15,11 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "../../../lib/data";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
-import type { Transaction } from "../../../types";
+import type {
+  SortConfig,
+  Transaction,
+  TransactionSortKey,
+} from "../../../types";
 
 // Helper functions for styling
 const getTypeStyles = (type: string) => {
@@ -84,7 +88,7 @@ export const EnhancedTransactionTable = ({
   initialFilters = {},
 }: {
   data: Transaction[];
-  onSort?: (key: string) => void;
+  onSort?: (key: TransactionSortKey) => void;
   currentPage?: number;
   transactionsPerPage?: number;
   initialFilters?: Record<string, any>;
@@ -92,7 +96,7 @@ export const EnhancedTransactionTable = ({
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [sortConfig, setSortConfig] = useState({
+  const [sortConfig, setSortConfig] = useState<SortConfig<TransactionSortKey>>({
     key: "date",
     direction: "desc",
   });
@@ -110,6 +114,18 @@ export const EnhancedTransactionTable = ({
   });
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+
+  const columns: Array<{ key: TransactionSortKey; label: string }> = [
+    { key: "date", label: "Date" },
+    { key: "time", label: "Time" },
+    { key: "account", label: "Account" },
+    { key: "category", label: "Category" },
+    { key: "subcategory", label: "Subcategory" },
+    { key: "note", label: "Note" },
+    { key: "amount", label: "Amount" },
+    { key: "type", label: "Type" },
+    { key: "runningBalance", label: "Balance" },
+  ];
 
   // Debounce search and filter values to reduce re-renders
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
@@ -320,7 +336,7 @@ export const EnhancedTransactionTable = ({
     }));
   };
 
-  const handleSort = (key: string) => {
+  const handleSort = (key: TransactionSortKey) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
@@ -733,17 +749,7 @@ export const EnhancedTransactionTable = ({
           </colgroup>
           <thead className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border-b-2 border-blue-500/30">
             <tr>
-              {[
-                { key: "date", label: "Date" },
-                { key: "time", label: "Time" },
-                { key: "account", label: "Account" },
-                { key: "category", label: "Category" },
-                { key: "subcategory", label: "Subcategory" },
-                { key: "note", label: "Note" },
-                { key: "amount", label: "Amount" },
-                { key: "type", label: "Type" },
-                { key: "runningBalance", label: "Balance" },
-              ].map((column) => (
+              {columns.map((column) => (
                 <th
                   key={column.key}
                   className="p-4 text-xs font-bold text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-700/50 transition-all duration-300 group"

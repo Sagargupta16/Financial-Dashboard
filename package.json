@@ -32,7 +32,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
     "predeploy": "pnpm build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist",
     "clean": "pnpm dlx rimraf node_modules && pnpm install",
     "prepare": "husky"
   },

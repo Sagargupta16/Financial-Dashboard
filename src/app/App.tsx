@@ -1,4 +1,10 @@
-import { useState, useEffect, Suspense, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  Suspense,
+  useRef,
+  type MutableRefObject,
+} from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,6 +45,7 @@ import { lazyLoad } from "../utils/lazyLoad";
 
 // Config
 import { TABS_CONFIG } from "../config/tabs";
+import type { SortConfig, TransactionSortKey } from "../types";
 
 // Lazy load page components for better performance
 const OverviewPage = lazyLoad(
@@ -100,13 +107,31 @@ ChartJS.register(
   TimeScale
 );
 
+type ChartRefKey =
+  | "doughnut"
+  | "bar"
+  | "incomeSources"
+  | "spendingByAccount"
+  | "line"
+  | "spendingByDay"
+  | "subcategoryBreakdown"
+  | "treemap"
+  | "enhancedSubcategoryBreakdown"
+  | "multiCategoryTimeAnalysis"
+  | "netWorth"
+  | "cumulativeCategoryTrend"
+  | "seasonalSpendingHeatmap"
+  | "yearOverYearComparison"
+  | "spendingForecast"
+  | "accountBalanceProgression"
+  | "dayWeekSpendingPatterns";
+
+type ChartRefMap = Record<ChartRefKey, MutableRefObject<ChartJS | null>>;
+
 const App = () => {
   // State
   const [activeTab, setActiveTab] = useState<string>("overview");
-  const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: "asc" | "desc";
-  }>({
+  const [sortConfig, setSortConfig] = useState<SortConfig<TransactionSortKey>>({
     key: "date",
     direction: "desc",
   });
@@ -115,24 +140,24 @@ const App = () => {
   const transactionsPerPage = 25;
 
   // Chart refs for download functionality
-  const chartRefs = {
-    doughnut: useRef(null),
-    bar: useRef(null),
-    incomeSources: useRef(null),
-    spendingByAccount: useRef(null),
-    line: useRef(null),
-    spendingByDay: useRef(null),
-    subcategoryBreakdown: useRef(null),
-    treemap: useRef(null),
-    enhancedSubcategoryBreakdown: useRef(null),
-    multiCategoryTimeAnalysis: useRef(null),
-    netWorth: useRef(null),
-    cumulativeCategoryTrend: useRef(null),
-    seasonalSpendingHeatmap: useRef(null),
-    yearOverYearComparison: useRef(null),
-    spendingForecast: useRef(null),
-    accountBalanceProgression: useRef(null),
-    dayWeekSpendingPatterns: useRef(null),
+  const chartRefs: ChartRefMap = {
+    doughnut: useRef<ChartJS | null>(null),
+    bar: useRef<ChartJS | null>(null),
+    incomeSources: useRef<ChartJS | null>(null),
+    spendingByAccount: useRef<ChartJS | null>(null),
+    line: useRef<ChartJS | null>(null),
+    spendingByDay: useRef<ChartJS | null>(null),
+    subcategoryBreakdown: useRef<ChartJS | null>(null),
+    treemap: useRef<ChartJS | null>(null),
+    enhancedSubcategoryBreakdown: useRef<ChartJS | null>(null),
+    multiCategoryTimeAnalysis: useRef<ChartJS | null>(null),
+    netWorth: useRef<ChartJS | null>(null),
+    cumulativeCategoryTrend: useRef<ChartJS | null>(null),
+    seasonalSpendingHeatmap: useRef<ChartJS | null>(null),
+    yearOverYearComparison: useRef<ChartJS | null>(null),
+    spendingForecast: useRef<ChartJS | null>(null),
+    accountBalanceProgression: useRef<ChartJS | null>(null),
+    dayWeekSpendingPatterns: useRef<ChartJS | null>(null),
   };
 
   // Custom hooks
@@ -164,7 +189,7 @@ const App = () => {
   }, [uniqueValues.expenseCategories, drilldownCategory]);
 
   // Handlers
-  const handleSort = (key: string) => {
+  const handleSort = (key: TransactionSortKey) => {
     setSortConfig((p) => ({
       key,
       direction: p.key === key && p.direction === "asc" ? "desc" : "asc",

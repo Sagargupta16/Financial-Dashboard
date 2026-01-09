@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { BudgetPlanner } from "./BudgetPlanner";
-import { NeedsWantsSavings } from "./NeedsWantsSavings";
-import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
 import { FinancialHealthScore } from "../../../components/data-display/FinancialHealthScore";
 import { SpendingCalendar } from "../../../components/data-display/SpendingCalendar";
 import { Tabs } from "../../../components/ui/Tabs";
 import type { Transaction } from "../../../types";
+import { BudgetPlanner } from "./BudgetPlanner";
+import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
+import { NeedsWantsSavings } from "./NeedsWantsSavings";
 
 type AccountBalanceEntry = {
   name: string;
@@ -44,10 +44,7 @@ export const BudgetGoalsSection = ({
       // Handle array format: [{name, balance}]
       const entries: Array<[string, number]> = Array.isArray(accountBalances)
         ? accountBalances.map((acc) => [acc.name, acc.balance])
-        : Object.entries(accountBalances).map(([name, balance]) => [
-            name,
-            Number(balance),
-          ]);
+        : Object.entries(accountBalances).map(([name, balance]) => [name, Number(balance)]);
 
       entries.forEach(([name, balance]) => {
         const nameLower = name.toLowerCase();
@@ -105,12 +102,9 @@ export const BudgetGoalsSection = ({
     <div className="space-y-8">
       {/* Section Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          🎯 Budget & Planning
-        </h1>
+        <h1 className="text-3xl font-bold text-white mb-2">🎯 Budget & Planning</h1>
         <p className="text-gray-400">
-          Track your financial health and plan your spending with
-          Needs/Wants/Savings breakdown
+          Track your financial health and plan your spending with Needs/Wants/Savings breakdown
         </p>
       </div>
 
@@ -125,9 +119,7 @@ export const BudgetGoalsSection = ({
           {/* Financial Health Score */}
           <div>
             <FinancialHealthScore
-              filteredData={
-                filteredData as unknown as Record<string, unknown>[]
-              }
+              filteredData={filteredData as unknown as Record<string, unknown>[]}
               kpiData={kpiData}
               accountBalances={bankAccounts}
               investments={investments}

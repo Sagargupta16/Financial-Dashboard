@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { exportChartAsPNG } from "../../lib/charts";
 
 interface ChartContainerProps {
@@ -93,9 +93,7 @@ export const ChartContainer = ({
         <h3 className="text-xl font-semibold text-white">{title}</h3>
         <div className="flex items-center space-x-4">
           {actions}
-          {chartRef && filename && (
-            <ExportButton chartRef={chartRef} filename={filename} />
-          )}
+          {chartRef && filename && <ExportButton chartRef={chartRef} filename={filename} />}
         </div>
       </div>
       {children}
@@ -193,21 +191,11 @@ export const TimeNavigationControls = ({
     </div>
 
     <div className="flex items-center gap-4">
-      <NavigationButton
-        onClick={onPrevious}
-        disabled={!canGoPrevious}
-        direction="left"
-      />
+      <NavigationButton onClick={onPrevious} disabled={!canGoPrevious} direction="left" />
 
-      <div className="text-white font-semibold min-w-[150px] text-center">
-        {currentPeriod}
-      </div>
+      <div className="text-white font-semibold min-w-[150px] text-center">{currentPeriod}</div>
 
-      <NavigationButton
-        onClick={onNext}
-        disabled={!canGoNext}
-        direction="right"
-      />
+      <NavigationButton onClick={onNext} disabled={!canGoNext} direction="right" />
     </div>
   </div>
 );
@@ -271,11 +259,7 @@ export const InfoCard = ({
     </div>
     <div className="text-white font-semibold text-lg mt-1">{value}</div>
     {change !== null && (
-      <div
-        className={`text-sm mt-1 ${
-          change >= 0 ? "text-green-400" : "text-red-400"
-        }`}
-      >
+      <div className={`text-sm mt-1 ${change >= 0 ? "text-green-400" : "text-red-400"}`}>
         {change >= 0 ? "↗" : "↘"} {Math.abs(change).toFixed(1)}%
       </div>
     )}

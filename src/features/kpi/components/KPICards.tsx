@@ -19,10 +19,7 @@ interface SmallKPICardProps {
 
 // Helper function to get color classes based on color prop
 const getColorClasses = (color: KPICardProps["color"]) => {
-  const colorMap: Record<
-    KPICardProps["color"],
-    { icon: string; bar: string; side: string }
-  > = {
+  const colorMap: Record<KPICardProps["color"], { icon: string; bar: string; side: string }> = {
     green: {
       icon: "from-green-600/20 to-green-800/20 text-green-400",
       bar: "from-green-600 via-green-500 to-emerald-400",
@@ -105,14 +102,7 @@ export const KPICard = React.memo(
  * Compact version of KPICard for grid layouts
  */
 export const SmallKPICard = React.memo(
-  ({
-    title,
-    value,
-    icon,
-    unit,
-    isCount = false,
-    color = "blue",
-  }: SmallKPICardProps) => {
+  ({ title, value, icon, unit, isCount = false, color = "blue" }: SmallKPICardProps) => {
     const colors = getColorClasses(color);
 
     const displayValue = () => {
@@ -140,11 +130,7 @@ export const SmallKPICard = React.memo(
           </span>
           <p className="text-2xl font-extrabold text-white group-hover:text-gradient-primary transition-all duration-300">
             {displayValue()}
-            {unit && (
-              <span className="text-base font-normal text-gray-400 ml-1">
-                {unit}
-              </span>
-            )}
+            {unit && <span className="text-base font-normal text-gray-400 ml-1">{unit}</span>}
           </p>
         </div>
 

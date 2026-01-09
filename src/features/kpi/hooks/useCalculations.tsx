@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import {
-  calculateDateRange,
-  calculateTotalIncome,
-  calculateTotalExpense,
-  calculateSavingsRate,
-  calculateDailyAverage,
-  calculateMonthlyAverage,
-  calculateTotalCashbackEarned,
-  calculateCashbackShared,
   calculateActualCashback,
+  calculateCashbackShared,
+  calculateDailyAverage,
+  calculateDateRange,
+  calculateMonthlyAverage,
+  calculateSavingsRate,
+  calculateTotalCashbackEarned,
+  calculateTotalExpense,
+  calculateTotalIncome,
   calculateTotalReimbursements,
 } from "../../../lib/calculations";
 import type { DateRangeResult } from "../../../lib/calculations/time/dateRange";
@@ -79,9 +79,7 @@ export const useKPIData = (
     const income = calculateTotalIncome(filteredData);
     const expense = calculateTotalExpense(filteredData);
 
-    const expenseTransactions = filteredData.filter(
-      (item) => item.type === "Expense"
-    );
+    const expenseTransactions = filteredData.filter((item) => item.type === "Expense");
 
     const transferData = filteredData.reduce(
       (acc: { transferIn: number; transferOut: number }, item) => {
@@ -119,10 +117,7 @@ export const useKPIData = (
         0,
         ...expenseTransactions.map((item) => Math.abs(Number(item.amount) || 0))
       ),
-      averageExpense:
-        expenseTransactions.length > 0
-          ? expense / expenseTransactions.length
-          : 0,
+      averageExpense: expenseTransactions.length > 0 ? expense / expenseTransactions.length : 0,
       totalTransactions: filteredData.length,
       transferData,
       cashbackData,
@@ -148,21 +143,11 @@ export const useKeyInsights = (
       };
     }
 
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const daySpending = new Array(7).fill(0);
     const categoryCounts: Record<string, number> = {};
 
-    const toDate = (
-      value: string | number | Date | null | undefined
-    ): Date | null => {
+    const toDate = (value: string | number | Date | null | undefined): Date | null => {
       if (!value) {
         return null;
       }
@@ -184,17 +169,14 @@ export const useKeyInsights = (
             daySpending[dayIndex] += amount;
           }
         }
-        categoryCounts[item.category] =
-          (categoryCounts[item.category] || 0) + 1;
+        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
       }
     });
 
     const maxSpending = Math.max(...daySpending);
-    const busiestDay =
-      maxSpending > 0 ? days[daySpending.indexOf(maxSpending)] : "N/A";
+    const busiestDay = maxSpending > 0 ? days[daySpending.indexOf(maxSpending)] : "N/A";
     const mostFrequentCategory =
-      Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
-      "N/A";
+      Object.entries(categoryCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || "N/A";
 
     // Calculate more meaningful averages - absolute value of all transactions
     const totalAbsoluteValue = filteredData.reduce(
@@ -306,12 +288,9 @@ export const useEnhancedKPIData = (
 
     // Calculate actual days in the last period (not always 30)
     const actualDaysInPeriod = Math.min(30, dateRange.days);
-    const spendingPerDay30d =
-      actualDaysInPeriod > 0 ? spending30d / actualDaysInPeriod : 0;
+    const spendingPerDay30d = actualDaysInPeriod > 0 ? spending30d / actualDaysInPeriod : 0;
     const spendingVelocity =
-      dailySpendingRate > 0
-        ? (spendingPerDay30d / dailySpendingRate) * 100
-        : 100;
+      dailySpendingRate > 0 ? (spendingPerDay30d / dailySpendingRate) * 100 : 100;
 
     // 6. Category Concentration
     const categoryTotals: Record<string, number> = {};
@@ -323,9 +302,7 @@ export const useEnhancedKPIData = (
       }
     });
 
-    const topCategory = Object.entries(categoryTotals).sort(
-      ([, a], [, b]) => b - a
-    )[0];
+    const topCategory = Object.entries(categoryTotals).sort(([, a], [, b]) => b - a)[0];
 
     const categoryConcentration =
       topCategory && expense > 0

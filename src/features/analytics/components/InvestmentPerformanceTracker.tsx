@@ -1,17 +1,18 @@
 /* eslint-disable max-lines-per-function */
-import { useMemo } from "react";
+
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  CreditCard,
   AlertTriangle,
   CheckCircle,
+  CreditCard,
+  DollarSign,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
+import { useMemo } from "react";
 import { Line } from "react-chartjs-2";
-import { calculateInvestmentPerformance } from "../../../lib/calculations/financial";
 import { preparePnLChartData } from "../../../lib/analytics/investments";
-import type { Transaction, InvestmentTransaction } from "../../../types";
+import { calculateInvestmentPerformance } from "../../../lib/calculations/financial";
+import type { InvestmentTransaction, Transaction } from "../../../types";
 
 interface InvestmentPerformanceTrackerProps {
   filteredData: Transaction[];
@@ -85,9 +86,7 @@ export const InvestmentPerformanceTracker = ({
             <TrendingUp className="text-purple-300" size={32} />
           </div>
           <div>
-            <h2 className="text-3xl font-bold gradient-text">
-              Investment Performance Tracker
-            </h2>
+            <h2 className="text-3xl font-bold gradient-text">Investment Performance Tracker</h2>
             <p className="text-gray-300 text-sm mt-1">
               Track your stock market performance, P&L, and brokerage fees
             </p>
@@ -116,9 +115,7 @@ export const InvestmentPerformanceTracker = ({
                 maximumFractionDigits: 0,
               })}
             </div>
-            <div className="text-xs font-semibold text-blue-300/80">
-              All-time deposits
-            </div>
+            <div className="text-xs font-semibold text-blue-300/80">All-time deposits</div>
           </div>
         </div>
 
@@ -273,12 +270,8 @@ export const InvestmentPerformanceTracker = ({
           <div className="text-xs font-semibold text-gray-400">
             {rsuHoldings > 0 &&
               `Includes ₹${rsuHoldings.toLocaleString("en-IN", { maximumFractionDigits: 0 })} RSU`}
-            {rsuHoldings === 0 &&
-              totalWithdrawals > 0 &&
-              "Net amount in market"}
-            {rsuHoldings === 0 &&
-              totalWithdrawals === 0 &&
-              "All capital still invested"}
+            {rsuHoldings === 0 && totalWithdrawals > 0 && "Net amount in market"}
+            {rsuHoldings === 0 && totalWithdrawals === 0 && "All capital still invested"}
           </div>
         </div>
 
@@ -294,9 +287,7 @@ export const InvestmentPerformanceTracker = ({
             />
           </div>
           <div className="text-3xl font-extrabold text-white mb-2">
-            {realizedLosses > 0
-              ? (realizedProfits / realizedLosses).toFixed(2)
-              : "∞"}
+            {realizedLosses > 0 ? (realizedProfits / realizedLosses).toFixed(2) : "∞"}
           </div>
           <div className="text-xs font-semibold text-gray-400">
             {realizedProfits > realizedLosses
@@ -309,9 +300,7 @@ export const InvestmentPerformanceTracker = ({
       {/* P&L Chart */}
       {chartData.labels.length > 0 && (
         <div className="glass border border-gray-700/30 rounded-2xl p-7 shadow-2xl card-hover">
-          <h3 className="text-2xl font-bold gradient-text mb-6">
-            Cumulative P&L Over Time
-          </h3>
+          <h3 className="text-2xl font-bold gradient-text mb-6">Cumulative P&L Over Time</h3>
           <div style={{ height: "350px" }}>
             <Line data={chartData} options={chartOptions} />
           </div>
@@ -320,9 +309,7 @@ export const InvestmentPerformanceTracker = ({
 
       {/* Recent Transactions */}
       <div className="glass border border-gray-700/30 rounded-2xl p-7 shadow-2xl">
-        <h3 className="text-2xl font-bold gradient-text mb-6">
-          Recent Investment Transactions
-        </h3>
+        <h3 className="text-2xl font-bold gradient-text mb-6">Recent Investment Transactions</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -342,72 +329,70 @@ export const InvestmentPerformanceTracker = ({
               </tr>
             </thead>
             <tbody>
-              {transactions
-                .slice(0, 10)
-                .map((t: InvestmentTransaction, index: number) => {
-                  const getTypeBadgeClass = (type: string) => {
-                    if (type === "Dividend") {
-                      return "bg-green-900/50 text-green-300 border-green-500/30";
-                    }
-                    if (type === "Sell") {
-                      return "bg-red-900/50 text-red-300 border-red-500/30";
-                    }
-                    if (type === "Brokerage") {
-                      return "bg-yellow-900/50 text-yellow-300 border-yellow-500/30";
-                    }
-                    return "bg-blue-900/50 text-blue-300 border-blue-500/30";
-                  };
+              {transactions.slice(0, 10).map((t: InvestmentTransaction, index: number) => {
+                const getTypeBadgeClass = (type: string) => {
+                  if (type === "Dividend") {
+                    return "bg-green-900/50 text-green-300 border-green-500/30";
+                  }
+                  if (type === "Sell") {
+                    return "bg-red-900/50 text-red-300 border-red-500/30";
+                  }
+                  if (type === "Brokerage") {
+                    return "bg-yellow-900/50 text-yellow-300 border-yellow-500/30";
+                  }
+                  return "bg-blue-900/50 text-blue-300 border-blue-500/30";
+                };
 
-                  const getAmountClass = (type: string) => {
-                    if (type === "Dividend") {
-                      return "text-green-400";
-                    }
-                    if (type === "Sell" || type === "Brokerage") {
-                      return "text-red-400";
-                    }
-                    return "text-gray-300";
-                  };
+                const getAmountClass = (type: string) => {
+                  if (type === "Dividend") {
+                    return "text-green-400";
+                  }
+                  if (type === "Sell" || type === "Brokerage") {
+                    return "text-red-400";
+                  }
+                  return "text-gray-300";
+                };
 
-                  const getAmountPrefix = (type: string) => {
-                    if (type === "Profit") {
-                      return "+";
-                    }
-                    if (type === "Loss" || type === "Fee") {
-                      return "-";
-                    }
-                    return "";
-                  };
+                const getAmountPrefix = (type: string) => {
+                  if (type === "Profit") {
+                    return "+";
+                  }
+                  if (type === "Loss" || type === "Fee") {
+                    return "-";
+                  }
+                  return "";
+                };
 
-                  return (
-                    <tr
-                      key={`${t.date}-${t.type}-${t.amount}`}
-                      className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 transition-all duration-300 group animate-fade-in"
-                      style={{ animationDelay: `${index * 30}ms` }}
-                    >
-                      <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
-                        {new Date(t.date).toLocaleDateString("en-IN")}
-                      </td>
-                      <td className="py-4 px-5">
-                        <span
-                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border ${getTypeBadgeClass(t.type)}`}
-                        >
-                          {t.type}
-                        </span>
-                      </td>
-                      <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
-                        {t.subcategory || t.category}
-                      </td>
-                      <td
-                        className={`py-4 px-5 text-right font-bold text-base ${getAmountClass(t.type)} group-hover:scale-105 transition-transform duration-300`}
+                return (
+                  <tr
+                    key={`${t.date}-${t.type}-${t.amount}`}
+                    className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 transition-all duration-300 group animate-fade-in"
+                    style={{ animationDelay: `${index * 30}ms` }}
+                  >
+                    <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
+                      {new Date(t.date).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="py-4 px-5">
+                      <span
+                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border ${getTypeBadgeClass(t.type)}`}
                       >
-                        {getAmountPrefix(t.type)}₹
-                        {t.amount.toLocaleString("en-IN", {
-                          maximumFractionDigits: 0,
-                        })}
-                      </td>
-                    </tr>
-                  );
-                })}
+                        {t.type}
+                      </span>
+                    </td>
+                    <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
+                      {t.subcategory || t.category}
+                    </td>
+                    <td
+                      className={`py-4 px-5 text-right font-bold text-base ${getAmountClass(t.type)} group-hover:scale-105 transition-transform duration-300`}
+                    >
+                      {getAmountPrefix(t.type)}₹
+                      {t.amount.toLocaleString("en-IN", {
+                        maximumFractionDigits: 0,
+                      })}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -421,18 +406,13 @@ export const InvestmentPerformanceTracker = ({
         <div className="space-y-4">
           {netProfitLoss < 0 && (
             <div className="flex items-start gap-4 glass bg-red-900/20 border border-red-500/30 rounded-xl p-5 animate-fade-in">
-              <AlertTriangle
-                className="text-red-400 mt-1 flex-shrink-0"
-                size={24}
-              />
+              <AlertTriangle className="text-red-400 mt-1 flex-shrink-0" size={24} />
               <div>
-                <p className="text-red-300 font-bold text-lg">
-                  Net Loss Position
-                </p>
+                <p className="text-red-300 font-bold text-lg">Net Loss Position</p>
                 <p className="text-red-200/90 text-sm mt-2 leading-relaxed">
                   Your investments are currently at a net loss of ₹
-                  {Math.abs(netProfitLoss).toLocaleString("en-IN")}. Consider
-                  reviewing your strategy and diversifying your portfolio.
+                  {Math.abs(netProfitLoss).toLocaleString("en-IN")}. Consider reviewing your
+                  strategy and diversifying your portfolio.
                 </p>
               </div>
             </div>
@@ -440,19 +420,13 @@ export const InvestmentPerformanceTracker = ({
 
           {brokerageFees > realizedProfits * 0.3 && (
             <div className="flex items-start gap-4 glass bg-yellow-900/20 border border-yellow-500/30 rounded-xl p-5 animate-fade-in">
-              <AlertTriangle
-                className="text-yellow-400 mt-1 flex-shrink-0"
-                size={24}
-              />
+              <AlertTriangle className="text-yellow-400 mt-1 flex-shrink-0" size={24} />
               <div>
-                <p className="text-yellow-300 font-bold text-lg">
-                  High Brokerage Fees
-                </p>
+                <p className="text-yellow-300 font-bold text-lg">High Brokerage Fees</p>
                 <p className="text-yellow-200/90 text-sm mt-2 leading-relaxed">
                   Brokerage fees are eating up{" "}
-                  {((brokerageFees / realizedProfits) * 100).toFixed(0)}% of
-                  your profits. Consider switching to a discount broker or
-                  reducing trade frequency.
+                  {((brokerageFees / realizedProfits) * 100).toFixed(0)}% of your profits. Consider
+                  switching to a discount broker or reducing trade frequency.
                 </p>
               </div>
             </div>
@@ -460,17 +434,12 @@ export const InvestmentPerformanceTracker = ({
 
           {netProfitLoss >= 0 && returnPercentage > 0 && (
             <div className="flex items-start gap-4 glass bg-green-900/20 border border-green-500/30 rounded-xl p-5 animate-fade-in">
-              <CheckCircle
-                className="text-green-400 mt-1 flex-shrink-0"
-                size={24}
-              />
+              <CheckCircle className="text-green-400 mt-1 flex-shrink-0" size={24} />
               <div>
-                <p className="text-green-300 font-bold text-lg">
-                  Profitable Trading
-                </p>
+                <p className="text-green-300 font-bold text-lg">Profitable Trading</p>
                 <p className="text-green-200/90 text-sm mt-2 leading-relaxed">
-                  Great job! You've made a {returnPercentage.toFixed(2)}% return
-                  on your investments. Keep maintaining your winning strategy.
+                  Great job! You've made a {returnPercentage.toFixed(2)}% return on your
+                  investments. Keep maintaining your winning strategy.
                 </p>
               </div>
             </div>
@@ -478,18 +447,12 @@ export const InvestmentPerformanceTracker = ({
 
           {realizedProfits > 0 && realizedLosses > realizedProfits && (
             <div className="flex items-start gap-4 glass bg-blue-900/20 border border-blue-500/30 rounded-xl p-5 animate-fade-in">
-              <AlertTriangle
-                className="text-blue-400 mt-1 flex-shrink-0"
-                size={24}
-              />
+              <AlertTriangle className="text-blue-400 mt-1 flex-shrink-0" size={24} />
               <div>
-                <p className="text-blue-300 font-bold text-lg">
-                  Tax Loss Harvesting Opportunity
-                </p>
+                <p className="text-blue-300 font-bold text-lg">Tax Loss Harvesting Opportunity</p>
                 <p className="text-blue-200/90 text-sm mt-2 leading-relaxed">
-                  You have realized losses that can offset your gains for tax
-                  purposes. Consult with a tax advisor to optimize your tax
-                  liability.
+                  You have realized losses that can offset your gains for tax purposes. Consult with
+                  a tax advisor to optimize your tax liability.
                 </p>
               </div>
             </div>

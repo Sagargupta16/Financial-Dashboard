@@ -1,19 +1,15 @@
-import { useMemo } from "react";
 import {
   AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
   AlertTriangle,
-  Info,
+  Calendar,
   CheckCircle,
+  Info,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
+import { useMemo } from "react";
 import { generateComprehensiveInsights } from "../../../lib/analytics/trends";
-import type {
-  Transaction,
-  ComprehensiveInsights,
-  Insight,
-} from "../../../types";
+import type { ComprehensiveInsights, Insight, Transaction } from "../../../types";
 
 interface SmartInsightsPanelProps {
   filteredData: Transaction[];
@@ -24,10 +20,7 @@ interface SmartInsightsPanelProps {
  * Smart Insights Panel
  * Shows automatically detected patterns, anomalies, and recommendations
  */
-export const SmartInsightsPanel = ({
-  filteredData,
-  budgets = {},
-}: SmartInsightsPanelProps) => {
+export const SmartInsightsPanel = ({ filteredData, budgets = {} }: SmartInsightsPanelProps) => {
   const insights: ComprehensiveInsights = useMemo(() => {
     return generateComprehensiveInsights(filteredData, budgets);
   }, [filteredData, budgets]);
@@ -89,9 +82,7 @@ export const SmartInsightsPanel = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <AlertCircle className="text-blue-400" size={24} />
-          <h3 className="text-xl font-semibold text-white">
-            Smart Insights & Alerts
-          </h3>
+          <h3 className="text-xl font-semibold text-white">Smart Insights & Alerts</h3>
         </div>
         <div className="flex gap-2 text-xs">
           <span className="px-2 py-1 rounded-full bg-red-500/20 text-red-300">
@@ -119,22 +110,14 @@ export const SmartInsightsPanel = ({
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type)}
-                  </div>
+                  <div className="flex-shrink-0 mt-1">{getIcon(insight.type)}</div>
                   <div className="flex-1">
-                    <h5 className="text-white font-semibold mb-1">
-                      {insight.title}
-                    </h5>
-                    <p className="text-gray-300 text-sm mb-2">
-                      {insight.message}
-                    </p>
+                    <h5 className="text-white font-semibold mb-1">{insight.title}</h5>
+                    <p className="text-gray-300 text-sm mb-2">{insight.message}</p>
                     {insight.action && (
                       <div className="flex items-center gap-2 text-xs text-blue-400">
                         <TrendingDown size={14} />
-                        <span className="font-medium">
-                          Action: {insight.action}
-                        </span>
+                        <span className="font-medium">Action: {insight.action}</span>
                       </div>
                     )}
                   </div>
@@ -156,22 +139,14 @@ export const SmartInsightsPanel = ({
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type)}
-                  </div>
+                  <div className="flex-shrink-0 mt-1">{getIcon(insight.type)}</div>
                   <div className="flex-1">
-                    <h5 className="text-white font-semibold mb-1">
-                      {insight.title}
-                    </h5>
-                    <p className="text-gray-300 text-sm mb-2">
-                      {insight.message}
-                    </p>
+                    <h5 className="text-white font-semibold mb-1">{insight.title}</h5>
+                    <p className="text-gray-300 text-sm mb-2">{insight.message}</p>
                     {insight.action && (
                       <div className="flex items-center gap-2 text-xs text-blue-400">
                         <Info size={14} />
-                        <span className="font-medium">
-                          Suggestion: {insight.action}
-                        </span>
+                        <span className="font-medium">Suggestion: {insight.action}</span>
                       </div>
                     )}
                   </div>
@@ -193,16 +168,10 @@ export const SmartInsightsPanel = ({
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    {getIcon(insight.type)}
-                  </div>
+                  <div className="flex-shrink-0 mt-1">{getIcon(insight.type)}</div>
                   <div className="flex-1">
-                    <h5 className="text-white font-semibold mb-1">
-                      {insight.title}
-                    </h5>
-                    <p className="text-gray-300 text-sm mb-2">
-                      {insight.message}
-                    </p>
+                    <h5 className="text-white font-semibold mb-1">{insight.title}</h5>
+                    <p className="text-gray-300 text-sm mb-2">{insight.message}</p>
                     {insight.action && (
                       <div className="flex items-center gap-2 text-xs text-blue-400">
                         <CheckCircle size={14} />

@@ -4,40 +4,28 @@
  */
 
 import type {
-  Transaction,
+  ComprehensiveInsights,
   DayPatterns,
   Insight,
   SeasonalData,
-  ComprehensiveInsights,
+  Transaction,
 } from "../../types";
 import { getMonthKey } from "../data";
-import { detectSeasonality, detectOutliers } from "./forecasts";
+import { detectOutliers, detectSeasonality } from "./forecasts";
 
 /**
  * Analyze spending patterns by day of week
  * @param transactions - Transaction data
  * @returns Day of week analysis
  */
-export const analyzeDayOfWeekPatterns = (
-  transactions: Transaction[]
-): DayPatterns | null => {
+export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): DayPatterns | null => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
 
-  const expenses = transactions.filter(
-    (t) => t.type === "Expense" && t.category !== "In-pocket"
-  );
+  const expenses = transactions.filter((t) => t.type === "Expense" && t.category !== "In-pocket");
 
-  const dayNames = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   const dayData = dayNames.map(() => ({ total: 0, count: 0 }));
 
@@ -53,13 +41,8 @@ export const analyzeDayOfWeekPatterns = (
   const insights: Insight[] = [];
 
   // Find highest spending day
-  const maxDay = dayData.reduce(
-    (max, d, i) => (d.total > dayData[max].total ? i : max),
-    0
-  );
-  const maxDayPercent = ((dayData[maxDay].total / totalSpending) * 100).toFixed(
-    0
-  );
+  const maxDay = dayData.reduce((max, d, i) => (d.total > dayData[max].total ? i : max), 0);
+  const maxDayPercent = ((dayData[maxDay].total / totalSpending) * 100).toFixed(0);
 
   if (dayData[maxDay].total > avgDaily * 1.5) {
     insights.push({
@@ -106,23 +89,16 @@ export const analyzeDayOfWeekPatterns = (
  * @param {Array} transactions - Transaction data
  * @returns {Array} Anomaly insights
  */
-export const detectSpendingAnomalies = (
-  transactions: Transaction[]
-): Insight[] => {
+export const detectSpendingAnomalies = (transactions: Transaction[]): Insight[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
 
   const insights: Insight[] = [];
-  const expenses = transactions.filter(
-    (t) => t.type === "Expense" && t.category !== "In-pocket"
-  );
+  const expenses = transactions.filter((t) => t.type === "Expense" && t.category !== "In-pocket");
 
   // Group by month
-  const monthlyData: Record<
-    string,
-    { total: number; byCategory: Record<string, number> }
-  > = {};
+  const monthlyData: Record<string, { total: number; byCategory: Record<string, number> }> = {};
   expenses.forEach((t) => {
     const month = getMonthKey(t.date);
     if (!monthlyData[month]) {
@@ -174,26 +150,14 @@ export const detectSpendingAnomalies = (
   expenses.forEach((t) => allCategories.add(t.category));
 
   allCategories.forEach((category: string) => {
-    const categoryData = months.map(
-      (m) => monthlyData[m].byCategory[category] || 0
-    );
+    const categoryData = months.map((m) => monthlyData[m].byCategory[category] || 0);
     const recentAvg =
-      recentMonths.reduce(
-        (sum, m) => sum + (monthlyData[m].byCategory[category] || 0),
-        0
-      ) / recentMonths.length;
-    const historicalAvg =
-      categoryData.reduce((a, b) => a + b, 0) / categoryData.length;
+      recentMonths.reduce((sum, m) => sum + (monthlyData[m].byCategory[category] || 0), 0) /
+      recentMonths.length;
+    const historicalAvg = categoryData.reduce((a, b) => a + b, 0) / categoryData.length;
 
-    if (
-      recentAvg > historicalAvg * 1.4 &&
-      recentAvg > 1000 &&
-      categoryData.length >= 3
-    ) {
-      const increase = (
-        ((recentAvg - historicalAvg) / historicalAvg) *
-        100
-      ).toFixed(0);
+    if (recentAvg > historicalAvg * 1.4 && recentAvg > 1000 && categoryData.length >= 3) {
+      const increase = (((recentAvg - historicalAvg) / historicalAvg) * 100).toFixed(0);
       insights.push({
         type: "trend" as const,
         priority: "medium" as const,
@@ -212,17 +176,13 @@ export const detectSpendingAnomalies = (
  * @param {Array} transactions - Transaction data
  * @returns {Object} Seasonal analysis
  */
-export const analyzeSeasonalPatterns = (
-  transactions: Transaction[]
-): SeasonalData | null => {
+export const analyzeSeasonalPatterns = (transactions: Transaction[]): SeasonalData | null => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
 
   const insights: Insight[] = [];
-  const expenses = transactions.filter(
-    (t) => t.type === "Expense" && t.category !== "In-pocket"
-  );
+  const expenses = transactions.filter((t) => t.type === "Expense" && t.category !== "In-pocket");
 
   // Group by month
   const monthlyData: Record<string, number> = {};
@@ -308,12 +268,7 @@ export const generateBudgetForecastAlerts = (
   transactions: Transaction[],
   budgets: Record<string, number>
 ): any[] => {
-  if (
-    !transactions ||
-    transactions.length === 0 ||
-    !budgets ||
-    Object.keys(budgets).length === 0
-  ) {
+  if (!transactions || transactions.length === 0 || !budgets || Object.keys(budgets).length === 0) {
     return [];
   }
 
@@ -321,26 +276,19 @@ export const generateBudgetForecastAlerts = (
   const currentMonth = getMonthKey(new Date());
   const currentMonthExpenses = transactions.filter(
     (t) =>
-      t.type === "Expense" &&
-      t.category !== "In-pocket" &&
-      getMonthKey(t.date) === currentMonth
+      t.type === "Expense" && t.category !== "In-pocket" && getMonthKey(t.date) === currentMonth
   );
 
   // Group current month by category
   const categorySpending: Record<string, number> = {};
   currentMonthExpenses.forEach((t) => {
-    categorySpending[t.category] =
-      (categorySpending[t.category] || 0) + Math.abs(t.amount || 0);
+    categorySpending[t.category] = (categorySpending[t.category] || 0) + Math.abs(t.amount || 0);
   });
 
   // Get current day of month
   const today = new Date();
   const currentDay = today.getDate();
-  const daysInMonth = new Date(
-    today.getFullYear(),
-    today.getMonth() + 1,
-    0
-  ).getDate();
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const daysRemaining = daysInMonth - currentDay;
   const monthProgress = currentDay / daysInMonth;
 
@@ -398,9 +346,7 @@ export const generateComprehensiveInsights = (
 
   // Sort by priority
   const priorityOrder: Record<string, number> = { high: 1, medium: 2, low: 3 };
-  allInsights.sort(
-    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
-  );
+  allInsights.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
   return {
     all: allInsights,

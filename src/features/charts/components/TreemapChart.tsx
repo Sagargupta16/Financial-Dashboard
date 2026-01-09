@@ -1,7 +1,7 @@
-import { useRef, useEffect, useMemo, useState } from "react";
-import { select } from "d3-selection";
 import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
+import { select } from "d3-selection";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCurrency } from "../../../lib/formatters";
 import type { Transaction } from "../../../types";
 
@@ -11,11 +11,7 @@ interface TreemapChartProps {
 }
 
 // Helper function to add text line to treemap labels
-const appendTextLine = (
-  textElement: any,
-  line: string,
-  index: number
-): void => {
+const appendTextLine = (textElement: any, line: string, index: number): void => {
   textElement
     .append("tspan")
     .attr("x", 4)
@@ -56,10 +52,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
       return false;
     });
@@ -112,17 +105,14 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
 
       timeFilteredData.forEach((item) => {
         const category = item.category || "Other";
-        categoryTotals[category] =
-          (categoryTotals[category] || 0) + item.amount;
+        categoryTotals[category] = (categoryTotals[category] || 0) + item.amount;
       });
 
-      const children = Object.entries(categoryTotals).map(
-        ([category, amount]) => ({
-          name: category,
-          value: amount,
-          category: category,
-        })
-      );
+      const children = Object.entries(categoryTotals).map(([category, amount]) => ({
+        name: category,
+        value: amount,
+        category: category,
+      }));
 
       return { name: "root", children };
     }
@@ -221,8 +211,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
     if (viewMode === "month") {
       return (
         currentYear < currentDate.getFullYear() ||
-        (currentYear === currentDate.getFullYear() &&
-          currentMonth < currentDate.getMonth() + 1)
+        (currentYear === currentDate.getFullYear() && currentMonth < currentDate.getMonth() + 1)
       );
     } else if (viewMode === "year") {
       return currentYear < currentDate.getFullYear();
@@ -231,28 +220,17 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
   };
 
   useEffect(() => {
-    if (
-      !svgRef.current ||
-      !treemapData.children ||
-      treemapData.children.length === 0
-    ) {
+    if (!svgRef.current || !treemapData.children || treemapData.children.length === 0) {
       return;
     }
 
     // Helper function to format display name based on length
     const getDisplayName = (name: string, maxLength: number): string => {
-      return name.length > maxLength
-        ? `${name.substring(0, maxLength - 3)}...`
-        : name;
+      return name.length > maxLength ? `${name.substring(0, maxLength - 3)}...` : name;
     };
 
     // Helper function to add text labels to rectangles
-    const addTextLabels = (
-      text: any,
-      d: any,
-      rectWidth: number,
-      rectHeight: number
-    ): void => {
+    const addTextLabels = (text: any, d: any, rectWidth: number, rectHeight: number): void => {
       if (rectWidth < 50 || rectHeight < 30) {
         return; // Don't add text for very small rectangles
       }
@@ -312,9 +290,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .style("max-width", "100%")
         .style("max-height", "100%");
 
-      const g = svg
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
       // Create tooltip
       const tooltip = select("body")
@@ -358,10 +334,8 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
             ${((d.data.value / root.value) * 100).toFixed(1)}% of total
           `);
         })
-        .on("mousemove", function (event: any) {
-          tooltip
-            .style("top", event.pageY - 10 + "px")
-            .style("left", event.pageX + 10 + "px");
+        .on("mousemove", (event: any) => {
+          tooltip.style("top", event.pageY - 10 + "px").style("left", event.pageX + 10 + "px");
         })
         .on("mouseout", function (this: SVGRectElement) {
           select(this).attr("opacity", 0.8);
@@ -433,9 +407,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
   return (
     <div className="lg:col-span-2 bg-gray-800 p-6 rounded-2xl shadow-lg h-[600px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Expense Breakdown Treemap
-        </h3>
+        <h3 className="text-xl font-semibold text-white">Expense Breakdown Treemap</h3>
         <button
           onClick={() => {
             if (chartRef?.current) {
@@ -446,8 +418,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
               const fileName = `expense-treemap-${viewMode}-${currentYear}`;
-              const monthSuffix =
-                viewMode === "month" ? `-${currentMonth}` : "";
+              const monthSuffix = viewMode === "month" ? `-${currentMonth}` : "";
               link.download = fileName + monthSuffix + ".svg";
               link.href = url;
               link.click();
@@ -545,9 +516,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
           </button>
         </div>
 
-        <div className="text-xs text-gray-400">
-          {timeFilteredData.length} expenses
-        </div>
+        <div className="text-xs text-gray-400">{timeFilteredData.length} expenses</div>
       </div>
 
       {/* Treemap Container */}
@@ -568,9 +537,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
       </div>
 
       <div className="mt-2 text-xs text-gray-600">
-        <p className="mb-1">
-          Rectangle size = expense amount. Hover for details.
-        </p>
+        <p className="mb-1">Rectangle size = expense amount. Hover for details.</p>
         <div className="text-xs text-gray-500">
           {showSubcategories
             ? "Showing subcategories within main categories"

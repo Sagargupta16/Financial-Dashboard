@@ -1,19 +1,19 @@
 /* eslint-disable max-lines-per-function */
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BUDGET_ALLOCATION_DEFAULTS, NWS_COLORS } from "../../../constants";
+import { filterByType } from "../../../lib/data";
+import { parseAmount } from "../../../lib/parsers";
+import type { Transaction } from "../../../types";
 import {
   calculateNWSBreakdown,
   calculateNWSPercentages,
   compareWithIdealAllocation,
-  generateNWSInsights,
   formatCurrency,
   formatPercentage,
+  generateNWSInsights,
   loadAllocation,
   saveAllocation,
 } from "../utils/needsWantsSavingsUtils";
-import { NWS_COLORS, BUDGET_ALLOCATION_DEFAULTS } from "../../../constants";
-import { parseAmount } from "../../../lib/parsers";
-import { filterByType } from "../../../lib/data";
-import type { Transaction } from "../../../types";
 
 type AllocationKey = "needs" | "wants" | "savings";
 type Allocation = Record<AllocationKey, number>;
@@ -31,9 +31,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
     BUDGET_ALLOCATION_DEFAULTS as Allocation
   );
   const [editMode, setEditMode] = useState(false);
-  const [tempAllocation, setTempAllocation] = useState(
-    BUDGET_ALLOCATION_DEFAULTS as Allocation
-  );
+  const [tempAllocation, setTempAllocation] = useState(BUDGET_ALLOCATION_DEFAULTS as Allocation);
 
   // Load saved allocation on mount
   useEffect(() => {
@@ -45,10 +43,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
   // Calculate total income
   const totalIncome = useMemo(() => {
     const incomeTransactions = filterByType(transactions, "Income");
-    return incomeTransactions.reduce(
-      (sum: number, t: any) => sum + parseAmount(t),
-      0
-    );
+    return incomeTransactions.reduce((sum: number, t: any) => sum + parseAmount(t), 0);
   }, [transactions]);
 
   // Calculate breakdown
@@ -81,8 +76,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
 
   const saveAllocationChanges = () => {
     // Validate that total equals 100
-    const total =
-      tempAllocation.needs + tempAllocation.wants + tempAllocation.savings;
+    const total = tempAllocation.needs + tempAllocation.wants + tempAllocation.savings;
 
     if (Math.abs(total - 100) > 0.1) {
       alert("Total allocation must equal 100%");
@@ -147,12 +141,8 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-2xl font-bold text-white">
-            50/30/20 Budget Breakdown
-          </h3>
-          <p className="text-gray-400 mt-1">
-            Track your spending across Needs, Wants, and Savings
-          </p>
+          <h3 className="text-2xl font-bold text-white">50/30/20 Budget Breakdown</h3>
+          <p className="text-gray-400 mt-1">Track your spending across Needs, Wants, and Savings</p>
         </div>
         <div className="flex gap-2">
           {editMode ? (
@@ -207,17 +197,13 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{icon}</span>
                   <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {label}
-                    </h4>
+                    <h4 className="text-lg font-semibold text-white">{label}</h4>
                     {editMode ? (
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="number"
                           value={tempAllocation[key]}
-                          onChange={(e) =>
-                            handleAllocationChange(key, e.target.value)
-                          }
+                          onChange={(e) => handleAllocationChange(key, e.target.value)}
                           className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                           min="0"
                           max="100"
@@ -226,9 +212,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                         <span className="text-gray-400 text-sm">%</span>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-400">
-                        Target: {customAllocation[key]}%
-                      </p>
+                      <p className="text-sm text-gray-400">Target: {customAllocation[key]}%</p>
                     )}
                   </div>
                 </div>
@@ -245,15 +229,10 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                   {formatCurrency(percentage?.amount || 0)}
                 </div>
                 <div className="text-sm text-gray-400 mt-1">
-                  {formatPercentage((percentage?.percentage || 0) / 100)} of
-                  total spending
+                  {formatPercentage((percentage?.percentage || 0) / 100)} of total spending
                   {percentage?.percentageOfIncome && (
                     <span className="ml-2">
-                      •{" "}
-                      {formatPercentage(
-                        (percentage.percentageOfIncome || 0) / 100
-                      )}{" "}
-                      of income
+                      • {formatPercentage((percentage.percentageOfIncome || 0) / 100)} of income
                     </span>
                   )}
                 </div>
@@ -264,8 +243,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                 <div className="flex justify-between text-xs text-gray-400">
                   <span>Actual</span>
                   <span>
-                    {formatCurrency(data?.amount || 0)} /{" "}
-                    {formatCurrency(data?.idealAmount || 0)}
+                    {formatCurrency(data?.amount || 0)} / {formatCurrency(data?.idealAmount || 0)}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -288,9 +266,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
 
       {/* Visual Breakdown */}
       <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-        <h4 className="text-lg font-semibold text-white mb-4">
-          Spending Distribution
-        </h4>
+        <h4 className="text-lg font-semibold text-white mb-4">Spending Distribution</h4>
 
         {/* Stacked Progress Bar */}
         <div className="mb-6">
@@ -317,13 +293,9 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
             {categories.map(({ key, label, icon, color }) => (
               <div key={key} className="flex items-center gap-2">
                 <span>{icon}</span>
-                <div
-                  className="w-4 h-4 rounded"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
                 <span className="text-sm text-gray-300">
-                  {label}:{" "}
-                  {formatPercentage((percentages[key]?.percentage || 0) / 100)}
+                  {label}: {formatPercentage((percentages[key]?.percentage || 0) / 100)}
                 </span>
               </div>
             ))}
@@ -364,13 +336,11 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
 
               const colorMap = {
                 success: "text-green-400 bg-green-900/20 border-green-500/30",
-                warning:
-                  "text-yellow-400 bg-yellow-900/20 border-yellow-500/30",
+                warning: "text-yellow-400 bg-yellow-900/20 border-yellow-500/30",
                 critical: "text-red-400 bg-red-900/20 border-red-500/30",
               };
 
-              const insightType: InsightLevel =
-                (insight?.type as InsightLevel) ?? "success";
+              const insightType: InsightLevel = (insight?.type as InsightLevel) ?? "success";
 
               return (
                 <div
@@ -390,18 +360,11 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
 
       {/* Category Details */}
       <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-        <h4 className="text-lg font-semibold text-white mb-4">
-          Category Breakdown
-        </h4>
+        <h4 className="text-lg font-semibold text-white mb-4">Category Breakdown</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map(({ key, label, icon }) => {
-            const details = (breakdown?.categoryDetails?.[key] ?? {}) as Record<
-              string,
-              number
-            >;
-            const sortedCategories = Object.entries(details).sort(
-              ([, a], [, b]) => b - a
-            );
+            const details = (breakdown?.categoryDetails?.[key] ?? {}) as Record<string, number>;
+            const sortedCategories = Object.entries(details).sort(([, a], [, b]) => b - a);
 
             return (
               <div key={key}>
@@ -412,13 +375,8 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                 <div className="space-y-2">
                   {sortedCategories.length > 0 ? (
                     sortedCategories.slice(0, 5).map(([category, amount]) => (
-                      <div
-                        key={category}
-                        className="flex justify-between items-center text-sm"
-                      >
-                        <span className="text-gray-400 truncate">
-                          {category}
-                        </span>
+                      <div key={category} className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400 truncate">{category}</span>
                         <span className="text-white font-medium">
                           {formatCurrency(Number(amount) || 0, false)}
                         </span>

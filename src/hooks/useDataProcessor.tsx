@@ -1,14 +1,9 @@
 // @ts-nocheck
-import { useState, useEffect, useMemo } from "react";
-import { parseCurrency, parseDate } from "../lib/parsers";
-import logger from "../utils/logger";
+import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
-import type {
-  Transaction,
-  UniqueValues,
-  DataFilters,
-  SortConfig,
-} from "../types";
+import { parseCurrency, parseDate } from "../lib/parsers";
+import type { DataFilters, SortConfig, Transaction, UniqueValues } from "../types";
+import logger from "../utils/logger";
 
 // Helper function: Parse CSV/TSV row handling quoted fields
 const parseCsvRow = (row) => {
@@ -51,9 +46,7 @@ const convertExcelSerialDate = (excelDate, index) => {
   const days = Math.floor(excelDate);
   const timeFraction = excelDate - days;
 
-  const date = new Date(
-    excelEpoch.getTime() + (days - 2) * 24 * 60 * 60 * 1000
-  );
+  const date = new Date(excelEpoch.getTime() + (days - 2) * 24 * 60 * 60 * 1000);
 
   const hours = Math.floor(timeFraction * 24);
   const minutes = Math.floor((timeFraction * 24 - hours) * 60);
@@ -61,9 +54,7 @@ const convertExcelSerialDate = (excelDate, index) => {
 
   date.setHours(hours, minutes, seconds);
 
-  const dateStr = `${date.getDate().toString().padStart(2, "0")}/${(
-    date.getMonth() + 1
-  )
+  const dateStr = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
     .toString()
     .padStart(2, "0")}/${date.getFullYear()}`;
   const timeStr = `${hours.toString().padStart(2, "0")}:${minutes
@@ -82,9 +73,7 @@ const convertExcelSerialDate = (excelDate, index) => {
 // Helper function: Convert Date object to date/time strings
 const convertDateObject = (date, index) => {
   logger.debug(`Row ${index} is Date object`);
-  const dateStr = `${date.getDate().toString().padStart(2, "0")}/${(
-    date.getMonth() + 1
-  )
+  const dateStr = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
     .toString()
     .padStart(2, "0")}/${date.getFullYear()}`;
   const timeStr = `${date.getHours().toString().padStart(2, "0")}:${date
@@ -183,10 +172,7 @@ const createOldFormatItem = (row, index) => {
 
 // Helper function: Validate parsed item
 const isValidItem = (item) => {
-  const isValid =
-    item?.date &&
-    item?.type &&
-    (item.type.includes("Transfer") || item.amount > 0);
+  const isValid = item?.date && item?.type && (item.type.includes("Transfer") || item.amount > 0);
 
   logger.debug("Filter check for item:", item, "isValid:", isValid);
   return isValid;
@@ -194,9 +180,7 @@ const isValidItem = (item) => {
 
 // Helper function: Detect Excel data format
 const detectExcelFormat = (header) => {
-  const hasPeriod = header.some(
-    (h) => h?.includes("period") || h?.includes("date")
-  );
+  const hasPeriod = header.some((h) => h?.includes("period") || h?.includes("date"));
   const hasTime = header.some((h) => h?.includes("time"));
   const hasAccounts = header.some((h) => h?.includes("account"));
   const hasCategory = header.some((h) => h?.includes("category"));
@@ -219,17 +203,12 @@ const processExcelRow = (row, index, isNewFormat) => {
 
   // Skip rows with insufficient columns
   if (!row || row.length < 7) {
-    logger.debug(
-      `Skipping row ${index} due to insufficient columns:`,
-      row?.length
-    );
+    logger.debug(`Skipping row ${index} due to insufficient columns:`, row?.length);
     return null;
   }
 
   // Create item based on format
-  const item = isNewFormat
-    ? createNewFormatItem(row, index)
-    : createOldFormatItem(row, index);
+  const item = isNewFormat ? createNewFormatItem(row, index) : createOldFormatItem(row, index);
 
   return item;
 };
@@ -244,9 +223,7 @@ export const useDataProcessor = (initialCsvData) => {
       const lines = csvText.trim().split("\n");
       const header = lines[0].toLowerCase();
       const isNewFormat =
-        header.includes("period") &&
-        header.includes("accounts") &&
-        header.includes("category");
+        header.includes("period") && header.includes("accounts") && header.includes("category");
 
       const rows = lines.slice(1);
 
@@ -272,9 +249,7 @@ export const useDataProcessor = (initialCsvData) => {
       setError(null);
     } catch (e) {
       logger.error("Failed to parse CSV data:", e);
-      setError(
-        "Could not parse the financial data. Please check the file format."
-      );
+      setError("Could not parse the financial data. Please check the file format.");
     } finally {
       setLoading(false);
     }
@@ -301,15 +276,12 @@ export const useDataProcessor = (initialCsvData) => {
 
       if (!jsonData || jsonData.length === 0) {
         logger.error("No data found in Excel file");
-        setError(
-          "No data found in the Excel file. Please check the file format."
-        );
+        setError("No data found in the Excel file. Please check the file format.");
         return;
       }
 
       // Check header to determine format
-      const header =
-        jsonData[0]?.map((h) => h?.toString().toLowerCase().trim()) || [];
+      const header = jsonData[0]?.map((h) => h?.toString().toLowerCase().trim()) || [];
       logger.debug("Processed header:", header);
 
       const isNewFormat = detectExcelFormat(header);
@@ -411,9 +383,7 @@ export const useFilteredData = (
       .filter((item) => {
         const searchTermLower = filters.searchTerm.toLowerCase();
         const itemDate = item.date;
-        const startDate = filters.startDate
-          ? new Date(filters.startDate)
-          : null;
+        const startDate = filters.startDate ? new Date(filters.startDate) : null;
         const endDate = filters.endDate ? new Date(filters.endDate) : null;
         if (startDate) {
           startDate.setHours(0, 0, 0, 0);

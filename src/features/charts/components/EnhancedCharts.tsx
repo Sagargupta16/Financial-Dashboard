@@ -1,15 +1,15 @@
-import React from "react";
 import type { Chart as ChartJS } from "chart.js";
+import React from "react";
 import { Bar } from "react-chartjs-2";
-import { truncateLabel } from "../../../lib/formatters";
-import { commonChartOptions } from "./ChartConfig";
 import {
   ChartContainer,
   ExportButton,
   TimeNavigationControls,
 } from "../../../components/data-display/ChartUIComponents";
-import { useTimeNavigation } from "../hooks/useChartHooks";
+import { truncateLabel } from "../../../lib/formatters";
 import type { Transaction } from "../../../types";
+import { useTimeNavigation } from "../hooks/useChartHooks";
+import { commonChartOptions } from "./ChartConfig";
 
 interface EnhancedChartProps {
   filteredData: Transaction[];
@@ -54,14 +54,11 @@ export const EnhancedTopExpenseCategoriesChart = ({
   type ExpenseRow = { amount?: number; category?: string; type?: string };
 
   const chartData = React.useMemo(() => {
-    const expenses = timeFilteredData.reduce<Record<string, number>>(
-      (acc, item: ExpenseRow) => {
-        const key = String(item.category ?? "Uncategorized");
-        acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
-        return acc;
-      },
-      {}
-    );
+    const expenses = timeFilteredData.reduce<Record<string, number>>((acc, item: ExpenseRow) => {
+      const key = String(item.category ?? "Uncategorized");
+      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
+      return acc;
+    }, {});
 
     const sorted = Object.entries(expenses)
       .sort(([, a], [, b]) => b - a)
@@ -107,9 +104,7 @@ export const EnhancedTopExpenseCategoriesChart = ({
         }.png`}
       />
 
-      <div className="text-sm text-gray-400 mb-4">
-        {timeFilteredData.length} expenses
-      </div>
+      <div className="text-sm text-gray-400 mb-4">{timeFilteredData.length} expenses</div>
 
       <div className="flex-grow">
         <Bar ref={chartRef} data={chartData} options={commonChartOptions} />
@@ -119,10 +114,7 @@ export const EnhancedTopExpenseCategoriesChart = ({
 };
 
 // Enhanced Top Income Sources Chart with time navigation
-export const EnhancedTopIncomeSourcesChart = ({
-  filteredData,
-  chartRef,
-}: EnhancedChartProps) => {
+export const EnhancedTopIncomeSourcesChart = ({ filteredData, chartRef }: EnhancedChartProps) => {
   const {
     currentYear,
     currentMonth,
@@ -144,14 +136,11 @@ export const EnhancedTopIncomeSourcesChart = ({
   type IncomeRow = { amount?: number; category?: string; type?: string };
 
   const chartData = React.useMemo(() => {
-    const income = timeFilteredData.reduce<Record<string, number>>(
-      (acc, item: IncomeRow) => {
-        const key = String(item.category ?? "Uncategorized");
-        acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
-        return acc;
-      },
-      {}
-    );
+    const income = timeFilteredData.reduce<Record<string, number>>((acc, item: IncomeRow) => {
+      const key = String(item.category ?? "Uncategorized");
+      acc[key] = (acc[key] || 0) + (Number(item.amount) || 0);
+      return acc;
+    }, {});
 
     const sorted = Object.entries(income)
       .sort(([, a], [, b]) => b - a)
@@ -197,9 +186,7 @@ export const EnhancedTopIncomeSourcesChart = ({
         }.png`}
       />
 
-      <div className="text-sm text-gray-400 mb-4">
-        {timeFilteredData.length} income entries
-      </div>
+      <div className="text-sm text-gray-400 mb-4">{timeFilteredData.length} income entries</div>
 
       <div className="flex-grow">
         <Bar ref={chartRef} data={chartData} options={commonChartOptions} />

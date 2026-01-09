@@ -47,10 +47,7 @@ export const calculateDailyAverage = (total: number, days: number): number => {
  * - partial month data: extrapolates to full month
  * - NaN inputs: returns 0
  */
-export const calculateMonthlyAverage = (
-  total: number,
-  days: number
-): number => {
+export const calculateMonthlyAverage = (total: number, days: number): number => {
   if (days === 0 || Number.isNaN(total) || Number.isNaN(days)) {
     return 0;
   }
@@ -72,10 +69,7 @@ export const calculateMonthlyAverage = (
  * - count = 0: returns 0
  * - NaN inputs: returns 0
  */
-export const calculateAveragePerTransaction = (
-  total: number,
-  count: number
-): number => {
+export const calculateAveragePerTransaction = (total: number, count: number): number => {
   if (count === 0 || Number.isNaN(total) || Number.isNaN(count)) {
     return 0;
   }

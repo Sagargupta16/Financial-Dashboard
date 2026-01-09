@@ -101,14 +101,7 @@ export const useChartData = (
       datasets: [
         {
           data: sorted.map(([, a]) => a),
-          backgroundColor: [
-            "#3b82f6",
-            "#8b5cf6",
-            "#ec4899",
-            "#f97316",
-            "#eab308",
-            "#6b7280",
-          ],
+          backgroundColor: ["#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#6b7280"],
           borderColor: "#1f2937",
           borderWidth: 4,
         },
@@ -117,30 +110,29 @@ export const useChartData = (
   }, [filteredData]);
 
   const lineChartData = useMemo(() => {
-    const monthly = filteredData.reduce<
-      Record<string, { income: number; expense: number }>
-    >((acc, item) => {
-      if (item.category === "In-pocket") {
+    const monthly = filteredData.reduce<Record<string, { income: number; expense: number }>>(
+      (acc, item) => {
+        if (item.category === "In-pocket") {
+          return acc;
+        }
+        const date = toDate(item.date);
+        if (!date) {
+          return acc;
+        }
+        const month = date.toISOString().slice(0, 7);
+        if (!acc[month]) {
+          acc[month] = { income: 0, expense: 0 };
+        }
+        if (item.type === "Income") {
+          acc[month].income += Number(item.amount) || 0;
+        } else if (item.type === "Expense") {
+          acc[month].expense += Number(item.amount) || 0;
+        }
         return acc;
-      }
-      const date = toDate(item.date);
-      if (!date) {
-        return acc;
-      }
-      const month = date.toISOString().slice(0, 7);
-      if (!acc[month]) {
-        acc[month] = { income: 0, expense: 0 };
-      }
-      if (item.type === "Income") {
-        acc[month].income += Number(item.amount) || 0;
-      } else if (item.type === "Expense") {
-        acc[month].expense += Number(item.amount) || 0;
-      }
-      return acc;
-    }, {});
-    const sortedMonths = Object.keys(monthly).sort((a, b) =>
-      a.localeCompare(b)
+      },
+      {}
     );
+    const sortedMonths = Object.keys(monthly).sort((a, b) => a.localeCompare(b));
 
     // Convert YYYY-MM format to readable month labels
     const formatMonthLabel = (monthString: string) => {
@@ -215,9 +207,7 @@ export const useChartData = (
       return { labels: [], datasets: [] };
     }
     const spending = filteredData
-      .filter(
-        (item) => item.type === "Expense" && item.category === drilldownCategory
-      )
+      .filter((item) => item.type === "Expense" && item.category === drilldownCategory)
       .reduce<Record<string, number>>((acc, item) => {
         const sub = String(item.subcategory ?? "Uncategorized");
         acc[sub] = (acc[sub] || 0) + (Number(item.amount) || 0);

@@ -9,10 +9,7 @@
  * @param window - Window size
  * @returns Moving averages
  */
-export const calculateMovingAverage = (
-  data: number[],
-  window = 3
-): number[] => {
+export const calculateMovingAverage = (data: number[], window = 3): number[] => {
   if (!data || data.length < window) {
     return [];
   }
@@ -37,11 +34,7 @@ interface SmoothingResult {
  * @param periods - Number of periods to forecast
  * @returns Forecast data with smoothed values
  */
-export const exponentialSmoothing = (
-  data: number[],
-  alpha = 0.3,
-  periods = 6
-): SmoothingResult => {
+export const exponentialSmoothing = (data: number[], alpha = 0.3, periods = 6): SmoothingResult => {
   if (!data || data.length === 0) {
     return { smoothed: [], forecast: [] };
   }
@@ -92,10 +85,8 @@ export const doubleExponentialSmoothing = (
   const smoothed = [data[0]];
 
   for (let i = 1; i < data.length; i++) {
-    const newLevel =
-      alpha * data[i] + (1 - alpha) * (level[i - 1] + trend[i - 1]);
-    const newTrend =
-      beta * (newLevel - level[i - 1]) + (1 - beta) * trend[i - 1];
+    const newLevel = alpha * data[i] + (1 - alpha) * (level[i - 1] + trend[i - 1]);
+    const newTrend = beta * (newLevel - level[i - 1]) + (1 - beta) * trend[i - 1];
 
     level.push(newLevel);
     trend.push(newTrend);
@@ -143,11 +134,8 @@ export const linearRegression = (data: number[]): LinearRegressionResult => {
 
   // Calculate R² (coefficient of determination)
   const yMean = sumY / n;
-  const ssTotal = data.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
-  const ssResidual = data.reduce(
-    (sum, y, i) => sum + Math.pow(y - (slope * i + intercept), 2),
-    0
-  );
+  const ssTotal = data.reduce((sum, y) => sum + (y - yMean) ** 2, 0);
+  const ssResidual = data.reduce((sum, y, i) => sum + (y - (slope * i + intercept)) ** 2, 0);
   const r2 = ssTotal > 0 ? 1 - ssResidual / ssTotal : 0;
 
   return { slope, intercept, r2: Math.max(0, Math.min(1, r2)) };
@@ -166,9 +154,7 @@ interface SeasonalityResult {
  * @param monthlyData - Data grouped by month (e.g., "2024-01": value)
  * @returns Seasonal indices and analysis
  */
-export const detectSeasonality = (
-  monthlyData: Record<string, number>
-): SeasonalityResult => {
+export const detectSeasonality = (monthlyData: Record<string, number>): SeasonalityResult => {
   if (!monthlyData || Object.keys(monthlyData).length < 12) {
     return { hasSeasonality: false, indices: {}, strength: 0 };
   }
@@ -186,13 +172,11 @@ export const detectSeasonality = (
   // Calculate average for each month
   const monthlyAverages: Record<number, number> = {};
   Object.entries(monthGroups).forEach(([month, values]) => {
-    monthlyAverages[Number(month)] =
-      values.reduce((a, b) => a + b, 0) / values.length;
+    monthlyAverages[Number(month)] = values.reduce((a, b) => a + b, 0) / values.length;
   });
 
   // Calculate overall average
-  const overallAverage =
-    Object.values(monthlyAverages).reduce((a, b) => a + b, 0) / 12;
+  const overallAverage = Object.values(monthlyAverages).reduce((a, b) => a + b, 0) / 12;
 
   // Calculate seasonal indices (month average / overall average)
   const indices: Record<string, number> = {};
@@ -203,9 +187,7 @@ export const detectSeasonality = (
   // Calculate seasonality strength (coefficient of variation)
   const values = Object.values(indices);
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance =
-    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    values.length;
+  const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
   const stdDev = Math.sqrt(variance);
   const strength = mean > 0 ? stdDev / mean : 0;
 
@@ -300,11 +282,9 @@ export const calculateConfidenceIntervals = (
   }
 
   // Calculate standard deviation of historical data
-  const mean =
-    historicalData.reduce((a, b) => a + b, 0) / historicalData.length;
+  const mean = historicalData.reduce((a, b) => a + b, 0) / historicalData.length;
   const variance =
-    historicalData.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    (historicalData.length - 1);
+    historicalData.reduce((sum, val) => sum + (val - mean) ** 2, 0) / (historicalData.length - 1);
   const stdDev = Math.sqrt(variance);
 
   // Z-score for confidence level (1.96 for 95%)
@@ -317,14 +297,12 @@ export const calculateConfidenceIntervals = (
 
   // Calculate margin of error (increases with forecast horizon)
   const upper = forecastData.map((value, index) => {
-    const margin =
-      stdDev * zScore * Math.sqrt(1 + (index + 1) / historicalData.length);
+    const margin = stdDev * zScore * Math.sqrt(1 + (index + 1) / historicalData.length);
     return value + margin;
   });
 
   const lower = forecastData.map((value, index) => {
-    const margin =
-      stdDev * zScore * Math.sqrt(1 + (index + 1) / historicalData.length);
+    const margin = stdDev * zScore * Math.sqrt(1 + (index + 1) / historicalData.length);
     return Math.max(0, value - margin);
   });
 
@@ -349,8 +327,7 @@ export const calculateVolatility = (data: number[]): VolatilityResult => {
   }
 
   const mean = data.reduce((a, b) => a + b, 0) / data.length;
-  const variance =
-    data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
+  const variance = data.reduce((sum, val) => sum + (val - mean) ** 2, 0) / data.length;
   const stdDev = Math.sqrt(variance);
 
   // Coefficient of variation
@@ -411,23 +388,14 @@ export const comprehensiveForecast = (
 
   // Calculate all forecast methods
   const simpleAverage =
-    dataToUse.slice(-6).reduce((a, b) => a + b, 0) /
-    Math.min(6, dataToUse.length);
+    dataToUse.slice(-6).reduce((a, b) => a + b, 0) / Math.min(6, dataToUse.length);
   const expSmooth = exponentialSmoothing(dataToUse, 0.3, periods);
-  const doubleExpSmooth = doubleExponentialSmoothing(
-    dataToUse,
-    0.3,
-    0.1,
-    periods
-  );
+  const doubleExpSmooth = doubleExponentialSmoothing(dataToUse, 0.3, 0.1, periods);
   const regression = linearRegression(dataToUse);
 
   // Linear regression forecast
   const regressionForecast = Array.from({ length: periods }, (_, i) => {
-    return Math.max(
-      0,
-      regression.slope * (dataToUse.length + i) + regression.intercept
-    );
+    return Math.max(0, regression.slope * (dataToUse.length + i) + regression.intercept);
   });
 
   // Determine best method based on R² and volatility

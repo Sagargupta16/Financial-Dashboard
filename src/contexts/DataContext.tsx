@@ -1,11 +1,11 @@
 import {
   createContext,
-  useContext,
-  useState,
+  type ReactNode,
   useCallback,
-  useMemo,
+  useContext,
   useEffect,
-  ReactNode,
+  useMemo,
+  useState,
 } from "react";
 import { BUDGET_ALLOCATION_DEFAULTS } from "../constants";
 import type { Transaction } from "../types";
@@ -44,10 +44,7 @@ interface DataContextType {
   clearError: () => void;
   budgetPreferences: BudgetPreferences;
   updateBudgetAllocation: (allocation: BudgetAllocation) => void;
-  updateCustomCategories: (
-    type: keyof CustomCategories,
-    categories: string[]
-  ) => void;
+  updateCustomCategories: (type: keyof CustomCategories, categories: string[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -68,40 +65,35 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   const [error, setError] = useState<string | null>(null);
 
   // Budget preferences state
-  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(
-    () => {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
-        return saved
-          ? JSON.parse(saved)
-          : {
-              allocation: BUDGET_ALLOCATION_DEFAULTS,
-              customCategories: {
-                needs: [],
-                wants: [],
-                savings: [],
-              },
-            };
-      } catch {
-        return {
-          allocation: BUDGET_ALLOCATION_DEFAULTS,
-          customCategories: {
-            needs: [],
-            wants: [],
-            savings: [],
-          },
-        };
-      }
+  const [budgetPreferences, setBudgetPreferences] = useState<BudgetPreferences>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_PREFERENCES);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            allocation: BUDGET_ALLOCATION_DEFAULTS,
+            customCategories: {
+              needs: [],
+              wants: [],
+              savings: [],
+            },
+          };
+    } catch {
+      return {
+        allocation: BUDGET_ALLOCATION_DEFAULTS,
+        customCategories: {
+          needs: [],
+          wants: [],
+          savings: [],
+        },
+      };
     }
-  );
+  });
 
   // Save preferences to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(
-        STORAGE_KEY_PREFERENCES,
-        JSON.stringify(budgetPreferences)
-      );
+      localStorage.setItem(STORAGE_KEY_PREFERENCES, JSON.stringify(budgetPreferences));
     } catch (error) {
       console.error("Failed to save budget preferences:", error);
     }
@@ -111,12 +103,9 @@ export const DataProvider = ({ children }: DataProviderProps) => {
     setTransactions(newTransactions);
   }, []);
 
-  const updateDateRange = useCallback(
-    (start: Date | null, end: Date | null) => {
-      setDateRange({ start, end });
-    },
-    []
-  );
+  const updateDateRange = useCallback((start: Date | null, end: Date | null) => {
+    setDateRange({ start, end });
+  }, []);
 
   const clearError = useCallback(() => {
     setError(null);

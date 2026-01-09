@@ -6,14 +6,14 @@
 // @ts-nocheck
 
 import {
-  NEEDS_CATEGORIES,
-  WANTS_CATEGORIES,
-  SAVINGS_CATEGORIES,
   BUDGET_ALLOCATION_DEFAULTS,
+  NEEDS_CATEGORIES,
+  SAVINGS_CATEGORIES,
+  WANTS_CATEGORIES,
 } from "../../../constants";
-import { parseAmount } from "../../../lib/parsers";
 import { filterByType } from "../../../lib/data";
 import { getMonthKey } from "../../../lib/formatters";
+import { parseAmount } from "../../../lib/parsers";
 import logger from "../../../utils/logger";
 
 const STORAGE_KEY = "financial_dashboard_nws_allocation";
@@ -69,11 +69,7 @@ export const calculateNWSBreakdown = (transactions) => {
   };
 
   // Early return if no data
-  if (
-    !transactions ||
-    !Array.isArray(transactions) ||
-    transactions.length === 0
-  ) {
+  if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
     return result;
   }
 
@@ -145,11 +141,7 @@ export const calculateNWSBreakdown = (transactions) => {
 export const calculateMonthlyNWSBreakdown = (transactions) => {
   const monthlyData = {};
 
-  if (
-    !transactions ||
-    !Array.isArray(transactions) ||
-    transactions.length === 0
-  ) {
+  if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
     return monthlyData;
   }
 
@@ -228,11 +220,7 @@ export const calculateMonthlyNWSBreakdown = (transactions) => {
 export const calculateYearlyNWSBreakdown = (transactions) => {
   const yearlyData = {};
 
-  if (
-    !transactions ||
-    !Array.isArray(transactions) ||
-    transactions.length === 0
-  ) {
+  if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
     return yearlyData;
   }
 
@@ -348,10 +336,7 @@ export const calculateNWSPercentages = (breakdown: any, income?: number) => {
 /**
  * Compare actual spending vs. ideal 50/30/20 allocation
  */
-export const compareWithIdealAllocation = (
-  breakdown,
-  customAllocation?: any
-) => {
+export const compareWithIdealAllocation = (breakdown, customAllocation?: any) => {
   const allocation = customAllocation || BUDGET_ALLOCATION_DEFAULTS;
   const total = breakdown.needs + breakdown.wants + breakdown.savings;
 
@@ -370,9 +355,7 @@ export const compareWithIdealAllocation = (
   };
 
   const comparison: Record<string, any> = {};
-  for (const [key, idealPercent] of Object.entries(
-    allocation as Record<string, number>
-  )) {
+  for (const [key, idealPercent] of Object.entries(allocation as Record<string, number>)) {
     const actualPercent = (actualPercentages as any)[key] ?? 0;
     const difference = actualPercent - idealPercent;
 

@@ -4,11 +4,7 @@ import {
   calculateHealthScore,
   generateRecommendations,
 } from "../../features/budget/utils/budgetUtils";
-import {
-  getScoreColor,
-  getGradient,
-  prepareHealthData,
-} from "../../lib/analytics/healthScore";
+import { getGradient, getScoreColor, prepareHealthData } from "../../lib/analytics/healthScore";
 
 interface ScoreDisplayProps {
   score?: {
@@ -57,9 +53,7 @@ const ScoreDisplay = ({ score }: ScoreDisplayProps) => (
       </p>
       <p className="text-white/60 text-sm mt-1">out of 100</p>
       <div className="mt-4 pt-4 border-t border-white/20">
-        <p className="text-white text-xl font-bold">
-          Grade: {score?.grade || "N/A"}
-        </p>
+        <p className="text-white text-xl font-bold">Grade: {score?.grade || "N/A"}</p>
       </div>
     </div>
   </div>
@@ -119,23 +113,14 @@ export const FinancialHealthScore = ({
         calculateHealthScore,
         generateRecommendations,
       }),
-    [
-      filteredData,
-      kpiData,
-      accountBalances,
-      allAccountBalances,
-      investments,
-      deposits,
-    ]
+    [filteredData, kpiData, accountBalances, allAccountBalances, investments, deposits]
   );
 
   const { score, recommendations } = healthData;
 
   return (
     <div className="bg-gray-800/50 rounded-2xl p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">
-        🏆 Financial Health Score
-      </h2>
+      <h2 className="text-2xl font-bold text-white mb-6">🏆 Financial Health Score</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Score */}
@@ -146,9 +131,7 @@ export const FinancialHealthScore = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-700/50 rounded-lg p-4">
               <p className="text-gray-400 text-sm">Savings Rate</p>
-              <p className="text-2xl font-bold text-white mt-1">
-                {score?.savingsRate || 0}%
-              </p>
+              <p className="text-2xl font-bold text-white mt-1">{score?.savingsRate || 0}%</p>
               <div className="mt-2 h-2 bg-gray-600 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-blue-600 to-purple-600"
@@ -165,16 +148,8 @@ export const FinancialHealthScore = ({
                 {score?.monthsCovered || 0} months
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                ₹
-                {Number.parseInt(
-                  score?.emergencyFundAmount || 0,
-                  10
-                ).toLocaleString("en-IN")}{" "}
-                / ₹
-                {Number.parseInt(
-                  score?.averageMonthlyExpenses || 0,
-                  10
-                ).toLocaleString("en-IN")}
+                ₹{Number.parseInt(score?.emergencyFundAmount || 0, 10).toLocaleString("en-IN")} / ₹
+                {Number.parseInt(score?.averageMonthlyExpenses || 0, 10).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-500 text-xs">Cash / Avg Monthly</p>
               <div className="mt-2 h-2 bg-gray-600 rounded-full overflow-hidden">
@@ -193,11 +168,7 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Liquid Assets</p>
               <p className="text-xl font-bold text-green-400 mt-1">
-                ₹
-                {Number.parseInt(
-                  score?.totalLiquidAssets || 0,
-                  10
-                ).toLocaleString("en-IN")}
+                ₹{Number.parseInt(score?.totalLiquidAssets || 0, 10).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">Bank</p>
             </div>
@@ -205,11 +176,7 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Investments</p>
               <p className="text-xl font-bold text-blue-400 mt-1">
-                ₹
-                {Number.parseInt(
-                  score?.totalInvestments || 0,
-                  10
-                ).toLocaleString("en-IN")}
+                ₹{Number.parseInt(score?.totalInvestments || 0, 10).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">MF, Stocks</p>
             </div>
@@ -217,10 +184,7 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Deposits</p>
               <p className="text-xl font-bold text-purple-400 mt-1">
-                ₹
-                {Number.parseInt(score?.totalDeposits || 0, 10).toLocaleString(
-                  "en-IN"
-                )}
+                ₹{Number.parseInt(score?.totalDeposits || 0, 10).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">FD, Loans</p>
             </div>
@@ -228,14 +192,10 @@ export const FinancialHealthScore = ({
             <div className="bg-gray-700/50 rounded-lg p-3">
               <p className="text-gray-400 text-xs">Debt</p>
               <p className="text-xl font-bold text-red-400 mt-1">
-                ₹
-                {Number.parseInt(score?.totalDebt || 0, 10).toLocaleString(
-                  "en-IN"
-                )}
+                ₹{Number.parseInt(score?.totalDebt || 0, 10).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                {Number.parseFloat(score?.debtToIncomeRatio || 0).toFixed(1)}%
-                of income
+                {Number.parseFloat(score?.debtToIncomeRatio || 0).toFixed(1)}% of income
               </p>
             </div>
           </div>
@@ -246,41 +206,39 @@ export const FinancialHealthScore = ({
             <div className="space-y-3">
               {score?.metrics &&
                 Object.entries(score.metrics).map(([key, value]) => {
-                  const metricInfo: Record<
-                    string,
-                    { max: number; label: string; detail: string }
-                  > = {
-                    savingsRate: {
-                      max: 25,
-                      label: "Savings Rate",
-                      detail: `${score?.savingsRate || 0}%`,
-                    },
-                    consistency: {
-                      max: 15,
-                      label: "Spending Consistency",
-                      detail: "Moderate",
-                    },
-                    emergencyFund: {
-                      max: 25,
-                      label: "Emergency Fund",
-                      detail: `${score?.monthsCovered || 0} months`,
-                    },
-                    ratio: {
-                      max: 15,
-                      label: "Income/Expense Ratio",
-                      detail: `${score?.details?.ratio?.toFixed(2) || 1}x`,
-                    },
-                    categoryBalance: {
-                      max: 10,
-                      label: "Category Balance",
-                      detail: "Diversified",
-                    },
-                    debtManagement: {
-                      max: 10,
-                      label: "Debt Management",
-                      detail: `${score?.debtToIncomeRatio || 0}% DTI`,
-                    },
-                  };
+                  const metricInfo: Record<string, { max: number; label: string; detail: string }> =
+                    {
+                      savingsRate: {
+                        max: 25,
+                        label: "Savings Rate",
+                        detail: `${score?.savingsRate || 0}%`,
+                      },
+                      consistency: {
+                        max: 15,
+                        label: "Spending Consistency",
+                        detail: "Moderate",
+                      },
+                      emergencyFund: {
+                        max: 25,
+                        label: "Emergency Fund",
+                        detail: `${score?.monthsCovered || 0} months`,
+                      },
+                      ratio: {
+                        max: 15,
+                        label: "Income/Expense Ratio",
+                        detail: `${score?.details?.ratio?.toFixed(2) || 1}x`,
+                      },
+                      categoryBalance: {
+                        max: 10,
+                        label: "Category Balance",
+                        detail: "Diversified",
+                      },
+                      debtManagement: {
+                        max: 10,
+                        label: "Debt Management",
+                        detail: `${score?.debtToIncomeRatio || 0}% DTI`,
+                      },
+                    };
 
                   const info = metricInfo[key] || {
                     max: 10,
@@ -302,9 +260,7 @@ export const FinancialHealthScore = ({
                   return (
                     <div key={key}>
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-gray-300 text-sm font-medium">
-                          {info.label}
-                        </p>
+                        <p className="text-gray-300 text-sm font-medium">{info.label}</p>
                         <div className="flex items-center gap-2">
                           <p className="text-gray-400 text-xs">{info.detail}</p>
                           <p className="text-white text-sm font-semibold">
@@ -329,19 +285,15 @@ export const FinancialHealthScore = ({
       {/* Recommendations */}
       {recommendations.length > 0 && (
         <div className="mt-6 pt-6 border-t border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            💡 Recommendations
-          </h3>
+          <h3 className="text-lg font-semibold text-white mb-4">💡 Recommendations</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendations.map(
-              (rec: RecommendationCardProps["rec"], index: number) => (
-                <RecommendationCard
-                  key={`${rec.type}-${rec.category}-${index}`}
-                  rec={rec}
-                  index={index}
-                />
-              )
-            )}
+            {recommendations.map((rec: RecommendationCardProps["rec"], index: number) => (
+              <RecommendationCard
+                key={`${rec.type}-${rec.category}-${index}`}
+                rec={rec}
+                index={index}
+              />
+            ))}
           </div>
         </div>
       )}

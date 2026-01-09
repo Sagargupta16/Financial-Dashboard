@@ -5,9 +5,9 @@
  */
 
 import {
-  calculateDateRange as canonicalDateRange,
-  calculateDailyAverage as canonicalDailyAverage,
   calculateAveragePerTransaction as canonicalAveragePerTransaction,
+  calculateDailyAverage as canonicalDailyAverage,
+  calculateDateRange as canonicalDateRange,
   calculatePercentage as canonicalPercentage,
 } from "./index";
 
@@ -42,11 +42,7 @@ export const formatNumber = (number, decimals = 2) =>
 /**
  * Calculate savings potential with percentage
  */
-export const calculateSavingsPotential = (
-  total,
-  totalDays,
-  reductionPercentage
-) => {
+export const calculateSavingsPotential = (total, totalDays, reductionPercentage) => {
   const monthlyAmount = calculateMonthlyAverage(total, totalDays);
   const monthlySavings = monthlyAmount * reductionPercentage;
   const annualSavings = monthlySavings * 12;
@@ -106,10 +102,7 @@ export const calculateMetrics = (transactions, category = null) => {
   const expenseTransactions = filtered.filter((t) => t.type === "Expense");
   const dateRange = calculateDateRange(filtered);
 
-  const total = expenseTransactions.reduce(
-    (sum, t) => sum + Math.abs(t.amount || 0),
-    0
-  );
+  const total = expenseTransactions.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
   const count = expenseTransactions.length;
 
   return {
@@ -154,8 +147,7 @@ export const calculateMovingAverage = (values, window = 7) => {
   for (let i = 0; i < values.length; i++) {
     const start = Math.max(0, i - window + 1);
     const windowValues = values.slice(start, i + 1);
-    const average =
-      windowValues.reduce((sum, v) => sum + v, 0) / windowValues.length;
+    const average = windowValues.reduce((sum, v) => sum + v, 0) / windowValues.length;
     result.push(average);
   }
 
@@ -235,10 +227,7 @@ export const calculateMonthlyComparison = (transactions) => {
     const previousMonth = months[i - 1];
 
     if (byMonth[previousMonth] && byMonth[currentMonth]) {
-      const growth = calculateGrowthRate(
-        byMonth[currentMonth].total,
-        byMonth[previousMonth].total
-      );
+      const growth = calculateGrowthRate(byMonth[currentMonth].total, byMonth[previousMonth].total);
       growthRates.push(growth);
     }
   }
@@ -285,14 +274,12 @@ export const calculateCategoryBudgetStatus = (transactions, budgets = {}) => {
     .filter((t) => t.type === "Expense")
     .forEach((t) => {
       const cat = t.category || "Uncategorized";
-      categorySpending[cat] =
-        (categorySpending[cat] || 0) + Math.abs(t.amount || 0);
+      categorySpending[cat] = (categorySpending[cat] || 0) + Math.abs(t.amount || 0);
     });
 
   // If no budgets provided, create suggestions based on spending
   const allCategories = Object.keys(categorySpending);
-  const budgetCategories =
-    Object.keys(budgets).length > 0 ? Object.keys(budgets) : allCategories;
+  const budgetCategories = Object.keys(budgets).length > 0 ? Object.keys(budgets) : allCategories;
 
   return budgetCategories.map((category) => {
     const spent = categorySpending[category] || 0;
@@ -370,8 +357,7 @@ export const calculateCashFlowForecast = (transactions, forecastDays = 30) => {
     dailyIncome,
     dailyExpense,
     netDaily,
-    daysUntilZero:
-      netDaily < 0 ? Math.abs(currentBalance / netDaily) : Infinity,
+    daysUntilZero: netDaily < 0 ? Math.abs(currentBalance / netDaily) : Infinity,
     projection,
     status,
   };
@@ -425,9 +411,7 @@ export const detectRecurringTransactions = (transactions) => {
     }
 
     // Use note/description as primary identifier, fallback to category
-    const description = (t.note || t.description || t.category || "Unknown")
-      .trim()
-      .toLowerCase();
+    const description = (t.note || t.description || t.category || "Unknown").trim().toLowerCase();
     const amount = Math.abs(Number(t.amount) || 0);
 
     // Skip very small amounts (likely not subscriptions)
@@ -476,8 +460,7 @@ export const detectRecurringTransactions = (transactions) => {
     // Calculate average interval and standard deviation
     const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
     const variance =
-      intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) /
-      intervals.length;
+      intervals.reduce((sum, val) => sum + (val - avgInterval) ** 2, 0) / intervals.length;
     const stdDev = Math.sqrt(variance);
 
     // Check if intervals are consistent (low standard deviation = recurring)
@@ -493,13 +476,10 @@ export const detectRecurringTransactions = (transactions) => {
     if (isRecurring) {
       const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
       const lastDate = dates[dates.length - 1];
-      const nextExpected = new Date(
-        lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000
-      );
+      const nextExpected = new Date(lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000);
 
       // Check if subscription is still active (last occurrence within 2x interval)
-      const daysSinceLastOccurrence =
-        (Date.now() - lastDate) / (1000 * 60 * 60 * 24);
+      const daysSinceLastOccurrence = (Date.now() - lastDate) / (1000 * 60 * 60 * 24);
       const isActive = daysSinceLastOccurrence < avgInterval * 2;
 
       recurring.push({
@@ -544,8 +524,7 @@ export const detectAnomalies = (transactions, sensitivity = 2) => {
 
   const amounts = expenses.map((t) => Math.abs(t.amount || 0));
   const mean = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-  const variance =
-    amounts.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / amounts.length;
+  const variance = amounts.reduce((sq, n) => sq + (n - mean) ** 2, 0) / amounts.length;
   const stdDev = Math.sqrt(variance);
 
   return expenses
@@ -566,10 +545,9 @@ export const detectAnomalies = (transactions, sensitivity = 2) => {
         ...t,
         deviation: ((amount - mean) / stdDev).toFixed(2),
         severity,
-        message: `${amount.toFixed(0)} is ${(
-          ((amount - mean) / mean) *
-          100
-        ).toFixed(0)}% above average`,
+        message: `${amount.toFixed(0)} is ${(((amount - mean) / mean) * 100).toFixed(
+          0
+        )}% above average`,
       };
     })
     .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -615,17 +593,14 @@ export const calculateCategoryTrends = (transactions) => {
 
   const categories = [
     ...new Set(
-      transactions
-        .filter((t) => t.type === "Expense")
-        .map((t) => t.category || "Uncategorized")
+      transactions.filter((t) => t.type === "Expense").map((t) => t.category || "Uncategorized")
     ),
   ];
 
   return categories
     .map((category) => {
       const catTransactions = transactions.filter(
-        (t) =>
-          (t.category || "Uncategorized") === category && t.type === "Expense"
+        (t) => (t.category || "Uncategorized") === category && t.type === "Expense"
       );
 
       if (catTransactions.length < 2) {
@@ -639,29 +614,13 @@ export const calculateCategoryTrends = (transactions) => {
         return null;
       }
 
-      const midPoint = new Date(
-        (dateRange.startDate.getTime() + dateRange.endDate.getTime()) / 2
-      );
+      const midPoint = new Date((dateRange.startDate.getTime() + dateRange.endDate.getTime()) / 2);
 
-      const firstHalf = filterByDateRange(
-        catTransactions,
-        dateRange.startDate,
-        midPoint
-      );
-      const secondHalf = filterByDateRange(
-        catTransactions,
-        midPoint,
-        dateRange.endDate
-      );
+      const firstHalf = filterByDateRange(catTransactions, dateRange.startDate, midPoint);
+      const secondHalf = filterByDateRange(catTransactions, midPoint, dateRange.endDate);
 
-      const firstTotal = firstHalf.reduce(
-        (sum, t) => sum + Math.abs(t.amount || 0),
-        0
-      );
-      const secondTotal = secondHalf.reduce(
-        (sum, t) => sum + Math.abs(t.amount || 0),
-        0
-      );
+      const firstTotal = firstHalf.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
+      const secondTotal = secondHalf.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
 
       const trend = calculateGrowthRate(secondTotal, firstTotal);
 
@@ -678,10 +637,7 @@ export const calculateCategoryTrends = (transactions) => {
         secondHalfTotal: secondTotal,
         trend,
         direction,
-        monthlyAverage: calculateMonthlyAverage(
-          firstTotal + secondTotal,
-          dateRange.days
-        ),
+        monthlyAverage: calculateMonthlyAverage(firstTotal + secondTotal, dateRange.days),
       };
     })
     .filter((item) => item !== null)
@@ -717,9 +673,7 @@ export const calculateIncomeStability = (transactions) => {
 
   const amounts = income.map((t) => Math.abs(t.amount || 0));
   const mean = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-  const variance =
-    amounts.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    amounts.length;
+  const variance = amounts.reduce((sum, val) => sum + (val - mean) ** 2, 0) / amounts.length;
   const stdDev = Math.sqrt(variance);
   const coefficientOfVariation = mean > 0 ? stdDev / mean : 0;
 
@@ -795,11 +749,7 @@ export const calculateMonthlyHealthRatio = (transactions) => {
  * 10. Calculate Savings Goal Progress
  * Days/months until you reach a savings goal
  */
-export const calculateGoalProgress = (
-  currentBalance,
-  goal,
-  monthlyNetIncome
-) => {
+export const calculateGoalProgress = (currentBalance, goal, monthlyNetIncome) => {
   if (goal <= 0 || currentBalance >= goal) {
     return {
       remaining: 0,
@@ -824,9 +774,7 @@ export const calculateGoalProgress = (
 
   const remaining = goal - currentBalance;
   const monthsNeeded = remaining / monthlyNetIncome;
-  const estimatedDate = new Date(
-    Date.now() + monthsNeeded * 30.44 * 24 * 60 * 60 * 1000
-  );
+  const estimatedDate = new Date(Date.now() + monthsNeeded * 30.44 * 24 * 60 * 60 * 1000);
 
   return {
     remaining,
@@ -853,17 +801,13 @@ export const calculateTotal = (data) => {
 
   if (Array.isArray(data)) {
     return data.reduce((sum, item) => {
-      const value =
-        typeof item === "object" ? item.balance || item.amount || 0 : item;
+      const value = typeof item === "object" ? item.balance || item.amount || 0 : item;
       return sum + (Number.parseFloat(value) || 0);
     }, 0);
   }
 
   if (typeof data === "object") {
-    return Object.values(data).reduce(
-      (sum, val) => sum + (Number.parseFloat(val) || 0),
-      0
-    );
+    return Object.values(data).reduce((sum, val) => sum + (Number.parseFloat(val) || 0), 0);
   }
 
   return 0;

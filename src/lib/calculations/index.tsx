@@ -10,87 +10,81 @@
  * import { calculateSavingsRate, calculateDateRange } from 'src/shared/utils/calculations';
  */
 
-// Date Range Calculations
-export { calculateDateRange } from "./time/dateRange";
-
 // Average Calculations
 export {
+  calculateAveragePerTransaction,
   calculateDailyAverage,
   calculateMonthlyAverage,
-  calculateAveragePerTransaction,
 } from "./aggregations/averages";
+// Category Analysis
+export { getTopCategories, groupByCategory } from "./aggregations/category";
 
 // Aggregation Calculations
 export {
-  calculateTotalIncome,
   calculateTotalExpense,
+  calculateTotalIncome,
 } from "./aggregations/totals";
-
-// Savings Calculations
-export {
-  calculateSavings,
-  calculateSavingsRate,
-  calculatePercentage,
-} from "./financial/savings";
-
-// Category Analysis
-export { groupByCategory, getTopCategories } from "./aggregations/category";
-
 // Cashback Calculations
 export {
-  calculateTotalCashbackEarned,
-  calculateCashbackShared,
   calculateActualCashback,
   calculateCashbackByCard,
   calculateCashbackMetrics,
+  calculateCashbackShared,
+  calculateTotalCashbackEarned,
 } from "./financial/cashback";
-
 // Reimbursement Calculations
 export {
-  calculateTotalReimbursements,
-  getReimbursementTransactions,
   calculateAverageReimbursement,
   calculateReimbursementByPeriod,
   calculateReimbursementMetrics,
+  calculateTotalReimbursements,
+  getReimbursementTransactions,
 } from "./financial/reimbursement";
-
+// Savings Calculations
+export {
+  calculatePercentage,
+  calculateSavings,
+  calculateSavingsRate,
+} from "./financial/savings";
 // Re-export all legacy functions for backwards compatibility
 export {
+  calculateCashFlowForecast,
+  calculateCategoryBudgetStatus,
+  calculateCategoryTrends,
+  calculateDayOfMonthPattern,
+  calculateDebtToIncomeRatio,
+  calculateEmergencyFundMonths,
+  calculateGoalProgress,
+  calculateGrowthRate,
+  calculateIncomeExpenseRatio,
+  calculateIncomeStability,
+  calculateMetrics,
+  calculateMonthlyComparison,
+  calculateMonthlyHealthRatio,
+  calculateMovingAverage,
   calculatePerDayFrequency,
   calculatePerMonthFrequency,
   calculatePerWeekFrequency,
-  formatNumber,
   calculateSavingsPotential,
+  calculateTotal,
+  calculateTotalDebt,
+  calculateTotalDeposits,
+  calculateTotalInvestments,
+  calculateTotalLiquidAssets,
+  detectAnomalies,
+  detectRecurringTransactions,
   filterByDateRange,
   filterByType,
-  calculateMetrics,
-  calculateGrowthRate,
+  formatNumber,
+  getFinancialGrade,
   roundTo,
-  calculateMovingAverage,
-  validateDataCompleteness,
-  calculateMonthlyComparison,
-  calculateCategoryBudgetStatus,
-  calculateCashFlowForecast,
-  detectRecurringTransactions,
-  detectAnomalies,
-  calculateDayOfMonthPattern,
-  calculateCategoryTrends,
-  calculateIncomeStability,
-  calculateMonthlyHealthRatio,
-  calculateGoalProgress,
-  calculateTotal,
-  calculateTotalLiquidAssets,
-  calculateTotalInvestments,
-  calculateTotalDeposits,
-  calculateTotalDebt,
-  calculateDebtToIncomeRatio,
-  calculateEmergencyFundMonths,
-  calculateIncomeExpenseRatio,
+  scoreCategoryBalance,
   scoreConsistency,
+  scoreDebtManagement,
   scoreEmergencyFund,
   scoreIncomeExpenseRatio,
-  scoreCategoryBalance,
-  scoreDebtManagement,
   scoreSavingsRate,
-  getFinancialGrade,
+  validateDataCompleteness,
 } from "./legacy";
+// Date Range Calculations
+export { calculateDateRange } from "./time/dateRange";

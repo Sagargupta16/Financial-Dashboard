@@ -14,9 +14,7 @@ import type { Transaction } from "../../../types";
  * @param transactions - All transactions
  * @returns Total reimbursements
  */
-export const calculateTotalReimbursements = (
-  transactions: Transaction[]
-): number => {
+export const calculateTotalReimbursements = (transactions: Transaction[]): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -29,10 +27,7 @@ export const calculateTotalReimbursements = (
       (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
   );
 
-  return reimbursementTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
+  return reimbursementTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 };
 
 /**
@@ -40,9 +35,7 @@ export const calculateTotalReimbursements = (
  * @param transactions - All transactions
  * @returns Reimbursement transaction details
  */
-export const getReimbursementTransactions = (
-  transactions: Transaction[]
-): any[] => {
+export const getReimbursementTransactions = (transactions: Transaction[]): any[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
@@ -93,10 +86,7 @@ export const calculateReimbursementByPeriod = (transactions: Transaction[]) => {
     return {};
   }
 
-  const byPeriod: Record<
-    string,
-    { total: number; count: number; transactions: any[] }
-  > = {};
+  const byPeriod: Record<string, { total: number; count: number; transactions: any[] }> = {};
 
   reimbTransactions.forEach((t) => {
     const date = new Date(t.date);
@@ -163,15 +153,10 @@ export const calculateReimbursementMetrics = (transactions: Transaction[]) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const recentReimbursements = reimbTransactions.filter(
-    (t) => new Date(t.date) >= thirtyDaysAgo
-  );
+  const recentReimbursements = reimbTransactions.filter((t) => new Date(t.date) >= thirtyDaysAgo);
 
   if (recentReimbursements.length > 0) {
-    const recentTotal = recentReimbursements.reduce(
-      (sum, t) => sum + t.amount,
-      0
-    );
+    const recentTotal = recentReimbursements.reduce((sum, t) => sum + t.amount, 0);
     insights.push({
       title: "Recent Activity",
       message: `₹${recentTotal.toLocaleString()} reimbursed in last 30 days`,

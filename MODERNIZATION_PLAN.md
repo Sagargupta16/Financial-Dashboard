@@ -1,0 +1,443 @@
+# 🚀 Financial Dashboard Modernization Plan
+
+**Branch:** `feature/modernization-refactor`  
+**Created:** January 9, 2026  
+**Estimated Completion:** 8 phases over 2-3 weeks
+
+---
+
+## 📋 Implementation Order & Rationale
+
+### Phase 1: Biome Setup (Infrastructure) ✅ COMPLETE
+
+**Priority:** HIGH | **Effort:** 1 hour | **Status:** ✅ **COMPLETE**
+
+**Why First:** Sets up better, faster tooling for all subsequent work.
+
+**Tasks:**
+
+- [x] Install Biome (`@biomejs/biome`)
+- [x] Create `biome.json` configuration
+- [x] Remove ESLint and Prettier dependencies
+- [x] Update package.json scripts
+- [x] Run initial format/lint pass
+- [x] Update VS Code settings.json
+
+**Completed Changes:**
+- ✅ Removed 9 ESLint/Prettier packages (-49 packages total)
+- ✅ Added Biome (2 packages)
+- ✅ Configured with React/TypeScript best practices
+- ✅ Formatted 100 files successfully
+- ✅ Updated all npm scripts (lint, format, check)
+- ✅ Removed eslint.config.mjs
+
+**New Scripts:**
+```bash
+pnpm lint         # Biome lint
+pnpm lint:fix     # Biome lint with fixes
+pnpm format       # Biome format
+pnpm check        # Full check (format + lint)
+pnpm check:fix    # Full check with fixes
+```
+
+---
+
+### Phase 2: Extract Custom Hooks (Code Organization) 🔄 IN PROGRESS
+
+**Priority:** HIGH | **Effort:** 2 hours | **Status:** 🔄 **IN PROGRESS**
+
+**Why Second:** Cleaner code makes next migrations easier.
+
+**Tasks:**
+
+- [ ] Audit all components for hook extraction opportunities
+- [ ] Extract `useLocalStorage` hook from components
+- [ ] Extract `useWindowSize` for responsive logic
+- [ ] Extract `useDebounce` if not already centralized
+- [ ] Extract `useClickOutside` for dropdowns/modals
+- [ ] Move to `src/hooks/` with proper naming
+- [ ] Add JSDoc documentation to each hook
+- [ ] Update imports across components
+
+**Target Reductions:**
+
+- App.tsx: 329 lines → ~200 lines (-40%)
+- OverviewPage: Reduce by ~30%
+- CategoryAnalysisPage: Reduce by ~25%
+
+**New Hooks:**
+
+```
+src/hooks/
+  ├── useLocalStorage.tsx       (Persist state)
+  ├── useWindowSize.tsx         (Responsive breakpoints)
+  ├── useClickOutside.tsx       (Close on outside click)
+  ├── useChartExport.tsx        (Export chart functionality)
+  └── useTransactionFilters.tsx (Centralized filtering)
+```
+
+---
+
+### Phase 3: Zustand State Management (Architecture) ⚡
+
+**Priority:** HIGH | **Effort:** 3 hours | **Status:** Pending Phase 2
+
+**Why Third:** Cleaner state before routing changes.
+
+**Tasks:**
+
+- [ ] Install `zustand`
+- [ ] Create `src/store/financialStore.ts`
+- [ ] Migrate transactions state
+- [ ] Migrate dateRange state
+- [ ] Migrate budgetPreferences state
+- [ ] Add persist middleware for localStorage
+- [ ] Add devtools middleware
+- [ ] Replace all `useData()` with Zustand selectors
+- [ ] Remove `DataContext.tsx` (save 185 lines!)
+- [ ] Update all imports
+- [ ] Test state persistence
+
+**Store Structure:**
+
+```typescript
+// src/store/financialStore.ts
+interface FinancialStore {
+  // State
+  transactions: Transaction[];
+  dateRange: { start: Date | null; end: Date | null };
+  budgetPreferences: BudgetPreferences;
+  loading: boolean;
+  error: string | null;
+
+  // Actions
+  setTransactions: (transactions: Transaction[]) => void;
+  updateDateRange: (start: Date | null, end: Date | null) => void;
+  updateBudgetAllocation: (allocation: BudgetAllocation) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+}
+```
+
+**Benefits:**
+
+- 73% less code (185 → 50 lines)
+- No unnecessary re-renders
+- Better DevTools integration
+- Selective subscriptions
+- Easier testing
+
+---
+
+### Phase 4: File-Based Routing (Architecture) 🗂️
+
+**Priority:** MEDIUM | **Effort:** 2 hours | **Status:** Pending Phase 3
+
+**Why Fourth:** Simplifies routing after state is clean.
+
+**Tasks:**
+
+- [ ] Install `vite-plugin-pages` and `react-router-dom` types
+- [ ] Configure plugin in `vite.config.ts`
+- [ ] Restructure pages directory
+- [ ] Rename files to route convention
+- [ ] Remove manual lazy loading from App.tsx
+- [ ] Update imports to use generated routes
+- [ ] Add catch-all 404 page
+- [ ] Test all routes work correctly
+
+**New Structure:**
+
+```
+src/pages/
+  ├── index.tsx                 → /          (redirect to /overview)
+  ├── overview.tsx              → /overview
+  ├── income-expense.tsx        → /income-expense
+  ├── category-analysis.tsx     → /category-analysis
+  ├── trends-forecasts.tsx      → /trends-forecasts
+  ├── investment.tsx            → /investment
+  ├── tax.tsx                   → /tax
+  ├── family.tsx                → /family
+  ├── credit-card.tsx           → /credit-card
+  ├── patterns.tsx              → /patterns
+  ├── transactions.tsx          → /transactions
+  ├── budget.tsx                → /budget
+  └── [...all].tsx             → /404
+```
+
+**Benefits:**
+
+- Remove ~50 lines from App.tsx
+- Automatic code splitting
+- Conventional routing
+- Easier to add new pages
+
+---
+
+### Phase 5: shadcn/ui Integration (UI Modernization) 🎨
+
+**Priority:** MEDIUM | **Effort:** 4 hours | **Status:** Pending Phase 4
+
+**Why Fifth:** UI improvements after structure is solid.
+
+**Tasks:**
+
+- [ ] Run `npx shadcn-ui@latest init`
+- [ ] Configure with existing Tailwind setup
+- [ ] Install core components (card, button, tabs, skeleton)
+- [ ] Replace custom Tabs component
+- [ ] Replace custom Loading/Skeleton components
+- [ ] Replace custom Button components
+- [ ] Update Header/Footer with shadcn components
+- [ ] Add Dialog/Modal components
+- [ ] Update all imports
+- [ ] Remove old component files
+
+**Components to Replace:**
+
+```
+Replace src/components/ui/Tabs.tsx          → shadcn/ui tabs
+Replace src/components/ui/Loading.tsx       → shadcn/ui skeleton
+Replace src/components/ui/Skeleton.tsx      → shadcn/ui skeleton
+Replace src/components/ui/Button.tsx        → shadcn/ui button
+Add shadcn/ui dialog, dropdown-menu, select
+```
+
+**Benefits:**
+
+- Remove ~500 lines of custom components
+- Better accessibility (ARIA)
+- Consistent design system
+- Built-in dark mode support
+- Battle-tested components
+
+---
+
+### Phase 6: Component-Level Code Splitting (Optimization) 📦
+
+**Priority:** MEDIUM | **Effort:** 2 hours | **Status:** Pending Phase 5
+
+**Why Sixth:** Optimize after components are clean.
+
+**Tasks:**
+
+- [ ] Identify heavy components (Chart components, Analytics)
+- [ ] Wrap heavy components with `lazy()`
+- [ ] Add Suspense boundaries with skeletons
+- [ ] Split vendor chunks in vite.config.ts
+- [ ] Lazy load icon libraries
+- [ ] Analyze bundle with `rollup-plugin-visualizer`
+- [ ] Tree-shake D3 imports (import only needed)
+- [ ] Test load times
+
+**Target Components for Splitting:**
+
+```typescript
+// Split these heavy components
+const ChartComponents = lazy(() => import("./ChartComponents"));
+const InvestmentPerformanceTracker = lazy(() => import("./Investment"));
+const TaxPlanningDashboard = lazy(() => import("./TaxPlanning"));
+const SpendingCalendar = lazy(() => import("./SpendingCalendar"));
+```
+
+**Expected Results:**
+
+- Initial bundle: 800KB → 400KB (-50%)
+- First load: 2.3s → 1.1s (-52%)
+- Lighthouse score: 85 → 95+
+
+---
+
+### Phase 7: Modular Feature Folders (Architecture) 📁
+
+**Priority:** LOW | **Effort:** 3 hours | **Status:** Pending Phase 6
+
+**Why Seventh:** Major restructure after everything else is stable.
+
+**Tasks:**
+
+- [ ] Plan new folder structure
+- [ ] Create feature-based folders
+- [ ] Co-locate components, hooks, utils, types
+- [ ] Move files to new locations
+- [ ] Update all imports (use find/replace)
+- [ ] Update barrel exports (index.ts files)
+- [ ] Update documentation
+- [ ] Test all imports resolve
+
+**New Structure:**
+
+```
+src/
+├── features/
+│   ├── overview/
+│   │   ├── components/
+│   │   │   ├── MainKPISection.tsx
+│   │   │   └── FinancialHealthMetrics.tsx
+│   │   ├── hooks/
+│   │   │   └── useOverviewData.tsx
+│   │   ├── utils/
+│   │   │   └── calculations.ts
+│   │   ├── types.ts
+│   │   └── index.ts
+│   ├── transactions/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   └── index.ts
+│   └── [other features...]
+├── shared/
+│   ├── components/
+│   ├── hooks/
+│   └── utils/
+└── store/
+    └── financialStore.ts
+```
+
+**Benefits:**
+
+- Better code organization
+- Feature isolation
+- Easier to find related code
+- Scales better for team growth
+
+---
+
+### Phase 8: Comparison Mode Feature (New Feature) 📊
+
+**Priority:** LOW | **Effort:** 4 hours | **Status:** Pending Phase 7
+
+**Why Last:** New feature after codebase is modernized.
+
+**Tasks:**
+
+- [ ] Design comparison UI mockup
+- [ ] Create comparison hook (`useComparison`)
+- [ ] Add comparison selector component
+- [ ] Implement year-over-year comparison
+- [ ] Implement month-over-month comparison
+- [ ] Add comparison charts (side-by-side bars)
+- [ ] Add percentage change indicators
+- [ ] Add trend arrows (up/down)
+- [ ] Style comparison cards
+- [ ] Add to Overview and Category pages
+- [ ] Write tests
+
+**Features:**
+
+```typescript
+// Comparison Types
+type ComparisonMode = 'YoY' | 'MoM' | 'Custom'
+
+// UI Components
+<ComparisonSelector mode={mode} onChange={setMode} />
+<ComparisonCard
+  current={currentData}
+  previous={previousData}
+  metric="Total Spending"
+/>
+
+// Data Structure
+{
+  current: { value: 50000, period: "Dec 2025" },
+  previous: { value: 45000, period: "Dec 2024" },
+  change: { value: 5000, percentage: 11.11, trend: "up" }
+}
+```
+
+**UI Elements:**
+
+- Toggle between YoY, MoM, Custom range
+- Side-by-side metric cards
+- Percentage change badges
+- Trend arrows and colors
+- Comparison charts
+
+---
+
+## 🎯 Success Metrics
+
+### Code Quality
+
+- [ ] Lines of code reduced by 30%
+- [ ] Bundle size reduced by 50%
+- [ ] TypeScript strict mode enabled
+- [ ] Zero ESLint/Biome errors
+- [ ] Test coverage > 70%
+
+### Performance
+
+- [ ] First Contentful Paint < 1.0s
+- [ ] Time to Interactive < 2.0s
+- [ ] Lighthouse Performance > 95
+- [ ] Bundle size < 400KB
+
+### Developer Experience
+
+- [ ] Build time < 3s (cold start)
+- [ ] Hot reload < 500ms
+- [ ] Format time < 100ms (Biome)
+- [ ] Lint time < 200ms (Biome)
+
+---
+
+## 📝 Testing Checklist (After Each Phase)
+
+- [ ] All pages load without errors
+- [ ] CSV import/export works
+- [ ] Charts render correctly
+- [ ] Filters apply correctly
+- [ ] State persists in localStorage
+- [ ] Responsive on mobile/tablet/desktop
+- [ ] No console errors/warnings
+- [ ] TypeScript compiles successfully
+- [ ] Build completes successfully
+- [ ] Git commit with clear message
+
+---
+
+## 🚨 Rollback Plan
+
+If any phase causes critical issues:
+
+1. Git revert to previous commit
+2. Document the issue
+3. Create fix branch
+4. Address issue in isolation
+5. Reapply when resolved
+
+---
+
+## 📚 Resources & References
+
+### Documentation
+
+- [Biome Docs](https://biomejs.dev/)
+- [Zustand Docs](https://docs.pmnd.rs/zustand)
+- [vite-plugin-pages](https://github.com/hannoeru/vite-plugin-pages)
+- [shadcn/ui](https://ui.shadcn.com/)
+
+### Examples
+
+- [Zustand Persist](https://docs.pmnd.rs/zustand/integrations/persisting-store-data)
+- [File-based Routing Example](https://github.com/hannoeru/vite-plugin-pages/tree/main/examples)
+- [shadcn Integration](https://ui.shadcn.com/docs/installation/vite)
+
+---
+
+## ✅ Current Status
+
+**Active Phase:** Phase 2 - Extract Custom Hooks  
+**Overall Progress:** 1/8 phases complete (12.5%)  
+**Blockers:** None  
+**Next Steps:** Extract custom hooks to reduce component complexity
+
+**Completed Phases:**
+- ✅ Phase 1: Biome Setup (January 9, 2026)
+
+---
+
+**Last Updated:** January 9, 2026  
+**Branch:** feature/modernization-refactor  
+**Estimated Completion:** January 30, 2026

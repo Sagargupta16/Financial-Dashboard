@@ -84,9 +84,7 @@ export const getSpendingVelocityIconColor = (velocity: number) => {
  * @returns {string} Tailwind CSS class
  */
 export const getNetWorthColor = (netWorth: number) => {
-  return netWorth >= 0
-    ? "bg-green-900/20 border-green-500/30"
-    : "bg-red-900/20 border-red-500/30";
+  return netWorth >= 0 ? "bg-green-900/20 border-green-500/30" : "bg-red-900/20 border-red-500/30";
 };
 
 /**
@@ -104,10 +102,7 @@ export const getNetWorthIconColor = (netWorth: number) => {
  * @param {number} threshold - Warning threshold (default 50)
  * @returns {string} Tailwind CSS class
  */
-export const getCategoryConcentrationColor = (
-  percentage: number,
-  threshold: number = 50
-) => {
+export const getCategoryConcentrationColor = (percentage: number, threshold: number = 50) => {
   return percentage > threshold
     ? "bg-orange-900/20 border-orange-500/30"
     : "bg-blue-900/20 border-blue-500/30";
@@ -253,10 +248,7 @@ export const getSubscriptionsDisplay = (
   }
 
   // Calculate total monthly cost using monthlyEquivalent
-  const totalMonthly = activeSubscriptions.reduce(
-    (sum, t) => sum + (t.monthlyEquivalent || 0),
-    0
-  );
+  const totalMonthly = activeSubscriptions.reduce((sum, t) => sum + (t.monthlyEquivalent || 0), 0);
 
   const count = activeSubscriptions.length;
   const plural = count > 1 ? "s" : "";
@@ -325,9 +317,7 @@ export const getYearsAndMonths = (transactions: any[]) => {
     yearSet.add(date.getFullYear());
   });
 
-  const sortedYears = Array.from(yearSet).sort(
-    (a, b) => (b as number) - (a as number)
-  );
+  const sortedYears = Array.from(yearSet).sort((a, b) => (b as number) - (a as number));
   const monthLabels = [
     { value: "0", label: "January" },
     { value: "1", label: "February" },

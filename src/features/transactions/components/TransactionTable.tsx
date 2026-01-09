@@ -1,25 +1,21 @@
-import { useState, useMemo, useEffect } from "react";
 import {
   ArrowUpDown,
+  Calendar,
   ChevronLeft,
   ChevronRight,
-  Search,
-  Filter,
-  X,
-  Calendar,
-  DollarSign,
-  Tag,
-  FileText,
   CreditCard,
+  DollarSign,
+  FileText,
+  Filter,
+  Search,
   Settings,
+  Tag,
+  X,
 } from "lucide-react";
-import { formatCurrency } from "../../../lib/formatters";
+import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
-import type {
-  SortConfig,
-  Transaction,
-  TransactionSortKey,
-} from "../../../types";
+import { formatCurrency } from "../../../lib/formatters";
+import type { SortConfig, Transaction, TransactionSortKey } from "../../../types";
 
 // Helper functions for styling
 const getTypeStyles = (type: string) => {
@@ -65,10 +61,7 @@ const addRunningBalance = (
   return sorted.map((transaction) => {
     if (transaction.type === "Income" || transaction.type === "Transfer-In") {
       balance += transaction.amount;
-    } else if (
-      transaction.type === "Expense" ||
-      transaction.type === "Transfer-Out"
-    ) {
+    } else if (transaction.type === "Expense" || transaction.type === "Transfer-Out") {
       balance -= transaction.amount;
     }
 
@@ -134,17 +127,17 @@ export const EnhancedTransactionTable = ({
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
     return {
-      accounts: [
-        ...new Set(data.map((item) => item.account).filter(Boolean)),
-      ].sort((a, b) => a.localeCompare(b)),
-      categories: [
-        ...new Set(data.map((item) => item.category).filter(Boolean)),
-      ].sort((a, b) => a.localeCompare(b)),
-      subcategories: [
-        ...new Set(data.map((item) => item.subcategory).filter(Boolean)),
-      ].sort((a, b) => a.localeCompare(b)),
-      types: [...new Set(data.map((item) => item.type).filter(Boolean))].sort(
+      accounts: [...new Set(data.map((item) => item.account).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      categories: [...new Set(data.map((item) => item.category).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      subcategories: [...new Set(data.map((item) => item.subcategory).filter(Boolean))].sort(
         (a, b) => a.localeCompare(b)
+      ),
+      types: [...new Set(data.map((item) => item.type).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
       ),
     };
   }, [data]);
@@ -171,8 +164,7 @@ export const EnhancedTransactionTable = ({
     if (debouncedFilters.dateFrom) {
       const fromDate = new Date(debouncedFilters.dateFrom);
       filtered = filtered.filter((item) => {
-        const itemDate =
-          item.date instanceof Date ? item.date : new Date(item.date);
+        const itemDate = item.date instanceof Date ? item.date : new Date(item.date);
         return itemDate >= fromDate;
       });
     }
@@ -181,8 +173,7 @@ export const EnhancedTransactionTable = ({
       const toDate = new Date(debouncedFilters.dateTo);
       toDate.setHours(23, 59, 59, 999); // End of day
       filtered = filtered.filter((item) => {
-        const itemDate =
-          item.date instanceof Date ? item.date : new Date(item.date);
+        const itemDate = item.date instanceof Date ? item.date : new Date(item.date);
         return itemDate <= toDate;
       });
     }
@@ -202,21 +193,15 @@ export const EnhancedTransactionTable = ({
     }
 
     if (debouncedFilters.account) {
-      filtered = filtered.filter(
-        (item) => item.account === debouncedFilters.account
-      );
+      filtered = filtered.filter((item) => item.account === debouncedFilters.account);
     }
 
     if (debouncedFilters.category) {
-      filtered = filtered.filter(
-        (item) => item.category === debouncedFilters.category
-      );
+      filtered = filtered.filter((item) => item.category === debouncedFilters.category);
     }
 
     if (debouncedFilters.subcategory) {
-      filtered = filtered.filter(
-        (item) => item.subcategory === debouncedFilters.subcategory
-      );
+      filtered = filtered.filter((item) => item.subcategory === debouncedFilters.subcategory);
     }
 
     if (debouncedFilters.type) {
@@ -225,9 +210,7 @@ export const EnhancedTransactionTable = ({
 
     if (debouncedFilters.note) {
       const noteLower = debouncedFilters.note.toLowerCase();
-      filtered = filtered.filter((item) =>
-        (item.note || "").toLowerCase().includes(noteLower)
-      );
+      filtered = filtered.filter((item) => (item.note || "").toLowerCase().includes(noteLower));
     }
 
     return filtered;
@@ -252,9 +235,7 @@ export const EnhancedTransactionTable = ({
 
   // Apply sorting to data with balance
   const sortedData = useMemo(() => {
-    const sorted = [...dataWithBalance] as Array<
-      Transaction & { runningBalance: number }
-    >;
+    const sorted = [...dataWithBalance] as Array<Transaction & { runningBalance: number }>;
     if (sortConfig.key) {
       sorted.sort((a, b) => {
         let aVal = (a as any)[sortConfig.key];
@@ -268,10 +249,7 @@ export const EnhancedTransactionTable = ({
         }
 
         // Handle numeric sorting (amount, runningBalance)
-        if (
-          sortConfig.key === "amount" ||
-          sortConfig.key === "runningBalance"
-        ) {
+        if (sortConfig.key === "amount" || sortConfig.key === "runningBalance") {
           aVal = Number(aVal) || 0;
           bVal = Number(bVal) || 0;
           return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
@@ -434,9 +412,7 @@ export const EnhancedTransactionTable = ({
                     id="filter-date-from"
                     type="date"
                     value={filters.dateFrom}
-                    onChange={(e) =>
-                      handleFilterChange("dateFrom", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.dateFrom && (
@@ -463,9 +439,7 @@ export const EnhancedTransactionTable = ({
                     id="filter-date-to"
                     type="date"
                     value={filters.dateTo}
-                    onChange={(e) =>
-                      handleFilterChange("dateTo", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("dateTo", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.dateTo && (
@@ -495,9 +469,7 @@ export const EnhancedTransactionTable = ({
                     step="0.01"
                     placeholder="0.00"
                     value={filters.amountMin}
-                    onChange={(e) =>
-                      handleFilterChange("amountMin", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("amountMin", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.amountMin && (
@@ -526,9 +498,7 @@ export const EnhancedTransactionTable = ({
                     step="0.01"
                     placeholder="0.00"
                     value={filters.amountMax}
-                    onChange={(e) =>
-                      handleFilterChange("amountMax", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("amountMax", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                   />
                   {filters.amountMax && (
@@ -555,9 +525,7 @@ export const EnhancedTransactionTable = ({
                   <select
                     id="filter-account"
                     value={filters.account}
-                    onChange={(e) =>
-                      handleFilterChange("account", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("account", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Accounts</option>
@@ -591,9 +559,7 @@ export const EnhancedTransactionTable = ({
                   <select
                     id="filter-category"
                     value={filters.category}
-                    onChange={(e) =>
-                      handleFilterChange("category", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("category", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Categories</option>
@@ -627,9 +593,7 @@ export const EnhancedTransactionTable = ({
                   <select
                     id="filter-subcategory"
                     value={filters.subcategory}
-                    onChange={(e) =>
-                      handleFilterChange("subcategory", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("subcategory", e.target.value)}
                     className="w-full px-4 py-3 bg-gray-800/70 backdrop-blur-xl border border-gray-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 appearance-none cursor-pointer"
                   >
                     <option value="">All Subcategories</option>
@@ -859,9 +823,7 @@ export const EnhancedTransactionTable = ({
                 <td className="p-3">
                   <div
                     className={`text-sm font-bold transition-transform duration-300 group-hover:scale-105 text-right ${
-                      item.runningBalance >= 0
-                        ? "text-green-400"
-                        : "text-red-400"
+                      item.runningBalance >= 0 ? "text-green-400" : "text-red-400"
                     }`}
                   >
                     {formatCurrency(Math.abs(item.runningBalance))}
@@ -906,9 +868,7 @@ export const EnhancedTransactionTable = ({
             </span>{" "}
             of <span className="font-bold text-white">{sortedData.length}</span>
             {(searchTerm || activeFiltersCount > 0) && (
-              <span className="text-gray-400 ml-1">
-                (filtered from {data.length})
-              </span>
+              <span className="text-gray-400 ml-1">(filtered from {data.length})</span>
             )}
           </p>
           <div className="flex items-center gap-4">
@@ -921,13 +881,10 @@ export const EnhancedTransactionTable = ({
               <span>Previous</span>
             </button>
             <span className="text-base font-bold text-white px-4">
-              Page <span className="text-blue-400">{currentPage}</span> of{" "}
-              {totalPages}
+              Page <span className="text-blue-400">{currentPage}</span> of {totalPages}
             </span>
             <button
-              onClick={() =>
-                setCurrentPage(Math.min(currentPage + 1, totalPages))
-              }
+              onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 disabled:hover:scale-100"
             >

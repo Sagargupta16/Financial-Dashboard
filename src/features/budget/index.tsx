@@ -3,12 +3,12 @@
  * Centralized exports for budget-related components and utilities
  */
 
+export { BudgetGoalsSection } from "./components/BudgetGoalsSection";
 // Components
 export { BudgetPlanner } from "./components/BudgetPlanner";
-export { BudgetGoalsSection } from "./components/BudgetGoalsSection";
-export { RecurringPayments } from "./components/RecurringPayments";
-export { NeedsWantsSavings } from "./components/NeedsWantsSavings";
 export { MonthlyYearlyNWS } from "./components/MonthlyYearlyNWS";
+export { NeedsWantsSavings } from "./components/NeedsWantsSavings";
+export { RecurringPayments } from "./components/RecurringPayments";
 
 // Utilities
 export * from "./utils/budgetUtils";

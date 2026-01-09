@@ -53,9 +53,7 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
         return; // Skip if date parsing fails
       }
 
-      const amount = Math.abs(
-        Number.parseFloat(String(transaction.amount ?? "0")) || 0
-      );
+      const amount = Math.abs(Number.parseFloat(String(transaction.amount ?? "0")) || 0);
       const type = transaction.type;
 
       if (type === "Expense") {
@@ -81,9 +79,7 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
     const amounts = last30DaysData.map(([, d]) => d.total);
     const maxSpending = Math.max(...amounts, 0);
     const avgSpending =
-      amounts.length > 0
-        ? amounts.reduce((sum, val) => sum + val, 0) / amounts.length
-        : 0;
+      amounts.length > 0 ? amounts.reduce((sum, val) => sum + val, 0) / amounts.length : 0;
 
     // Return only last 30 days
     const filteredDailySpending = Object.fromEntries(last30DaysData);
@@ -130,9 +126,7 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">
-            📅 Spending Calendar
-          </h2>
+          <h2 className="text-2xl font-bold text-white">📅 Spending Calendar</h2>
           <p className="text-gray-400 mt-1">Last 30 days spending patterns</p>
         </div>
         <div className="text-right">
@@ -172,21 +166,15 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
                 )}`}
               >
                 <div className="p-2 flex flex-col items-center justify-center h-full">
-                  <p className="text-white text-xs font-medium">
-                    {getDayName(dateStr)}
-                  </p>
-                  <p className="text-white text-xs mt-1">
-                    {new Date(dateStr).getDate()}
-                  </p>
+                  <p className="text-white text-xs font-medium">{getDayName(dateStr)}</p>
+                  <p className="text-white text-xs mt-1">{new Date(dateStr).getDate()}</p>
                 </div>
               </div>
 
               {/* Tooltip */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                 <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[200px]">
-                  <p className="text-white font-medium mb-1">
-                    {formatDate(dateStr)}
-                  </p>
+                  <p className="text-white font-medium mb-1">{formatDate(dateStr)}</p>
                   <p className="text-gray-400 text-sm mb-2">
                     Total: ₹{data.total.toLocaleString()}
                   </p>
@@ -202,9 +190,7 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
                             className="text-gray-300 text-xs truncate"
                           >
                             {t.category}: ₹
-                            {Math.abs(
-                              Number.parseFloat(String(t.amount ?? "0"))
-                            ).toFixed(0)}
+                            {Math.abs(Number.parseFloat(String(t.amount ?? "0"))).toFixed(0)}
                           </p>
                         ))}
                         {data.transactions.length > 3 && (
@@ -227,17 +213,11 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => {
           const daySpending = dates
             .filter((dateStr) => getDayName(dateStr) === day)
-            .reduce(
-              (sum, dateStr) => sum + (dailySpending[dateStr]?.total || 0),
-              0
-            );
+            .reduce((sum, dateStr) => sum + (dailySpending[dateStr]?.total || 0), 0);
           const avgDaySpending = daySpending / 4; // Approx 4 weeks
 
           return (
-            <div
-              key={day}
-              className="bg-gray-700/50 rounded-lg p-3 text-center"
-            >
+            <div key={day} className="bg-gray-700/50 rounded-lg p-3 text-center">
               <p className="text-gray-400 text-xs mb-1">{day}</p>
               <p className="text-white font-medium text-sm">
                 ₹{(avgDaySpending || 0).toFixed(0).toLocaleString()}

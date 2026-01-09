@@ -2,8 +2,8 @@
 // Re-export formatters for chart utilities
 import {
   formatCurrency as formatCurrencyUtil,
-  truncateLabel as truncateLabelUtil,
   SHORT_MONTH_NAMES,
+  truncateLabel as truncateLabelUtil,
 } from "../formatters";
 
 export const formatCurrency = formatCurrencyUtil;
@@ -11,46 +11,10 @@ export const truncateLabel = truncateLabelUtil;
 export const shortMonthNames = SHORT_MONTH_NAMES;
 
 export const colorPalettes = {
-  primary: [
-    "#3b82f6",
-    "#ef4444",
-    "#10b981",
-    "#f59e0b",
-    "#8b5cf6",
-    "#06b6d4",
-    "#f97316",
-    "#84cc16",
-  ],
-  expense: [
-    "#ef4444",
-    "#dc2626",
-    "#b91c1c",
-    "#991b1b",
-    "#7f1d1d",
-    "#fca5a5",
-    "#f87171",
-    "#fee2e2",
-  ],
-  income: [
-    "#10b981",
-    "#059669",
-    "#047857",
-    "#065f46",
-    "#064e3b",
-    "#6ee7b7",
-    "#34d399",
-    "#d1fae5",
-  ],
-  neutral: [
-    "#6b7280",
-    "#4b5563",
-    "#374151",
-    "#1f2937",
-    "#111827",
-    "#9ca3af",
-    "#d1d5db",
-    "#f3f4f6",
-  ],
+  primary: ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4", "#f97316", "#84cc16"],
+  expense: ["#ef4444", "#dc2626", "#b91c1c", "#991b1b", "#7f1d1d", "#fca5a5", "#f87171", "#fee2e2"],
+  income: ["#10b981", "#059669", "#047857", "#065f46", "#064e3b", "#6ee7b7", "#34d399", "#d1fae5"],
+  neutral: ["#6b7280", "#4b5563", "#374151", "#1f2937", "#111827", "#9ca3af", "#d1d5db", "#f3f4f6"],
 };
 
 export const getCommonChartOptions = (customOptions = {}) => ({
@@ -85,9 +49,7 @@ export const getCommonChartOptions = (customOptions = {}) => ({
         maxRotation: 45,
         maxTicksLimit: 15,
         callback: function (value, _index) {
-          const label = this.getLabelForValue
-            ? this.getLabelForValue(value)
-            : value;
+          const label = this.getLabelForValue ? this.getLabelForValue(value) : value;
           return truncateLabel(label, 12);
         },
       },
@@ -168,9 +130,7 @@ export const groupDataByMonth = (data) => {
     }
 
     const date = new Date(item.date);
-    const monthKey = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}`;
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
     if (!acc[monthKey]) {
       acc[monthKey] = { income: 0, expense: 0, net: 0 };

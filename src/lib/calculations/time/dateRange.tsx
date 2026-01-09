@@ -3,11 +3,7 @@
  * Canonical implementation for date-related financial calculations
  */
 
-import {
-  DAYS_PER_MONTH,
-  MONTHS_PER_YEAR,
-  MILLISECONDS_PER_DAY,
-} from "../../../constants";
+import { DAYS_PER_MONTH, MILLISECONDS_PER_DAY, MONTHS_PER_YEAR } from "../../../constants";
 import type { Transaction } from "../../../types";
 
 export interface DateRangeResult {
@@ -36,9 +32,7 @@ export interface DateRangeResult {
  * - All invalid dates: returns { days: 0, months: 0, years: 0, startDate: null, endDate: null }
  * - Same-day transactions: returns { days: 1, months: 0.033, years: 0.003, ... }
  */
-export const calculateDateRange = (
-  transactions: Transaction[]
-): DateRangeResult => {
+export const calculateDateRange = (transactions: Transaction[]): DateRangeResult => {
   if (!transactions || transactions.length === 0) {
     return {
       days: 0,
@@ -52,9 +46,7 @@ export const calculateDateRange = (
     };
   }
 
-  const dates = transactions
-    .map((t) => new Date(t.date))
-    .filter((d) => !Number.isNaN(d.getTime()));
+  const dates = transactions.map((t) => new Date(t.date)).filter((d) => !Number.isNaN(d.getTime()));
 
   if (dates.length === 0) {
     return {
@@ -72,9 +64,7 @@ export const calculateDateRange = (
   const startDate = new Date(Math.min(...dates.map((d) => d.getTime())));
   const endDate = new Date(Math.max(...dates.map((d) => d.getTime())));
 
-  const daysDiff = Math.ceil(
-    (endDate.getTime() - startDate.getTime()) / MILLISECONDS_PER_DAY
-  );
+  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / MILLISECONDS_PER_DAY);
 
   // Ensure at least 1 day if transactions exist (handles same-day transactions)
   const days = Math.max(1, daysDiff);

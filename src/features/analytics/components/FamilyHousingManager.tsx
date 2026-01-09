@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
+
+import { Calendar, Home, TrendingUp, Users, Zap } from "lucide-react";
 import { useMemo } from "react";
-import { Users, Home, TrendingUp, Calendar, Zap } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   calculateFamilyExpenses,
@@ -15,9 +16,7 @@ interface FamilyHousingManagerProps {
  * Family & Housing Expense Manager
  * Track family expenses, rent, and housing costs
  */
-export const FamilyHousingManager = ({
-  filteredData,
-}: FamilyHousingManagerProps) => {
+export const FamilyHousingManager = ({ filteredData }: FamilyHousingManagerProps) => {
   const familyData = useMemo(() => {
     return calculateFamilyExpenses(filteredData);
   }, [filteredData]);
@@ -99,12 +98,8 @@ export const FamilyHousingManager = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          👨‍👩‍👧 Family & Housing Manager
-        </h2>
-        <p className="text-purple-100">
-          Track family support and housing expenses
-        </p>
+        <h2 className="text-2xl font-bold text-white mb-2">👨‍👩‍👧 Family & Housing Manager</h2>
+        <p className="text-purple-100">Track family support and housing expenses</p>
       </div>
 
       {/* Family Expenses Section */}
@@ -119,9 +114,7 @@ export const FamilyHousingManager = ({
           {/* Total Family Expense */}
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-purple-100 text-sm font-medium">
-                Total Family Expense
-              </span>
+              <span className="text-purple-100 text-sm font-medium">Total Family Expense</span>
               <Users className="text-purple-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -136,9 +129,7 @@ export const FamilyHousingManager = ({
           {/* Monthly Average */}
           <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-pink-100 text-sm font-medium">
-                Monthly Average
-              </span>
+              <span className="text-pink-100 text-sm font-medium">Monthly Average</span>
               <Calendar className="text-pink-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -153,14 +144,10 @@ export const FamilyHousingManager = ({
           {/* Categories */}
           <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-indigo-100 text-sm font-medium">
-                Expense Categories
-              </span>
+              <span className="text-indigo-100 text-sm font-medium">Expense Categories</span>
               <TrendingUp className="text-indigo-200" size={24} />
             </div>
-            <div className="text-3xl font-bold text-white">
-              {familyData.breakdown.length}
-            </div>
+            <div className="text-3xl font-bold text-white">{familyData.breakdown.length}</div>
             <div className="text-sm text-indigo-100 mt-1">Different types</div>
           </div>
         </div>
@@ -168,9 +155,7 @@ export const FamilyHousingManager = ({
         {/* Family Spending Breakdown */}
         {familyData.breakdown.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 mb-6">
-            <h4 className="text-xl font-bold text-white mb-4">
-              Family Spending Breakdown
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-4">Family Spending Breakdown</h4>
             <div style={{ height: "300px" }}>
               <Bar data={familyChartData} options={chartOptions} />
             </div>
@@ -180,9 +165,7 @@ export const FamilyHousingManager = ({
         {/* Top Family Expenses */}
         {familyData.topExpenses.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-            <h4 className="text-xl font-bold text-white mb-4">
-              Top Family Expenses
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-4">Top Family Expenses</h4>
             <div className="space-y-3">
               {familyData.topExpenses.map((expense: any) => (
                 <div
@@ -222,9 +205,7 @@ export const FamilyHousingManager = ({
           {/* Total Housing */}
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-blue-100 text-sm font-medium">
-                Total Housing
-              </span>
+              <span className="text-blue-100 text-sm font-medium">Total Housing</span>
               <Home className="text-blue-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -238,9 +219,7 @@ export const FamilyHousingManager = ({
           {/* Rent */}
           <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-cyan-100 text-sm font-medium">
-                Total Rent
-              </span>
+              <span className="text-cyan-100 text-sm font-medium">Total Rent</span>
               <Calendar className="text-cyan-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -254,9 +233,7 @@ export const FamilyHousingManager = ({
           {/* Utilities */}
           <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-yellow-100 text-sm font-medium">
-                Total Utilities
-              </span>
+              <span className="text-yellow-100 text-sm font-medium">Total Utilities</span>
               <Zap className="text-yellow-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -270,9 +247,7 @@ export const FamilyHousingManager = ({
           {/* Monthly Rent Avg */}
           <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-indigo-100 text-sm font-medium">
-                Avg Rent/Month
-              </span>
+              <span className="text-indigo-100 text-sm font-medium">Avg Rent/Month</span>
               <TrendingUp className="text-indigo-200" size={24} />
             </div>
             <div className="text-3xl font-bold text-white">
@@ -287,9 +262,7 @@ export const FamilyHousingManager = ({
         {/* Housing Trends */}
         {housingData.trends.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 mb-6">
-            <h4 className="text-xl font-bold text-white mb-4">
-              Housing Expenses Over Time
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-4">Housing Expenses Over Time</h4>
             <div style={{ height: "300px" }}>
               <Line data={housingTrendsData} options={chartOptions} />
             </div>
@@ -299,9 +272,7 @@ export const FamilyHousingManager = ({
         {/* Recent Rent Payments */}
         {housingData.rentPayments.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 mb-6">
-            <h4 className="text-xl font-bold text-white mb-4">
-              Recent Rent Payments
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-4">Recent Rent Payments</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {housingData.rentPayments.slice(0, 6).map((payment: any) => (
                 <div
@@ -315,9 +286,7 @@ export const FamilyHousingManager = ({
                         year: "numeric",
                       })}
                     </div>
-                    <div className="text-gray-400 text-sm">
-                      {payment.note || "Rent Payment"}
-                    </div>
+                    <div className="text-gray-400 text-sm">{payment.note || "Rent Payment"}</div>
                   </div>
                   <div className="text-xl font-bold text-blue-400">
                     ₹
@@ -334,9 +303,7 @@ export const FamilyHousingManager = ({
         {/* Recent Utilities */}
         {housingData.utilities.length > 0 && (
           <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-            <h4 className="text-xl font-bold text-white mb-4">
-              Recent Utility Bills
-            </h4>
+            <h4 className="text-xl font-bold text-white mb-4">Recent Utility Bills</h4>
             <div className="space-y-2">
               {housingData.utilities.slice(0, 8).map((utility: any) => (
                 <div
@@ -372,21 +339,17 @@ export const FamilyHousingManager = ({
             <div className="flex items-start gap-3 bg-green-500/10 border border-green-500/30 rounded-lg p-4">
               <Home className="text-green-400 mt-0.5" size={20} />
               <div>
-                <p className="text-green-300 font-medium">
-                  HRA Exemption Eligible
-                </p>
+                <p className="text-green-300 font-medium">HRA Exemption Eligible</p>
                 <p className="text-green-200/80 text-sm mt-1">
-                  Your annual rent of ₹
-                  {housingData.totalRent.toLocaleString("en-IN")} is eligible
+                  Your annual rent of ₹{housingData.totalRent.toLocaleString("en-IN")} is eligible
                   for HRA tax exemption. Estimated HRA benefit: ₹
-                  {Math.min(housingData.totalRent * 0.9, 200000).toLocaleString(
-                    "en-IN",
-                    { maximumFractionDigits: 0 }
-                  )}
+                  {Math.min(housingData.totalRent * 0.9, 200000).toLocaleString("en-IN", {
+                    maximumFractionDigits: 0,
+                  })}
                 </p>
                 <p className="text-green-200/60 text-xs mt-2">
-                  * Actual HRA exemption depends on salary structure and city.
-                  Consult your CA for accurate calculation.
+                  * Actual HRA exemption depends on salary structure and city. Consult your CA for
+                  accurate calculation.
                 </p>
               </div>
             </div>

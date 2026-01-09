@@ -1,10 +1,6 @@
-import { describe, it, expect } from "vitest";
-import {
-  calculateProjectedTax,
-  calculateTaxForIncome,
-  calculateTaxForSlab,
-} from "./taxPlanning";
+import { describe, expect, it } from "vitest";
 import type { Transaction } from "../../types";
+import { calculateProjectedTax, calculateTaxForIncome, calculateTaxForSlab } from "./taxPlanning";
 
 describe("Tax Planning - Business Logic", () => {
   const createMockTransaction = (
@@ -67,12 +63,7 @@ describe("Tax Planning - Business Logic", () => {
         createMockTransaction("2024-03-15", 100000, "Income"),
       ];
 
-      const result = calculateProjectedTax(
-        marchTransactions,
-        1200000,
-        75000,
-        60000
-      );
+      const result = calculateProjectedTax(marchTransactions, 1200000, 75000, 60000);
       // Would return null if tested in March, but for other months will calculate
       expect(result).toBeDefined();
     });
@@ -220,9 +211,7 @@ describe("Tax Planning - Business Logic", () => {
       expect(result).toBeDefined();
       if (result) {
         expect(result.currentTax).toBe(currentTax);
-        expect(result.additionalTaxLiability).toBe(
-          result.projectedTotalTax - currentTax
-        );
+        expect(result.additionalTaxLiability).toBe(result.projectedTotalTax - currentTax);
       }
     });
   });

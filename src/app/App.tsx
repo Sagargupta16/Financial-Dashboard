@@ -1,52 +1,41 @@
-import { useState, useEffect, Suspense, useRef, type RefObject } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
+  ArcElement,
   BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  TimeScale,
   Title,
   Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement,
-  TimeScale,
-  Filler,
 } from "chart.js";
-
+import { type RefObject, Suspense, useEffect, useRef, useState } from "react";
+import { Footer } from "../components/layout/Footer";
 // Components
 import { Header } from "../components/layout/Header";
-import { Footer } from "../components/layout/Footer";
-import { Tabs, TabContent } from "../components/ui/Tabs";
 import { LoadingSpinner } from "../components/ui/Loading";
 import { SectionSkeleton } from "../components/ui/SectionSkeleton";
-
-// Hooks
-import {
-  useDataProcessor,
-  useUniqueValues,
-  useFilteredData,
-} from "../hooks/useDataProcessor";
-import {
-  useKPIData,
-  useKeyInsights,
-  useAccountBalances,
-} from "../features/kpi/hooks/useCalculations";
-import { useChartData } from "../features/charts/hooks/useChartData";
-
-// Utils
-import { initialCsvData } from "../constants/index";
-import { lazyLoad } from "../utils/lazyLoad";
-
+import { TabContent, Tabs } from "../components/ui/Tabs";
 // Config
 import { TABS_CONFIG } from "../config/tabs";
+// Utils
+import { initialCsvData } from "../constants/index";
+import { useChartData } from "../features/charts/hooks/useChartData";
+import {
+  useAccountBalances,
+  useKeyInsights,
+  useKPIData,
+} from "../features/kpi/hooks/useCalculations";
+// Hooks
+import { useDataProcessor, useFilteredData, useUniqueValues } from "../hooks/useDataProcessor";
 import type { SortConfig, TransactionSortKey } from "../types";
+import { lazyLoad } from "../utils/lazyLoad";
 
 // Lazy load page components for better performance
-const OverviewPage = lazyLoad(
-  () => import("../pages/OverviewPage/OverviewPage"),
-  "OverviewPage"
-);
+const OverviewPage = lazyLoad(() => import("../pages/OverviewPage/OverviewPage"), "OverviewPage");
 const IncomeExpensePage = lazyLoad(
   () => import("../pages/IncomeExpensePage/IncomeExpensePage"),
   "IncomeExpensePage"
@@ -75,10 +64,7 @@ const CreditCardFoodOptimizer = lazyLoad(
   () => import("../features/analytics/components/CreditCardFoodOptimizer"),
   "CreditCardFoodOptimizer"
 );
-const PatternsPage = lazyLoad(
-  () => import("../pages/PatternsPage/PatternsPage"),
-  "PatternsPage"
-);
+const PatternsPage = lazyLoad(() => import("../pages/PatternsPage/PatternsPage"), "PatternsPage");
 const TransactionsPage = lazyLoad(
   () => import("../pages/TransactionsPage/TransactionsPage"),
   "TransactionsPage"
@@ -157,8 +143,7 @@ const App = () => {
   };
 
   // Custom hooks
-  const { data, loading, error, handleFileUpload } =
-    useDataProcessor(initialCsvData);
+  const { data, loading, error, handleFileUpload } = useDataProcessor(initialCsvData);
   const uniqueValues = useUniqueValues(data);
 
   // Default filters for data processing
@@ -215,11 +200,7 @@ const App = () => {
         <Header onFileUpload={handleFileUpload} />
 
         {/* Tab Navigation */}
-        <Tabs
-          tabs={TABS_CONFIG}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-        />
+        <Tabs tabs={TABS_CONFIG} activeTab={activeTab} onChange={setActiveTab} />
 
         {/* Tab Content */}
         <TabContent isActive={activeTab === "overview"}>
@@ -261,10 +242,7 @@ const App = () => {
 
         <TabContent isActive={activeTab === "trends"}>
           <Suspense fallback={<SectionSkeleton />}>
-            <TrendsForecastsPage
-              chartRefs={chartRefs}
-              filteredData={filteredData}
-            />
+            <TrendsForecastsPage chartRefs={chartRefs} filteredData={filteredData} />
           </Suspense>
         </TabContent>
 

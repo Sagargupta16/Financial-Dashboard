@@ -1,22 +1,17 @@
-import { useMemo, useState } from "react";
+import type { ChartOptions as ChartJSOptions } from "chart.js";
 import {
-  FileText,
-  DollarSign,
-  Shield,
-  TrendingDown,
   AlertCircle,
   CheckCircle2,
+  DollarSign,
+  FileText,
+  Shield,
+  TrendingDown,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
-import type { ChartOptions as ChartJSOptions } from "chart.js";
-import { calculateTaxPlanning } from "../../../lib/calculations/financial";
 import { calculateProjectedTax } from "../../../lib/analytics/taxPlanning";
-import type {
-  Transaction,
-  ComprehensiveTaxData,
-  TaxProjection,
-  ChartData,
-} from "../../../types";
+import { calculateTaxPlanning } from "../../../lib/calculations/financial";
+import type { ChartData, ComprehensiveTaxData, TaxProjection, Transaction } from "../../../types";
 
 interface TaxPlanningDashboardProps {
   filteredData: Transaction[];
@@ -60,9 +55,7 @@ const TaxDashboardHeader = ({
   <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl p-6 shadow-lg">
     <div className="flex items-center justify-between">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          📋 Tax Planning Dashboard
-        </h2>
+        <h2 className="text-2xl font-bold text-white mb-2">📋 Tax Planning Dashboard</h2>
         <p className="text-blue-100">
           Plan your taxes, maximize deductions, and optimize your savings
         </p>
@@ -155,9 +148,7 @@ const KeyMetricsSection = ({
 
     <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 shadow-lg">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-orange-100 text-sm font-medium">
-          Taxable Income
-        </span>
+        <span className="text-orange-100 text-sm font-medium">Taxable Income</span>
         <FileText className="text-orange-200" size={24} />
       </div>
       <div className="text-3xl font-bold text-white">
@@ -169,9 +160,7 @@ const KeyMetricsSection = ({
     <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 shadow-lg">
       <div className="flex items-center justify-between mb-2">
         <span className="text-red-100 text-sm font-medium">
-          {selectedFY === "FY 2024-25" && actualTdsPaid > 0
-            ? "Actual Tax Paid"
-            : "Estimated Tax"}
+          {selectedFY === "FY 2024-25" && actualTdsPaid > 0 ? "Actual Tax Paid" : "Estimated Tax"}
         </span>
         <TrendingDown className="text-red-200" size={24} />
       </div>
@@ -189,9 +178,7 @@ const KeyMetricsSection = ({
       </div>
       <div className="text-xs text-red-200 mt-1">
         {selectedFY === "FY 2024-25" && actualTdsPaid > 0 ? (
-          `Salary TDS: ₹${(
-            (actualTdsPaid || 0) - (rsuTaxPaid || 0)
-          ).toLocaleString("en-IN", {
+          `Salary TDS: ₹${((actualTdsPaid || 0) - (rsuTaxPaid || 0)).toLocaleString("en-IN", {
             maximumFractionDigits: 0,
           })} + RSU: ₹${(rsuTaxPaid || 0).toLocaleString("en-IN", {
             maximumFractionDigits: 0,
@@ -213,9 +200,7 @@ const KeyMetricsSection = ({
 
     <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 shadow-lg">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-green-100 text-sm font-medium">
-          Post-Tax Income
-        </span>
+        <span className="text-green-100 text-sm font-medium">Post-Tax Income</span>
         <Shield className="text-green-200" size={24} />
       </div>
       <div className="text-3xl font-bold text-white">
@@ -254,48 +239,36 @@ const ImportantNote = ({
     >
       {isFy2024WithTds ? (
         <>
-          <CheckCircle2
-            className="text-green-400 flex-shrink-0 mt-0.5"
-            size={20}
-          />
+          <CheckCircle2 className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="text-sm text-green-100">
-            <strong className="text-green-300">FY 2024-25 Calculation:</strong>{" "}
-            Using reverse TDS formula to calculate actual gross income and TDS
-            paid.
+            <strong className="text-green-300">FY 2024-25 Calculation:</strong> Using reverse TDS
+            formula to calculate actual gross income and TDS paid.
             <span className="block mt-2 text-green-200">
-              • <strong>Gross Income:</strong> ₹
-              {calculatedGrossIncome.toLocaleString("en-IN")}
-              <br />• <strong>Net Received:</strong> ₹
-              {totalIncome.toLocaleString("en-IN")}
-              <br />• <strong>Actual TDS Paid:</strong> ₹
-              {actualTdsPaid.toLocaleString("en-IN")}
+              • <strong>Gross Income:</strong> ₹{calculatedGrossIncome.toLocaleString("en-IN")}
+              <br />• <strong>Net Received:</strong> ₹{totalIncome.toLocaleString("en-IN")}
+              <br />• <strong>Actual TDS Paid:</strong> ₹{actualTdsPaid.toLocaleString("en-IN")}
             </span>
             <span className="block mt-2 text-green-300 text-xs">
-              Formula: Gross = ₹15L + (Net - ₹13.44L) / 0.688, where 0.688 = 1 -
-              (30% × 1.04)
+              Formula: Gross = ₹15L + (Net - ₹13.44L) / 0.688, where 0.688 = 1 - (30% × 1.04)
             </span>
           </div>
         </>
       ) : (
         <>
-          <AlertCircle
-            className="text-yellow-400 flex-shrink-0 mt-0.5"
-            size={20}
-          />
+          <AlertCircle className="text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="text-sm text-yellow-100">
-            <strong className="text-yellow-300">Important:</strong> Income shown
-            is POST-TDS (net amount received after tax deduction). Tax
-            calculated here is based on this net income, so it will be LOWER
-            than actual TDS paid.
+            <strong className="text-yellow-300">Important:</strong> Income shown is POST-TDS (net
+            amount received after tax deduction). Tax calculated here is based on this net income,
+            so it will be LOWER than actual TDS paid.
             {(selectedFY === "FY 2022-23" || selectedFY === "FY 2023-24") && (
               <span className="block mt-2 text-yellow-200">
-                <strong>{selectedFY}:</strong> Your income was below taxable
-                limit (₹2.5L under old slabs) - ₹0 tax paid.
+                <strong>{selectedFY}:</strong> Your income was below taxable limit (₹2.5L under old
+                slabs) - ₹0 tax paid.
               </span>
             )}
             <span className="block mt-2 text-yellow-300 font-medium">
-              💡 For accurate TDS tracking: Add a "TDS Paid" expense entry for
-              each salary month with the TDS amount deducted.
+              💡 For accurate TDS tracking: Add a "TDS Paid" expense entry for each salary month
+              with the TDS amount deducted.
             </span>
           </div>
         </>
@@ -309,10 +282,7 @@ interface ProjectedTaxProps {
   totalIncome: number;
 }
 
-const ProjectedTaxSection = ({
-  projectedTaxData,
-  totalIncome,
-}: ProjectedTaxProps) => {
+const ProjectedTaxSection = ({ projectedTaxData, totalIncome }: ProjectedTaxProps) => {
   if (!projectedTaxData || projectedTaxData.monthsRemaining <= 0) {
     return null;
   }
@@ -340,9 +310,7 @@ const ProjectedTaxSection = ({
         </div>
         <div className="bg-purple-500/20 rounded-lg px-4 py-2">
           <div className="text-xs text-purple-300">Months Remaining</div>
-          <div className="text-2xl font-bold text-purple-400">
-            {monthsRemaining}
-          </div>
+          <div className="text-2xl font-bold text-purple-400">{monthsRemaining}</div>
         </div>
       </div>
 
@@ -359,9 +327,7 @@ const ProjectedTaxSection = ({
         </div>
 
         <div className="bg-gray-800/50 rounded-lg p-4">
-          <div className="text-xs text-gray-400 mb-1">
-            Projected Annual Income
-          </div>
+          <div className="text-xs text-gray-400 mb-1">Projected Annual Income</div>
           <div className="text-lg font-bold text-blue-400">
             ₹
             {projectedAnnualSalary.toLocaleString("en-IN", {
@@ -386,47 +352,35 @@ const ProjectedTaxSection = ({
             })}
           </div>
           <div className="text-xs text-gray-400 mt-1">
-            Current: ₹
-            {currentTax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            Current: ₹{currentTax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
           </div>
         </div>
 
         <div className="bg-gray-800/50 rounded-lg p-4">
-          <div className="text-xs text-gray-400 mb-1">
-            Additional Tax Liability
-          </div>
+          <div className="text-xs text-gray-400 mb-1">Additional Tax Liability</div>
           <div className="text-lg font-bold text-red-400">
             ₹
             {Math.max(0, additionalTaxLiability).toLocaleString("en-IN", {
               maximumFractionDigits: 0,
             })}
           </div>
-          <div className="text-xs text-yellow-400 mt-1">
-            {monthsRemaining} months remaining
-          </div>
+          <div className="text-xs text-yellow-400 mt-1">{monthsRemaining} months remaining</div>
         </div>
       </div>
 
       <div className="mt-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <AlertCircle
-            className="text-yellow-400 flex-shrink-0 mt-0.5"
-            size={20}
-          />
+          <AlertCircle className="text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="text-sm text-yellow-200">
-            <strong>Note:</strong> This projection assumes your next{" "}
-            {monthsRemaining} month(s) salary will match the last 3 months
-            average. Current month's salary is already included in your income.
-            Actual tax may vary based on bonuses, deductions, and other income
+            <strong>Note:</strong> This projection assumes your next {monthsRemaining} month(s)
+            salary will match the last 3 months average. Current month's salary is already included
+            in your income. Actual tax may vary based on bonuses, deductions, and other income
             sources.
             {additionalTaxLiability > 0 && (
               <span className="block mt-2">
                 💡 <strong>Tip:</strong> Consider setting aside ₹
-                {Math.ceil(
-                  additionalTaxLiability / monthsRemaining
-                ).toLocaleString("en-IN")}
-                per month for the next {monthsRemaining} month(s) to cover the
-                projected liability.
+                {Math.ceil(additionalTaxLiability / monthsRemaining).toLocaleString("en-IN")}
+                per month for the next {monthsRemaining} month(s) to cover the projected liability.
               </span>
             )}
           </div>
@@ -475,8 +429,7 @@ const ChartsSection = ({
         <div className="flex justify-between text-sm">
           <span className="text-gray-300">Salary Income:</span>
           <span className="text-white font-medium">
-            ₹
-            {salaryIncome.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            ₹{salaryIncome.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
           </span>
         </div>
         <div className="flex justify-between text-sm">
@@ -494,9 +447,7 @@ const ChartsSection = ({
         {rsuGrossIncome > 0 && (
           <>
             <div className="flex justify-between text-sm border-t border-gray-600 pt-2 mt-2">
-              <span className="text-gray-400 text-xs">
-                RSU Gross (Pre-tax):
-              </span>
+              <span className="text-gray-400 text-xs">RSU Gross (Pre-tax):</span>
               <span className="text-gray-400 text-xs font-medium">
                 ₹
                 {rsuGrossIncome.toLocaleString("en-IN", {
@@ -505,9 +456,7 @@ const ChartsSection = ({
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-red-400 text-xs">
-                RSU Tax Paid (31.2%):
-              </span>
+              <span className="text-red-400 text-xs">RSU Tax Paid (31.2%):</span>
               <span className="text-red-400 text-xs font-medium">
                 -₹
                 {rsuTaxPaid.toLocaleString("en-IN", {
@@ -527,9 +476,7 @@ const ChartsSection = ({
     </div>
 
     <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-      <h3 className="text-xl font-bold text-white mb-4">
-        Tax &amp; Deductions
-      </h3>
+      <h3 className="text-xl font-bold text-white mb-4">Tax &amp; Deductions</h3>
       <div style={{ height: "300px" }}>
         <Doughnut data={deductionsChartData} options={chartOptions} />
       </div>
@@ -546,8 +493,7 @@ const ChartsSection = ({
         <div className="flex justify-between text-sm">
           <span className="text-gray-300">Tax Liability:</span>
           <span className="text-red-400 font-medium">
-            ₹
-            {estimatedTax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            ₹{estimatedTax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
           </span>
         </div>
       </div>
@@ -565,9 +511,7 @@ interface DeductionItem {
 
 const DeductionsSection = ({ deductions }: { deductions: DeductionItem[] }) => (
   <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-    <h3 className="text-xl font-bold text-white mb-4">
-      Tax Deductions Claimed
-    </h3>
+    <h3 className="text-xl font-bold text-white mb-4">Tax Deductions Claimed</h3>
     <div className="space-y-4">
       {deductions.map((deduction) => (
         <div key={deduction.name} className="bg-gray-700/50 rounded-lg p-4">
@@ -592,9 +536,9 @@ const DeductionsSection = ({ deductions }: { deductions: DeductionItem[] }) => (
               <div className="flex justify-between text-sm text-gray-300 mb-1">
                 <span>
                   Utilized: ₹
-                  {(
-                    deduction.limit - (deduction.remaining || 0)
-                  ).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                  {(deduction.limit - (deduction.remaining || 0)).toLocaleString("en-IN", {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
                 <span>
                   Remaining: ₹
@@ -621,9 +565,7 @@ const DeductionsSection = ({ deductions }: { deductions: DeductionItem[] }) => (
 
 const TaxSlabsTable = ({ taxableIncome }: { taxableIncome: number }) => (
   <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
-    <h3 className="text-xl font-bold text-white mb-4">
-      Tax Slabs (New Regime FY 2025-26)
-    </h3>
+    <h3 className="text-xl font-bold text-white mb-4">Tax Slabs (New Regime FY 2025-26)</h3>
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
@@ -709,12 +651,12 @@ const TaxSlabsTable = ({ taxableIncome }: { taxableIncome: number }) => (
             <td className="py-3 px-4 text-center text-gray-300">30%</td>
             <td className="py-3 px-4 text-right text-red-500">
               ₹
-              {(taxableIncome > 2400000
-                ? (taxableIncome - 2400000) * 0.3
-                : 0
-              ).toLocaleString("en-IN", {
-                maximumFractionDigits: 0,
-              })}
+              {(taxableIncome > 2400000 ? (taxableIncome - 2400000) * 0.3 : 0).toLocaleString(
+                "en-IN",
+                {
+                  maximumFractionDigits: 0,
+                }
+              )}
             </td>
           </tr>
         </tbody>
@@ -762,13 +704,10 @@ const RecommendationsSection = ({
 
   return (
     <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 rounded-xl p-6 shadow-lg border border-blue-700/50">
-      <h3 className="text-xl font-bold text-white mb-4">
-        💡 Tax Saving Recommendations
-      </h3>
+      <h3 className="text-xl font-bold text-white mb-4">💡 Tax Saving Recommendations</h3>
       <div className="space-y-3">
         {recommendations.map((rec) => {
-          const styles =
-            priorityStyles[rec.priority ?? ""] ?? priorityStyles.default;
+          const styles = priorityStyles[rec.priority ?? ""] ?? priorityStyles.default;
 
           return (
             <div
@@ -778,9 +717,7 @@ const RecommendationsSection = ({
               <AlertCircle className={styles.icon} size={20} />
               <div>
                 <p className={`font-medium ${styles.title}`}>{rec.action}</p>
-                <p className={`text-sm mt-1 ${styles.message}`}>
-                  {rec.message}
-                </p>
+                <p className={`text-sm mt-1 ${styles.message}`}>{rec.message}</p>
               </div>
             </div>
           );
@@ -796,44 +733,29 @@ const ImportantNotesSection = () => (
     <ul className="space-y-2 text-gray-300">
       <li className="flex items-start gap-2">
         <span className="text-blue-400 mt-1">•</span>
-        <span>
-          This is an estimate based on the New Tax Regime for FY 2025-26
-        </span>
+        <span>This is an estimate based on the New Tax Regime for FY 2025-26</span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-400 mt-1">•</span>
-        <span>
-          Standard deduction of ₹75,000 is automatically applied for salaried
-          individuals
-        </span>
+        <span>Standard deduction of ₹75,000 is automatically applied for salaried individuals</span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-400 mt-1">•</span>
-        <span>
-          80C limit is ₹1,50,000 for investments like PPF, ELSS, LIC, etc.
-        </span>
+        <span>80C limit is ₹1,50,000 for investments like PPF, ELSS, LIC, etc.</span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-400 mt-1">•</span>
-        <span>
-          HRA exemption is calculated based on actual rent paid (simplified
-          calculation)
-        </span>
+        <span>HRA exemption is calculated based on actual rent paid (simplified calculation)</span>
       </li>
       <li className="flex items-start gap-2">
         <span className="text-blue-400 mt-1">•</span>
-        <span>
-          Please consult with a certified CA for accurate tax filing and
-          planning
-        </span>
+        <span>Please consult with a certified CA for accurate tax filing and planning</span>
       </li>
     </ul>
   </div>
 );
 
-export const TaxPlanningDashboard = ({
-  filteredData,
-}: TaxPlanningDashboardProps) => {
+export const TaxPlanningDashboard = ({ filteredData }: TaxPlanningDashboardProps) => {
   const taxPlanningData = useMemo(() => {
     return calculateTaxPlanning(filteredData);
   }, [filteredData]);
@@ -841,9 +763,7 @@ export const TaxPlanningDashboard = ({
   const { overall, byFinancialYear, availableYears } = taxPlanningData;
 
   const [selectedFY, setSelectedFY] = useState<string>(
-    (availableYears as string[]).length > 0
-      ? (availableYears as string[])[0]
-      : "overall"
+    (availableYears as string[]).length > 0 ? (availableYears as string[])[0] : "overall"
   );
 
   const taxData: ComprehensiveTaxData =
@@ -898,13 +818,7 @@ export const TaxPlanningDashboard = ({
   const chartOptions = createChartOptions();
 
   const projectedTaxData = useMemo(
-    () =>
-      calculateProjectedTax(
-        filteredData,
-        totalIncome,
-        standardDeduction,
-        totalTaxLiability
-      ),
+    () => calculateProjectedTax(filteredData, totalIncome, standardDeduction, totalTaxLiability),
     [filteredData, totalIncome, standardDeduction, totalTaxLiability]
   );
 
@@ -937,10 +851,7 @@ export const TaxPlanningDashboard = ({
         totalIncome={totalIncome}
       />
 
-      <ProjectedTaxSection
-        projectedTaxData={projectedTaxData}
-        totalIncome={totalIncome}
-      />
+      <ProjectedTaxSection projectedTaxData={projectedTaxData} totalIncome={totalIncome} />
 
       <ChartsSection
         incomeChartData={incomeChartData}

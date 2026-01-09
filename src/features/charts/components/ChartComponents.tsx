@@ -2,17 +2,10 @@
 // @ts-nocheck
 import React from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
-import {
-  formatCurrency,
-  getCommonChartOptions,
-  truncateLabel,
-} from "../../../lib/charts";
+import { comprehensiveForecast, detectSeasonality } from "../../../lib/analytics/forecasts";
+import { formatCurrency, getCommonChartOptions, truncateLabel } from "../../../lib/charts";
 import logger from "../../../utils/logger";
 import { useTimeNavigation } from "../hooks/useChartHooks";
-import {
-  comprehensiveForecast,
-  detectSeasonality,
-} from "../../../lib/analytics/forecasts";
 
 interface ChartComponentProps {
   filteredData: any[];
@@ -31,16 +24,11 @@ const aggregateByMonth = (data) => {
   const monthlyData = {};
   data.forEach((item) => {
     const monthKey = item.date.substring(0, 7);
-    if (
-      !monthlyData[monthKey] ||
-      new Date(item.date) > new Date(monthlyData[monthKey].date)
-    ) {
+    if (!monthlyData[monthKey] || new Date(item.date) > new Date(monthlyData[monthKey].date)) {
       monthlyData[monthKey] = item;
     }
   });
-  return Object.values(monthlyData).sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
+  return Object.values(monthlyData).sort((a, b) => new Date(a.date) - new Date(b.date));
 };
 
 // Helper function to build cumulative data points
@@ -57,14 +45,7 @@ const buildRegularDataPoints = (labels, getData, item) => {
 };
 
 // Helper function to create dataset objects for charts
-const createDatasets = (
-  items,
-  getData,
-  labels,
-  colors,
-  dataMode,
-  labelTruncate = null
-) => {
+const createDatasets = (items, getData, labels, colors, dataMode, labelTruncate = null) => {
   if (dataMode === "cumulative") {
     const cumulativeData = {};
     items.forEach((item) => {
@@ -92,10 +73,7 @@ const createDatasets = (
 };
 
 // eslint-disable-next-line max-lines-per-function
-export const EnhancedSpendingByAccountChart = ({
-  filteredData,
-  chartRef,
-}: ChartComponentProps) => {
+export const EnhancedSpendingByAccountChart = ({ filteredData, chartRef }: ChartComponentProps) => {
   const {
     currentYear,
     currentMonth,
@@ -119,10 +97,7 @@ export const EnhancedSpendingByAccountChart = ({
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
       return false;
     });
@@ -248,15 +223,9 @@ export const EnhancedSpendingByAccountChart = ({
             },
             label: (context) => {
               const value = context.parsed;
-              const total = context.dataset.data.reduce(
-                (sum, val) => sum + val,
-                0
-              );
+              const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
               const percentage = ((value / total) * 100).toFixed(1);
-              return [
-                `Amount: ${formatCurrency(value)}`,
-                `Percentage: ${percentage}%`,
-              ];
+              return [`Amount: ${formatCurrency(value)}`, `Percentage: ${percentage}%`];
             },
           },
         },
@@ -296,9 +265,7 @@ export const EnhancedSpendingByAccountChart = ({
     } else if (viewMode === "year") {
       return `Spending by Account (${currentYear})`;
     } else if (viewMode === "month") {
-      return `Spending by Account (${formatMonthLabel(
-        currentMonth
-      )} ${currentYear})`;
+      return `Spending by Account (${formatMonthLabel(currentMonth)} ${currentYear})`;
     }
     return "Spending by Account";
   };
@@ -365,9 +332,7 @@ export const EnhancedSpendingByAccountChart = ({
                 : "bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300 hover:from-gray-600 hover:to-gray-700 border border-gray-600"
             }`}
           >
-            {mode === "all-time"
-              ? "All Time"
-              : mode.charAt(0).toUpperCase() + mode.slice(1)}
+            {mode === "all-time" ? "All Time" : mode.charAt(0).toUpperCase() + mode.slice(1)}
           </button>
         ))}
       </div>
@@ -392,8 +357,7 @@ export const EnhancedSpendingByAccountChart = ({
             </svg>
           </button>
           <span className="text-gray-300 font-medium px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl border border-gray-600">
-            {viewMode === "month" &&
-              `${formatMonthLabel(currentMonth)} ${currentYear}`}
+            {viewMode === "month" && `${formatMonthLabel(currentMonth)} ${currentYear}`}
             {viewMode === "year" && currentYear}
           </span>
           <button
@@ -428,11 +392,7 @@ export const EnhancedSpendingByAccountChart = ({
       {/* Chart Container */}
       <div className="relative z-10 flex-1 relative bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl p-4 border border-gray-700/50">
         {chartData.labels.length > 0 ? (
-          <Doughnut
-            ref={chartRef}
-            data={chartData}
-            options={enhancedDoughnutOptions}
-          />
+          <Doughnut ref={chartRef} data={chartData} options={enhancedDoughnutOptions} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
@@ -466,12 +426,8 @@ export const EnhancedSubcategoryBreakdownChart = ({
   selectedCategory,
   onCategoryChange,
 }: EnhancedSubcategoryBreakdownChartProps) => {
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
+  const [currentYear, setCurrentYear] = React.useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = React.useState(new Date().getMonth() + 1);
   const [viewMode, setViewMode] = React.useState("month");
   const [dataMode, setDataMode] = React.useState("regular"); // Add this line
 
@@ -494,20 +450,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
   );
 
   const shortMonthNames = React.useMemo(
-    () => [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     []
   );
 
@@ -534,10 +477,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
     });
   }, [filteredData, currentYear, currentMonth, viewMode]);
@@ -659,10 +599,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
             return;
           }
           const date = new Date(item.date);
-          if (
-            date.getFullYear() === currentYear &&
-            date.getMonth() + 1 === currentMonth
-          ) {
+          if (date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth) {
             const day = date.getDate();
             const sub = item.subcategory || "Uncategorized";
             if (!dailyData[day][sub]) {
@@ -774,9 +711,7 @@ export const EnhancedSubcategoryBreakdownChart = ({
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Enhanced Subcategory Analysis
-        </h3>
+        <h3 className="text-xl font-semibold text-white">Enhanced Subcategory Analysis</h3>
         <div className="flex items-center gap-3">
           <select
             value={selectedCategory}
@@ -895,9 +830,8 @@ export const EnhancedSubcategoryBreakdownChart = ({
 
         <div className="text-sm text-gray-400">
           {
-            timeFilteredData.filter(
-              (i) => i.type === "Expense" && i.category === selectedCategory
-            ).length
+            timeFilteredData.filter((i) => i.type === "Expense" && i.category === selectedCategory)
+              .length
           }{" "}
           transactions
         </div>
@@ -916,12 +850,8 @@ export const MultiCategoryTimeAnalysisChart = ({
   chartRef,
   categories: _categories,
 }: ChartComponentProps) => {
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
+  const [currentYear, setCurrentYear] = React.useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = React.useState(new Date().getMonth() + 1);
   const [viewMode, setViewMode] = React.useState("month");
   const [dataMode, setDataMode] = React.useState("regular");
 
@@ -944,20 +874,7 @@ export const MultiCategoryTimeAnalysisChart = ({
   );
 
   const shortMonthNames = React.useMemo(
-    () => [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     []
   );
 
@@ -984,23 +901,13 @@ export const MultiCategoryTimeAnalysisChart = ({
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
     });
   }, [filteredData, currentYear, currentMonth, viewMode]);
 
   const chartData = React.useMemo(() => {
-    const colors = [
-      "#ef4444",
-      "#f97316",
-      "#f59e0b",
-      "#22c55e",
-      "#3b82f6",
-      "#8b5cf6",
-    ];
+    const colors = ["#ef4444", "#f97316", "#f59e0b", "#22c55e", "#3b82f6", "#8b5cf6"];
 
     if (viewMode === "decade") {
       const decade = Math.floor(currentYear / 10) * 10;
@@ -1043,8 +950,7 @@ export const MultiCategoryTimeAnalysisChart = ({
         labels: Array.from({ length: 10 }, (_, i) => `${decade + i}`),
         datasets: createDatasets(
           topCategories,
-          (yearIndex, category) =>
-            yearlyData[decade + yearIndex][category] || 0,
+          (yearIndex, category) => yearlyData[decade + yearIndex][category] || 0,
           Array.from({ length: 10 }, (_, i) => `${decade + i}`),
           colors,
           dataMode,
@@ -1113,10 +1019,7 @@ export const MultiCategoryTimeAnalysisChart = ({
             return;
           }
           const date = new Date(item.date);
-          if (
-            date.getFullYear() === currentYear &&
-            date.getMonth() + 1 === currentMonth
-          ) {
+          if (date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth) {
             const day = date.getDate();
             const category = item.category;
             if (!dailyData[day][category]) {
@@ -1150,15 +1053,7 @@ export const MultiCategoryTimeAnalysisChart = ({
         ),
       };
     }
-  }, [
-    filteredData,
-    currentYear,
-    currentMonth,
-    viewMode,
-    dataMode,
-    monthNames,
-    shortMonthNames,
-  ]);
+  }, [filteredData, currentYear, currentMonth, viewMode, dataMode, monthNames, shortMonthNames]);
 
   const handlePrevious = () => {
     if (viewMode === "month") {
@@ -1203,9 +1098,7 @@ export const MultiCategoryTimeAnalysisChart = ({
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Multi-Category Time Analysis
-        </h3>
+        <h3 className="text-xl font-semibold text-white">Multi-Category Time Analysis</h3>
         <button
           onClick={() => {
             if (chartRef?.current) {
@@ -1310,8 +1203,7 @@ export const MultiCategoryTimeAnalysisChart = ({
         </div>
 
         <div className="text-sm text-gray-400">
-          {timeFilteredData.filter((i) => i.type === "Expense").length} expense
-          transactions
+          {timeFilteredData.filter((i) => i.type === "Expense").length} expense transactions
         </div>
       </div>
 
@@ -1325,12 +1217,8 @@ export const MultiCategoryTimeAnalysisChart = ({
 // eslint-disable-next-line max-lines-per-function
 export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   const [viewMode, setViewMode] = React.useState("all-time");
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
+  const [currentYear, setCurrentYear] = React.useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = React.useState(new Date().getMonth() + 1);
 
   const availableYears = React.useMemo(() => {
     const years = new Set();
@@ -1354,10 +1242,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
       } else if (viewMode === "year") {
         return date.getFullYear() === currentYear;
       } else if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
       return false;
     });
@@ -1382,9 +1267,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
         return acc;
       }, {});
 
-    const sortedDates = Object.keys(dailyData).sort((a, b) =>
-      a.localeCompare(b)
-    );
+    const sortedDates = Object.keys(dailyData).sort((a, b) => a.localeCompare(b));
 
     let cumulativeNetWorth = 0;
     const netWorthData = sortedDates.map((dateKey) => {
@@ -1424,10 +1307,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
         return monthNames[date.getMonth()];
       }
       if (total > 50) {
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-          2,
-          "0"
-        )}`;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
       }
       const monthNames = [
         "Jan",
@@ -1650,9 +1530,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
     } else if (viewMode === "year") {
       return `Net Worth Progression (${currentYear})`;
     } else if (viewMode === "month") {
-      return `Net Worth Progression (${
-        monthNames[currentMonth - 1]
-      } ${currentYear})`;
+      return `Net Worth Progression (${monthNames[currentMonth - 1]} ${currentYear})`;
     }
     return "Net Worth Progression";
   };
@@ -1675,9 +1553,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          {getDisplayTitle()}
-        </h3>
+        <h3 className="text-xl font-semibold text-white">{getDisplayTitle()}</h3>
         <button
           onClick={() => {
             if (chartRef?.current) {
@@ -1723,9 +1599,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
           >
-            {mode === "all-time"
-              ? "All Time"
-              : mode.charAt(0).toUpperCase() + mode.slice(1)}
+            {mode === "all-time" ? "All Time" : mode.charAt(0).toUpperCase() + mode.slice(1)}
           </button>
         ))}
       </div>
@@ -1750,8 +1624,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
             </svg>
           </button>
           <span className="text-gray-300 font-medium">
-            {viewMode === "month" &&
-              `${monthNames[currentMonth - 1]} ${currentYear}`}
+            {viewMode === "month" && `${monthNames[currentMonth - 1]} ${currentYear}`}
             {viewMode === "year" && currentYear}
           </span>
           <button
@@ -1829,11 +1702,7 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
       {/* Chart Container */}
       <div className="flex-1 relative">
         {chartData.labels.length > 0 ? (
-          <Line
-            ref={chartRef}
-            data={chartData}
-            options={netWorthChartOptions}
-          />
+          <Line ref={chartRef} data={chartData} options={netWorthChartOptions} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
@@ -1851,12 +1720,8 @@ export const NetWorthTrendChart = ({ filteredData, chartRef }) => {
 // eslint-disable-next-line max-lines-per-function
 export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   const [viewMode, setViewMode] = React.useState("yearly");
-  const [currentYear, setCurrentYear] = React.useState(
-    new Date().getFullYear()
-  );
-  const [currentMonth, setCurrentMonth] = React.useState(
-    new Date().getMonth() + 1
-  );
+  const [currentYear, setCurrentYear] = React.useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = React.useState(new Date().getMonth() + 1);
   const [selectedCategories, setSelectedCategories] = React.useState(new Set());
 
   const availableYears = React.useMemo(() => {
@@ -1872,11 +1737,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   const availableCategories = React.useMemo(() => {
     const categories = new Set();
     filteredData.forEach((item) => {
-      if (
-        item.type === "Expense" &&
-        item.category &&
-        item.category !== "In-pocket"
-      ) {
+      if (item.type === "Expense" && item.category && item.category !== "In-pocket") {
         categories.add(item.category);
       }
     });
@@ -1887,9 +1748,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
     if (availableCategories.length > 0 && selectedCategories.size === 0) {
       const categoryTotals = availableCategories.map((category) => {
         const total = filteredData
-          .filter(
-            (item) => item.type === "Expense" && item.category === category
-          )
+          .filter((item) => item.type === "Expense" && item.category === category)
           .reduce((sum, item) => sum + item.amount, 0);
         return { category, total };
       });
@@ -1905,11 +1764,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
 
   const timeFilteredData = React.useMemo(() => {
     return filteredData.filter((item) => {
-      if (
-        !item.date ||
-        item.type !== "Expense" ||
-        item.category === "In-pocket"
-      ) {
+      if (!item.date || item.type !== "Expense" || item.category === "In-pocket") {
         return false;
       }
       const date = new Date(item.date);
@@ -1919,10 +1774,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
       } else if (viewMode === "yearly") {
         return date.getFullYear() === currentYear;
       } else if (viewMode === "monthly") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
       return false;
     });
@@ -1951,9 +1803,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         dailyData[dateKey][transaction.category] += transaction.amount;
       });
 
-    const sortedDates = Object.keys(dailyData).sort((a, b) =>
-      a.localeCompare(b)
-    );
+    const sortedDates = Object.keys(dailyData).sort((a, b) => a.localeCompare(b));
 
     const cumulativeData = {};
     selectedCategories.forEach((category) => {
@@ -1995,10 +1845,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
         return monthNames[date.getMonth()];
       }
       if (total > 50) {
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-          2,
-          "0"
-        )}`;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
       }
       const monthNames = [
         "Jan",
@@ -2233,9 +2080,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
     } else if (viewMode === "yearly") {
       return `Cumulative Category Spending Trends (${currentYear})`;
     } else if (viewMode === "monthly") {
-      return `Cumulative Category Spending Trends (${
-        monthNames[currentMonth - 1]
-      } ${currentYear})`;
+      return `Cumulative Category Spending Trends (${monthNames[currentMonth - 1]} ${currentYear})`;
     }
     return "Cumulative Category Spending Trends";
   };
@@ -2253,9 +2098,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          {getDisplayTitle()}
-        </h3>
+        <h3 className="text-xl font-semibold text-white">{getDisplayTitle()}</h3>
         <button
           onClick={() => {
             if (chartRef?.current) {
@@ -2301,9 +2144,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
           >
-            {mode === "all-time"
-              ? "All Time"
-              : mode.charAt(0).toUpperCase() + mode.slice(1)}
+            {mode === "all-time" ? "All Time" : mode.charAt(0).toUpperCase() + mode.slice(1)}
           </button>
         ))}
       </div>
@@ -2328,8 +2169,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
             </svg>
           </button>
           <span className="text-gray-300 font-medium">
-            {viewMode === "monthly" &&
-              `${monthNames[currentMonth - 1]} ${currentYear}`}
+            {viewMode === "monthly" && `${monthNames[currentMonth - 1]} ${currentYear}`}
             {viewMode === "yearly" && currentYear}
           </span>
           <button
@@ -2353,9 +2193,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
 
       {/* Category Selection */}
       <div className="mb-4">
-        <div className="text-sm text-gray-400 mb-2">
-          Select Categories to Display:
-        </div>
+        <div className="text-sm text-gray-400 mb-2">Select Categories to Display:</div>
         <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
           {availableCategories.map((category) => (
             <button
@@ -2376,11 +2214,7 @@ export const CumulativeCategoryTrendChart = ({ filteredData, chartRef }) => {
       {/* Chart Container */}
       <div className="flex-1 relative">
         {chartData.labels.length > 0 && selectedCategories.size > 0 ? (
-          <Line
-            ref={chartRef}
-            data={chartData}
-            options={cumulativeChartOptions}
-          />
+          <Line ref={chartRef} data={chartData} options={cumulativeChartOptions} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
             <div className="text-center">
@@ -2409,11 +2243,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
   const availableCategories = React.useMemo(() => {
     const categories = new Set(["All"]);
     filteredData.forEach((item) => {
-      if (
-        item.type === "Expense" &&
-        item.category &&
-        item.category !== "In-pocket"
-      ) {
+      if (item.type === "Expense" && item.category && item.category !== "In-pocket") {
         categories.add(item.category);
       }
     });
@@ -2456,9 +2286,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
     const getMaxValue = (monthlyData) => {
-      return Math.max(
-        ...Object.values(monthlyData).flatMap((y) => Object.values(y))
-      );
+      return Math.max(...Object.values(monthlyData).flatMap((y) => Object.values(y)));
     };
 
     const datasets = years.map((year) => ({
@@ -2541,16 +2369,13 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col">
       <div className="flex justify-between items-center mb-2">
         <div>
-          <h3 className="text-xl font-semibold text-white">
-            Seasonal Spending Heatmap
-          </h3>
+          <h3 className="text-xl font-semibold text-white">Seasonal Spending Heatmap</h3>
           {seasonalInfo && (
             <div className="text-xs text-gray-400 mt-1">
-              Peak: {seasonalInfo.peak?.month} (
-              {((seasonalInfo.peak?.index - 1) * 100).toFixed(0)}% above avg) |
-              Low: {seasonalInfo.low?.month} (
-              {((1 - seasonalInfo.low?.index) * 100).toFixed(0)}% below avg) |
-              Seasonality: {seasonalAnalysis.hasSeasonality ? "Strong" : "Weak"}
+              Peak: {seasonalInfo.peak?.month} ({((seasonalInfo.peak?.index - 1) * 100).toFixed(0)}%
+              above avg) | Low: {seasonalInfo.low?.month} (
+              {((1 - seasonalInfo.low?.index) * 100).toFixed(0)}% below avg) | Seasonality:{" "}
+              {seasonalAnalysis.hasSeasonality ? "Strong" : "Weak"}
             </div>
           )}
         </div>
@@ -2609,9 +2434,7 @@ export const SeasonalSpendingHeatmap = ({ filteredData, chartRef }) => {
                 bodyColor: "#e5e7eb",
                 callbacks: {
                   label: (context) =>
-                    `${context.dataset.label}: ${formatCurrency(
-                      context.parsed.y
-                    )}`,
+                    `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
                 },
               },
             },
@@ -2700,30 +2523,10 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
 
     const labels =
       comparisonType === "monthly"
-        ? [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ]
+        ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         : ["Q1", "Q2", "Q3", "Q4"];
 
-    const colors = [
-      "#3b82f6",
-      "#8b5cf6",
-      "#ec4899",
-      "#f97316",
-      "#eab308",
-      "#10b981",
-    ];
+    const colors = ["#3b82f6", "#8b5cf6", "#ec4899", "#f97316", "#eab308", "#10b981"];
 
     const datasets = [];
     Array.from(selectedYears)
@@ -2759,9 +2562,7 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[450px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">
-          Year-over-Year Comparison
-        </h3>
+        <h3 className="text-xl font-semibold text-white">Year-over-Year Comparison</h3>
         <div className="flex items-center space-x-4">
           <select
             value={comparisonType}
@@ -2802,9 +2603,7 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
 
       {/* Year Selection */}
       <div className="mb-4">
-        <div className="text-sm text-gray-400 mb-2">
-          Select Years to Compare:
-        </div>
+        <div className="text-sm text-gray-400 mb-2">Select Years to Compare:</div>
         <div className="flex flex-wrap gap-2">
           {availableYears.map((year) => (
             <button
@@ -2837,9 +2636,7 @@ export const YearOverYearComparisonChart = ({ filteredData, chartRef }) => {
                 bodyColor: "#e5e7eb",
                 callbacks: {
                   label: (context) =>
-                    `${context.dataset.label}: ${formatCurrency(
-                      context.parsed.y
-                    )}`,
+                    `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
                 },
               },
             },
@@ -2882,9 +2679,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
       }
 
       const date = new Date(item.date);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
       if (!monthlyData[monthKey]) {
         monthlyData[monthKey] = { income: 0, expense: 0, net: 0 };
@@ -2896,13 +2691,10 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         monthlyData[monthKey].expense += item.amount;
       }
 
-      monthlyData[monthKey].net =
-        monthlyData[monthKey].income - monthlyData[monthKey].expense;
+      monthlyData[monthKey].net = monthlyData[monthKey].income - monthlyData[monthKey].expense;
     });
 
-    const historicalMonths = Object.keys(monthlyData).sort((a, b) =>
-      a.localeCompare(b)
-    );
+    const historicalMonths = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
     const lastMonth = historicalMonths.at(-1);
 
     // Prepare data for advanced forecasting
@@ -2967,10 +2759,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
     const datasets = [
       {
         label: "Historical Net Cash Flow",
-        data: [
-          ...historicalNetDisplay,
-          ...new Array(forecastMonths).fill(null),
-        ],
+        data: [...historicalNetDisplay, ...new Array(forecastMonths).fill(null)],
         borderColor: "#10b981",
         backgroundColor: "rgba(16, 185, 129, 0.1)",
         borderWidth: 3,
@@ -2979,10 +2768,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
       },
       {
         label: `Forecast (${forecastMethod})`,
-        data: [
-          ...new Array(historicalNetDisplay.length).fill(null),
-          ...selectedNetForecast,
-        ],
+        data: [...new Array(historicalNetDisplay.length).fill(null), ...selectedNetForecast],
         borderColor: "#f59e0b",
         backgroundColor: "rgba(245, 158, 11, 0.1)",
         borderWidth: 3,
@@ -3041,14 +2827,11 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-2">
         <div>
-          <h3 className="text-xl font-semibold text-white">
-            Advanced Spending Forecast
-          </h3>
+          <h3 className="text-xl font-semibold text-white">Advanced Spending Forecast</h3>
           {forecastInfo && (
             <div className="text-xs text-gray-400 mt-1">
-              Method: {forecastInfo.method} | Volatility:{" "}
-              {forecastInfo.volatility?.level || "N/A"} | R²:{" "}
-              {(forecastInfo.dataQuality?.r2 || 0).toFixed(2)} | Outliers:{" "}
+              Method: {forecastInfo.method} | Volatility: {forecastInfo.volatility?.level || "N/A"}{" "}
+              | R²: {(forecastInfo.dataQuality?.r2 || 0).toFixed(2)} | Outliers:{" "}
               {forecastInfo.outliers}
             </div>
           )}
@@ -3056,9 +2839,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
         <div className="flex items-center space-x-2">
           <select
             value={forecastMonths}
-            onChange={(e) =>
-              setForecastMonths(Number.parseInt(e.target.value, 10))
-            }
+            onChange={(e) => setForecastMonths(Number.parseInt(e.target.value, 10))}
             className="bg-gray-700 text-white px-2 py-1 rounded-lg text-xs"
           >
             <option value={3}>3 Months</option>
@@ -3131,9 +2912,7 @@ export const SpendingForecastChart = ({ filteredData, chartRef }) => {
                 bodyColor: "#e5e7eb",
                 callbacks: {
                   label: (context) =>
-                    `${context.dataset.label}: ${formatCurrency(
-                      context.parsed.y
-                    )}`,
+                    `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
                 },
               },
             },
@@ -3170,9 +2949,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
   const [showAverage, setShowAverage] = React.useState(true);
 
   const chartData = React.useMemo(() => {
-    const accounts = [
-      ...new Set(filteredData.map((item) => item.account)),
-    ].sort((a, b) => a.localeCompare(b));
+    const accounts = [...new Set(filteredData.map((item) => item.account))].sort((a, b) =>
+      a.localeCompare(b)
+    );
 
     const accountData = {};
     accounts.forEach((account) => {
@@ -3185,9 +2964,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
       }
 
       const date = new Date(item.date);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
       if (!accountData[item.account][monthKey]) {
         accountData[item.account][monthKey] = {
@@ -3213,8 +2990,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
       allMonths.forEach((month) => {
         if (accountData[account][month]) {
           runningBalance +=
-            accountData[account][month].income -
-            accountData[account][month].expense;
+            accountData[account][month].income - accountData[account][month].expense;
           accountData[account][month].balance = runningBalance;
         } else {
           accountData[account][month] = {
@@ -3261,9 +3037,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         label: account,
         data: allMonths.map((month) => {
           const data = accountData[account][month];
-          return viewMode === "cumulative"
-            ? data.balance
-            : data.income - data.expense;
+          return viewMode === "cumulative" ? data.balance : data.income - data.expense;
         }),
         borderColor: colors[index % colors.length],
         backgroundColor: colors[index % colors.length] + "20",
@@ -3277,14 +3051,9 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         const accountValues = accounts
           .map((account) => {
             const data = accountData[account][month];
-            return viewMode === "cumulative"
-              ? data.balance
-              : data.income - data.expense;
+            return viewMode === "cumulative" ? data.balance : data.income - data.expense;
           })
-          .filter(
-            (value) =>
-              value !== undefined && value !== null && !Number.isNaN(value)
-          );
+          .filter((value) => value !== undefined && value !== null && !Number.isNaN(value));
 
         return accountValues.reduce((sum, value) => sum + value, 0);
       });
@@ -3294,22 +3063,14 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
         const accountValues = accounts
           .map((account) => {
             const data = accountData[account][month];
-            return viewMode === "cumulative"
-              ? data.balance
-              : data.income - data.expense;
+            return viewMode === "cumulative" ? data.balance : data.income - data.expense;
           })
-          .filter(
-            (value) =>
-              value !== undefined && value !== null && !Number.isNaN(value)
-          );
+          .filter((value) => value !== undefined && value !== null && !Number.isNaN(value));
 
         if (accountValues.length === 0) {
           return 0;
         }
-        return (
-          accountValues.reduce((sum, value) => sum + value, 0) /
-          accountValues.length
-        );
+        return accountValues.reduce((sum, value) => sum + value, 0) / accountValues.length;
       });
 
       // Add total portfolio line dataset
@@ -3356,9 +3117,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
             label: viewMode === "cumulative" ? "Balance" : "Net Income",
             data: allMonths.map((month) => {
               const data = accountData[account][month];
-              return viewMode === "cumulative"
-                ? data.balance
-                : data.income - data.expense;
+              return viewMode === "cumulative" ? data.balance : data.income - data.expense;
             }),
             borderColor: "#10b981",
             backgroundColor: "rgba(16, 185, 129, 0.1)",
@@ -3370,9 +3129,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
             ? [
                 {
                   label: "Income",
-                  data: allMonths.map(
-                    (month) => accountData[account][month].income
-                  ),
+                  data: allMonths.map((month) => accountData[account][month].income),
                   borderColor: "#3b82f6",
                   backgroundColor: "rgba(59, 130, 246, 0.1)",
                   borderWidth: 2,
@@ -3381,9 +3138,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
                 },
                 {
                   label: "Expense",
-                  data: allMonths.map(
-                    (month) => -accountData[account][month].expense
-                  ),
+                  data: allMonths.map((month) => -accountData[account][month].expense),
                   borderColor: "#ef4444",
                   backgroundColor: "rgba(239, 68, 68, 0.1)",
                   borderWidth: 2,
@@ -3397,16 +3152,14 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
     }
   }, [filteredData, selectedAccount, viewMode, showAverage]);
 
-  const accounts = [...new Set(filteredData.map((item) => item.account))].sort(
-    (a, b) => a.localeCompare(b)
+  const accounts = [...new Set(filteredData.map((item) => item.account))].sort((a, b) =>
+    a.localeCompare(b)
   );
 
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg h-[500px] flex flex-col lg:col-span-2">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-semibold text-white">
-          Account Balance Progression
-        </h3>
+        <h3 className="text-xl font-semibold text-white">Account Balance Progression</h3>
         <div className="flex items-center space-x-3">
           <select
             value={selectedAccount}
@@ -3483,9 +3236,7 @@ export const AccountBalanceProgressionChart = ({ filteredData, chartRef }) => {
                 bodyColor: "#e5e7eb",
                 callbacks: {
                   label: (context) =>
-                    `${context.dataset.label}: ${formatCurrency(
-                      context.parsed.y
-                    )}`,
+                    `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
                 },
               },
             },
@@ -3535,9 +3286,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         "Friday",
         "Saturday",
       ];
-      const weekData = new Array(7)
-        .fill(0)
-        .map(() => ({ expense: 0, income: 0, count: 0 }));
+      const weekData = new Array(7).fill(0).map(() => ({ expense: 0, income: 0, count: 0 }));
 
       expenseData.forEach((item) => {
         const dayOfWeek = new Date(item.date).getDay();
@@ -3556,28 +3305,19 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
       if (metricType === "expense") {
         data = weekData.map((d) => d.expense);
         backgroundColors = dayNames.map((_, index) => {
-          const intensity = Math.max(
-            0.3,
-            Math.min(1, data[index] / Math.max(...data))
-          );
+          const intensity = Math.max(0.3, Math.min(1, data[index] / Math.max(...data)));
           return `rgba(239, 68, 68, ${intensity})`;
         });
       } else if (metricType === "income") {
         data = weekData.map((d) => d.income);
         backgroundColors = dayNames.map((_, index) => {
-          const intensity = Math.max(
-            0.3,
-            Math.min(1, data[index] / Math.max(...data))
-          );
+          const intensity = Math.max(0.3, Math.min(1, data[index] / Math.max(...data)));
           return `rgba(16, 185, 129, ${intensity})`;
         });
       } else {
         data = weekData.map((d) => d.count);
         backgroundColors = dayNames.map((_, index) => {
-          const intensity = Math.max(
-            0.3,
-            Math.min(1, data[index] / Math.max(...data))
-          );
+          const intensity = Math.max(0.3, Math.min(1, data[index] / Math.max(...data)));
           return `rgba(59, 130, 246, ${intensity})`;
         });
       }
@@ -3611,9 +3351,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         ],
       };
     } else {
-      const monthData = new Array(31)
-        .fill(0)
-        .map(() => ({ expense: 0, income: 0, count: 0 }));
+      const monthData = new Array(31).fill(0).map(() => ({ expense: 0, income: 0, count: 0 }));
 
       expenseData.forEach((item) => {
         const dayOfMonth = new Date(item.date).getDate() - 1;
@@ -3638,9 +3376,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         backgroundColors = new Array(31).fill(0).map((_, index) => {
           const maxValue = Math.max(...data.filter((v) => v > 0));
           const intensity =
-            data[index] > 0
-              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-              : 0.1;
+            data[index] > 0 ? Math.max(0.3, Math.min(1, data[index] / maxValue)) : 0.1;
           return `rgba(239, 68, 68, ${intensity})`;
         });
       } else if (metricType === "income") {
@@ -3648,9 +3384,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         backgroundColors = new Array(31).fill(0).map((_, index) => {
           const maxValue = Math.max(...data.filter((v) => v > 0));
           const intensity =
-            data[index] > 0
-              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-              : 0.1;
+            data[index] > 0 ? Math.max(0.3, Math.min(1, data[index] / maxValue)) : 0.1;
           return `rgba(16, 185, 129, ${intensity})`;
         });
       } else {
@@ -3658,9 +3392,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
         backgroundColors = new Array(31).fill(0).map((_, index) => {
           const maxValue = Math.max(...data.filter((v) => v > 0));
           const intensity =
-            data[index] > 0
-              ? Math.max(0.3, Math.min(1, data[index] / maxValue))
-              : 0.1;
+            data[index] > 0 ? Math.max(0.3, Math.min(1, data[index] / maxValue)) : 0.1;
           return `rgba(59, 130, 246, ${intensity})`;
         });
       }
@@ -3783,8 +3515,7 @@ export const DayWeekSpendingPatternsChart = ({ filteredData, chartRef }) => {
               y: {
                 ticks: {
                   color: "#9ca3af",
-                  callback: (v) =>
-                    metricType === "count" ? v : formatCurrency(v),
+                  callback: (v) => (metricType === "count" ? v : formatCurrency(v)),
                 },
                 grid: { color: "#374151" },
               },
@@ -3838,9 +3569,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
 
     const incomeData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
-      const amount = Number.parseFloat(
-        (t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, "")
-      );
+      const amount = Number.parseFloat((t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, ""));
 
       return (
         incomeExpenseType.toLowerCase() === "income" ||
@@ -3851,9 +3580,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
 
     const expenseData = timeFilteredData.filter((t) => {
       const incomeExpenseType = t["Income/Expense"] || t.Type || "";
-      const amount = Number.parseFloat(
-        (t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, "")
-      );
+      const amount = Number.parseFloat((t.INR || t.Amount || "0").replaceAll(/[₹,$]/g, ""));
 
       return (
         incomeExpenseType.toLowerCase() === "expense" ||
@@ -3862,23 +3589,12 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       );
     });
 
-    logger.debug(
-      "Income Data:",
-      incomeData.length,
-      "Expense Data:",
-      expenseData.length
-    );
+    logger.debug("Income Data:", incomeData.length, "Expense Data:", expenseData.length);
 
     const incomeByAccount = incomeData.reduce((acc, transaction) => {
-      const account =
-        transaction.Accounts || transaction.Account || "Other Income";
+      const account = transaction.Accounts || transaction.Account || "Other Income";
       const amount = Math.abs(
-        Number.parseFloat(
-          (transaction.INR || transaction.Amount || "0").replaceAll(
-            /[₹,$]/g,
-            ""
-          )
-        )
+        Number.parseFloat((transaction.INR || transaction.Amount || "0").replaceAll(/[₹,$]/g, ""))
       );
       if (amount > 0) {
         acc[account] = (acc[account] || 0) + amount;
@@ -3889,12 +3605,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     const expensesByCategory = expenseData.reduce((acc, transaction) => {
       const category = transaction.Category || "Other Expenses";
       const amount = Math.abs(
-        Number.parseFloat(
-          (transaction.INR || transaction.Amount || "0").replaceAll(
-            /[₹,$]/g,
-            ""
-          )
-        )
+        Number.parseFloat((transaction.INR || transaction.Amount || "0").replaceAll(/[₹,$]/g, ""))
       );
       if (amount > 0) {
         acc[category] = (acc[category] || 0) + amount;
@@ -3932,18 +3643,12 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     nodes.push(...incomeNodes, ...expenseNodes);
 
     const totalIncome = incomeNodes.reduce((sum, node) => sum + node.value, 0);
-    const totalExpenses = expenseNodes.reduce(
-      (sum, node) => sum + node.value,
-      0
-    );
+    const totalExpenses = expenseNodes.reduce((sum, node) => sum + node.value, 0);
 
     incomeNodes.forEach((incomeNode) => {
       expenseNodes.forEach((expenseNode) => {
-        const flowRatio =
-          (incomeNode.value / totalIncome) *
-          (expenseNode.value / totalExpenses);
-        const flowValue =
-          Math.min(incomeNode.value, expenseNode.value) * flowRatio;
+        const flowRatio = (incomeNode.value / totalIncome) * (expenseNode.value / totalExpenses);
+        const flowValue = Math.min(incomeNode.value, expenseNode.value) * flowRatio;
 
         if (flowValue >= minFlowAmount / 10) {
           links.push({
@@ -3972,10 +3677,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       node.x = margin.left;
       node.y = margin.top + i * (incomeHeight / incomeNodes.length) + 30;
       node.width = 140;
-      node.height = Math.max(
-        40,
-        (node.value / Math.max(...incomeNodes.map((n) => n.value))) * 80
-      );
+      node.height = Math.max(40, (node.value / Math.max(...incomeNodes.map((n) => n.value))) * 80);
     });
 
     const expenseHeight = Math.max(expenseNodes.length * 60, height * 0.8);
@@ -3983,10 +3685,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
       node.x = width - margin.right - 140;
       node.y = margin.top + i * (expenseHeight / expenseNodes.length) + 30;
       node.width = 140;
-      node.height = Math.max(
-        40,
-        (node.value / Math.max(...expenseNodes.map((n) => n.value))) * 80
-      );
+      node.height = Math.max(40, (node.value / Math.max(...expenseNodes.map((n) => n.value))) * 80);
     });
 
     return { width, height, margin };
@@ -4015,9 +3714,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
   };
 
   const exportToCSV = (data, filename) => {
-    const csvContent = data
-      .map((row) => Object.values(row).join(","))
-      .join("\n");
+    const csvContent = data.map((row) => Object.values(row).join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
 
     const url = globalThis.URL.createObjectURL(blob);
@@ -4031,9 +3728,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
     <div className="lg:col-span-2 bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 h-[600px] flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h3 className="text-xl font-bold text-white mb-2">
-            â‚¹ Money Flow Analysis
-          </h3>
+          <h3 className="text-xl font-bold text-white mb-2">â‚¹ Money Flow Analysis</h3>
           <p className="text-gray-400 text-sm">
             Visualize how money flows from income sources to expense categories
           </p>
@@ -4114,9 +3809,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
                   stroke="#60a5fa"
                   strokeWidth={Math.max(
                     2,
-                    (link.value /
-                      Math.max(...sankeyData.links.map((l) => l.value))) *
-                      20
+                    (link.value / Math.max(...sankeyData.links.map((l) => l.value))) * 20
                   )}
                   fill="none"
                   opacity={0.6}
@@ -4147,9 +3840,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
                     textAnchor="middle"
                     className="pointer-events-none"
                   >
-                    {node.name.length > 15
-                      ? `${node.name.substring(0, 12)}...`
-                      : node.name}
+                    {node.name.length > 15 ? `${node.name.substring(0, 12)}...` : node.name}
                   </text>
                   <text
                     x={node.x + node.width / 2}
@@ -4166,38 +3857,17 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
 
               {/* Legend */}
               <g transform={`translate(20, ${height - 60})`}>
-                <rect
-                  x={0}
-                  y={0}
-                  width={15}
-                  height={15}
-                  fill="#10b981"
-                  rx={3}
-                />
+                <rect x={0} y={0} width={15} height={15} fill="#10b981" rx={3} />
                 <text x={20} y={12} fill="#9ca3af" fontSize="12">
                   Income Sources
                 </text>
 
-                <rect
-                  x={130}
-                  y={0}
-                  width={15}
-                  height={15}
-                  fill="#ef4444"
-                  rx={3}
-                />
+                <rect x={130} y={0} width={15} height={15} fill="#ef4444" rx={3} />
                 <text x={150} y={12} fill="#9ca3af" fontSize="12">
                   Expense Categories
                 </text>
 
-                <rect
-                  x={280}
-                  y={0}
-                  width={15}
-                  height={3}
-                  fill="#60a5fa"
-                  rx={1}
-                />
+                <rect x={280} y={0} width={15} height={3} fill="#60a5fa" rx={1} />
                 <text x={300} y={12} fill="#9ca3af" fontSize="12">
                   Money Flow
                 </text>
@@ -4216,8 +3886,7 @@ export const SankeyFlowChart = ({ filteredData, chartRef }) => {
               </div>
               {filteredData.length > 0 && (
                 <div className="text-xs text-gray-500 mt-2">
-                  Try reducing the minimum amount filter or changing the time
-                  range
+                  Try reducing the minimum amount filter or changing the time range
                 </div>
               )}
             </div>

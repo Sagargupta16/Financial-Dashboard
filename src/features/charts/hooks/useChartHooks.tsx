@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
-  getAvailableYears,
   filterDataByTimeRange,
+  getAvailableYears,
   groupDataByCategory,
   groupDataByMonth,
 } from "../../../lib/charts";
@@ -31,18 +31,12 @@ const monthNames = [
 ];
 
 // Custom hook for time navigation logic
-export const useTimeNavigation = (
-  data: GenericDataItem[],
-  initialViewMode: string = "month"
-) => {
+export const useTimeNavigation = (data: GenericDataItem[], initialViewMode: string = "month") => {
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
 
-  const availableYears = useMemo(
-    () => getAvailableYears(data) as number[],
-    [data]
-  );
+  const availableYears = useMemo(() => getAvailableYears(data) as number[], [data]);
 
   const canGoPrevious = () => {
     if (viewMode === "month") {
@@ -116,10 +110,7 @@ export const useTimeNavigation = (
         return date.getFullYear() === currentYear;
       }
       if (viewMode === "month") {
-        return (
-          date.getFullYear() === currentYear &&
-          date.getMonth() + 1 === currentMonth
-        );
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
       }
       return true;
     });
@@ -164,18 +155,13 @@ export const useChartDataProcessor = (
 
     // Filter out in-pocket if needed
     if (excludeInPocket) {
-      processedData = processedData.filter(
-        (item) => item.category !== "In-pocket"
-      );
+      processedData = processedData.filter((item) => item.category !== "In-pocket");
     }
 
     // Group data
     let groupedData: Record<string, number> | undefined;
     if (groupBy === "category") {
-      groupedData = groupDataByCategory(processedData) as Record<
-        string,
-        number
-      >;
+      groupedData = groupDataByCategory(processedData) as Record<string, number>;
     } else if (groupBy === "month") {
       groupedData = groupDataByMonth(processedData) as Record<string, number>;
     } else if (groupBy === "account") {
@@ -263,13 +249,8 @@ export const useMultipleFilters = (initialFilters = {}) => {
 // Custom hook for trend analysis
 export const useTrendAnalysis = (data: GenericDataItem[]) => {
   return useMemo(() => {
-    const groupedData = groupDataByMonth(data) as Record<
-      string,
-      { net: number }
-    >;
-    const sortedMonths = Object.keys(groupedData).sort((a, b) =>
-      a.localeCompare(b)
-    );
+    const groupedData = groupDataByMonth(data) as Record<string, { net: number }>;
+    const sortedMonths = Object.keys(groupedData).sort((a, b) => a.localeCompare(b));
 
     if (sortedMonths.length < 2) {
       return { trend: "insufficient-data", change: 0, direction: "neutral" };
@@ -319,41 +300,27 @@ export const useForecastData = (
   method = "linear"
 ) => {
   return useMemo(() => {
-    const monthlyData = groupDataByMonth(historicalData) as Record<
-      string,
-      { net: number }
-    >;
-    const sortedMonths = Object.keys(monthlyData).sort((a, b) =>
-      a.localeCompare(b)
-    );
+    const monthlyData = groupDataByMonth(historicalData) as Record<string, { net: number }>;
+    const sortedMonths = Object.keys(monthlyData).sort((a, b) => a.localeCompare(b));
 
     if (sortedMonths.length < 3) {
       return { forecast: [], confidence: "low" };
     }
 
-    const recentData = sortedMonths
-      .slice(-6)
-      .map((month) => monthlyData[month].net);
+    const recentData = sortedMonths.slice(-6).map((month) => monthlyData[month].net);
     let forecast: number[] = [];
 
     if (method === "linear") {
       // Simple moving average
-      const average =
-        recentData.reduce((sum, val) => sum + val, 0) / recentData.length;
+      const average = recentData.reduce((sum, val) => sum + val, 0) / recentData.length;
       forecast = new Array(forecastPeriods).fill(average);
     } else if (method === "trend") {
       // Linear regression
       const n = recentData.length;
       const sumX = recentData.reduce((sum, _, index) => sum + index, 0);
       const sumY = recentData.reduce((sum, val) => sum + val, 0);
-      const sumXY = recentData.reduce(
-        (sum, val, index) => sum + index * val,
-        0
-      );
-      const sumXX = recentData.reduce(
-        (sum, _, index) => sum + index * index,
-        0
-      );
+      const sumXY = recentData.reduce((sum, val, index) => sum + index * val, 0);
+      const sumXX = recentData.reduce((sum, _, index) => sum + index * index, 0);
 
       const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
       const intercept = (sumY - slope * sumX) / n;
@@ -376,8 +343,7 @@ export const useForecastData = (
     return {
       forecast,
       confidence,
-      historicalAverage:
-        recentData.reduce((sum, val) => sum + val, 0) / recentData.length,
+      historicalAverage: recentData.reduce((sum, val) => sum + val, 0) / recentData.length,
     };
   }, [historicalData, forecastPeriods, method]);
 };

@@ -1,5 +1,5 @@
 import { Sparkles } from "lucide-react";
-import React from "react";
+import type React from "react";
 
 interface TabItem {
   id: string;
@@ -50,9 +50,7 @@ export const Tabs = ({ tabs, activeTab, onChange }: TabsProps) => {
                   ) : (
                     <tab.icon className="w-5 h-5 flex-shrink-0 relative z-10 group-hover:scale-110 transition-transform duration-300" />
                   ))}
-                <span className="font-bold text-sm truncate relative z-10">
-                  {tab.label}
-                </span>
+                <span className="font-bold text-sm truncate relative z-10">{tab.label}</span>
                 {tab.badge && (
                   <span className="ml-2 px-2.5 py-0.5 text-xs rounded-full bg-red-500 text-white font-bold shadow-lg relative z-10 pulse-glow">
                     {tab.badge}

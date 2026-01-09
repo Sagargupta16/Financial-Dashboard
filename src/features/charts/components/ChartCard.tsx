@@ -1,6 +1,6 @@
-import React from "react";
 import type { Chart as ChartJS } from "chart.js";
 import { Download } from "lucide-react";
+import type React from "react";
 import { downloadChart } from "../../../lib/data";
 
 interface ChartCardProps {

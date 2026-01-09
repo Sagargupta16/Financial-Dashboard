@@ -5,22 +5,22 @@
 
 // @ts-nocheck
 
-import logger from "../../../utils/logger";
+import { INVESTMENT_ACCOUNTS, INVESTMENT_CATEGORIES } from "../../../constants";
 import {
-  calculateTotalLiquidAssets,
-  calculateTotalInvestments,
-  calculateTotalDeposits,
   calculateTotalDebt,
+  calculateTotalDeposits,
+  calculateTotalInvestments,
+  calculateTotalLiquidAssets,
+  getFinancialGrade,
   scoreConsistency,
+  scoreDebtManagement,
   scoreEmergencyFund,
   scoreIncomeExpenseRatio,
-  scoreDebtManagement,
-  getFinancialGrade,
 } from "../../../lib/calculations";
-import { parseAmount } from "../../../lib/parsers";
 import { filterByType } from "../../../lib/data";
 import { getMonthKey } from "../../../lib/formatters";
-import { INVESTMENT_CATEGORIES, INVESTMENT_ACCOUNTS } from "../../../constants";
+import { parseAmount } from "../../../lib/parsers";
+import logger from "../../../utils/logger";
 
 // Storage keys for budget data
 const BUDGET_KEY = "financial_dashboard_budgets";
@@ -88,8 +88,7 @@ export const calculateSpendingTrends = (transactions) => {
     if (!monthlySpending[monthKey]) {
       monthlySpending[monthKey] = {};
     }
-    monthlySpending[monthKey][category] =
-      (monthlySpending[monthKey][category] || 0) + amount;
+    monthlySpending[monthKey][category] = (monthlySpending[monthKey][category] || 0) + amount;
   });
 
   return monthlySpending;
@@ -217,15 +216,11 @@ export const calculateGoalProgress = (goal, currentAmount) => {
   // Calculate time remaining
   const now = new Date();
   const deadline = new Date(goal.deadline);
-  const daysRemaining = Math.max(
-    0,
-    Math.ceil((deadline - now) / (1000 * 60 * 60 * 24))
-  );
+  const daysRemaining = Math.max(0, Math.ceil((deadline - now) / (1000 * 60 * 60 * 24)));
   const monthsRemaining = Math.max(1, Math.ceil(daysRemaining / 30));
 
   // Required monthly savings to meet goal
-  const requiredMonthlySavings =
-    monthsRemaining > 0 ? remaining / monthsRemaining : 0;
+  const requiredMonthlySavings = monthsRemaining > 0 ? remaining / monthsRemaining : 0;
 
   // Projected completion based on current savings rate
   const monthlySavings = goal.monthlySavings || 0;
@@ -234,9 +229,7 @@ export const calculateGoalProgress = (goal, currentAmount) => {
 
   if (monthlySavings > 0 && remaining > 0) {
     const monthsNeeded = Math.ceil(remaining / monthlySavings);
-    projectedDate = new Date(
-      now.getTime() + monthsNeeded * 30 * 24 * 60 * 60 * 1000
-    );
+    projectedDate = new Date(now.getTime() + monthsNeeded * 30 * 24 * 60 * 60 * 1000);
     onTrack = projectedDate <= deadline;
   } else if (remaining <= 0) {
     projectedDate = now;
@@ -315,18 +308,14 @@ export const detectRecurringPayments = (transactions) => {
         const intervals = [];
         for (let i = 1; i < groupItems.length; i++) {
           const days = Math.round(
-            (groupItems[i].date - groupItems[i - 1].date) /
-              (1000 * 60 * 60 * 24)
+            (groupItems[i].date - groupItems[i - 1].date) / (1000 * 60 * 60 * 24)
           );
           intervals.push(days);
         }
 
         // Check if intervals are consistent (within 5 days variance)
-        const avgInterval =
-          intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
-        const isConsistent = intervals.every(
-          (interval) => Math.abs(interval - avgInterval) <= 5
-        );
+        const avgInterval = intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
+        const isConsistent = intervals.every((interval) => Math.abs(interval - avgInterval) <= 5);
 
         if (isConsistent) {
           // Determine frequency
@@ -341,9 +330,7 @@ export const detectRecurringPayments = (transactions) => {
 
           // Calculate next payment date
           const lastDate = groupItems[groupItems.length - 1].date;
-          const nextDate = new Date(
-            lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000
-          );
+          const nextDate = new Date(lastDate.getTime() + avgInterval * 24 * 60 * 60 * 1000);
 
           recurring.push({
             category,
@@ -396,9 +383,7 @@ const calculateSpendingVariance = (transactions) => {
 
   // Calculate coefficient of variation (CV)
   const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-  const variance =
-    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    values.length;
+  const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
   const stdDev = Math.sqrt(variance);
   const cv = mean > 0 ? (stdDev / mean) * 100 : 25;
 
@@ -449,8 +434,7 @@ export const calculateHealthScore = (data) => {
     expenseTransactions.forEach((transaction) => {
       const monthKey = getMonthKey(transaction);
       const amount = parseAmount(transaction);
-      monthlyExpenseTotals[monthKey] =
-        (monthlyExpenseTotals[monthKey] || 0) + amount;
+      monthlyExpenseTotals[monthKey] = (monthlyExpenseTotals[monthKey] || 0) + amount;
     });
 
     const expenseValues = Object.values(monthlyExpenseTotals);
@@ -459,12 +443,9 @@ export const calculateHealthScore = (data) => {
       const recentMonths = Object.keys(monthlyExpenseTotals)
         .sort((a, b) => a.localeCompare(b))
         .slice(-3);
-      const recentExpenses = recentMonths.map(
-        (month) => monthlyExpenseTotals[month]
-      );
+      const recentExpenses = recentMonths.map((month) => monthlyExpenseTotals[month]);
       averageMonthlyExpenses =
-        recentExpenses.reduce((sum, val) => sum + val, 0) /
-        recentExpenses.length;
+        recentExpenses.reduce((sum, val) => sum + val, 0) / recentExpenses.length;
     }
   }
 
@@ -481,22 +462,19 @@ export const calculateHealthScore = (data) => {
   // 2. Emergency Fund Coverage (0-25 points)
   // Emergency fund should use ONLY liquid bank cash, not investments/deposits
   // Calculate months covered using average monthly expenses from transaction history
-  const monthsCovered =
-    averageMonthlyExpenses > 0 ? totalLiquidAssets / averageMonthlyExpenses : 0;
+  const monthsCovered = averageMonthlyExpenses > 0 ? totalLiquidAssets / averageMonthlyExpenses : 0;
   metrics.emergencyFund = scoreEmergencyFund(monthsCovered);
   details.monthsCovered = monthsCovered;
   details.averageMonthlyExpenses = averageMonthlyExpenses;
 
   // 3. Debt Management (0-20 points)
-  const debtToIncomeRatio =
-    validIncome > 0 ? (totalDebt / (validIncome * 12)) * 100 : 0;
+  const debtToIncomeRatio = validIncome > 0 ? (totalDebt / (validIncome * 12)) * 100 : 0;
   metrics.debtManagement = scoreDebtManagement(debtToIncomeRatio);
   details.debtToIncomeRatio = debtToIncomeRatio;
   details.totalDebt = totalDebt; // Store raw debt value
 
   // 4. Income/Expense Balance (0-15 points)
-  const incomeExpenseRatio =
-    validExpenses > 0 ? validIncome / validExpenses : 1;
+  const incomeExpenseRatio = validExpenses > 0 ? validIncome / validExpenses : 1;
   metrics.incomeExpenseRatio = scoreIncomeExpenseRatio(incomeExpenseRatio);
   details.incomeExpenseRatio = incomeExpenseRatio;
 
@@ -649,8 +627,7 @@ export const generateRecommendations = (budgetComparison, healthScore) => {
       type: "warning",
       category: "Overall",
       message: "Financial health needs attention",
-      action:
-        "Focus on: 1) Reduce expenses 2) Increase savings 3) Build emergency fund",
+      action: "Focus on: 1) Reduce expenses 2) Increase savings 3) Build emergency fund",
     });
   }
 

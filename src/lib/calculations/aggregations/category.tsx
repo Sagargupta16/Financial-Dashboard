@@ -31,9 +31,7 @@ interface CategoryData {
  * - Missing category: uses "Uncategorized"
  * - Invalid amounts: treated as 0
  */
-export const groupByCategory = (
-  transactions: Transaction[]
-): Record<string, CategoryData> => {
+export const groupByCategory = (transactions: Transaction[]): Record<string, CategoryData> => {
   if (!transactions || transactions.length === 0) {
     return {};
   }
@@ -77,9 +75,7 @@ export const groupByCategory = (
  * - limit = 0: returns []
  */
 export const getTopCategories = (transactions: Transaction[], limit = 10) => {
-  const grouped = groupByCategory(
-    transactions.filter((t: Transaction) => t.type === "Expense")
-  );
+  const grouped = groupByCategory(transactions.filter((t: Transaction) => t.type === "Expense"));
 
   return Object.entries(grouped)
     .map(([category, data]) => ({

@@ -1,13 +1,13 @@
 // @ts-nocheck
 import {
-  NetWorthTrendChart,
-  CumulativeCategoryTrendChart,
-  SeasonalSpendingHeatmap,
-  YearOverYearComparisonChart,
-  SpendingForecastChart,
   AccountBalanceProgressionChart,
+  CumulativeCategoryTrendChart,
   DayWeekSpendingPatternsChart,
+  NetWorthTrendChart,
+  SeasonalSpendingHeatmap,
   SmartInsightsPanel,
+  SpendingForecastChart,
+  YearOverYearComparisonChart,
 } from "../../features/charts/components";
 
 /**
@@ -20,10 +20,7 @@ export const TrendsForecastsPage = ({ chartRefs, filteredData }) => {
       <SmartInsightsPanel filteredData={filteredData} />
 
       {/* Net Worth Trend */}
-      <NetWorthTrendChart
-        filteredData={filteredData}
-        chartRef={chartRefs.netWorth}
-      />
+      <NetWorthTrendChart filteredData={filteredData} chartRef={chartRefs.netWorth} />
 
       {/* Cumulative & Advanced Analytics - Merged Section */}
       <div className="bg-gray-800/50 rounded-2xl p-6">

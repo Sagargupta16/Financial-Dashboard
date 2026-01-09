@@ -4,17 +4,17 @@
  */
 
 import {
-  LayoutDashboard,
-  TrendingUp,
-  Tags,
-  LineChart,
-  Target,
-  Repeat,
-  Receipt,
-  TrendingDown,
-  FileText,
-  Users,
   CreditCard,
+  FileText,
+  LayoutDashboard,
+  LineChart,
+  Receipt,
+  Repeat,
+  Tags,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 
 export const TABS_CONFIG = [

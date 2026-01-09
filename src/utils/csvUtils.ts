@@ -78,15 +78,7 @@ export const exportToCSV = (data: CsvTransaction[]): string => {
     throw new Error("No data to export");
   }
 
-  const headers = [
-    "Date",
-    "Type",
-    "Category",
-    "Subcategory",
-    "Amount",
-    "Account",
-    "Description",
-  ];
+  const headers = ["Date", "Type", "Category", "Subcategory", "Amount", "Account", "Description"];
   const csvRows = [headers.join(",")];
 
   data.forEach((transaction) => {
@@ -118,10 +110,7 @@ export const exportToCSV = (data: CsvTransaction[]): string => {
  * @param {string} csvString - CSV formatted string
  * @param {string} filename - Desired filename (without extension)
  */
-export const downloadCSV = (
-  csvString: string,
-  filename: string = "transactions"
-): void => {
+export const downloadCSV = (csvString: string, filename: string = "transactions"): void => {
   const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
 

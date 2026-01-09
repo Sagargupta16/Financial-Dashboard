@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 import {
-  calculateMonthlyComparison,
-  calculateCategoryBudgetStatus,
   calculateCashFlowForecast,
-  detectRecurringTransactions,
-  detectAnomalies,
-  calculateDayOfMonthPattern,
+  calculateCategoryBudgetStatus,
   calculateCategoryTrends,
-  calculateIncomeStability,
-  calculateMonthlyHealthRatio,
-  calculateGoalProgress,
   calculateDateRange,
+  calculateDayOfMonthPattern,
+  calculateGoalProgress,
+  calculateIncomeStability,
+  calculateMonthlyComparison,
+  calculateMonthlyHealthRatio,
+  detectAnomalies,
+  detectRecurringTransactions,
 } from "../../../lib/calculations";
 
 /**
@@ -131,8 +131,7 @@ export const useAdvancedAnalytics = (transactions: any[]) => {
       cashFlowStatus: cashFlowForecast?.status || "unknown",
       averageMonthlyHealth:
         monthlyHealthRatio && monthlyHealthRatio.length > 0
-          ? monthlyHealthRatio.reduce((sum, m) => sum + m.ratio, 0) /
-            monthlyHealthRatio.length
+          ? monthlyHealthRatio.reduce((sum, m) => sum + m.ratio, 0) / monthlyHealthRatio.length
           : 0,
     };
 

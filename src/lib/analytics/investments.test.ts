@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
-import {
-  calculateMonthlyPnL,
-  preparePnLChartData,
-  calculateInvestmentMetrics,
-  calculateReturnPercentage,
-} from "./investments";
-import { formatCurrency } from "../formatters";
+import { describe, expect, it } from "vitest";
 import type { InvestmentTransaction } from "../../types";
+import { formatCurrency } from "../formatters";
+import {
+  calculateInvestmentMetrics,
+  calculateMonthlyPnL,
+  calculateReturnPercentage,
+  preparePnLChartData,
+} from "./investments";
 
 describe("Investment Analytics - Business Logic", () => {
   const createMockInvestmentTransaction = (
@@ -69,11 +69,7 @@ describe("Investment Analytics - Business Logic", () => {
 
       const result = calculateMonthlyPnL(transactions);
 
-      expect(result.map((r) => r.month)).toEqual([
-        "2024-01",
-        "2024-02",
-        "2024-03",
-      ]);
+      expect(result.map((r) => r.month)).toEqual(["2024-01", "2024-02", "2024-03"]);
     });
 
     it("should calculate cumulative correctly over multiple months", () => {

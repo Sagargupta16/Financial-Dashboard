@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -8,11 +8,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * Skeleton Component - Loading placeholder with shimmer animation
  */
-export const Skeleton = ({
-  className = "",
-  variant = "default",
-  ...props
-}: SkeletonProps) => {
+export const Skeleton = ({ className = "", variant = "default", ...props }: SkeletonProps) => {
   const baseClasses =
     "animate-pulse bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] rounded";
 
@@ -69,10 +65,7 @@ interface TableRowSkeletonProps {
  * TableRowSkeleton - Transaction table row skeleton
  */
 export const TableRowSkeleton = ({ columns = 6 }: TableRowSkeletonProps) => {
-  const columnIds = Array.from(
-    { length: columns },
-    () => `col-${crypto.randomUUID()}`
-  );
+  const columnIds = Array.from({ length: columns }, () => `col-${crypto.randomUUID()}`);
 
   return (
     <tr className="border-b border-gray-700">
@@ -103,11 +96,7 @@ export const ChartSkeleton = ({ height = "300px" }: ChartSkeletonProps) => {
       <Skeleton className="h-6 w-48 mb-4" />
       <div className="flex items-end justify-between gap-2" style={{ height }}>
         {barHeights.map((barHeight, index) => (
-          <Skeleton
-            key={barIds[index]}
-            className="w-full"
-            style={{ height: barHeight }}
-          />
+          <Skeleton key={barIds[index]} className="w-full" style={{ height: barHeight }} />
         ))}
       </div>
     </div>

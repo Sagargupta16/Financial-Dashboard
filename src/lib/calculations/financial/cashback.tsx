@@ -15,9 +15,7 @@ import type { Transaction } from "../../../types";
  * @param transactions - All transactions
  * @returns Total cashback earned
  */
-export const calculateTotalCashbackEarned = (
-  transactions: Transaction[]
-): number => {
+export const calculateTotalCashbackEarned = (transactions: Transaction[]): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -29,10 +27,7 @@ export const calculateTotalCashbackEarned = (
       (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
   );
 
-  return cashbackTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
+  return cashbackTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 };
 
 /**
@@ -40,9 +35,7 @@ export const calculateTotalCashbackEarned = (
  * @param transactions - All transactions
  * @returns Total cashback shared
  */
-export const calculateCashbackShared = (
-  transactions: Transaction[]
-): number => {
+export const calculateCashbackShared = (transactions: Transaction[]): number => {
   if (!transactions || transactions.length === 0) {
     return 0;
   }
@@ -58,10 +51,7 @@ export const calculateCashbackShared = (
         (t as any)["Income/Expense"] === "Transfer-Out")
   );
 
-  return cashbackSharedTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
+  return cashbackSharedTransactions.reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 };
 
 /**
@@ -69,9 +59,7 @@ export const calculateCashbackShared = (
  * @param transactions - All transactions
  * @returns Actual cashback retained
  */
-export const calculateActualCashback = (
-  transactions: Transaction[]
-): number => {
+export const calculateActualCashback = (transactions: Transaction[]): number => {
   const totalEarned = calculateTotalCashbackEarned(transactions);
   const totalShared = calculateCashbackShared(transactions);
   return totalEarned - totalShared;
@@ -99,9 +87,7 @@ export const calculateCashbackByCard = (
     t.account?.toLowerCase().includes("credit")
   );
 
-  const cardAccounts = Array.from(
-    new Set(creditCardTransactions.map((t) => t.account))
-  );
+  const cardAccounts = Array.from(new Set(creditCardTransactions.map((t) => t.account)));
 
   const byCard: Record<
     string,
@@ -125,9 +111,7 @@ export const calculateCashbackByCard = (
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
     const spending = cardTransactions
-      .filter(
-        (t) => t.type === "Expense" || (t as any)["Income/Expense"] === "Exp."
-      )
+      .filter((t) => t.type === "Expense" || (t as any)["Income/Expense"] === "Exp.")
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
     const cashbackRate = spending > 0 ? (cashback / spending) * 100 : 0;
@@ -171,9 +155,7 @@ export const calculateCashbackMetrics = (transactions: Transaction[]) => {
     0
   );
   const cashbackRate =
-    totalCreditCardSpending > 0
-      ? (totalCashbackEarned / totalCreditCardSpending) * 100
-      : 0;
+    totalCreditCardSpending > 0 ? (totalCashbackEarned / totalCreditCardSpending) * 100 : 0;
 
   // Generate insights
   const insights = [];

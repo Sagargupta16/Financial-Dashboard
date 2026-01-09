@@ -71,8 +71,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Upload entire repository
-          path: "./build"
+          # Upload dist directory (Vite output)
+          path: "./dist"
 
       - name: Deploy to GitHub Pages
         id: deployment

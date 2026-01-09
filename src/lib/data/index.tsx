@@ -1,8 +1,6 @@
 // @ts-nocheck
 // Helper Functions for Data Processing
 
-import { formatCurrency as formatCurrencyUtil } from "../formatters";
-
 /**
  * Parses a currency string and returns a numeric value
  * @param {string} value - The currency string to parse (e.g., "₹1,234.56")

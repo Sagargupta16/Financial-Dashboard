@@ -249,7 +249,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
       })
       .sort((a, b) => (b.monthKey ?? "").localeCompare(a.monthKey ?? "")); // Most recent first
 
-    return data as PeriodItem[];
+    return data;
   }, [transactions]);
 
   // Calculate yearly breakdown
@@ -272,7 +272,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
       })
       .sort((a, b) => (b.year ?? 0) - (a.year ?? 0)); // Most recent first
 
-    return data as PeriodItem[];
+    return data;
   }, [transactions]);
 
   // Format month key for display

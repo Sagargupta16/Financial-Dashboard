@@ -7,7 +7,7 @@ import type { Chart as ChartJS } from "chart.js";
 
 interface EnhancedMonthlyTrendsChartProps {
   filteredData: Transaction[];
-  chartRef?: React.MutableRefObject<ChartJS<"line"> | undefined>;
+  chartRef?: React.RefObject<ChartJS<"line"> | undefined>;
 }
 
 // Enhanced Monthly Trends Chart with time navigation

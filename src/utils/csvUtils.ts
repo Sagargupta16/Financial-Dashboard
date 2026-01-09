@@ -103,7 +103,7 @@ export const exportToCSV = (data: CsvTransaction[]): string => {
     const escapedRow = row.map((field) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replaceAll(/"/g, '""')}"`;
+        return `"${str.replaceAll('"', '""')}"`;
       }
       return str;
     });

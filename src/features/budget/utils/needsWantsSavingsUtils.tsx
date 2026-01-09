@@ -13,7 +13,7 @@ import {
 } from "../../../constants";
 import { parseAmount } from "../../../lib/parsers";
 import { filterByType } from "../../../lib/data";
-import { getMonthKey, formatPercentage } from "../../../lib/formatters";
+import { getMonthKey } from "../../../lib/formatters";
 import logger from "../../../utils/logger";
 
 const STORAGE_KEY = "financial_dashboard_nws_allocation";
@@ -574,10 +574,16 @@ export const generateNWSInsights = (breakdown, income) => {
  * Format currency for display
  */
 export const formatCurrency = (amount, showDecimals = true) => {
-  const formatted = showDecimals
-    ? amount.toFixed(2)
-    : Math.round(amount).toString();
-  return `₹${formatted.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  const options = {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: showDecimals ? 2 : 0,
+    maximumFractionDigits: showDecimals ? 2 : 0,
+  };
+  // Use 'en-IN' for Indian Rupee formatting, but remove the default '₹'
+  // and add it back to match the original function's output.
+  const formatted = new Intl.NumberFormat("en-IN", options).format(amount);
+  return `₹${formatted.replace("₹", "")}`;
 };
 
 export { formatPercentage } from "../../../lib/formatters";

@@ -7,7 +7,7 @@ import type { Transaction } from "../../../types";
 
 interface TreemapChartProps {
   filteredData: Transaction[];
-  chartRef?: React.MutableRefObject<any>;
+  chartRef?: React.RefObject<SVGSVGElement | null>;
 }
 
 // Helper function to add text line to treemap labels
@@ -206,12 +206,9 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
       return false;
     }
     if (viewMode === "month") {
-      return (
-        currentYear > Math.min(...(availableYears as number[])) ||
-        currentMonth > 1
-      );
+      return currentYear > Math.min(...availableYears) || currentMonth > 1;
     } else if (viewMode === "year") {
-      return currentYear > Math.min(...(availableYears as number[]));
+      return currentYear > Math.min(...availableYears);
     }
     return false;
   };

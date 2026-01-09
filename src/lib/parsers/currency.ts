@@ -57,15 +57,5 @@ export const parseAmount = (transaction: any): number => {
  * parseSignedAmount("1234") // 1234
  */
 export const parseSignedAmount = (value: string | number): number => {
-  if (typeof value === "number") {
-    return value;
-  }
-
-  if (typeof value !== "string") {
-    return 0;
-  }
-
-  const cleaned = value.replaceAll(/[₹$€£¥,\s]/g, "").trim();
-  const parsed = Number.parseFloat(cleaned);
-  return Number.isNaN(parsed) ? 0 : parsed;
+  return parseCurrency(value);
 };

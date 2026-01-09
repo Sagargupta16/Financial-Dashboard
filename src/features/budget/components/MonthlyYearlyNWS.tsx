@@ -236,7 +236,12 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
     const data = Object.entries(breakdown)
       .map(([monthKey, values]) => {
-        const { needs = 0, wants = 0, savings = 0, ...rest } = values || {};
+        const {
+          needs = 0,
+          wants = 0,
+          savings = 0,
+          ...rest
+        } = (values as any) || {};
         return {
           monthKey,
           needs,
@@ -259,7 +264,12 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
     const data = Object.entries(breakdown)
       .map(([year, values]) => {
-        const { needs = 0, wants = 0, savings = 0, ...rest } = values || {};
+        const {
+          needs = 0,
+          wants = 0,
+          savings = 0,
+          ...rest
+        } = (values as any) || {};
         return {
           year: Number.parseInt(year),
           needs,

@@ -1,7 +1,7 @@
 import React from "react";
 import type { Chart as ChartJS } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { truncateLabel } from "../../../lib/charts";
+import { truncateLabel } from "../../../lib/formatters";
 import { commonChartOptions } from "./ChartConfig";
 import {
   ChartContainer,

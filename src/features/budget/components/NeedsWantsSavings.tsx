@@ -11,7 +11,8 @@ import {
   saveAllocation,
 } from "../utils/needsWantsSavingsUtils";
 import { NWS_COLORS, BUDGET_ALLOCATION_DEFAULTS } from "../../../constants";
-import { filterByType, parseAmount } from "../../../lib/data";
+import { parseAmount } from "../../../lib/parsers";
+import { filterByType } from "../../../lib/data";
 import type { Transaction } from "../../../types";
 
 type AllocationKey = "needs" | "wants" | "savings";
@@ -244,12 +245,15 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                   {formatCurrency(percentage?.amount || 0)}
                 </div>
                 <div className="text-sm text-gray-400 mt-1">
-                  {formatPercentage(percentage?.percentage || 0)} of total
-                  spending
+                  {formatPercentage((percentage?.percentage || 0) / 100)} of
+                  total spending
                   {percentage?.percentageOfIncome && (
                     <span className="ml-2">
-                      • {formatPercentage(percentage.percentageOfIncome)} of
-                      income
+                      •{" "}
+                      {formatPercentage(
+                        (percentage.percentageOfIncome || 0) / 100
+                      )}{" "}
+                      of income
                     </span>
                   )}
                 </div>
@@ -274,7 +278,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                 </div>
                 <div className="text-xs text-gray-400">
                   {(data?.difference || 0) > 0 ? "+" : ""}
-                  {formatPercentage(data?.difference || 0)} vs target
+                  {formatPercentage((data?.difference || 0) / 100)} vs target
                 </div>
               </div>
             </div>
@@ -318,7 +322,8 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                   style={{ backgroundColor: color }}
                 />
                 <span className="text-sm text-gray-300">
-                  {label}: {formatPercentage(percentages[key]?.percentage || 0)}
+                  {label}:{" "}
+                  {formatPercentage((percentages[key]?.percentage || 0) / 100)}
                 </span>
               </div>
             ))}
@@ -337,7 +342,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
             <div>
               <p className="text-sm text-gray-400">Total Income</p>
               <p className="text-xl font-bold text-green-400">
-                {formatCurrency(percentages.totalIncome)}
+                {formatCurrency(percentages?.totalIncome || 0)}
               </p>
             </div>
           )}
@@ -415,7 +420,7 @@ export const NeedsWantsSavings = ({ transactions }: NeedsWantsSavingsProps) => {
                           {category}
                         </span>
                         <span className="text-white font-medium">
-                          {formatCurrency(amount, false)}
+                          {formatCurrency(Number(amount) || 0, false)}
                         </span>
                       </div>
                     ))

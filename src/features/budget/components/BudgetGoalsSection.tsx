@@ -125,7 +125,9 @@ export const BudgetGoalsSection = ({
           {/* Financial Health Score */}
           <div>
             <FinancialHealthScore
-              filteredData={filteredData}
+              filteredData={
+                filteredData as unknown as Record<string, unknown>[]
+              }
               kpiData={kpiData}
               accountBalances={bankAccounts}
               investments={investments}
@@ -160,7 +162,18 @@ export const BudgetGoalsSection = ({
 
       {activeTab === "calendar" && (
         <div className="bg-gray-800/50 rounded-2xl p-6">
-          <SpendingCalendar filteredData={filteredData} />
+          <SpendingCalendar
+            filteredData={
+              filteredData as unknown as Array<
+                {
+                  date?: string | Date;
+                  type?: string;
+                  amount?: number | string;
+                  category?: string;
+                } & Record<string, unknown>
+              >
+            }
+          />
         </div>
       )}
     </div>

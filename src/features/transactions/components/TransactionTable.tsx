@@ -13,7 +13,7 @@ import {
   CreditCard,
   Settings,
 } from "lucide-react";
-import { formatCurrency } from "../../../lib/data";
+import { formatCurrency } from "../../../lib/formatters";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import type {
   SortConfig,
@@ -737,15 +737,15 @@ export const EnhancedTransactionTable = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left table-fixed">
           <colgroup>
-            <col className="w-28" /> {/* Date */}
-            <col className="w-20" /> {/* Time */}
-            <col className="w-36" /> {/* Account */}
-            <col className="w-32" /> {/* Category */}
-            <col className="w-32" /> {/* Subcategory */}
-            <col className="w-48" /> {/* Note */}
-            <col className="w-28" /> {/* Amount */}
-            <col className="w-28" /> {/* Type */}
-            <col className="w-36" /> {/* Running Balance */}
+            <col className="w-28" />
+            <col className="w-20" />
+            <col className="w-36" />
+            <col className="w-32" />
+            <col className="w-32" />
+            <col className="w-48" />
+            <col className="w-28" />
+            <col className="w-28" />
+            <col className="w-36" />
           </colgroup>
           <thead className="bg-gradient-to-r from-gray-800/80 to-gray-900/80 backdrop-blur-sm border-b-2 border-blue-500/30">
             <tr>

@@ -67,7 +67,7 @@ const CategoryBar = ({
           {formatCurrency(amount, false)}
         </div>
         <div className="text-xs text-gray-500">
-          {formatPercentage(percentage)}
+          {formatPercentage(percentage / 100)}
         </div>
       </div>
     </div>
@@ -173,19 +173,19 @@ const PeriodCard = ({
           <div className="text-center">
             <div className="text-gray-400">Needs</div>
             <div className="text-white font-medium">
-              {formatPercentage(item.percentages.needs.percentage)}
+              {formatPercentage(item.percentages.needs.percentage / 100)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-gray-400">Wants</div>
             <div className="text-white font-medium">
-              {formatPercentage(item.percentages.wants.percentage)}
+              {formatPercentage(item.percentages.wants.percentage / 100)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-gray-400">Savings</div>
             <div className="text-white font-medium">
-              {formatPercentage(item.percentages.savings.percentage)}
+              {formatPercentage(item.percentages.savings.percentage / 100)}
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@ const PeriodCard = ({
               <span
                 className={`font-medium ${getSavingsRateColor(savingsRate)}`}
               >
-                {formatPercentage(savingsRate)}
+                {formatPercentage(savingsRate / 100)}
               </span>
             </div>
           </div>
@@ -447,7 +447,8 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Needs</div>
                       <div className="text-xl font-bold text-blue-400">
                         {formatPercentage(
-                          selectedData.percentages.needs.percentageOfIncome
+                          (selectedData.percentages.needs.percentageOfIncome ||
+                            0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 50%</div>
@@ -456,7 +457,8 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Wants</div>
                       <div className="text-xl font-bold text-amber-400">
                         {formatPercentage(
-                          selectedData.percentages.wants.percentageOfIncome
+                          (selectedData.percentages.wants.percentageOfIncome ||
+                            0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 30%</div>
@@ -465,7 +467,8 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
                       <div className="text-sm text-gray-400 mb-1">Savings</div>
                       <div className="text-xl font-bold text-green-400">
                         {formatPercentage(
-                          selectedData.percentages.savings.percentageOfIncome
+                          (selectedData.percentages.savings
+                            .percentageOfIncome || 0) / 100
                         )}
                       </div>
                       <div className="text-xs text-gray-500">Target: 20%</div>

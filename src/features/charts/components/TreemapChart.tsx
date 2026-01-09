@@ -1,17 +1,21 @@
-// @ts-nocheck
 import { useRef, useEffect, useMemo, useState } from "react";
-import * as d3 from "d3-selection";
+import { select } from "d3-selection";
 import { hierarchy, treemap, treemapBinary } from "d3-hierarchy";
 import { scaleOrdinal } from "d3-scale";
-import { formatCurrency } from "../../../lib/charts";
+import { formatCurrency } from "../../../lib/formatters";
+import type { Transaction } from "../../../types";
 
 interface TreemapChartProps {
-  filteredData: any[];
-  chartRef?: any;
+  filteredData: Transaction[];
+  chartRef?: React.MutableRefObject<any>;
 }
 
 // Helper function to add text line to treemap labels
-const appendTextLine = (textElement, line, index) => {
+const appendTextLine = (
+  textElement: any,
+  line: string,
+  index: number
+): void => {
   textElement
     .append("tspan")
     .attr("x", 4)
@@ -22,7 +26,7 @@ const appendTextLine = (textElement, line, index) => {
 };
 
 export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
-  const svgRef = useRef(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const [viewMode, setViewMode] = useState("all-time");
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
@@ -30,13 +34,13 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
 
   // Get available years from data
   const availableYears = useMemo(() => {
-    const years = new Set();
+    const years = new Set<number>();
     filteredData.forEach((item) => {
       if (item.date) {
         years.add(new Date(item.date).getFullYear());
       }
     });
-    return Array.from(years).sort((a, b) => b - a);
+    return Array.from(years).sort((a, b) => (b as number) - (a as number));
   }, [filteredData]);
 
   // Filter data based on selected time period
@@ -69,7 +73,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
 
     if (showSubcategories) {
       // Group by category and subcategory
-      const categoryData = {};
+      const categoryData: Record<string, Record<string, number>> = {};
 
       timeFilteredData.forEach((item) => {
         const category = item.category || "Other";
@@ -88,10 +92,10 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
 
       // Convert to hierarchical structure
       const children = Object.entries(categoryData).map(
-        ([category, subcategories]) => ({
+        ([category, subcategories]: [string, Record<string, number>]) => ({
           name: category,
           children: Object.entries(subcategories).map(
-            ([subcategory, amount]) => ({
+            ([subcategory, amount]: [string, number]) => ({
               name: subcategory,
               value: amount,
               category: category,
@@ -104,7 +108,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
       return { name: "root", children };
     } else {
       // Group by category only
-      const categoryTotals = {};
+      const categoryTotals: Record<string, number> = {};
 
       timeFilteredData.forEach((item) => {
         const category = item.category || "Other";
@@ -202,9 +206,12 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
       return false;
     }
     if (viewMode === "month") {
-      return currentYear > Math.min(...availableYears) || currentMonth > 1;
+      return (
+        currentYear > Math.min(...(availableYears as number[])) ||
+        currentMonth > 1
+      );
     } else if (viewMode === "year") {
-      return currentYear > Math.min(...availableYears);
+      return currentYear > Math.min(...(availableYears as number[]));
     }
     return false;
   };
@@ -236,14 +243,19 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
     }
 
     // Helper function to format display name based on length
-    const getDisplayName = (name, maxLength) => {
+    const getDisplayName = (name: string, maxLength: number): string => {
       return name.length > maxLength
         ? `${name.substring(0, maxLength - 3)}...`
         : name;
     };
 
     // Helper function to add text labels to rectangles
-    const addTextLabels = (text, d, rectWidth, rectHeight) => {
+    const addTextLabels = (
+      text: any,
+      d: any,
+      rectWidth: number,
+      rectHeight: number
+    ): void => {
       if (rectWidth < 50 || rectHeight < 30) {
         return; // Don't add text for very small rectangles
       }
@@ -261,11 +273,18 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
     };
 
     const renderTreemap = () => {
-      const svg = d3.select(svgRef.current);
+      const svg = select(svgRef.current);
       svg.selectAll("*").remove();
+
+      if (!svgRef.current) {
+        return;
+      }
 
       // Get container dimensions dynamically
       const container = svgRef.current.parentElement;
+      if (!container) {
+        return;
+      }
       const containerRect = container.getBoundingClientRect();
       const containerWidth = Math.max(containerRect.width || 800, 400);
       const containerHeight = Math.max(containerRect.height || 500, 300);
@@ -276,8 +295,8 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
 
       // Create hierarchy and treemap layout
       const root = hierarchy(treemapData)
-        .sum((d) => d.value || 0)
-        .sort((a, b) => b.value - a.value);
+        .sum((d: any) => d.value || 0)
+        .sort((a: any, b: any) => (b.value || 0) - (a.value || 0));
 
       const treemapLayout = treemap()
         .tile(treemapBinary)
@@ -301,8 +320,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
       // Create tooltip
-      const tooltip = d3
-        .select("body")
+      const tooltip = select("body")
         .append("div")
         .attr("class", "treemap-tooltip")
         .style("position", "absolute")
@@ -319,14 +337,14 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .selectAll("g")
         .data(root.leaves())
         .join("g")
-        .attr("transform", (d) => `translate(${d.x0},${d.y0})`);
+        .attr("transform", (d: any) => `translate(${d.x0 || 0},${d.y0 || 0})`);
 
       // Add rectangles
       leaves
         .append("rect")
-        .attr("width", (d) => d.x1 - d.x0)
-        .attr("height", (d) => d.y1 - d.y0)
-        .attr("fill", (d) => {
+        .attr("width", (d: any) => d.x1 - d.x0)
+        .attr("height", (d: any) => d.y1 - d.y0)
+        .attr("fill", (d: any) => {
           const category = showSubcategories ? d.data.category : d.data.name;
           return colorScale(category);
         })
@@ -334,8 +352,8 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .attr("stroke-width", 1)
         .attr("opacity", 0.8)
         .style("cursor", "pointer")
-        .on("mouseover", function (event, d) {
-          d3.select(this).attr("opacity", 1);
+        .on("mouseover", function (this: SVGRectElement, _event: any, d: any) {
+          select(this).attr("opacity", 1);
           const displayName = showSubcategories ? d.data.fullName : d.data.name;
           tooltip.style("visibility", "visible").html(`
             <strong>${displayName}</strong><br/>
@@ -343,13 +361,13 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
             ${((d.data.value / root.value) * 100).toFixed(1)}% of total
           `);
         })
-        .on("mousemove", function (event) {
+        .on("mousemove", function (event: any) {
           tooltip
             .style("top", event.pageY - 10 + "px")
             .style("left", event.pageX + 10 + "px");
         })
-        .on("mouseout", function () {
-          d3.select(this).attr("opacity", 0.8);
+        .on("mouseout", function (this: SVGRectElement) {
+          select(this).attr("opacity", 0.8);
           tooltip.style("visibility", "hidden");
         });
 
@@ -359,7 +377,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .attr("x", 4)
         .attr("y", 14)
         .attr("font-family", "Arial, sans-serif")
-        .attr("font-size", (d) => {
+        .attr("font-size", (d: any) => {
           const rectWidth = d.x1 - d.x0;
           const rectHeight = d.y1 - d.y0;
           const area = rectWidth * rectHeight;
@@ -378,8 +396,8 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         .attr("fill", "white")
         .attr("text-shadow", "1px 1px 2px rgba(0,0,0,0.7)")
         .style("pointer-events", "none")
-        .each(function (d) {
-          const text = d3.select(this);
+        .each(function (this: SVGTextElement, d: any) {
+          const text = select(this);
           const rectWidth = d.x1 - d.x0;
           const rectHeight = d.y1 - d.y0;
           addTextLabels(text, d, rectWidth, rectHeight);

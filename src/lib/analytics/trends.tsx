@@ -3,7 +3,13 @@
  * Automatically detects patterns and generates actionable insights
  */
 
-import type { Transaction } from "../../types";
+import type {
+  Transaction,
+  DayPatterns,
+  Insight,
+  SeasonalData,
+  ComprehensiveInsights,
+} from "../../types";
 import { getMonthKey } from "../data";
 import { detectSeasonality, detectOutliers } from "./forecasts";
 
@@ -12,7 +18,9 @@ import { detectSeasonality, detectOutliers } from "./forecasts";
  * @param transactions - Transaction data
  * @returns Day of week analysis
  */
-export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
+export const analyzeDayOfWeekPatterns = (
+  transactions: Transaction[]
+): DayPatterns | null => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
@@ -42,7 +50,7 @@ export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
   const totalSpending = dayData.reduce((sum, d) => sum + d.total, 0);
   const avgDaily = totalSpending / 7;
 
-  const insights = [];
+  const insights: Insight[] = [];
 
   // Find highest spending day
   const maxDay = dayData.reduce(
@@ -55,8 +63,8 @@ export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
 
   if (dayData[maxDay].total > avgDaily * 1.5) {
     insights.push({
-      type: "pattern",
-      priority: "medium",
+      type: "pattern" as const,
+      priority: "medium" as const,
       title: `${dayNames[maxDay]} is Your Peak Spending Day`,
       message: `You spend ${maxDayPercent}% more on ${dayNames[maxDay]}s compared to average (₹${dayData[maxDay].total.toLocaleString()})`,
       action: "Consider meal prepping or avoiding shopping on this day",
@@ -72,8 +80,8 @@ export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
   if (weekendAvg > weekdayAvg * 1.3) {
     const difference = ((weekendAvg / weekdayAvg - 1) * 100).toFixed(0);
     insights.push({
-      type: "pattern",
-      priority: "high",
+      type: "pattern" as const,
+      priority: "high" as const,
       title: "Weekend Spending Spike Detected",
       message: `Weekend spending is ${difference}% higher than weekdays (₹${weekendAvg.toLocaleString()} vs ₹${weekdayAvg.toLocaleString()})`,
       action: "Plan weekend budgets or activities to control spending",
@@ -98,12 +106,14 @@ export const analyzeDayOfWeekPatterns = (transactions: Transaction[]): any => {
  * @param {Array} transactions - Transaction data
  * @returns {Array} Anomaly insights
  */
-export const detectSpendingAnomalies = (transactions: Transaction[]): any[] => {
+export const detectSpendingAnomalies = (
+  transactions: Transaction[]
+): Insight[] => {
   if (!transactions || transactions.length === 0) {
     return [];
   }
 
-  const insights: any[] = [];
+  const insights: Insight[] = [];
   const expenses = transactions.filter(
     (t) => t.type === "Expense" && t.category !== "In-pocket"
   );
@@ -149,8 +159,8 @@ export const detectSpendingAnomalies = (transactions: Transaction[]): any[] => {
 
     if (amount > avg) {
       insights.push({
-        type: "anomaly",
-        priority: "high",
+        type: "anomaly" as const,
+        priority: "high" as const,
         title: `Unusual Spending in ${monthName}`,
         message: `Spending was ${percentDiff}% higher than average (₹${amount.toLocaleString()} vs ₹${avg.toLocaleString()})`,
         action: "Review large expenses in this month",
@@ -185,8 +195,8 @@ export const detectSpendingAnomalies = (transactions: Transaction[]): any[] => {
         100
       ).toFixed(0);
       insights.push({
-        type: "trend",
-        priority: "medium",
+        type: "trend" as const,
+        priority: "medium" as const,
         title: `${category} Spending Trending Up`,
         message: `Last 3 months average is ${increase}% higher (₹${recentAvg.toLocaleString()} vs ₹${historicalAvg.toLocaleString()})`,
         action: `Review ${category} expenses and identify unnecessary costs`,
@@ -202,12 +212,14 @@ export const detectSpendingAnomalies = (transactions: Transaction[]): any[] => {
  * @param {Array} transactions - Transaction data
  * @returns {Object} Seasonal analysis
  */
-export const analyzeSeasonalPatterns = (transactions: Transaction[]): any => {
+export const analyzeSeasonalPatterns = (
+  transactions: Transaction[]
+): SeasonalData | null => {
   if (!transactions || transactions.length === 0) {
     return null;
   }
 
-  const insights: any[] = [];
+  const insights: Insight[] = [];
   const expenses = transactions.filter(
     (t) => t.type === "Expense" && t.category !== "In-pocket"
   );
@@ -250,8 +262,8 @@ export const analyzeSeasonalPatterns = (transactions: Transaction[]): any => {
     if (peakMonths.length > 0) {
       const topPeak = peakMonths[0];
       insights.push({
-        type: "seasonal",
-        priority: "high",
+        type: "seasonal" as const,
+        priority: "high" as const,
         title: `${topPeak.month} is Historically High Spending`,
         message: `Spending is typically ${topPeak.percent}% above average in ${topPeak.month}`,
         action: `Budget ₹${((seasonalAnalysis.overallAverage || 0) * topPeak.index).toLocaleString()} for ${topPeak.month}`,
@@ -271,8 +283,8 @@ export const analyzeSeasonalPatterns = (transactions: Transaction[]): any => {
     if (lowMonths.length > 0) {
       const topLow = lowMonths[0];
       insights.push({
-        type: "seasonal",
-        priority: "low",
+        type: "seasonal" as const,
+        priority: "low" as const,
         title: `${topLow.month} Shows Lower Spending`,
         message: `Historically ${topLow.percent}% below average - good for savings`,
         action: "Consider extra savings or debt payments in this month",
@@ -341,16 +353,16 @@ export const generateBudgetForecastAlerts = (
     if (projectedOverrun > 0 && daysRemaining > 0) {
       const overrunPercent = ((projectedOverrun / budget) * 100).toFixed(0);
       insights.push({
-        type: "budget-alert",
-        priority: "high",
+        type: "budget-alert" as const,
+        priority: "high" as const,
         title: `${category} Budget at Risk`,
         message: `On track to exceed budget by ₹${projectedOverrun.toLocaleString()} (${overrunPercent}%)`,
         action: `Reduce daily spending to ₹${(remaining / daysRemaining).toLocaleString()} or less`,
       });
     } else if (spent > budget * 0.8 && spent < budget) {
       insights.push({
-        type: "budget-warning",
-        priority: "medium",
+        type: "budget-warning" as const,
+        priority: "medium" as const,
         title: `${category} Budget 80% Used`,
         message: `₹${remaining.toLocaleString()} remaining for ${daysRemaining} days`,
         action: `Limit to ₹${(remaining / daysRemaining).toLocaleString()}/day`,
@@ -370,14 +382,14 @@ export const generateBudgetForecastAlerts = (
 export const generateComprehensiveInsights = (
   transactions: Transaction[],
   budgets: Record<string, number> = {}
-): any => {
+): ComprehensiveInsights => {
   const dayPatterns = analyzeDayOfWeekPatterns(transactions);
   const anomalies = detectSpendingAnomalies(transactions);
   const seasonal = analyzeSeasonalPatterns(transactions);
   const budgetAlerts = generateBudgetForecastAlerts(transactions, budgets);
 
   // Combine all insights
-  const allInsights: any[] = [
+  const allInsights: Insight[] = [
     ...(dayPatterns?.insights || []),
     ...anomalies,
     ...(seasonal?.insights || []),

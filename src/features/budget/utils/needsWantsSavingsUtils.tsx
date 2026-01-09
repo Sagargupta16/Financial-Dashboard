@@ -11,7 +11,9 @@ import {
   SAVINGS_CATEGORIES,
   BUDGET_ALLOCATION_DEFAULTS,
 } from "../../../constants";
-import { parseAmount, filterByType, getMonthKey } from "../../../lib/data";
+import { parseAmount } from "../../../lib/parsers";
+import { filterByType } from "../../../lib/data";
+import { getMonthKey, formatPercentage } from "../../../lib/formatters";
 import logger from "../../../utils/logger";
 
 const STORAGE_KEY = "financial_dashboard_nws_allocation";
@@ -575,12 +577,7 @@ export const formatCurrency = (amount, showDecimals = true) => {
   const formatted = showDecimals
     ? amount.toFixed(2)
     : Math.round(amount).toString();
-  return `₹${formatted.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  return `₹${formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 };
 
-/**
- * Format percentage for display
- */
-export const formatPercentage = (percentage) => {
-  return `${percentage.toFixed(1)}%`;
-};
+export { formatPercentage };

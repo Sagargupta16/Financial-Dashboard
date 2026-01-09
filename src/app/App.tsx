@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  Suspense,
-  useRef,
-  type MutableRefObject,
-} from "react";
+import { useState, useEffect, Suspense, useRef, type RefObject } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,6 +11,7 @@ import {
   PointElement,
   LineElement,
   TimeScale,
+  Filler,
 } from "chart.js";
 
 // Components
@@ -104,7 +99,8 @@ ChartJS.register(
   ArcElement,
   PointElement,
   LineElement,
-  TimeScale
+  TimeScale,
+  Filler
 );
 
 type ChartRefKey =
@@ -126,7 +122,7 @@ type ChartRefKey =
   | "accountBalanceProgression"
   | "dayWeekSpendingPatterns";
 
-type ChartRefMap = Record<ChartRefKey, MutableRefObject<ChartJS | null>>;
+type ChartRefMap = Record<ChartRefKey, RefObject<ChartJS | null>>;
 
 const App = () => {
   // State

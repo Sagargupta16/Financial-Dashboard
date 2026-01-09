@@ -17,7 +17,9 @@ import {
   scoreDebtManagement,
   getFinancialGrade,
 } from "../../../lib/calculations";
-import { parseAmount, filterByType, getMonthKey } from "../../../lib/data";
+import { parseAmount } from "../../../lib/parsers";
+import { filterByType } from "../../../lib/data";
+import { getMonthKey } from "../../../lib/formatters";
 import { INVESTMENT_CATEGORIES, INVESTMENT_ACCOUNTS } from "../../../constants";
 
 // Storage keys for budget data

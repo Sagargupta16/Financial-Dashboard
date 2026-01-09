@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { formatCurrency } from "../../../lib/data";
+import { formatCurrency } from "../../../lib/formatters";
 
 export const AccountBalancesCard = ({ balances }) => (
   <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">

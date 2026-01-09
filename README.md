@@ -953,6 +953,17 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - Check Node.js version compatibility (>=20.0.0 required)
 - Clear pnpm cache: `pnpm store prune`
 
+## 📚 Documentation
+
+Comprehensive technical documentation is available in the [`docs/`](./docs) folder:
+
+- **[Architecture Guide](./docs/architecture/comprehensive-guide.md)** - System design, patterns, and technical decisions
+- **[Data Flow Diagram](./docs/architecture/data-flow.md)** - Visual representation of data flow
+- **[TypeScript Migration](./docs/migration/typescript-migration.md)** - Migration guide and best practices
+- **[Phase 1 Report](./docs/reports/phase-1-completion.md)** - Project milestones and achievements
+
+📖 **[View Full Documentation Index →](./docs/README.md)**
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -960,6 +971,12 @@ const reimbursements = calculateTotalReimbursements(transactions);
 3. Commit changes: `git commit -m 'Add new feature'`
 4. Push to branch: `git push origin feature-name`
 5. Submit a Pull Request
+
+**Before contributing:**
+
+- Review the [Architecture Guide](./docs/architecture/comprehensive-guide.md)
+- Follow TypeScript best practices from the [Migration Guide](./docs/migration/typescript-migration.md)
+- Add tests for new business logic
 
 ## 📄 License
 

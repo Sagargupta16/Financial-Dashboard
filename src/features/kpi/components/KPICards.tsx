@@ -1,5 +1,5 @@
 import React from "react";
-import { formatCurrency } from "../../../lib/data";
+import { formatCurrency } from "../../../lib/formatters";
 
 interface KPICardProps {
   title: string;

@@ -26,7 +26,7 @@ export const calculateTotalReimbursements = (
     (t) =>
       (t.subcategory === "Expense Reimbursement" ||
         t.subcategory?.toLowerCase().includes("reimburs")) &&
-      (t.type === "Income" || t["Income/Expense"] === "Income")
+      (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
   );
 
   return reimbursementTransactions.reduce(
@@ -52,15 +52,15 @@ export const getReimbursementTransactions = (
       (t) =>
         (t.subcategory === "Expense Reimbursement" ||
           t.subcategory?.toLowerCase().includes("reimburs")) &&
-        (t.type === "Income" || t["Income/Expense"] === "Income")
+        (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
     )
     .map((t) => ({
-      date: t.date || t.Period,
-      account: t.account || t.Accounts,
-      amount: Math.abs(Number(t.amount || t.Amount) || 0),
-      note: t.note || t.Note,
-      category: t.category || t.Category,
-      subcategory: t.subcategory || t.Subcategory,
+      date: t.date || (t as any).Period,
+      account: t.account || (t as any).Accounts,
+      amount: Math.abs(Number(t.amount || (t as any).Amount) || 0),
+      note: t.note || (t as any).Note,
+      category: t.category || (t as any).Category,
+      subcategory: t.subcategory || (t as any).Subcategory,
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };

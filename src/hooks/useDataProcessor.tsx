@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useMemo } from "react";
-import { parseCurrency, parseDate } from "../lib/data";
+import { parseCurrency, parseDate } from "../lib/parsers";
 import logger from "../utils/logger";
 import * as XLSX from "xlsx";
 import type {

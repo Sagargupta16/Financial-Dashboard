@@ -1,32 +1,14 @@
 // @ts-nocheck
-// Import formatCurrency from dataUtils
-import { formatCurrency as formatCurrencyUtil } from "../data";
+// Re-export formatters for chart utilities
+import {
+  formatCurrency as formatCurrencyUtil,
+  truncateLabel as truncateLabelUtil,
+  SHORT_MONTH_NAMES,
+} from "../formatters";
 
 export const formatCurrency = formatCurrencyUtil;
-
-export const truncateLabel = (label, maxLength = 12) => {
-  if (typeof label !== "string") {
-    return label;
-  }
-  return label.length > maxLength
-    ? `${label.substring(0, maxLength)}...`
-    : label;
-};
-
-export const shortMonthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+export const truncateLabel = truncateLabelUtil;
+export const shortMonthNames = SHORT_MONTH_NAMES;
 
 export const colorPalettes = {
   primary: [

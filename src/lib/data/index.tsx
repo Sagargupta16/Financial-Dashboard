@@ -1,6 +1,9 @@
 // @ts-nocheck
 // Helper Functions for Data Processing
 
+import { parseAmount as parseAmountUtil } from "../parsers";
+import { formatCurrency as formatCurrencyUtil } from "../formatters";
+
 /**
  * Parses a currency string and returns a numeric value
  * @param {string} value - The currency string to parse (e.g., "₹1,234.56")
@@ -50,20 +53,13 @@ export const parseDate = (dateString, timeString) => {
 };
 
 /**
- * Formats a numeric value as Indian Rupee currency
+ * Format a numeric value as currency (re-exported from formatters)
  * @param {number} value - The numeric value to format
  * @returns {string} Formatted currency string (e.g., "₹1,234.56")
  * @example
  * formatCurrency(1234.56) // returns "₹1,234.56"
  */
-export const formatCurrency = (value) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
+export const formatCurrency = formatCurrencyUtil;
 
 /**
  * Parses transaction amount to absolute number

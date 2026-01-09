@@ -26,7 +26,7 @@ export const calculateTotalCashbackEarned = (
   const cashbackTransactions = transactions.filter(
     (t) =>
       t.category === "Refund & Cashbacks" &&
-      (t.type === "Income" || t["Income/Expense"] === "Income")
+      (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
   );
 
   return cashbackTransactions.reduce(
@@ -54,8 +54,8 @@ export const calculateCashbackShared = (
       t.account === "Cashback Shared" &&
       (t.type === "Expense" ||
         t.type === "Transfer-Out" ||
-        t["Income/Expense"] === "Exp." ||
-        t["Income/Expense"] === "Transfer-Out")
+        (t as any)["Income/Expense"] === "Exp." ||
+        (t as any)["Income/Expense"] === "Transfer-Out")
   );
 
   return cashbackSharedTransactions.reduce(
@@ -120,12 +120,14 @@ export const calculateCashbackByCard = (
       .filter(
         (t) =>
           t.category === "Refund & Cashbacks" &&
-          (t.type === "Income" || t["Income/Expense"] === "Income")
+          (t.type === "Income" || (t as any)["Income/Expense"] === "Income")
       )
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
     const spending = cardTransactions
-      .filter((t) => t.type === "Expense" || t["Income/Expense"] === "Exp.")
+      .filter(
+        (t) => t.type === "Expense" || (t as any)["Income/Expense"] === "Exp."
+      )
       .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 
     const cashbackRate = spending > 0 ? (cashback / spending) * 100 : 0;

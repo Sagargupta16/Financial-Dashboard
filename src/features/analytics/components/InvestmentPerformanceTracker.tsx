@@ -10,9 +10,11 @@ import {
 } from "lucide-react";
 import { Line } from "react-chartjs-2";
 import { calculateInvestmentPerformance } from "../../../lib/calculations/financial";
+import { preparePnLChartData } from "../../../lib/analytics/investments";
+import type { Transaction, InvestmentTransaction } from "../../../types";
 
 interface InvestmentPerformanceTrackerProps {
-  filteredData: any[];
+  filteredData: Transaction[];
 }
 
 /**
@@ -40,52 +42,9 @@ export const InvestmentPerformanceTracker = ({
     transactions,
   } = investmentData;
 
-  // Prepare chart data for P&L over time
+  // Prepare chart data for P&L over time using extracted service
   const chartData = useMemo(() => {
-    const monthlyPnL: Record<string, number> = {};
-
-    transactions.forEach((t: any) => {
-      if (t.date) {
-        const month = new Date(t.date).toISOString().slice(0, 7);
-        if (!monthlyPnL[month]) {
-          monthlyPnL[month] = 0;
-        }
-        if (t.type === "Profit") {
-          monthlyPnL[month] += t.amount;
-        } else if (t.type === "Loss" || t.type === "Fee") {
-          monthlyPnL[month] -= t.amount;
-        }
-      }
-    });
-
-    const sortedMonths = Object.keys(monthlyPnL).sort((a, b) =>
-      a.localeCompare(b)
-    );
-    const cumulativePnL: number[] = [];
-    let cumulative = 0;
-
-    sortedMonths.forEach((month: string) => {
-      cumulative += monthlyPnL[month];
-      cumulativePnL.push(cumulative);
-    });
-
-    return {
-      labels: sortedMonths,
-      datasets: [
-        {
-          label: "Cumulative P&L",
-          data: cumulativePnL,
-          borderColor:
-            cumulative >= 0 ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)",
-          backgroundColor:
-            cumulative >= 0
-              ? "rgba(34, 197, 94, 0.1)"
-              : "rgba(239, 68, 68, 0.1)",
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    };
+    return preparePnLChartData(transactions);
   }, [transactions]);
 
   const chartOptions = {
@@ -383,70 +342,72 @@ export const InvestmentPerformanceTracker = ({
               </tr>
             </thead>
             <tbody>
-              {transactions.slice(0, 10).map((t: any, index: number) => {
-                const getTypeBadgeClass = (type: string) => {
-                  if (type === "Profit") {
-                    return "bg-green-900/50 text-green-300 border-green-500/30";
-                  }
-                  if (type === "Loss") {
-                    return "bg-red-900/50 text-red-300 border-red-500/30";
-                  }
-                  if (type === "Fee") {
-                    return "bg-yellow-900/50 text-yellow-300 border-yellow-500/30";
-                  }
-                  return "bg-blue-900/50 text-blue-300 border-blue-500/30";
-                };
+              {transactions
+                .slice(0, 10)
+                .map((t: InvestmentTransaction, index: number) => {
+                  const getTypeBadgeClass = (type: string) => {
+                    if (type === "Dividend") {
+                      return "bg-green-900/50 text-green-300 border-green-500/30";
+                    }
+                    if (type === "Sell") {
+                      return "bg-red-900/50 text-red-300 border-red-500/30";
+                    }
+                    if (type === "Brokerage") {
+                      return "bg-yellow-900/50 text-yellow-300 border-yellow-500/30";
+                    }
+                    return "bg-blue-900/50 text-blue-300 border-blue-500/30";
+                  };
 
-                const getAmountClass = (type: string) => {
-                  if (type === "Profit") {
-                    return "text-green-400";
-                  }
-                  if (type === "Loss" || type === "Fee") {
-                    return "text-red-400";
-                  }
-                  return "text-gray-300";
-                };
+                  const getAmountClass = (type: string) => {
+                    if (type === "Dividend") {
+                      return "text-green-400";
+                    }
+                    if (type === "Sell" || type === "Brokerage") {
+                      return "text-red-400";
+                    }
+                    return "text-gray-300";
+                  };
 
-                const getAmountPrefix = (type: string) => {
-                  if (type === "Profit") {
-                    return "+";
-                  }
-                  if (type === "Loss" || type === "Fee") {
-                    return "-";
-                  }
-                  return "";
-                };
+                  const getAmountPrefix = (type: string) => {
+                    if (type === "Profit") {
+                      return "+";
+                    }
+                    if (type === "Loss" || type === "Fee") {
+                      return "-";
+                    }
+                    return "";
+                  };
 
-                return (
-                  <tr
-                    key={`${t.date}-${t.type}-${t.amount}`}
-                    className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 transition-all duration-300 group animate-fade-in"
-                    style={{ animationDelay: `${index * 30}ms` }}
-                  >
-                    <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
-                      {new Date(t.date).toLocaleDateString("en-IN")}
-                    </td>
-                    <td className="py-4 px-5">
-                      <span
-                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border ${getTypeBadgeClass(t.type)}`}
-                      >
-                        {t.type}
-                      </span>
-                    </td>
-                    <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
-                      {t.subcategory || t.category}
-                    </td>
-                    <td
-                      className={`py-4 px-5 text-right font-bold text-base ${getAmountClass(t.type)} group-hover:scale-105 transition-transform duration-300`}
+                  return (
+                    <tr
+                      key={`${t.date}-${t.type}-${t.amount}`}
+                      className="border-b border-gray-700/50 hover:bg-gradient-to-r hover:from-gray-800/60 hover:to-gray-700/60 transition-all duration-300 group animate-fade-in"
+                      style={{ animationDelay: `${index * 30}ms` }}
                     >
-                      {getAmountPrefix(t.type)}₹
-                      {t.amount.toLocaleString("en-IN", {
-                        maximumFractionDigits: 0,
-                      })}
-                    </td>
-                  </tr>
-                );
-              })}
+                      <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
+                        {new Date(t.date).toLocaleDateString("en-IN")}
+                      </td>
+                      <td className="py-4 px-5">
+                        <span
+                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border ${getTypeBadgeClass(t.type)}`}
+                        >
+                          {t.type}
+                        </span>
+                      </td>
+                      <td className="py-4 px-5 text-gray-300 text-sm font-medium group-hover:text-white transition-colors duration-300">
+                        {t.subcategory || t.category}
+                      </td>
+                      <td
+                        className={`py-4 px-5 text-right font-bold text-base ${getAmountClass(t.type)} group-hover:scale-105 transition-transform duration-300`}
+                      >
+                        {getAmountPrefix(t.type)}₹
+                        {t.amount.toLocaleString("en-IN", {
+                          maximumFractionDigits: 0,
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

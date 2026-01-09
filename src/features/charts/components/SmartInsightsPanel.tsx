@@ -9,10 +9,15 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { generateComprehensiveInsights } from "../../../lib/analytics/trends";
+import type {
+  Transaction,
+  ComprehensiveInsights,
+  Insight,
+} from "../../../types";
 
 interface SmartInsightsPanelProps {
-  filteredData: any[];
-  budgets?: any;
+  filteredData: Transaction[];
+  budgets?: Record<string, number>;
 }
 
 /**
@@ -23,7 +28,7 @@ export const SmartInsightsPanel = ({
   filteredData,
   budgets = {},
 }: SmartInsightsPanelProps) => {
-  const insights = useMemo(() => {
+  const insights: ComprehensiveInsights = useMemo(() => {
     return generateComprehensiveInsights(filteredData, budgets);
   }, [filteredData, budgets]);
 
@@ -108,9 +113,9 @@ export const SmartInsightsPanel = ({
             <h4 className="text-sm font-semibold text-red-400 mb-2 uppercase tracking-wide">
               ⚠️ Urgent Attention
             </h4>
-            {highPriorityInsights.map((insight: any) => (
+            {highPriorityInsights.map((insight: Insight, idx: number) => (
               <div
-                key={`high-${insight.type}-${insight.title}`}
+                key={`high-${insight.type}-${insight.title}-${idx}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
@@ -145,9 +150,9 @@ export const SmartInsightsPanel = ({
             <h4 className="text-sm font-semibold text-yellow-400 mb-2 uppercase tracking-wide">
               📊 Worth Monitoring
             </h4>
-            {mediumPriorityInsights.map((insight: any) => (
+            {mediumPriorityInsights.map((insight: Insight, idx: number) => (
               <div
-                key={`medium-${insight.type}-${insight.title}`}
+                key={`medium-${insight.type}-${insight.title}-${idx}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">
@@ -182,9 +187,9 @@ export const SmartInsightsPanel = ({
             <h4 className="text-sm font-semibold text-blue-400 mb-2 uppercase tracking-wide">
               💡 Good to Know
             </h4>
-            {lowPriorityInsights.map((insight: any) => (
+            {lowPriorityInsights.map((insight: Insight, idx: number) => (
               <div
-                key={`low-${insight.type}-${insight.title}`}
+                key={`low-${insight.type}-${insight.title}-${idx}`}
                 className={`border-l-4 ${getPriorityColor(insight.priority)} rounded-r-lg p-4 mb-2`}
               >
                 <div className="flex items-start gap-3">

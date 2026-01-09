@@ -2,10 +2,12 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
 import { commonChartOptions } from "./ChartConfig";
+import type { Transaction } from "../../../types";
+import type { Chart as ChartJS } from "chart.js";
 
 interface EnhancedMonthlyTrendsChartProps {
-  filteredData: any[];
-  chartRef?: any;
+  filteredData: Transaction[];
+  chartRef?: React.MutableRefObject<ChartJS<"line"> | undefined>;
 }
 
 // Enhanced Monthly Trends Chart with time navigation

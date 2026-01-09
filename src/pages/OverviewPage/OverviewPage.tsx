@@ -19,7 +19,7 @@ import {
   SecondaryKPISection,
   AdvancedAnalyticsKPISection,
 } from "../../features/kpi/components/KPISections";
-import { formatCurrency } from "../../lib/data";
+import { formatCurrency } from "../../lib/formatters";
 import { useEnhancedKPIData } from "../../features/kpi/hooks/useCalculations";
 import { useAdvancedAnalytics } from "../../features/analytics/hooks/useAdvancedAnalytics";
 import { generateSmartInsights } from "../../lib/analytics/insights";

@@ -8,22 +8,21 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
+import type { ChartOptions as ChartJSOptions } from "chart.js";
 import { calculateTaxPlanning } from "../../../lib/calculations/financial";
+import { calculateProjectedTax } from "../../../lib/analytics/taxPlanning";
+import type {
+  Transaction,
+  ComprehensiveTaxData,
+  TaxProjection,
+  ChartData,
+} from "../../../types";
 
 interface TaxPlanningDashboardProps {
-  filteredData: any[];
+  filteredData: Transaction[];
 }
 
-type TaxPlanningResult = {
-  overall: any;
-  byFinancialYear: Record<string, any>;
-  availableYears: string[];
-};
-
-type ChartOptions = ReturnType<typeof createChartOptions>;
-type TaxProjection = ReturnType<typeof calculateProjectedTax>;
-
-const createChartOptions = () => ({
+const createChartOptions = (): ChartJSOptions<"doughnut"> => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -42,87 +41,6 @@ const createChartOptions = () => ({
     },
   },
 });
-
-const calculateProjectedTax = (
-  filteredData: any[],
-  totalIncome: number,
-  standardDeduction: number,
-  totalTaxLiability: number
-) => {
-  if (!filteredData || filteredData.length === 0) {
-    return null;
-  }
-
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const fyMonth = currentMonth >= 3 ? currentMonth - 3 : currentMonth + 9;
-  const monthsRemaining = Math.max(0, 11 - fyMonth);
-  if (monthsRemaining === 0) {
-    return null;
-  }
-
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-  const recentSalaryTransactions = filteredData.filter((t) => {
-    const txDate = new Date(t.date);
-    return (
-      t.type === "Income" &&
-      t.category === "Employment Income" &&
-      (t.subcategory === "Salary" || t.subcategory === "Base Salary") &&
-      txDate >= threeMonthsAgo &&
-      txDate <= now
-    );
-  });
-
-  if (recentSalaryTransactions.length === 0) {
-    return null;
-  }
-
-  const totalRecentSalary = recentSalaryTransactions.reduce(
-    (sum, t) => sum + Math.abs(Number(t.amount) || 0),
-    0
-  );
-  const avgMonthlySalary = totalRecentSalary / recentSalaryTransactions.length;
-  const projectedAnnualSalary =
-    totalIncome + avgMonthlySalary * monthsRemaining;
-
-  const projectedTaxableIncome = Math.max(
-    0,
-    projectedAnnualSalary - standardDeduction - 2400
-  );
-
-  let projectedTax = 0;
-  if (projectedTaxableIncome > 400000) {
-    if (projectedTaxableIncome <= 800000) {
-      projectedTax = (projectedTaxableIncome - 400000) * 0.05;
-    } else if (projectedTaxableIncome <= 1200000) {
-      projectedTax = 20000 + (projectedTaxableIncome - 800000) * 0.1;
-    } else if (projectedTaxableIncome <= 1600000) {
-      projectedTax = 60000 + (projectedTaxableIncome - 1200000) * 0.15;
-    } else if (projectedTaxableIncome <= 2000000) {
-      projectedTax = 120000 + (projectedTaxableIncome - 1600000) * 0.2;
-    } else if (projectedTaxableIncome <= 2400000) {
-      projectedTax = 200000 + (projectedTaxableIncome - 2000000) * 0.25;
-    } else {
-      projectedTax = 300000 + (projectedTaxableIncome - 2400000) * 0.3;
-    }
-  }
-
-  const projectedCess = projectedTax * 0.04;
-  const projectedTotalTax = projectedTax + projectedCess;
-  const additionalTaxLiability = projectedTotalTax - totalTaxLiability;
-
-  return {
-    avgMonthlySalary,
-    monthsRemaining,
-    projectedAnnualSalary,
-    projectedTaxableIncome,
-    projectedTotalTax,
-    additionalTaxLiability,
-    currentTax: totalTaxLiability,
-  };
-};
 
 interface HeaderProps {
   availableYears: string[];
@@ -387,7 +305,7 @@ const ImportantNote = ({
 };
 
 interface ProjectedTaxProps {
-  projectedTaxData: TaxProjection;
+  projectedTaxData: TaxProjection | null;
   totalIncome: number;
 }
 
@@ -519,9 +437,9 @@ const ProjectedTaxSection = ({
 };
 
 interface ChartSectionProps {
-  incomeChartData: any;
-  deductionsChartData: any;
-  chartOptions: ChartOptions;
+  incomeChartData: ChartData;
+  deductionsChartData: ChartData;
+  chartOptions: ChartJSOptions<"doughnut">;
   salaryIncome: number;
   bonusIncome: number;
   rsuIncome: number;
@@ -805,16 +723,14 @@ const TaxSlabsTable = ({ taxableIncome }: { taxableIncome: number }) => (
   </div>
 );
 
-interface RecommendationItem {
-  priority?: string;
-  title?: string;
-  message: string;
-}
-
 const RecommendationsSection = ({
   recommendations,
 }: {
-  recommendations: RecommendationItem[];
+  recommendations: Array<{
+    priority?: string;
+    message: string;
+    action: string;
+  }>;
 }) => {
   if (!recommendations.length) {
     return null;
@@ -851,18 +767,20 @@ const RecommendationsSection = ({
       </h3>
       <div className="space-y-3">
         {recommendations.map((rec) => {
-          const { container, icon, title, message } =
+          const styles =
             priorityStyles[rec.priority ?? ""] ?? priorityStyles.default;
 
           return (
             <div
               key={rec.message}
-              className={`flex items-start gap-3 rounded-lg p-4 border ${container}`}
+              className={`flex items-start gap-3 rounded-lg p-4 border ${styles.container}`}
             >
-              <AlertCircle className={icon} size={20} />
+              <AlertCircle className={styles.icon} size={20} />
               <div>
-                <p className={`font-medium ${title}`}>{rec.title}</p>
-                <p className={`text-sm mt-1 ${message}`}>{rec.message}</p>
+                <p className={`font-medium ${styles.title}`}>{rec.action}</p>
+                <p className={`text-sm mt-1 ${styles.message}`}>
+                  {rec.message}
+                </p>
               </div>
             </div>
           );
@@ -916,18 +834,22 @@ const ImportantNotesSection = () => (
 export const TaxPlanningDashboard = ({
   filteredData,
 }: TaxPlanningDashboardProps) => {
-  const taxPlanningData = useMemo<TaxPlanningResult>(() => {
-    return calculateTaxPlanning(filteredData) as TaxPlanningResult;
+  const taxPlanningData = useMemo(() => {
+    return calculateTaxPlanning(filteredData);
   }, [filteredData]);
 
   const { overall, byFinancialYear, availableYears } = taxPlanningData;
 
   const [selectedFY, setSelectedFY] = useState<string>(
-    availableYears.length > 0 ? availableYears[0] : "overall"
+    (availableYears as string[]).length > 0
+      ? (availableYears as string[])[0]
+      : "overall"
   );
 
-  const taxData =
-    selectedFY === "overall" ? overall : byFinancialYear[selectedFY] || overall;
+  const taxData: ComprehensiveTaxData =
+    selectedFY === "overall"
+      ? overall
+      : (byFinancialYear as Record<string, any>)[selectedFY] || overall;
 
   const {
     totalIncome = 0,
@@ -989,7 +911,7 @@ export const TaxPlanningDashboard = ({
   return (
     <div className="space-y-6">
       <TaxDashboardHeader
-        availableYears={availableYears}
+        availableYears={availableYears as string[]}
         selectedFY={selectedFY}
         onYearChange={setSelectedFY}
         taxRegime={taxRegime}

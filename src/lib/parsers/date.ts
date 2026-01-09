@@ -31,13 +31,13 @@ export const parseDate = (
   }
 
   // DD/MM/YYYY format: day, month, year
-  const day = parseInt(dateParts[1], 10);
-  const month = parseInt(dateParts[2], 10) - 1; // JS months are 0-indexed
-  const year = parseInt(dateParts[3], 10);
+  const day = Number.parseInt(dateParts[1], 10);
+  const month = Number.parseInt(dateParts[2], 10) - 1; // JS months are 0-indexed
+  const year = Number.parseInt(dateParts[3], 10);
 
-  const hour = parseInt(timeParts[1], 10);
-  const minute = parseInt(timeParts[2], 10);
-  const second = parseInt(timeParts[3], 10);
+  const hour = Number.parseInt(timeParts[1], 10);
+  const minute = Number.parseInt(timeParts[2], 10);
+  const second = Number.parseInt(timeParts[3], 10);
 
   const date = new Date(year, month, day, hour, minute, second);
 
@@ -73,9 +73,9 @@ export const parseDateString = (dateString: string): Date | null => {
   const parts = ddmmyyyyRegex.exec(dateString);
 
   if (parts) {
-    const day = parseInt(parts[1], 10);
-    const month = parseInt(parts[2], 10) - 1;
-    const year = parseInt(parts[3], 10);
+    const day = Number.parseInt(parts[1], 10);
+    const month = Number.parseInt(parts[2], 10) - 1;
+    const year = Number.parseInt(parts[3], 10);
     date = new Date(year, month, day);
 
     if (!Number.isNaN(date.getTime())) {

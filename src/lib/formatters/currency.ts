@@ -32,7 +32,7 @@ export const formatCurrency = (
   } = options;
 
   // Handle edge cases
-  if (!isFinite(value) || isNaN(value)) {
+  if (!Number.isFinite(value) || Number.isNaN(value)) {
     value = 0;
   }
 

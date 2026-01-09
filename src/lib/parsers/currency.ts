@@ -21,7 +21,7 @@ export const parseCurrency = (value: string | number): number => {
   }
 
   // Remove currency symbols, commas, and whitespace
-  const cleaned = value.replace(/[₹$€£¥,\s]/g, "").trim();
+  const cleaned = value.replaceAll(/[₹$€£¥,\s]/g, "").trim();
 
   const parsed = Number.parseFloat(cleaned);
   return Number.isNaN(parsed) ? 0 : parsed;
@@ -36,7 +36,7 @@ export const parseCurrency = (value: string | number): number => {
  * parseAmount({amount: "1234"}) // 1234
  */
 export const parseAmount = (transaction: any): number => {
-  if (!transaction || transaction.amount === undefined) {
+  if (!transaction?.amount) {
     return 0;
   }
 
@@ -65,7 +65,7 @@ export const parseSignedAmount = (value: string | number): number => {
     return 0;
   }
 
-  const cleaned = value.replace(/[₹$€£¥,\s]/g, "").trim();
+  const cleaned = value.replaceAll(/[₹$€£¥,\s]/g, "").trim();
   const parsed = Number.parseFloat(cleaned);
   return Number.isNaN(parsed) ? 0 : parsed;
 };

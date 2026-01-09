@@ -40,7 +40,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
         years.add(new Date(item.date).getFullYear());
       }
     });
-    return Array.from(years).sort((a, b) => (b as number) - (a as number));
+    return Array.from(years).sort((a, b) => b - a);
   }, [filteredData]);
 
   // Filter data based on selected time period

@@ -28,7 +28,7 @@ export const formatPercentage = (
   decimals: number = 1
 ): string => {
   // Handle edge cases
-  if (!isFinite(value) || isNaN(value)) {
+  if (!Number.isFinite(value) || Number.isNaN(value)) {
     return "0.0%";
   }
 

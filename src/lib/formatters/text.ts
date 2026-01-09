@@ -79,7 +79,7 @@ export const camelToReadable = (text: string): string => {
     return "";
   }
   return text
-    .replace(/([A-Z])/g, " $1")
+    .replaceAll(/([A-Z])/g, " $1")
     .trim()
     .split(" ")
     .map((word) => capitalize(word))

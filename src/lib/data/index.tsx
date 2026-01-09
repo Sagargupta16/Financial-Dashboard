@@ -1,7 +1,6 @@
 // @ts-nocheck
 // Helper Functions for Data Processing
 
-import { parseAmount as parseAmountUtil } from "../parsers";
 import { formatCurrency as formatCurrencyUtil } from "../formatters";
 
 /**
@@ -59,7 +58,7 @@ export const parseDate = (dateString, timeString) => {
  * @example
  * formatCurrency(1234.56) // returns "₹1,234.56"
  */
-export const formatCurrency = formatCurrencyUtil;
+export { formatCurrency } from "../formatters";
 
 /**
  * Parses transaction amount to absolute number

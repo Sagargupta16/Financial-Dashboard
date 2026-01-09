@@ -12,7 +12,7 @@ export const lazyLoad = <T extends ComponentType<any>>(
 ): LazyExoticComponent<T> => {
   return lazy(() =>
     importFn().then((module) => ({
-      default: ((module as any)[exportName] || (module as any).default) as T,
+      default: (module[exportName] || module.default) as T,
     }))
   );
 };

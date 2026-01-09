@@ -577,7 +577,7 @@ export const formatCurrency = (amount, showDecimals = true) => {
   const formatted = showDecimals
     ? amount.toFixed(2)
     : Math.round(amount).toString();
-  return `₹${formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  return `₹${formatted.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 };
 
-export { formatPercentage };
+export { formatPercentage } from "../../../lib/formatters";

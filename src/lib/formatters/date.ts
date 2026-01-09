@@ -123,7 +123,7 @@ export const getMonthKey = (dateOrTransaction: any): string => {
   // If string, try to parse it
   if (typeof dateValue === "string") {
     const date = new Date(dateValue);
-    if (!isNaN(date.getTime())) {
+    if (!Number.isNaN(date.getTime())) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
       return `${year}-${month}`;

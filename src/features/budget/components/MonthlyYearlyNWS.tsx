@@ -231,10 +231,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
   // Calculate monthly breakdown
   const monthlyData = useMemo<PeriodItem[]>(() => {
-    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<
-      string,
-      Record<string, number>
-    >;
+    const breakdown = calculateMonthlyNWSBreakdown(transactions);
     const income = getMonthlyIncome(transactions) as Record<string, number>;
 
     const data = Object.entries(breakdown)
@@ -257,10 +254,7 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
 
   // Calculate yearly breakdown
   const yearlyData = useMemo<PeriodItem[]>(() => {
-    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<
-      string,
-      Record<string, number>
-    >;
+    const breakdown = calculateYearlyNWSBreakdown(transactions);
     const income = getYearlyIncome(transactions) as Record<string, number>;
 
     const data = Object.entries(breakdown)

@@ -16,9 +16,9 @@ import { type RefObject, Suspense, useEffect, useRef, useState } from "react";
 import { Footer } from "../components/layout/Footer";
 // Components
 import { Header } from "../components/layout/Header";
+import { CustomTabs, TabContent } from "../components/ui/CustomTabs";
 import { LoadingSpinner } from "../components/ui/Loading";
 import { SectionSkeleton } from "../components/ui/SectionSkeleton";
-import { TabContent, Tabs } from "../components/ui/Tabs";
 // Config
 import { TABS_CONFIG } from "../config/tabs";
 // Utils
@@ -200,7 +200,7 @@ const App = () => {
         <Header onFileUpload={handleFileUpload} />
 
         {/* Tab Navigation */}
-        <Tabs tabs={TABS_CONFIG} activeTab={activeTab} onChange={setActiveTab} />
+        <CustomTabs tabs={TABS_CONFIG} activeTab={activeTab} onChange={setActiveTab} />
 
         {/* Tab Content */}
         <TabContent isActive={activeTab === "overview"}>

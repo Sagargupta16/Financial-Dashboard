@@ -178,48 +178,19 @@ interface FinancialStore {
 
 ---
 
-### Phase 4: File-Based Routing (Architecture) 🗂️
+### Phase 4: File-Based Routing (Architecture) ⏭️ SKIPPED
 
-**Priority:** MEDIUM | **Effort:** 2 hours | **Status:** Pending Phase 3
+**Priority:** MEDIUM | **Effort:** 2 hours | **Status:** ⏭️ **SKIPPED - NOT APPLICABLE**
 
-**Why Fourth:** Simplifies routing after state is clean.
+**Why Skipped:** The application uses a tab-based UI pattern, not traditional routing. File-based routing (vite-plugin-pages) is designed for apps with multiple routes/pages. Since this app operates as a single-page application with tab navigation, file-based routing would add unnecessary complexity without providing benefits.
 
-**Tasks:**
+**Analysis:**
+- App uses `<TabContent isActive={activeTab === "overview"}>` pattern
+- All views are conditionally rendered based on `activeTab` state
+- No URL routing required (all on same page)
+- Current lazy loading structure is already optimal for tabs
 
-- [ ] Install `vite-plugin-pages` and `react-router-dom` types
-- [ ] Configure plugin in `vite.config.ts`
-- [ ] Restructure pages directory
-- [ ] Rename files to route convention
-- [ ] Remove manual lazy loading from App.tsx
-- [ ] Update imports to use generated routes
-- [ ] Add catch-all 404 page
-- [ ] Test all routes work correctly
-
-**New Structure:**
-
-```
-src/pages/
-  ├── index.tsx                 → /          (redirect to /overview)
-  ├── overview.tsx              → /overview
-  ├── income-expense.tsx        → /income-expense
-  ├── category-analysis.tsx     → /category-analysis
-  ├── trends-forecasts.tsx      → /trends-forecasts
-  ├── investment.tsx            → /investment
-  ├── tax.tsx                   → /tax
-  ├── family.tsx                → /family
-  ├── credit-card.tsx           → /credit-card
-  ├── patterns.tsx              → /patterns
-  ├── transactions.tsx          → /transactions
-  ├── budget.tsx                → /budget
-  └── [...all].tsx             → /404
-```
-
-**Benefits:**
-
-- Remove ~50 lines from App.tsx
-- Automatic code splitting
-- Conventional routing
-- Easier to add new pages
+**Decision:** Skip this phase and proceed to more impactful improvements.
 
 ---
 

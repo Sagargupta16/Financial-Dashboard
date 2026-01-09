@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { FinancialHealthScore } from "../../../components/data-display/FinancialHealthScore";
 import { SpendingCalendar } from "../../../components/data-display/SpendingCalendar";
-import { Tabs } from "../../../components/ui/Tabs";
+import { CustomTabs } from "../../../components/ui/CustomTabs";
 import type { Transaction } from "../../../types";
 import { BudgetPlanner } from "./BudgetPlanner";
 import { MonthlyYearlyNWS } from "./MonthlyYearlyNWS";
@@ -110,7 +110,7 @@ export const BudgetGoalsSection = ({
 
       {/* Tabs */}
       <div className="flex justify-center">
-        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+        <CustomTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
       </div>
 
       {/* Tab Content */}

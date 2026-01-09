@@ -1,116 +1,39 @@
-import type React from "react";
+import { cn } from "@/lib/utils";
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  variant?: "default" | "card" | "circle" | "button" | "text";
+function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("animate-pulse rounded-md bg-primary/10", className)} {...props} />;
 }
 
 /**
- * Skeleton Component - Loading placeholder with shimmer animation
+ * Card Skeleton - Loading placeholder for KPI cards
  */
-export const Skeleton = ({ className = "", variant = "default", ...props }: SkeletonProps) => {
-  const baseClasses =
-    "animate-pulse bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] rounded";
-
-  const variantClasses = {
-    default: "h-4 w-full",
-    card: "h-48 w-full rounded-2xl",
-    circle: "h-12 w-12 rounded-full",
-    button: "h-10 w-24 rounded-lg",
-    text: "h-3 w-3/4",
-  };
-
+export const SkeletonCard = () => {
   return (
-    <div
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-      style={{
-        animation: "shimmer 2s infinite",
-      }}
-      {...props}
-    />
-  );
-};
-
-/**
- * SkeletonCard - KPI Card skeleton for loading state
- */
-export const SkeletonCard = () => (
-  <div className="bg-gradient-to-br from-gray-800 via-gray-800 to-gray-900 p-6 rounded-2xl shadow-xl border border-gray-700">
-    <div className="flex items-center justify-between mb-4">
-      <Skeleton className="h-5 w-32" />
-      <Skeleton variant="circle" className="h-12 w-12" />
-    </div>
-    <Skeleton className="h-10 w-40" />
-  </div>
-);
-
-/**
- * SmallSkeletonCard - Small KPI Card skeleton for loading state
- */
-export const SmallSkeletonCard = () => (
-  <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-4 rounded-lg shadow-lg border border-gray-700">
-    <div className="flex items-center justify-between mb-2">
-      <Skeleton className="h-4 w-24" />
-      <Skeleton variant="circle" className="h-6 w-6" />
-    </div>
-    <Skeleton className="h-8 w-32" />
-  </div>
-);
-
-interface TableRowSkeletonProps {
-  columns?: number;
-}
-
-/**
- * TableRowSkeleton - Transaction table row skeleton
- */
-export const TableRowSkeleton = ({ columns = 6 }: TableRowSkeletonProps) => {
-  const columnIds = Array.from({ length: columns }, () => `col-${crypto.randomUUID()}`);
-
-  return (
-    <tr className="border-b border-gray-700">
-      {columnIds.map((id) => (
-        <td key={id} className="p-4">
-          <Skeleton className="h-4 w-full" />
-        </td>
-      ))}
-    </tr>
-  );
-};
-
-interface ChartSkeletonProps {
-  height?: string;
-}
-
-/**
- * Chart Skeleton - Animated loading skeleton for charts
- * Using fixed heights for better visual consistency
- */
-export const ChartSkeleton = ({ height = "300px" }: ChartSkeletonProps) => {
-  // Predefined heights for better visual consistency
-  const barHeights = ["45%", "70%", "55%", "85%", "60%", "75%", "50%", "65%"];
-  const barIds = barHeights.map(() => `bar-${crypto.randomUUID()}`);
-
-  return (
-    <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700">
-      <Skeleton className="h-6 w-48 mb-4" />
-      <div className="flex items-end justify-between gap-2" style={{ height }}>
-        {barHeights.map((barHeight, index) => (
-          <Skeleton key={barIds[index]} className="w-full" style={{ height: barHeight }} />
-        ))}
+    <div className="bg-gray-800 rounded-2xl shadow-lg p-6 space-y-4">
+      <Skeleton className="h-5 w-24 bg-gray-700" />
+      <Skeleton className="h-8 w-32 bg-gray-700" />
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-full bg-gray-700" />
+        <Skeleton className="h-3 w-4/5 bg-gray-700" />
       </div>
     </div>
   );
 };
 
-// Add shimmer animation to global styles
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-  `;
-  document.head.appendChild(style);
-}
+/**
+ * Chart Skeleton - Loading placeholder for chart sections
+ */
+export const ChartSkeleton = () => {
+  return (
+    <div className="bg-gray-800 rounded-2xl shadow-lg p-6 space-y-4">
+      <Skeleton className="h-6 w-40 bg-gray-700" />
+      <Skeleton className="h-64 w-full bg-gray-700 rounded-lg" />
+      <div className="flex justify-between">
+        <Skeleton className="h-4 w-20 bg-gray-700" />
+        <Skeleton className="h-4 w-20 bg-gray-700" />
+      </div>
+    </div>
+  );
+};
+
+export { Skeleton };

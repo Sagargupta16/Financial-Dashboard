@@ -44,6 +44,7 @@
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
     "type-check": "tsc --noEmit",
+      "test:run": "echo 'No tests configured yet - Phase 8 pending'",
     "prepare": "husky"
   },
   "devDependencies": {

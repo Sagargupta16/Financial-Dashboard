@@ -5,12 +5,13 @@ import {
   exportToCSV,
   downloadCSV,
   readFileAsText,
+  type CsvTransaction,
 } from "../../utils/csvUtils";
 
 interface CSVImportExportProps {
-  data: unknown[];
-  onImport: (data: unknown[]) => void;
-  filteredData: unknown[];
+  data: CsvTransaction[];
+  onImport: (data: CsvTransaction[]) => void;
+  filteredData: CsvTransaction[];
 }
 
 /**

@@ -45,7 +45,7 @@ export const parseCSV = (csvString: string): CsvTransaction[] => {
       type: row.Type || row.type,
       category: row.Category || row.category,
       subcategory: row.Subcategory || row.subcategory || "",
-      amount: Number.parseFloat(row.Amount || row.amount || 0),
+      amount: Number.parseFloat(String(row.Amount ?? row.amount ?? "0")),
       account: row.Account || row.account || "",
       description: row.Description || row.description || "",
     };
@@ -103,7 +103,7 @@ export const exportToCSV = (data: CsvTransaction[]): string => {
     const escapedRow = row.map((field) => {
       const str = String(field);
       if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replaceAll('"', '""')}"`;
+        return `"${str.replace(/"/g, '""')}"`;
       }
       return str;
     });

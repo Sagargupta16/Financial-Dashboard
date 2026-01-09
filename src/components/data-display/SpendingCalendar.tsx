@@ -5,6 +5,7 @@ type SpendingCalendarTransaction = {
   date?: string | Date;
   type?: string;
   amount?: number | string;
+  category?: string;
 } & Record<string, unknown>;
 
 interface SpendingCalendarProps {
@@ -52,7 +53,9 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
         return; // Skip if date parsing fails
       }
 
-      const amount = Math.abs(Number.parseFloat(transaction.amount) || 0);
+      const amount = Math.abs(
+        Number.parseFloat(String(transaction.amount ?? "0")) || 0
+      );
       const type = transaction.type;
 
       if (type === "Expense") {
@@ -199,7 +202,9 @@ export const SpendingCalendar = ({ filteredData }: SpendingCalendarProps) => {
                             className="text-gray-300 text-xs truncate"
                           >
                             {t.category}: ₹
-                            {Math.abs(Number.parseFloat(t.amount)).toFixed(0)}
+                            {Math.abs(
+                              Number.parseFloat(String(t.amount ?? "0"))
+                            ).toFixed(0)}
                           </p>
                         ))}
                         {data.transactions.length > 3 && (

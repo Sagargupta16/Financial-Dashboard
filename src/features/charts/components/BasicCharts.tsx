@@ -1,19 +1,32 @@
-import { type RefObject } from "react";
+import React from "react";
+import { type ChartData, type Point, type BubbleDataPoint } from "chart.js";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import { ChartCard } from "./ChartCard";
 import { commonChartOptions, doughnutOptions } from "./ChartConfig";
 
-interface ChartProps {
-  data: unknown;
-  chartRef?: RefObject<unknown>;
+type ChartRef = React.RefObject<any>;
+type DoughnutData = ChartData<"doughnut", number[], unknown>;
+type BarData = ChartData<
+  "bar",
+  (number | [number, number] | BubbleDataPoint | null)[],
+  unknown
+>;
+type LineData = ChartData<"line", (number | Point | null)[], unknown>;
+
+interface ChartProps<TData> {
+  data: TData;
+  chartRef?: ChartRef;
 }
 
 interface SubcategoryBreakdownChartProps {
-  data: unknown;
-  chartRef?: RefObject<unknown>;
+  data: BarData;
+  chartRef?: ChartRef;
 }
 
-export const IncomeVsExpenseChart = ({ data, chartRef }: ChartProps) => (
+export const IncomeVsExpenseChart = ({
+  data,
+  chartRef,
+}: ChartProps<DoughnutData>) => (
   <ChartCard
     title="Income vs Expense"
     chartRef={chartRef}
@@ -23,7 +36,10 @@ export const IncomeVsExpenseChart = ({ data, chartRef }: ChartProps) => (
   </ChartCard>
 );
 
-export const TopExpenseCategoriesChart = ({ data, chartRef }: ChartProps) => (
+export const TopExpenseCategoriesChart = ({
+  data,
+  chartRef,
+}: ChartProps<BarData>) => (
   <ChartCard
     title="Top Expense Categories"
     chartRef={chartRef}
@@ -33,7 +49,10 @@ export const TopExpenseCategoriesChart = ({ data, chartRef }: ChartProps) => (
   </ChartCard>
 );
 
-export const TopIncomeSourcesChart = ({ data, chartRef }: ChartProps) => (
+export const TopIncomeSourcesChart = ({
+  data,
+  chartRef,
+}: ChartProps<BarData>) => (
   <ChartCard
     title="Top Income Sources"
     chartRef={chartRef}
@@ -43,7 +62,10 @@ export const TopIncomeSourcesChart = ({ data, chartRef }: ChartProps) => (
   </ChartCard>
 );
 
-export const SpendingByAccountChart = ({ data, chartRef }: ChartProps) => (
+export const SpendingByAccountChart = ({
+  data,
+  chartRef,
+}: ChartProps<DoughnutData>) => (
   <ChartCard
     title="Spending by Account"
     chartRef={chartRef}
@@ -53,7 +75,10 @@ export const SpendingByAccountChart = ({ data, chartRef }: ChartProps) => (
   </ChartCard>
 );
 
-export const MonthlyTrendsChart = ({ data, chartRef }: ChartProps) => (
+export const MonthlyTrendsChart = ({
+  data,
+  chartRef,
+}: ChartProps<LineData>) => (
   <ChartCard
     title="Monthly Trends"
     chartRef={chartRef}
@@ -63,7 +88,7 @@ export const MonthlyTrendsChart = ({ data, chartRef }: ChartProps) => (
   </ChartCard>
 );
 
-export const SpendingByDayChart = ({ data, chartRef }: ChartProps) => (
+export const SpendingByDayChart = ({ data, chartRef }: ChartProps<BarData>) => (
   <ChartCard
     title="Spending by Day of Week"
     chartRef={chartRef}

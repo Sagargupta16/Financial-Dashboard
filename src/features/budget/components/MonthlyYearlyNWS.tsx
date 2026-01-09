@@ -230,37 +230,55 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   );
 
   // Calculate monthly breakdown
-  const monthlyData = useMemo(() => {
-    const breakdown = calculateMonthlyNWSBreakdown(transactions);
-    const income = getMonthlyIncome(transactions);
+  const monthlyData = useMemo<PeriodItem[]>(() => {
+    const breakdown = calculateMonthlyNWSBreakdown(transactions) as Record<
+      string,
+      Record<string, number>
+    >;
+    const income = getMonthlyIncome(transactions) as Record<string, number>;
 
     const data = Object.entries(breakdown)
-      .map(([monthKey, values]) => ({
-        monthKey,
-        ...values,
-        income: income[monthKey] || 0,
-        percentages: calculateNWSPercentages(values, income[monthKey]),
-      }))
-      .sort((a, b) => b.monthKey.localeCompare(a.monthKey)); // Most recent first
+      .map(([monthKey, values]) => {
+        const { needs = 0, wants = 0, savings = 0, ...rest } = values || {};
+        return {
+          monthKey,
+          needs,
+          wants,
+          savings,
+          ...rest,
+          income: income[monthKey] || 0,
+          percentages: calculateNWSPercentages(values || {}, income[monthKey]),
+        } as PeriodItem;
+      })
+      .sort((a, b) => (b.monthKey ?? "").localeCompare(a.monthKey ?? "")); // Most recent first
 
-    return data;
+    return data as PeriodItem[];
   }, [transactions]);
 
   // Calculate yearly breakdown
-  const yearlyData = useMemo(() => {
-    const breakdown = calculateYearlyNWSBreakdown(transactions);
-    const income = getYearlyIncome(transactions);
+  const yearlyData = useMemo<PeriodItem[]>(() => {
+    const breakdown = calculateYearlyNWSBreakdown(transactions) as Record<
+      string,
+      Record<string, number>
+    >;
+    const income = getYearlyIncome(transactions) as Record<string, number>;
 
     const data = Object.entries(breakdown)
-      .map(([year, values]) => ({
-        year: Number.parseInt(year),
-        ...values,
-        income: income[year] || 0,
-        percentages: calculateNWSPercentages(values, income[year]),
-      }))
-      .sort((a, b) => b.year - a.year); // Most recent first
+      .map(([year, values]) => {
+        const { needs = 0, wants = 0, savings = 0, ...rest } = values || {};
+        return {
+          year: Number.parseInt(year),
+          needs,
+          wants,
+          savings,
+          ...rest,
+          income: income[year] || 0,
+          percentages: calculateNWSPercentages(values || {}, income[year]),
+        } as PeriodItem;
+      })
+      .sort((a, b) => (b.year ?? 0) - (a.year ?? 0)); // Most recent first
 
-    return data;
+    return data as PeriodItem[];
   }, [transactions]);
 
   // Format month key for display
@@ -270,15 +288,16 @@ export const MonthlyYearlyNWS = ({ transactions }: MonthlyYearlyNWSProps) => {
   };
 
   // Get data based on view mode
-  const currentData = viewMode === "monthly" ? monthlyData : yearlyData;
+  const currentData: PeriodItem[] =
+    viewMode === "monthly" ? monthlyData : yearlyData;
 
   // Get selected period details
   const selectedData: PeriodItem | null = selectedPeriod
-    ? ((currentData as PeriodItem[]).find((item) =>
+    ? currentData.find((item) =>
         viewMode === "monthly"
           ? item.monthKey === selectedPeriod
           : item.year === selectedPeriod
-      ) ?? null)
+      ) || null
     : null;
 
   if (!transactions || transactions.length === 0) {

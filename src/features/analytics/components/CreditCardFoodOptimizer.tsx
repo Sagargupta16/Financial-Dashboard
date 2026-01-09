@@ -232,7 +232,6 @@ const CreditCardFoodOptimizer = ({
       <CashbackSection
         creditCardData={creditCardData}
         cardChartData={cardChartData}
-        chartOptions={chartOptions}
         doughnutOptions={doughnutOptions}
       />
 

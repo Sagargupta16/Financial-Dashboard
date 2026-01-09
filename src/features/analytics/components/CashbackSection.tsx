@@ -1,4 +1,5 @@
 import { CreditCard, Gift, TrendingUp } from "lucide-react";
+import { type ChartData, type ChartOptions } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 interface CardBreakdown {
@@ -18,8 +19,8 @@ interface CreditCardData {
 
 interface CashbackSectionProps {
   creditCardData: CreditCardData;
-  cardChartData: unknown;
-  doughnutOptions: unknown;
+  cardChartData: ChartData<"doughnut", number[], string>;
+  doughnutOptions: ChartOptions<"doughnut">;
 }
 
 /**

@@ -105,13 +105,21 @@ export const KPICard = React.memo(
  * Compact version of KPICard for grid layouts
  */
 export const SmallKPICard = React.memo(
-  ({ title, value, icon, unit, isCount = false }: SmallKPICardProps) => {
-    // Extract nested ternary for better readability
+  ({
+    title,
+    value,
+    icon,
+    unit,
+    isCount = false,
+    color = "blue",
+  }: SmallKPICardProps) => {
+    const colors = getColorClasses(color);
+
     const displayValue = () => {
       if (typeof value === "number" && !unit && !isCount) {
         return formatCurrency(value);
       }
-      if (isCount) {
+      if (isCount && typeof value === "number") {
         return value.toLocaleString();
       }
       return value;
@@ -119,10 +127,11 @@ export const SmallKPICard = React.memo(
 
     return (
       <div className="group glass border border-gray-700/30 p-6 rounded-2xl shadow-xl hover:shadow-blue-500/20 transition-all duration-300 flex items-center relative overflow-hidden animate-fade-in">
-        {/* Hover background effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-        <div className="relative z-10 p-4 rounded-2xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 text-blue-400 mr-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl">
+        <div
+          className={`relative z-10 p-4 rounded-2xl bg-gradient-to-br ${colors.icon} mr-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl`}
+        >
           {icon}
         </div>
         <div className="relative z-10 flex-1">
@@ -139,8 +148,9 @@ export const SmallKPICard = React.memo(
           </p>
         </div>
 
-        {/* Side accent bar */}
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-purple-600 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 shadow-lg"></div>
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-1.5 ${colors.side} transform scale-y-0 group-hover:scale-y-100 transition-transform duration-500 shadow-lg`}
+        ></div>
       </div>
     );
   }

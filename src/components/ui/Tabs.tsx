@@ -4,7 +4,7 @@ import React from "react";
 interface TabItem {
   id: string;
   label: string;
-  icon?: string | React.ComponentType<unknown>;
+  icon?: string | React.ElementType;
   badge?: string | number;
   description?: string;
 }

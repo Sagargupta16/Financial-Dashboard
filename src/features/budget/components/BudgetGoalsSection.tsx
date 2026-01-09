@@ -128,7 +128,6 @@ export const BudgetGoalsSection = ({
               filteredData={filteredData}
               kpiData={kpiData}
               accountBalances={bankAccounts}
-              allAccountBalances={accountBalances}
               investments={investments}
               deposits={deposits}
             />

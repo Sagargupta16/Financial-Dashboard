@@ -6,16 +6,13 @@ import { lazy, type ComponentType, type LazyExoticComponent } from "react";
  * @param exportName - Named export (optional, defaults to 'default')
  * @returns LazyExoticComponent for React
  */
-export const lazyLoad = <T extends ComponentType<unknown>>(
-  importFn: () => Promise<{ default: T } | Record<string, T>>,
+export const lazyLoad = <T extends ComponentType<any>>(
+  importFn: () => Promise<any>,
   exportName = "default"
 ): LazyExoticComponent<T> => {
   return lazy(() =>
     importFn().then((module) => ({
-      default:
-        exportName === "default"
-          ? (module as { default: T }).default
-          : (module as Record<string, T>)[exportName],
+      default: ((module as any)[exportName] || (module as any).default) as T,
     }))
   );
 };

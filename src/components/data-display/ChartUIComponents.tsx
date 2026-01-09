@@ -7,13 +7,13 @@ interface ChartContainerProps {
   className?: string;
   height?: string;
   colSpan?: string;
-  chartRef?: React.RefObject<unknown>;
+  chartRef?: React.RefObject<any>;
   filename?: string;
   actions?: React.ReactNode;
 }
 
 interface ExportButtonProps {
-  chartRef: React.RefObject<unknown>;
+  chartRef?: React.RefObject<any>;
   filename: string;
 }
 
@@ -106,9 +106,10 @@ export const ChartContainer = ({
 // Export button component
 export const ExportButton = ({ chartRef, filename }: ExportButtonProps) => (
   <button
-    onClick={() => exportChartAsPNG(chartRef, filename)}
+    onClick={() => chartRef && exportChartAsPNG(chartRef, filename)}
     className="text-gray-400 hover:text-white transition-colors"
     title="Export as PNG"
+    disabled={!chartRef}
   >
     <svg
       width="18"

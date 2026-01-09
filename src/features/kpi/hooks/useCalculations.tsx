@@ -261,7 +261,16 @@ export const useEnhancedKPIData = (
         netWorthPerMonth: 0,
         spendingVelocity: 100,
         categoryConcentration: null,
-        dateRange: { days: 0, months: 0, years: 0 },
+        dateRange: {
+          startDate: null,
+          endDate: null,
+          totalDays: 0,
+          totalMonths: 0,
+          totalYears: 0,
+          days: 0,
+          months: 0,
+          years: 0,
+        },
       };
     }
 

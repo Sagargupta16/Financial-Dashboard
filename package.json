@@ -2,7 +2,7 @@
   "name": "financial-dashboard",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "pnpm@10.33.0",
   "homepage": "https://sagargupta16.github.io/Financial-Dashboard",
   "engines": {
     "node": ">=20.0.0",
@@ -22,7 +22,7 @@
     "d3-hierarchy": "^3.1.2",
     "d3-scale": "^4.0.2",
     "d3-selection": "^3.0.0",
-    "lucide-react": "^0.555.0",
+    "lucide-react": "^0.577.0",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",

@@ -1,4 +1,4 @@
-import { FileSpreadsheet, Sparkles, TrendingUp, Upload } from "lucide-react";
+import { ArrowUpRight, FileSpreadsheet, TrendingUp, Upload } from "lucide-react";
 import type React from "react";
 
 interface HeaderProps {
@@ -6,59 +6,53 @@ interface HeaderProps {
 }
 
 export const Header = ({ onFileUpload }: HeaderProps) => (
-  <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center relative overflow-hidden animate-fade-in">
-    {/* Animated background gradient */}
-    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-2xl animate-pulse"></div>
-    <div className="absolute inset-0 glass rounded-2xl"></div>
+  <header className="mb-8 bg-gray-800/40 border border-gray-700/30 rounded-2xl p-6 sm:p-8">
+    {/* Ledger Sync banner */}
+    <a
+      href="https://github.com/Sagargupta16/ledger-sync"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-center gap-2 mb-6 px-4 py-2.5 bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-xl text-sm text-blue-300 hover:text-blue-200 hover:border-blue-500/40 transition-colors duration-200"
+    >
+      <span className="font-semibold">Ledger Sync</span>
+      <span className="text-gray-400">--</span>
+      <span className="text-gray-300">
+        A fully working, advanced financial dashboard with Sankey diagrams & anomaly detection
+      </span>
+      <ArrowUpRight size={14} className="flex-shrink-0" />
+    </a>
 
-    {/* Decorative elements */}
-    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-    <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
-
-    {/* Content */}
-    <div className="relative z-10 flex-1 p-6 sm:p-8">
-      <div className="flex items-center gap-4 mb-2">
-        <div className="p-3 bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 rounded-2xl shadow-2xl transform hover:scale-110 transition-transform duration-300">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
           <TrendingUp size={28} className="text-white" />
         </div>
         <div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold gradient-text animate-slide-in">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Financial Dashboard
           </h1>
-          <div className="flex items-center gap-2 mt-2">
-            <Sparkles size={18} className="text-yellow-400 animate-pulse" />
-            <p className="text-gray-300 text-sm sm:text-base font-medium">
-              Your intelligent finance analytics platform
-            </p>
-          </div>
+          <p className="text-gray-400 text-sm sm:text-base mt-1">
+            Your intelligent finance analytics platform
+          </p>
         </div>
       </div>
-    </div>
 
-    <div className="relative z-10 mt-6 sm:mt-0 flex flex-col sm:flex-row gap-3 p-6 sm:p-8">
+    <div className="mt-6 sm:mt-0 flex gap-3">
       <label
         htmlFor="csv-upload"
-        className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 text-white font-bold rounded-2xl cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-xl hover:shadow-blue-500/50 hover:scale-105 transform overflow-hidden"
+        className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl cursor-pointer hover:from-blue-500 hover:to-blue-600 transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-        <Upload
-          size={20}
-          className="mr-2.5 group-hover:rotate-12 transition-transform duration-300 relative z-10"
-        />
-        <span className="relative z-10">Upload CSV</span>
+        <Upload size={18} className="mr-2" />
+        Upload CSV
       </label>
       <input id="csv-upload" type="file" accept=".csv" className="hidden" onChange={onFileUpload} />
 
       <label
         htmlFor="excel-upload"
-        className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 via-emerald-600 to-emerald-700 text-white font-bold rounded-2xl cursor-pointer hover:from-green-700 hover:to-emerald-800 transition-all duration-300 shadow-xl hover:shadow-green-500/50 hover:scale-105 transform overflow-hidden"
+        className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl cursor-pointer hover:from-emerald-500 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-        <FileSpreadsheet
-          size={20}
-          className="mr-2.5 group-hover:rotate-12 transition-transform duration-300 relative z-10"
-        />
-        <span className="relative z-10">Upload Excel</span>
+        <FileSpreadsheet size={18} className="mr-2" />
+        Upload Excel
       </label>
       <input
         id="excel-upload"
@@ -67,6 +61,7 @@ export const Header = ({ onFileUpload }: HeaderProps) => (
         className="hidden"
         onChange={onFileUpload}
       />
+    </div>
     </div>
   </header>
 );

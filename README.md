@@ -1,14 +1,17 @@
-# 💰 Financial Dashboard
+# Financial Dashboard
+
+> **Looking for a fully working, production-ready financial dashboard with Sankey diagrams and anomaly detection?**
+> **Check out [Ledger Sync](https://github.com/Sagargupta16/ledger-sync)** -- Transform messy Excel bank statements into beautiful financial dashboards.
 
 A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, financial health, investments, tax planning, and lifestyle optimization.
 
 ![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.5.0-brightgreen)
 
-## 🎯 Demo
+## Demo
 
-🔗 **[Live Demo](https://sagargupta16.github.io/Financial-Dashboard)**
+**[Live Demo](https://sagargupta16.github.io/Financial-Dashboard)**
 
-💡 **Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get comprehensive financial insights instantly!
+**Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get comprehensive financial insights instantly!
 
 ## 📸 Screenshots
 

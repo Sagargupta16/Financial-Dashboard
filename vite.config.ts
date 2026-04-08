@@ -1,29 +1,33 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
-import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
+export default defineConfig(async () => {
+  const plugins = [
     react({
       // Enable Fast Refresh
       fastRefresh: true,
       // Use automatic JSX runtime
       jsxRuntime: 'automatic',
     }),
-    // Bundle analyzer (only in analyze mode)
-    ...(process.env.ANALYZE === 'true'
-      ? [
-          visualizer({
-            open: true,
-            filename: 'dist/stats.html',
-            gzipSize: true,
-            brotliSize: true,
-          }),
-        ]
-      : []),
-  ],
+  ];
+
+  // Bundle analyzer (only in analyze mode) - dynamic import for ESM compatibility
+  if (process.env.ANALYZE === 'true') {
+    const { visualizer } = await import('rollup-plugin-visualizer');
+    plugins.push(
+      visualizer({
+        open: true,
+        filename: 'dist/stats.html',
+        gzipSize: true,
+        brotliSize: true,
+      }),
+    );
+  }
+
+  return {
+  plugins,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -120,4 +124,5 @@ export default defineConfig({
       'lucide-react',
     ],
   },
+  };
 });

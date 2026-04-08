@@ -40,7 +40,7 @@ export const getSavingsRateIconColor = (rate: number): string => {
  */
 export const getSavingsRateMessage = (rate: number): string => {
   if (rate >= 20) {
-    return "Excellent! 🎉";
+    return "Excellent";
   }
   if (rate >= 10) {
     return "Good, aim for 20%+";
@@ -221,7 +221,7 @@ export const getMonthlyTrendDisplay = (monthlyComparison: {
 export const getAnomalyAlertDisplay = (anomaliesCount: number) => {
   if (anomaliesCount > 0) {
     const plural = anomaliesCount > 1 ? "s" : "";
-    return `⚠️ ${anomaliesCount} unusual transaction${plural}`;
+    return `${anomaliesCount} unusual transaction${plural}`;
   }
   return "✓ All normal";
 };

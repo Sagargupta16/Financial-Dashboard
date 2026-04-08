@@ -120,7 +120,7 @@ export const FinancialHealthScore = ({
 
   return (
     <div className="bg-gray-800/50 rounded-2xl p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">🏆 Financial Health Score</h2>
+      <h2 className="text-2xl font-bold text-white mb-6">Financial Health Score</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Score */}
@@ -285,7 +285,7 @@ export const FinancialHealthScore = ({
       {/* Recommendations */}
       {recommendations.length > 0 && (
         <div className="mt-6 pt-6 border-t border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">💡 Recommendations</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Recommendations</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recommendations.map((rec: RecommendationCardProps["rec"], index: number) => (
               <RecommendationCard

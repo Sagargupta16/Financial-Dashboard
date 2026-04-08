@@ -43,3 +43,7 @@ lint-output.json
 # misc
 .python-version
 *.tsbuildinfo
+.dockerignore
+.editorconfig
+.nvmrc
+.npmrc

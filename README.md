@@ -4,7 +4,6 @@
 
 **[View Live Demo](https://sagargupta.online/Financial-Dashboard/)**
 
-=======
 > **Looking for a fully working, production-ready financial dashboard with Sankey diagrams and anomaly detection?**
 > **Check out [Ledger Sync](https://github.com/Sagargupta16/ledger-sync)** -- Transform messy Excel bank statements into beautiful financial dashboards.
 

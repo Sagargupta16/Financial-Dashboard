@@ -1,5 +1,10 @@
 # Financial Dashboard
 
+![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/Financial-Dashboard?style=flat-square) ![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/Financial-Dashboard?style=flat-square) ![License](https://img.shields.io/github/license/Sagargupta16/Financial-Dashboard?style=flat-square) ![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/Financial-Dashboard?style=flat-square) ![Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)
+
+**[View Live Demo](https://sagargupta.online/Financial-Dashboard/)**
+
+=======
 > **Looking for a fully working, production-ready financial dashboard with Sankey diagrams and anomaly detection?**
 > **Check out [Ledger Sync](https://github.com/Sagargupta16/ledger-sync)** -- Transform messy Excel bank statements into beautiful financial dashboards.
 
@@ -980,6 +985,15 @@ Comprehensive technical documentation is available in the [`docs/`](./docs) fold
 - Review the [Architecture Guide](./docs/architecture/comprehensive-guide.md)
 - Follow TypeScript best practices from the [Migration Guide](./docs/migration/typescript-migration.md)
 - Add tests for new business logic
+
+## More Projects
+
+| Project | Description |
+|---------|-------------|
+| [LeetCode Rating Predictor](https://github.com/Sagargupta16/LeetCode_Rating_Predictor) | Full-stack ML-powered LeetCode contest rating predictor |
+| [InstagramLikesLeaderboard](https://github.com/Sagargupta16/InstagramLikesLeaderboard) | Browser tool showing who likes your Instagram posts the most |
+| [claude-cost-optimizer](https://github.com/Sagargupta16/claude-cost-optimizer) | Save 30-60% on Claude Code costs - proven strategies and benchmarks |
+| [Contact Manager](https://github.com/Sagargupta16/Contact-Manager-Mern) | Full-stack MERN contact manager with CRUD and dark mode |
 
 ## 📄 License
 

@@ -47,3 +47,12 @@ lint-output.json
 .editorconfig
 .nvmrc
 .npmrc
+
+# Added for consistency
+.env.local
+.env.*.local
+*.log
+Thumbs.db
+node_modules/
+dist/
+.next/

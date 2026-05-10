@@ -2,7 +2,7 @@
   "name": "financial-dashboard",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.4",
   "homepage": "https://sagargupta16.github.io/Financial-Dashboard",
   "engines": {
     "node": ">=20.0.0",

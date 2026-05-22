@@ -3,15 +3,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: read
-  security-events: write
-
 jobs:
-  node-ci:
+  build:
     uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
-
   security:
     uses: Sagargupta16/shared-workflows/.github/workflows/security-scan.yml@main
+    permissions:
+      contents: read
+      security-events: write

@@ -1,43 +1,17 @@
 name: CI
-
 on:
-    push:
-        branches:
-            - main
-            - typescript-migration
-    pull_request:
-        branches:
-            - "**"
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+  node-ci:
+    uses: Sagargupta16/shared-workflows/.github/workflows/node-ci.yml@main
 
-            - name: Setup PNPM
-              uses: pnpm/action-setup@v4
-              with:
-                  version: 10.33.4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
-                  cache: pnpm
-
-            - name: Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: Lint
-              run: pnpm lint
-
-            - name: Type check
-              run: pnpm type-check
-
-            - name: Test
-              run: pnpm test:run
-
-            - name: Build
-              run: pnpm build
+  security:
+    uses: Sagargupta16/shared-workflows/.github/workflows/security-scan.yml@main

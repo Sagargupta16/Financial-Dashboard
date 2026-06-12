@@ -1,6 +1,6 @@
 # Financial Dashboard
 
-![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/Financial-Dashboard?style=flat-square) ![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/Financial-Dashboard?style=flat-square) ![License](https://img.shields.io/github/license/Sagargupta16/Financial-Dashboard?style=flat-square) ![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/Financial-Dashboard?style=flat-square) ![Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/Sagargupta16/Financial-Dashboard?style=flat-square&cacheSeconds=86400) ![GitHub forks](https://img.shields.io/github/forks/Sagargupta16/Financial-Dashboard?style=flat-square&cacheSeconds=86400) ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square) ![Last Commit](https://img.shields.io/github/last-commit/Sagargupta16/Financial-Dashboard?style=flat-square&cacheSeconds=86400) ![Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)
 
 **[View Live Demo](https://sagargupta.online/Financial-Dashboard/)**
 
@@ -9,7 +9,7 @@
 
 A comprehensive, modern financial dashboard built with React that provides powerful analytics, AI-style insights, and visualizations for personal finance management. Upload your financial data and gain deep insights into your spending patterns, income sources, financial health, investments, tax planning, and lifestyle optimization.
 
-![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.17-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-0.5.0-brightgreen)
+![Financial Dashboard](https://img.shields.io/badge/React-19.1.1-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.18-blue) ![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-orange) ![License](https://img.shields.io/badge/License-MIT-green) ![Version](https://img.shields.io/badge/Version-1.2.0-brightgreen)
 
 ## Demo
 
@@ -17,20 +17,16 @@ A comprehensive, modern financial dashboard built with React that provides power
 
 **Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get comprehensive financial insights instantly!
 
-## 📸 Screenshots
-
-_Upload your financial data and watch your dashboard come to life with interactive charts, smart insights, and comprehensive analytics._
-
 ## ✨ Features
 
-### 🆕 **NEW: TypeScript Migration v0.5.0**
+### 🆕 **TypeScript Migration**
 
 - **Full TypeScript Support**: Enhanced type safety and developer experience
 - **Strict Mode**: Robust error checking and improved code quality
 - **Modern Architecture**: Updated codebase using latest React patterns
 - **Zero Runtime Errors**: Significantly improved stability and reliability
 
-### 🏗️ **Refactored Architecture v0.4.0**
+### 🏗️ **Refactored Architecture**
 
 - **Clean Folder Structure**: Modular organization by feature and concern
 - **Single Source of Truth**: All financial calculations centralized in `lib/calculations`
@@ -94,10 +90,10 @@ _Upload your financial data and watch your dashboard come to life with interacti
 
 ### Clean Modular Structure
 
-```
+```text
 src/
 ├── app/
-│   └── App.js                        # Main application component
+│   └── App.tsx                       # Main application component
 ├── pages/                            # Page-level components
 │   ├── OverviewPage/
 │   ├── AdvancedAnalyticsPage/
@@ -120,7 +116,8 @@ src/
 │   │   ├── components/
 │   │   └── hooks/
 │   └── transactions/                 # Transaction management
-│       └── components/
+│       ├── components/
+│       └── utils/
 ├── components/                       # Shared UI components
 │   ├── data-display/                 # Charts, health scores, calendars
 │   ├── errors/                       # Error boundaries
@@ -132,30 +129,33 @@ src/
 │   │   ├── aggregations/            # Averages, totals, categories
 │   │   ├── financial/               # Financial calculations
 │   │   ├── time/                    # Date range calculations
-│   │   ├── index.js                 # Main calculation exports
-│   │   └── legacy.js                # Backward compatibility
+│   │   ├── index.tsx                # Main calculation exports
+│   │   └── legacy.tsx               # Backward compatibility
 │   ├── analytics/                   # Analytics utilities
-│   │   ├── forecasts.js
-│   │   ├── insights.js
-│   │   ├── trends.js
-│   │   └── healthScore.js
+│   │   ├── forecasts.tsx
+│   │   ├── insights.tsx
+│   │   ├── trends.tsx
+│   │   └── healthScore.tsx
 │   ├── charts/                      # Chart utilities
-│   └── data/                        # Data processing & validation
-├── contexts/                        # React contexts
-│   └── DataContext.js
+│   ├── data/                        # Data processing & validation
+│   ├── formatters/                  # Currency, date, number, text formatting
+│   └── parsers/                     # Currency and date parsing
+├── store/                           # Zustand state management
+│   └── financialStore.ts
 ├── hooks/                           # Custom React hooks
-│   ├── useDataProcessor.js
-│   └── useDebouncedValue.js
+│   ├── useDataProcessor.tsx
+│   └── useDebouncedValue.tsx
 ├── utils/                           # General utilities
-│   ├── accessibility.js
-│   ├── localStorage.js
-│   ├── logger.js
-│   └── performance.js
+│   ├── csvUtils.ts
+│   ├── lazyLoad.tsx
+│   └── logger.tsx
 ├── config/                          # Configuration files
-│   ├── overview.js
-│   └── tabs.js
+│   ├── overview.tsx
+│   └── tabs.tsx
 ├── constants/                       # App constants
-│   └── index.js
+│   └── index.ts
+├── types/                           # Shared TypeScript types
+│   └── index.ts
 └── styles/                          # Global styles
     └── index.css
 ```
@@ -371,7 +371,7 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 3. **Start the development server**
 
    ```bash
-   pnpm start
+   pnpm dev
    ```
 
 4. **Open your browser**
@@ -385,10 +385,9 @@ This project uses **Husky** for Git hooks to maintain code quality automatically
 **What is Husky?**
 Husky is a tool that makes Git hooks easy. It runs scripts before certain Git actions (like commit or push) to ensure code quality.
 
-**Pre-commit Hook** (`.husky/pre-commit`):
+**Pre-commit checks** (via `lint-staged`):
 
-- ✅ Automatically runs ESLint on staged files
-- ✅ Automatically formats code with Prettier
+- ✅ Automatically runs Biome (lint + format) on staged files
 - ✅ Prevents commits if there are linting errors
 - ✅ Ensures consistent code style across the team
 
@@ -441,9 +440,9 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 
 ### Build & Development
 
-- **Create React App**: Zero-configuration setup
-- **ESLint**: Code quality and linting
-- **PropTypes**: Runtime type checking
+- **Vite**: Fast build tool and dev server
+- **Biome**: Code linting and formatting
+- **TypeScript**: Static type checking
 - **pnpm**: Fast, disk space efficient package manager
 - **Husky**: Git hooks for code quality
 
@@ -459,42 +458,34 @@ src/
 ├── pages/                 # Page-level components for routing
 ├── features/              # Feature modules (analytics, budget, charts, kpi, transactions)
 ├── components/            # Shared UI components (data-display, errors, import-export, layout, ui)
-├── lib/                   # Core libraries (calculations, analytics, charts, data)
-├── contexts/              # React contexts (DataContext)
+├── lib/                   # Core libraries (calculations, analytics, charts, data, formatters, parsers)
+├── store/                 # Zustand state management
 ├── hooks/                 # Custom React hooks
-├── utils/                 # General utilities (logger, localStorage, performance)
+├── utils/                 # General utilities (csvUtils, lazyLoad, logger)
 ├── config/                # Configuration files
 ├── constants/             # Application constants
+├── types/                 # Shared TypeScript types
 └── styles/                # Global styles
 ```
 
 ## 🎯 Available Scripts
 
 ```bash
-pnpm start          # Start development server
-pnpm build          # Build for production
-pnpm test           # Run test suite
-pnpm lint           # Run ESLint
-pnpm lint:fix       # Fix ESLint issues
-pnpm format         # Format code with Prettier
+pnpm dev            # Start development server
+pnpm build          # Type-check and build for production
+pnpm preview        # Preview the production build
+pnpm lint           # Run Biome linter
+pnpm lint:fix       # Fix Biome lint issues
+pnpm format         # Format code with Biome
+pnpm check          # Run Biome lint + format checks
+pnpm type-check     # Run TypeScript type checking
 ```
 
 ## 🔧 Configuration
 
 ### Currency Format
 
-Update the `formatCurrency` function in `src/shared/utils/dataUtils.js` to change currency:
-
-```javascript
-export const formatCurrency = (value) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR", // Change as needed
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
-```
+Update the `formatCurrency` function in `src/lib/formatters/currency.ts` to change currency (it formats as INR via `Intl.NumberFormat("en-IN", { currency: "INR" })` -- change the locale and currency code as needed).
 
 ### Custom Themes
 
@@ -512,7 +503,7 @@ This dashboard uses a comprehensive set of financial calculations. All formulas 
 Total Income = Sum of all transactions where type = "Income"
 ```
 
-_Location:_ `src/lib/calculations/aggregations/totals.js`
+_Location:_ `src/lib/calculations/aggregations/totals.tsx`
 
 #### 2. **Total Expense**
 
@@ -520,7 +511,7 @@ _Location:_ `src/lib/calculations/aggregations/totals.js`
 Total Expense = Sum of all transactions where type = "Expense"
 ```
 
-_Location:_ `src/lib/calculations/aggregations/totals.js`
+_Location:_ `src/lib/calculations/aggregations/totals.tsx`
 
 #### 3. **Net Balance (Savings)**
 
@@ -528,7 +519,7 @@ _Location:_ `src/lib/calculations/aggregations/totals.js`
 Net Balance = Total Income - Total Expense
 ```
 
-_Location:_ `src/lib/calculations/financial/savings.js`
+_Location:_ `src/lib/calculations/financial/savings.tsx`
 
 #### 4. **Savings Rate**
 
@@ -542,7 +533,7 @@ _Interpretation:_
 - ≥10%: Good 👍 (Yellow)
 - <10%: Needs Improvement ⚠️ (Red)
 
-_Location:_ `src/lib/calculations/financial/savings.js`
+_Location:_ `src/lib/calculations/financial/savings.tsx`
 
 ### Spending Analysis
 
@@ -552,7 +543,7 @@ _Location:_ `src/lib/calculations/financial/savings.js`
 Daily Average = Total Expense / Number of Days in Period
 ```
 
-_Location:_ `src/lib/calculations/aggregations/averages.js`
+_Location:_ `src/lib/calculations/aggregations/averages.tsx`
 
 #### 6. **Monthly Average Spending**
 
@@ -562,7 +553,7 @@ Monthly Average = (Total Expense / Number of Days) × 30.44
 
 _Note:_ 30.44 is the average number of days per month (365.25 / 12)
 
-_Location:_ `src/lib/calculations/aggregations/averages.js`
+_Location:_ `src/lib/calculations/aggregations/averages.tsx`
 
 #### 7. **Average Transaction Value**
 
@@ -570,7 +561,7 @@ _Location:_ `src/lib/calculations/aggregations/averages.js`
 Average Transaction = Total Transaction Amount / Number of Transactions
 ```
 
-_Location:_ `src/lib/calculations/aggregations/averages.js`
+_Location:_ `src/lib/calculations/aggregations/averages.tsx`
 
 #### 8. **Spending Velocity (30-day)**
 
@@ -584,7 +575,7 @@ _Interpretation:_
 - 80-120%: Normal spending range (Yellow)
 - > 120%: Spending more than usual (Red)
 
-_Location:_ `src/features/kpi/hooks/useCalculations.js`
+_Location:_ `src/features/kpi/hooks/useCalculations.tsx`
 
 ### Cashback Calculations
 
@@ -596,7 +587,7 @@ Total Cashback Earned = Sum of all transactions where:
   - Type = "Income"
 ```
 
-_Location:_ `src/lib/calculations/financial/cashback.js`
+_Location:_ `src/lib/calculations/financial/cashback.tsx`
 
 #### 10. **Cashback Shared**
 
@@ -606,7 +597,7 @@ Cashback Shared = Sum of all transactions where:
   - Type = "Expense" OR "Transfer-Out"
 ```
 
-_Location:_ `src/lib/calculations/financial/cashback.js`
+_Location:_ `src/lib/calculations/financial/cashback.tsx`
 
 #### 11. **Actual Cashback**
 
@@ -616,7 +607,7 @@ Actual Cashback = Total Cashback Earned - Cashback Shared
 
 _This represents the cashback you actually kept for yourself after sharing with others_
 
-_Location:_ `src/lib/calculations/financial/cashback.js`
+_Location:_ `src/lib/calculations/financial/cashback.tsx`
 
 #### 12. **Cashback Rate**
 
@@ -624,7 +615,7 @@ _Location:_ `src/lib/calculations/financial/cashback.js`
 Cashback Rate = (Total Cashback Earned / Total Credit Card Spending) × 100
 ```
 
-_Location:_ `src/lib/calculations/financial/cashback.js`
+_Location:_ `src/lib/calculations/financial/cashback.tsx`
 
 #### 13. **Per-Card Cashback**
 
@@ -634,7 +625,7 @@ For each credit card:
   Card Cashback Rate = (Card Cashback / Card Spending) × 100
 ```
 
-_Location:_ `src/lib/calculations/financial/cashback.js`
+_Location:_ `src/lib/calculations/financial/cashback.tsx`
 
 ### Reimbursement Calculations
 
@@ -646,7 +637,7 @@ Total Reimbursements = Sum of all transactions where:
   - Type = "Income"
 ```
 
-_Location:_ `src/lib/calculations/financial/reimbursement.js`
+_Location:_ `src/lib/calculations/financial/reimbursement.tsx`
 
 #### 15. **Average Reimbursement**
 
@@ -654,7 +645,7 @@ _Location:_ `src/lib/calculations/financial/reimbursement.js`
 Average Reimbursement = Total Reimbursements / Number of Reimbursement Transactions
 ```
 
-_Location:_ `src/lib/calculations/financial/reimbursement.js`
+_Location:_ `src/lib/calculations/financial/reimbursement.tsx`
 
 ### Investment Metrics
 
@@ -671,7 +662,7 @@ Net Return = (Current Holdings + Withdrawals - Capital Deployed + Realized Profi
 Return Percentage = (Net Return / Capital Deployed) × 100
 ```
 
-_Location:_ `src/lib/calculations/financial/index.js`
+_Location:_ `src/lib/calculations/financial/index.tsx`
 
 ### Tax Calculations
 
@@ -698,7 +689,7 @@ _Tax Slabs (New Regime FY 2025-26):_
 - ₹20L - ₹24L: 25%
 - Above ₹24L: 30%
 
-_Location:_ `src/lib/calculations/financial/index.js`
+_Location:_ `src/lib/calculations/financial/index.tsx`
 
 #### 20. **HRA Exemption**
 
@@ -709,7 +700,7 @@ HRA Exemption = Minimum of:
   3. Rent Paid - 10% of Basic Salary
 ```
 
-_Location:_ `src/lib/calculations/financial/index.js`
+_Location:_ `src/lib/calculations/financial/index.tsx`
 
 ### Food & Lifestyle Metrics
 
@@ -726,7 +717,7 @@ Daily Average = Total Food / Number of Days
 Monthly Average = (Total Food / Number of Days) × 30.44
 ```
 
-_Location:_ `src/lib/calculations/financial/index.js`
+_Location:_ `src/lib/calculations/financial/index.tsx`
 
 #### 22. **Transportation Metrics**
 
@@ -739,7 +730,7 @@ Daily Average = Total Transportation / Number of Days
 Per Trip Average = Total Transportation / Number of Transport Transactions
 ```
 
-_Location:_ `src/lib/calculations/financial/index.js`
+_Location:_ `src/lib/calculations/financial/index.tsx`
 
 ### Advanced Metrics
 
@@ -762,7 +753,7 @@ Top Category Concentration = Highest category percentage
 
 _Warning threshold: >50% indicates over-concentration_
 
-_Location:_ `src/features/kpi/hooks/useCalculations.js`
+_Location:_ `src/features/kpi/hooks/useCalculations.tsx`
 
 #### 25. **Account Balance Tracking**
 
@@ -775,7 +766,7 @@ For each account:
     - Transfers Out
 ```
 
-_Location:_ `src/features/kpi/hooks/useCalculations.js`
+_Location:_ `src/features/kpi/hooks/useCalculations.tsx`
 
 ### Time Period Calculations
 
@@ -787,7 +778,7 @@ Total Months = Total Days / 30.44
 Total Years = Total Days / 365.25
 ```
 
-_Location:_ `src/lib/calculations/time/dateRange.js`
+_Location:_ `src/lib/calculations/time/dateRange.tsx`
 
 ### Data Aggregation
 
@@ -800,7 +791,7 @@ For each category:
   Average = Total / Count
 ```
 
-_Location:_ `src/lib/calculations/aggregations/category.js`
+_Location:_ `src/lib/calculations/aggregations/category.tsx`
 
 #### 28. **Monthly Trends**
 
@@ -828,19 +819,20 @@ All calculations are organized in a clean, modular structure:
 
 ```
 src/lib/calculations/
-├── index.js                    # Main exports
+├── index.tsx                   # Main exports
 ├── aggregations/
-│   ├── averages.js            # Daily, monthly, per-transaction averages
-│   ├── category.js            # Category grouping and top categories
-│   └── totals.js              # Total income and expense
+│   ├── averages.tsx           # Daily, monthly, per-transaction averages
+│   ├── category.tsx           # Category grouping and top categories
+│   └── totals.tsx             # Total income and expense
 ├── financial/
-│   ├── cashback.js            # All cashback calculations
-│   ├── reimbursement.js       # Reimbursement calculations
-│   ├── savings.js             # Savings and savings rate
-│   └── index.js               # Investment, tax, food, transport
+│   ├── cashback.tsx           # All cashback calculations
+│   ├── netBalance.tsx         # Net balance breakdown
+│   ├── reimbursement.tsx      # Reimbursement calculations
+│   ├── savings.tsx            # Savings and savings rate
+│   └── index.tsx              # Investment, tax, food, transport
 ├── time/
-│   └── dateRange.js           # Date range and period calculations
-└── legacy.js                  # Legacy calculations (for compatibility)
+│   └── dateRange.tsx          # Date range and period calculations
+└── legacy.tsx                 # Legacy calculations (for compatibility)
 ```
 
 ### Using Calculations in Your Code
@@ -877,7 +869,7 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - ✅ Easy to test and maintain
 - ✅ Consistent calculations across all pages
 - ✅ Well-documented with JSDoc comments
-- ✅ Type-safe with PropTypes validation
+- ✅ Type-safe with TypeScript
 
 ## 📊 Dashboard Overview
 
@@ -960,17 +952,6 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - Check Node.js version compatibility (>=20.0.0 required)
 - Clear pnpm cache: `pnpm store prune`
 
-## 📚 Documentation
-
-Comprehensive technical documentation is available in the [`docs/`](./docs) folder:
-
-- **[Architecture Guide](./docs/architecture/comprehensive-guide.md)** - System design, patterns, and technical decisions
-- **[Data Flow Diagram](./docs/architecture/data-flow.md)** - Visual representation of data flow
-- **[TypeScript Migration](./docs/migration/typescript-migration.md)** - Migration guide and best practices
-- **[Phase 1 Report](./docs/reports/phase-1-completion.md)** - Project milestones and achievements
-
-📖 **[View Full Documentation Index →](./docs/README.md)**
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -981,8 +962,8 @@ Comprehensive technical documentation is available in the [`docs/`](./docs) fold
 
 **Before contributing:**
 
-- Review the [Architecture Guide](./docs/architecture/comprehensive-guide.md)
-- Follow TypeScript best practices from the [Migration Guide](./docs/migration/typescript-migration.md)
+- Review the Architecture section above
+- Follow TypeScript best practices
 - Add tests for new business logic
 
 ## More Projects
@@ -1006,7 +987,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
-- Built with [Create React App](https://create-react-app.dev/)
+- Built with [Vite](https://vitejs.dev/)
 - Charts powered by [Chart.js](https://www.chartjs.org/)
 - Icons by [Lucide](https://lucide.dev/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)

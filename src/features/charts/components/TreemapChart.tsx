@@ -10,6 +10,16 @@ interface TreemapChartProps {
   chartRef?: React.RefObject<SVGSVGElement | null>;
 }
 
+// Escape HTML special chars before interpolating user-controlled strings
+// (e.g. transaction category names from imported CSV/XLSX) into tooltip markup.
+const escapeHtml = (value: string): string =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
 // Helper function to add text line to treemap labels
 const appendTextLine = (textElement: any, line: string, index: number): void => {
   textElement
@@ -331,7 +341,7 @@ export const TreemapChart = ({ filteredData, chartRef }: TreemapChartProps) => {
           select(this).attr("opacity", 1);
           const displayName = showSubcategories ? d.data.fullName : d.data.name;
           tooltip.style("visibility", "visible").html(`
-            <strong>${displayName}</strong><br/>
+            <strong>${escapeHtml(String(displayName))}</strong><br/>
             Amount: ${formatCurrency(d.data.value)}<br/>
             ${((d.data.value / root.value) * 100).toFixed(1)}% of total
           `);

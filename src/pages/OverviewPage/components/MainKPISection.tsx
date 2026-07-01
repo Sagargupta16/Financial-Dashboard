@@ -60,7 +60,7 @@ export const MainKPISection = ({ income = 0, expense = 0, balanceBreakdown = nul
             title="Credit Card Debt"
             value={Math.abs(balanceBreakdown.debt || 0)}
             icon={<CreditCard size={20} />}
-            color={balanceBreakdown.debt < 0 ? "red" : "gray"}
+            color={balanceBreakdown.debt > 0 ? "red" : "gray"}
           />
         </div>
       )}

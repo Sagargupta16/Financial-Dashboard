@@ -239,7 +239,7 @@ export const getBalanceBreakdownInsights = (breakdown: NetBalanceBreakdown) => {
   }
 
   // Debt warning
-  if (breakdown.debt < 0) {
+  if (breakdown.debt > 0) {
     const debtAmount = Math.abs(breakdown.debt);
     insights.push({
       title: "Credit Card Debt",

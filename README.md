@@ -17,16 +17,16 @@ A comprehensive, modern financial dashboard built with React that provides power
 
 **Quick Start**: Just export your Money Manager backup to Excel and upload it on this link UI - you'll get comprehensive financial insights instantly!
 
-## ✨ Features
+## Features
 
-### 🆕 **TypeScript Migration**
+### **TypeScript Migration**
 
 - **Full TypeScript Support**: Enhanced type safety and developer experience
 - **Strict Mode**: Robust error checking and improved code quality
 - **Modern Architecture**: Updated codebase using latest React patterns
 - **Zero Runtime Errors**: Significantly improved stability and reliability
 
-### 🏗️ **Refactored Architecture**
+### **Refactored Architecture**
 
 - **Clean Folder Structure**: Modular organization by feature and concern
 - **Single Source of Truth**: All financial calculations centralized in `lib/calculations`
@@ -35,21 +35,21 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Optimized Performance**: Efficient calculations reused across all components
 - **Easy to Extend**: Add new features in isolated, focused modules
 
-### 📊 **Advanced Financial Management**
+### **Advanced Financial Management**
 
 - **📈 Investment Performance Tracker**: Stock market P&L, brokerage fees, returns, and actionable insights
 - **📋 Tax Planning Dashboard**: Income tax calculations, deductions (80C, HRA), tax slab breakdown, saving recommendations
 - **👨‍👩‍👧 Family & Housing Manager**: Family expenses, rent payments, utilities, HRA benefits
 - **💳 Lifestyle Optimizer**: Credit card analytics, cashback tracking, food spending, commute cost analysis
 
-### 📊 **Comprehensive Analytics**
+### **Comprehensive Analytics**
 
 - **KPI Overview**: Total income, expenses, net balance, transaction counts, and advanced financial health metrics
 - **Account Balances**: Real-time view of all account balances
 - **Transfer Tracking**: Monitor internal money movements between accounts
 - **Advanced Metrics**: Savings rate, spending velocity, burn rate, and category concentration
 
-### 📈 **Rich Visualizations**
+### **Rich Visualizations**
 
 - **Income vs Expense Breakdown** (Doughnut Chart)
 - **Top Expense Categories** (Bar Chart) - with time filtering
@@ -62,7 +62,7 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Tax Breakdown**: Visual representation of tax slabs and deductions
 - **Food & Transport Trends**: Monthly spending patterns and optimization opportunities
 
-### 🕒 **Time-Based Analysis**
+### **Time-Based Analysis**
 
 - **Enhanced Top Categories**: Monthly, yearly, and all-time views for expenses and income
 - **Enhanced Monthly Trends**: Yearly, last 12 months, and all-time views
@@ -71,7 +71,7 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Interactive Navigation**: Navigate through different time periods
 - **Trend Identification**: Spot patterns and seasonal variations
 
-### 🔍 **Data Management**
+### **Data Management**
 
 - **CSV & Excel Upload**: Easy data import functionality for both CSV and Excel files (.xlsx, .xls)
 - **Smart Parsing**: Handles quoted fields and various file formats
@@ -79,14 +79,14 @@ A comprehensive, modern financial dashboard built with React that provides power
 - **Sorting & Pagination**: Organized transaction table with sorting capabilities
 - **Export Charts**: Download visualizations as PNG images
 
-### 💼 **Transaction Types Support**
+### **Transaction Types Support**
 
 - **Income**: Track all income sources
 - **Expenses**: Monitor spending across categories
 - **Transfers**: Handle internal account transfers
 - **Categorization**: Organize transactions with categories and subcategories
 
-## 🏗️ Architecture
+## Architecture
 
 ### Clean Modular Structure
 
@@ -170,9 +170,9 @@ src/
 - ✅ **Easy to Extend**: Add new features without breaking existing ones
 - ✅ **Code Quality**: SonarQube compliant with proper error handling and logging
 
-## 🎯 Key Features in Detail
+## Key Features in Detail
 
-### Investment Performance Tracker 📈
+### Investment Performance Tracker
 
 **Comprehensive stock market analysis:**
 
@@ -193,7 +193,7 @@ src/
    - Strategy recommendations based on performance
    - Recent transaction history
 
-### Tax Planning Dashboard 📋
+### Tax Planning Dashboard
 
 **Complete income tax planning (FY 2025-26):**
 
@@ -219,7 +219,7 @@ src/
    - Unutilized deduction alerts
    - Optimization opportunities
 
-### Family & Housing Manager 👨‍👩‍👧‍👦
+### Family & Housing Manager
 
 **Track family and housing expenses:**
 
@@ -240,7 +240,7 @@ src/
    - Budget recommendations
    - Tax benefit alerts
 
-### Lifestyle Optimizer 💳
+### Lifestyle Optimizer
 
 **Optimize daily spending:**
 
@@ -344,7 +344,7 @@ Jan 5   | -₹12,000   | Expense | ₹38,000 (Positive)
 Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -378,7 +378,7 @@ Jan 10  | ₹60,000    | Income  | ₹98,000 (Positive)
 
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-### 🪝 Git Hooks with Husky
+### Git Hooks with Husky
 
 This project uses **Husky** for Git hooks to maintain code quality automatically:
 
@@ -400,7 +400,7 @@ Husky is a tool that makes Git hooks easy. It runs scripts before certain Git ac
 
 The hook configuration uses `lint-staged` to only check files you're actually committing.
 
-## 📋 Data Format (CSV & Excel)
+## Data Format (CSV & Excel)
 
 Your CSV or Excel file should follow this format:
 
@@ -427,7 +427,7 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 - **INR**: Amount in Indian Rupees (can include ₹ symbol and commas)
 - **Income/Expense**: Transaction type ("Income", "Expense", "Transfer-In", "Transfer-Out")
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Core Technologies
 
@@ -450,7 +450,7 @@ Date,Time,Accounts,Category,Subcategory,Note,INR,Income/Expense
 
 Modern browsers (Chrome, Firefox, Safari, Edge)
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 src/
@@ -468,7 +468,7 @@ src/
 └── styles/                # Global styles
 ```
 
-## 🎯 Available Scripts
+## Available Scripts
 
 ```bash
 pnpm dev            # Start development server
@@ -481,7 +481,7 @@ pnpm check          # Run Biome lint + format checks
 pnpm type-check     # Run TypeScript type checking
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Currency Format
 
@@ -491,7 +491,7 @@ Update the `formatCurrency` function in `src/lib/formatters/currency.ts` to chan
 
 Modify the color scheme in `tailwind.config.js` or update the CSS classes in components.
 
-## 📐 Formulas & Calculations Reference
+## Formulas & Calculations Reference
 
 This dashboard uses a comprehensive set of financial calculations. All formulas are centralized in `src/lib/calculations/` for consistency and maintainability.
 
@@ -813,7 +813,7 @@ For each transaction (chronologically):
   (where Income/Transfer-In adds, Expense/Transfer-Out subtracts)
 ```
 
-## 📊 Calculation Module Structure
+## Calculation Module Structure
 
 All calculations are organized in a clean, modular structure:
 
@@ -871,7 +871,7 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - ✅ Well-documented with JSDoc comments
 - ✅ Type-safe with TypeScript
 
-## 📊 Dashboard Overview
+## Dashboard Overview
 
 ### Main Sections
 
@@ -929,7 +929,7 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - Large transaction alerts
 - Running balance throughout the period
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -952,7 +952,7 @@ const reimbursements = calculateTotalReimbursements(transactions);
 - Check Node.js version compatibility (>=20.0.0 required)
 - Clear pnpm cache: `pnpm store prune`
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
@@ -975,17 +975,17 @@ const reimbursements = calculateTotalReimbursements(transactions);
 | [claude-cost-optimizer](https://github.com/Sagargupta16/claude-cost-optimizer) | Save 30-60% on Claude Code costs - proven strategies and benchmarks |
 | [Contact Manager](https://github.com/Sagargupta16/Contact-Manager-Mern) | Full-stack MERN contact manager with CRUD and dark mode |
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 👤 Author
+## Author
 
 **Sagar Gupta**
 
 - GitHub: [@Sagargupta16](https://github.com/Sagargupta16)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with [Vite](https://vitejs.dev/)
 - Charts powered by [Chart.js](https://www.chartjs.org/)

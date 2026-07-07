@@ -24,7 +24,7 @@ pnpm format           # Biome format (100 char width, double quotes, 2-space ind
 pnpm build:analyze    # Build with bundle visualizer (ANALYZE=true)
 ```
 
-Tests exist in `src/lib/analytics/*.test.ts` but the test runner script is a placeholder (`pnpm test:run` echoes a message). Test framework is Vitest with @testing-library/react.
+Tests exist in `src/lib/analytics/*.test.ts` but the test runner script is a placeholder (`pnpm test:run` echoes a message). Test files are written for Vitest + @testing-library/react, but neither is declared in package.json yet.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ All computation happens in hooks/lib, not in components. Pages receive computed 
 ### Code Organization
 
 - **`src/app/App.tsx`** - Orchestrator: registers Chart.js, manages tab state, lazy-loads all 11 pages, wires data through hooks to pages via props
-- **`src/features/`** - Feature modules (analytics, budget, charts, kpi, transactions), each with components/, hooks/, and utils/
+- **`src/features/`** - Feature modules (analytics, budget, charts, kpi, transactions), each with components/ plus hooks/ and/or utils/
 - **`src/pages/`** - Lazy-loaded page components, one per tab
 - **`src/lib/`** - Core logic: calculations/, analytics/, formatters/, parsers/, charts/, validators/
 - **`src/store/financialStore.ts`** - Zustand store with localStorage persistence (only budgetPreferences persisted). Individual selector hooks exported (useTransactions, useLoading, etc.)
 - **`src/components/ui/`** - Shadcn/ui primitives (new-york style) + custom components
-- **`src/hooks/`** - Global hooks. `useDataProcessor.tsx` (355 lines) is the central data ingestion hook
-- **`src/types/index.ts`** - All TypeScript types (540+ lines)
+- **`src/hooks/`** - Global hooks. `useDataProcessor.tsx` (417 lines) is the central data ingestion hook
+- **`src/types/index.ts`** - All TypeScript types (~540 lines)
 - **`src/constants/index.ts`** - Tax slabs, budget defaults, account categorization keywords
 
 ### Path Aliases
@@ -58,23 +58,23 @@ Tab-based (not route-based). `App.tsx` manages `activeTab` state with `CustomTab
 
 ### Account Categorization Logic
 
-Keywords in `src/constants/index.ts` classify accounts into Cash (bank, upi, gpay, phonepe, paytm), Investments (grow, stock, mutual, zerodha -- excludes "fam"/"friend"), Deposits (friend, family, loan, property), and Debt (credit card with negative balance). This drives the net balance breakdown on the Overview page.
+Keywords in `categorizeAccount` (`src/lib/calculations/financial/netBalance.tsx`) classify accounts into Cash (bank, upi, gpay, phonepe, paytm), Investments (grow, stock, mutual, zerodha -- excludes "fam"/"friend"), Deposits (friend, family, loan, property), and Debt (credit card/credit/cc keywords; any account with a negative balance also counts as debt). This drives the net balance breakdown on the Overview page.
 
 ## Code Style
 
 - **Biome** handles both linting and formatting (no ESLint/Prettier)
 - `useImportType: error` -- use `import type` for type-only imports
-- Pre-commit hook runs `biome check --write` via husky + lint-staged
+- husky + lint-staged are configured (lint-staged runs `biome check --write`), but `.husky/pre-commit` was removed so no hook actually fires on commit
 - Functional components only, hooks for all logic
 - Heavy `useMemo`/`useCallback` in data computation hooks
 - Some files use `// @ts-nocheck` (OverviewPage, MainKPISection) -- legacy, avoid adding more
 
 ## Build Configuration
 
-Vite config uses async `defineConfig` to dynamically import the ESM-only `rollup-plugin-visualizer`. Manual chunk splitting: react-vendor, chart-vendor, d3-vendor, radix-vendor, icons, state-vendor, plus feature-based chunks (analytics, budget, charts). Console logs stripped in production via terser.
+Vite config uses async `defineConfig` to dynamically import the ESM-only `rollup-plugin-visualizer`. Manual chunk splitting: react-vendor, chart-vendor, d3-vendor, radix-vendor, icons, state-vendor, plus feature-based chunks (analytics, budget, charts). `terserOptions` are set to strip console logs, but `build.minify` is left at the esbuild default, so they currently have no effect.
 
 ## CI/CD
 
-- **CI** (.github/workflows/ci.yml): pnpm install --frozen-lockfile -> lint -> type-check -> test:run -> build
+- **CI** (.github/workflows/ci.yml): calls reusable workflows from `Sagargupta16/shared-workflows` -- node-ci.yml (install -> lint -> build; test step skipped since there is no `test` script) and security-scan.yml
 - **Deploy** (.github/workflows/deploy.yml): builds on push to main, deploys dist/ to GitHub Pages
-- **Renovate**: monthly grouped dependency updates (1st of month)
+- **Renovate**: monthly grouped dependency updates via the shared-workflows preset (25th of month, automerge on green CI)

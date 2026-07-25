@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import "./styles/index.css";
 import App from "./app/App";
 import EnhancedErrorBoundary from "./components/errors/EnhancedErrorBoundary";

@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+
+overrides:
+  "rollup@>=4.0.0 <4.59.0": ">=4.59.0"
+  "picomatch@<2.3.2": ">=2.3.2"
+  esbuild: ">=0.28.1"

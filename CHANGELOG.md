@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1] - 2026-09-02
+
+### Security
+- Bump postcss 8.5.22 -> 8.5.26 (GHSA-fxqj-rqcc-2cmp, Dependabot alert #40)
+- Bump nanoid 3.3.16 -> 3.3.18, transitive via postcss (GHSA-2v37-7h3g-55p8, Dependabot alert #41)
+
 ## [1.2.0] - 2026-04-08
 
 ### UI Modernization

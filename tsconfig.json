@@ -27,8 +27,12 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
 
-    /* Path aliases */
-    "baseUrl": ".",
+    /* Path aliases. No baseUrl on purpose: TypeScript 7 removed the option
+       (error TS5102), and it is not needed here. With baseUrl absent, "paths"
+       resolves relative to this file's directory, which is exactly what
+       baseUrl "." meant, so every mapping below behaves identically.
+       vite.config.ts keeps its own resolve.alias block; the two must stay in
+       sync when an alias is added or renamed. */
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],

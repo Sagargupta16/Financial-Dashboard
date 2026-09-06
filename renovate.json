@@ -1,1 +1,15 @@
-{"$schema":"https://docs.renovatebot.com/renovate-schema.json","extends":["github>Sagargupta16/shared-workflows"]}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>Sagargupta16/shared-workflows"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false,
+      "description": "Major updates are paused for this repo. Tailwind 4 moved the PostCSS plugin to @tailwindcss/postcss, so the build fails until postcss.config and the Tailwind entry CSS are migrated. Every narrower hold tried before this one just surfaced the next blocked major in the same grouped PR, so the monthly major stream was pure noise: it could not go green and it held nothing useful. Security updates are unaffected -- vulnerabilityAlerts runs on its own schedule and ignores packageRules. Minor and patch updates continue normally. Delete this rule once the Tailwind 4 PostCSS migration is done."
+    }
+  ]
+}
